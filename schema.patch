@@ -1,0 +1,19 @@
+diff --git a/packages/core/src/schema.rs b/packages/core/src/schema.rs
+index ee96e5c..36c3aa3 100644
+--- a/packages/core/src/schema.rs
++++ b/packages/core/src/schema.rs
+@@ -161,13 +161,13 @@ table! {
+ table! {
+     user (id) {
+         authId -> Nullable<Text>,
+         email -> Text,
+         firstName -> Nullable<Text>,
+         lastName -> Nullable<Text>,
+-        address -> Nullable<Jsonb>,
++        // address -> Nullable<Jsonb>,
+         photoURL -> Nullable<Text>,
+         role -> Nullable<Text>,
+         id -> Uuid,
+         phoneNumber -> Nullable<Text>,
+         accountId -> Nullable<Uuid>,
+     }
