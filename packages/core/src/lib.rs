@@ -6,10 +6,6 @@ mod schema;
 
 pub mod auth;
 
-pub use crate::database::establish_connection;
+pub use crate::database::connect;
 
 type Result<T> = std::result::Result<T, diesel::result::Error>;
-
-pub struct Context {
-    pub conn: diesel::PgConnection,
-}
