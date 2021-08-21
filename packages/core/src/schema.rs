@@ -164,7 +164,7 @@ table! {
         email -> Text,
         firstName -> Nullable<Text>,
         lastName -> Nullable<Text>,
-        // address -> Nullable<Jsonb>,
+        address -> Nullable<Jsonb>,
         photoURL -> Nullable<Text>,
         role -> Nullable<Text>,
         id -> Uuid,
