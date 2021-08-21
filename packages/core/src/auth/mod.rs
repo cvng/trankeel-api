@@ -1,6 +1,5 @@
-use crate::database::connect;
 use crate::schema::user;
-use crate::AuthId;
+use crate::Context;
 use crate::Result;
 use diesel::dsl::FindBy;
 use diesel::prelude::*;
@@ -23,8 +22,8 @@ pub struct Person {
 
 // # Queries
 
-pub fn first_by_auth_id(auth_id: &AuthId) -> Result<Person> {
-    by_auth_id(&auth_id.0).first(&connect())
+pub fn first_by_auth_id(ctx: &Context) -> Result<Person> {
+    by_auth_id(&ctx.auth_id.0).first(&ctx.db_pool.get().unwrap())
 }
 
 // # Utils
