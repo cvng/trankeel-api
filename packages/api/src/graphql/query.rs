@@ -1,4 +1,5 @@
 use crate::graphql::person::Person;
+use async_graphql::Context;
 use async_graphql::Result;
 use piteo_core as core;
 
@@ -7,8 +8,9 @@ pub struct Query;
 
 #[async_graphql::Object]
 impl Query {
-    async fn viewer(&self, auth_id: String) -> Result<Person> {
-        match core::auth::first_by_auth_id(&auth_id) {
+    async fn viewer(&self, ctx: &Context<'_>) -> Result<Person> {
+        let auth_id = ctx.data::<core::AuthId>()?;
+        match core::auth::first_by_auth_id(auth_id) {
             Ok(person) => Ok(person.into()),
             Err(err) => Err(map_err(err)),
         }
