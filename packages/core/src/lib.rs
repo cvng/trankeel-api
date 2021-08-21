@@ -6,6 +6,6 @@ mod schema;
 
 pub mod auth;
 
-pub use crate::database::connect;
+pub type Error = diesel::result::Error;
 
-type Result<T> = std::result::Result<T, diesel::result::Error>;
+pub type Result<T> = std::result::Result<T, Error>;
