@@ -85,7 +85,7 @@ table! {
 table! {
     property (id) {
         accountId -> Nullable<Uuid>,
-        address -> Jsonb,
+        // address -> Jsonb,
         buildPeriod -> Nullable<Text>,
         buildingLegalStatus -> Nullable<Text>,
         commonSpaces -> Nullable<Text>,
