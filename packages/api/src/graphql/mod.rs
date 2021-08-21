@@ -1,9 +1,10 @@
+mod person;
 mod query;
 
+use crate::graphql::query::Query;
 use async_graphql::EmptyMutation;
 use async_graphql::EmptySubscription;
 use async_graphql::Schema;
-use query::Query;
 
 /// Piteo GraphQL schema.
 pub type PiteoSchema = Schema<Query, EmptyMutation, EmptySubscription>;
