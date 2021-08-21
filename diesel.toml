@@ -1,0 +1,7 @@
+# For documentation on how to configure this file,
+# see diesel.rs/guides/configuring-diesel-cli
+
+[print_schema]
+file = "packages/core/src/schema.rs"
+filter = { except_tables = ["_prisma_migrations"] }
+# patch-file = "schema.patch"

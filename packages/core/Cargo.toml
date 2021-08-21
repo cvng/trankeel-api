@@ -1,9 +1,10 @@
 [package]
 name = "piteo-core"
 version = "0.1.0"
-authors = ["Cedric Vangout <mail@cvng.dev>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+diesel = { version = "1.4.7", features = ["postgres", "uuidv07"] }
+uuid = "0.8.2"
