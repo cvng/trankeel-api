@@ -1,5 +1,5 @@
 use crate::graphql::person::Person;
-use async_graphql::*;
+use async_graphql::Result;
 use piteo_core as core;
 
 /// Query object.
