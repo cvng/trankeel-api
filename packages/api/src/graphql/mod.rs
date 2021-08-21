@@ -17,6 +17,8 @@ pub type PiteoSchema = Schema<Query, EmptyMutation, EmptySubscription>;
 
 /// Build Piteo GraphQL schema. https://async-graphql.github.io
 pub fn build_schema() -> PiteoSchema {
+    dotenv::dotenv().ok();
+
     let context = Context::new(db_pool_from_env(), auth_id_from_env());
 
     Schema::build(Query, EmptyMutation, EmptySubscription)
