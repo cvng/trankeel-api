@@ -1,0 +1,56 @@
+use piteo_core as core;
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Property {
+    account_id: Option<String>,
+    build_period: Option<String>,
+    building_legal_status: Option<String>,
+    common_spaces: Option<String>,
+    energy_class: Option<String>,
+    equipments: Option<String>,
+    gas_emission: Option<String>,
+    heating_method: Option<String>,
+    housing_type: Option<String>,
+    name: String,
+    note: Option<String>,
+    ntic_equipments: Option<String>,
+    other_spaces: Option<String>,
+    tax: Option<f64>,
+    room_count: String,
+    status: Option<String>,
+    surface: i32,
+    tenant_private_spaces: Option<String>,
+    usage_type: Option<String>,
+    water_heating_method: Option<String>,
+    id: String,
+    lender_id: String,
+}
+
+impl From<core::properties::Property> for Property {
+    fn from(item: core::properties::Property) -> Self {
+        Self {
+            account_id: item.account_id.map(|id| id.to_string()),
+            build_period: item.build_period,
+            building_legal_status: item.building_legal_status,
+            common_spaces: item.common_spaces,
+            energy_class: item.energy_class,
+            equipments: item.equipments,
+            gas_emission: item.gas_emission,
+            heating_method: item.heating_method,
+            housing_type: item.housing_type,
+            name: item.name,
+            note: item.note,
+            ntic_equipments: item.ntic_equipments,
+            other_spaces: item.other_spaces,
+            tax: item.tax,
+            room_count: item.room_count,
+            status: item.status,
+            surface: item.surface,
+            tenant_private_spaces: item.tenant_private_spaces,
+            usage_type: item.usage_type,
+            water_heating_method: item.water_heating_method,
+            id: item.id.to_string(),
+            lender_id: item.lender_id.to_string(),
+        }
+    }
+}

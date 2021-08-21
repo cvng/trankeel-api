@@ -1,4 +1,5 @@
 mod person;
+mod property;
 mod query;
 
 use crate::graphql::query::Query;
