@@ -14,18 +14,6 @@ pub type Error = diesel::result::Error;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-/// Context
-pub struct Context {
-    auth_id: AuthId,
-    db_pool: DbPool,
-}
-
-impl Context {
-    pub fn new(db_pool: DbPool, auth_id: AuthId) -> Self {
-        Self { auth_id, db_pool }
-    }
-}
-
 /// Authentication ID
 pub struct AuthId(String);
 

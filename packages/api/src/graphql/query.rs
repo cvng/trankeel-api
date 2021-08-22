@@ -3,6 +3,10 @@ use crate::graphql::property::Property;
 use async_graphql::Context;
 use async_graphql::Result;
 use piteo_core as core;
+use piteo_core::auth;
+use piteo_core::properties;
+use piteo_core::AuthId;
+use piteo_core::DbPool;
 
 /// Query object.
 pub struct Query;
@@ -10,14 +14,14 @@ pub struct Query;
 #[async_graphql::Object]
 impl Query {
     async fn viewer(&self, ctx: &Context<'_>) -> Result<Person> {
-        match core::auth::first_by_auth_id(ctx.data::<core::Context>()?) {
+        match auth::first_by_auth_id(&ctx.data::<DbPool>()?.get()?, ctx.data::<AuthId>()?) {
             Ok(person) => Ok(person.into()),
             Err(err) => Err(map_err(err)),
         }
     }
 
     async fn properties(&self, ctx: &Context<'_>) -> Result<Vec<Property>> {
-        match core::properties::load_by_auth_id(ctx.data::<core::Context>()?) {
+        match properties::load_by_auth_id(&ctx.data::<DbPool>()?.get()?, ctx.data::<AuthId>()?) {
             Ok(properties) => Ok(map_vec(properties)),
             Err(err) => Err(map_err(err)),
         }

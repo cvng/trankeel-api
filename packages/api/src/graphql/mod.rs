@@ -3,12 +3,11 @@ mod property;
 mod query;
 
 use crate::graphql::query::Query;
+use async_graphql::extensions::ApolloTracing;
 use async_graphql::EmptyMutation;
 use async_graphql::EmptySubscription;
 use async_graphql::Schema;
 use piteo_core::build_connection_pool;
-use piteo_core::AuthId;
-use piteo_core::Context;
 use piteo_core::DbPool;
 use std::env;
 
@@ -16,24 +15,21 @@ use std::env;
 pub type PiteoSchema = Schema<Query, EmptyMutation, EmptySubscription>;
 
 /// Build Piteo GraphQL schema. https://async-graphql.github.io
-pub fn build_schema() -> PiteoSchema {
-    dotenv::dotenv().ok();
+pub fn build_schema() -> Result<PiteoSchema, String> {
+    let db_pool = db_pool_from_env()?;
 
-    let context = Context::new(db_pool_from_env(), auth_id_from_env());
+    let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
+        .extension(ApolloTracing)
+        .data(db_pool)
+        .finish();
 
-    Schema::build(Query, EmptyMutation, EmptySubscription)
-        .data(context)
-        .finish()
+    Ok(schema)
 }
 
-/// Try creating database pool from env in debug.
-fn db_pool_from_env() -> DbPool {
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+/// Build database pool from env.
+fn db_pool_from_env() -> Result<DbPool, String> {
+    let database_url =
+        env::var("DATABASE_URL").map_err(|err| format!("DATABASE_URL must be set: {}", err))?;
+
     build_connection_pool(&database_url)
-}
-
-/// Try reading authentication ID from env in debug.
-fn auth_id_from_env() -> AuthId {
-    let auth_id = env::var("FIREBASE_ADMIN_USER_ID").expect("FIREBASE_ADMIN_USER_ID must be set");
-    AuthId::new(&auth_id)
 }
