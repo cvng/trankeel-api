@@ -1,6 +1,7 @@
+use crate::database::Conn;
 use crate::schema::property;
 use crate::schema::user;
-use crate::Context;
+use crate::AuthId;
 use crate::Result;
 use diesel::prelude::*;
 
@@ -35,10 +36,10 @@ pub struct Property {
 
 // # Queries
 
-pub fn load_by_auth_id(ctx: &Context) -> Result<Vec<Property>> {
+pub fn load_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Vec<Property>> {
     property::table
         .select(property::all_columns)
         .left_join(user::table.on(user::accountId.eq(property::accountId)))
-        .filter(user::authId.eq(&ctx.auth_id.0))
-        .load(&ctx.db_pool.get().unwrap())
+        .filter(user::authId.eq(&auth_id.0))
+        .load(conn)
 }
