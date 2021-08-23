@@ -1,3 +1,5 @@
+use crate::error::Context;
+use crate::Result;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::r2d2::PooledConnection;
@@ -10,10 +12,10 @@ pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 pub type Conn = PooledConnection<ConnectionManager<PgConnection>>;
 
 /// Build connection pool.
-pub fn build_connection_pool(database_url: &str) -> Result<DbPool, String> {
+pub fn build_connection_pool(database_url: &str) -> Result<DbPool> {
     let manager = ConnectionManager::<PgConnection>::new(database_url);
 
     Pool::builder()
         .build(manager)
-        .map_err(|err| format!("Error connecting to {}: {}", database_url, err))
+        .context(format!("Error connecting to {}", database_url))
 }

@@ -5,20 +5,12 @@ mod database;
 mod schema;
 
 pub mod auth;
+pub mod error;
 pub mod properties;
 
-pub use database::build_connection_pool;
-pub use database::DbPool;
-
-pub type Error = diesel::result::Error;
-
-pub type Result<T> = std::result::Result<T, Error>;
-
-/// Authentication ID
-pub struct AuthId(String);
-
-impl AuthId {
-    pub fn new(auth_id: &str) -> Self {
-        Self(auth_id.into())
-    }
-}
+pub use crate::auth::AuthId;
+pub use crate::auth::Person;
+pub use crate::database::build_connection_pool;
+pub use crate::database::DbPool;
+pub use crate::error::eyre::Result;
+pub use crate::properties::Property;

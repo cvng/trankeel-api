@@ -6,5 +6,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+eyre = "0.6.5"
 diesel = { version = "1.4.7", features = ["postgres", "r2d2", "uuidv07"] }
 uuid = "0.8.2"
