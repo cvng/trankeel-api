@@ -2,8 +2,8 @@ use crate::database::Conn;
 use crate::schema::property;
 use crate::schema::user;
 use crate::AuthId;
-use crate::Result;
 use diesel::prelude::*;
+use eyre::Error;
 
 // # Models
 
@@ -36,7 +36,7 @@ pub struct Property {
 
 // # Queries
 
-pub fn load_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Vec<Property>> {
+pub fn load_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Vec<Property>, Error> {
     property::table
         .select(property::all_columns)
         .left_join(user::table.on(user::accountId.eq(property::accountId)))

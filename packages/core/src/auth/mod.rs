@@ -1,8 +1,8 @@
 use crate::database::Conn;
 use crate::schema::user;
-use crate::Result;
 use diesel::dsl::FindBy;
 use diesel::prelude::*;
+use eyre::Error;
 
 // # Models
 
@@ -31,7 +31,7 @@ pub struct Person {
 
 // # Queries
 
-pub fn first_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Person> {
+pub fn first_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Person, Error> {
     by_auth_id(auth_id).first(conn).map_err(|err| err.into())
 }
 

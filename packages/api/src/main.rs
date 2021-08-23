@@ -5,7 +5,7 @@ mod guards;
 mod routes;
 mod server;
 
-use piteo_core::Result;
+use color_eyre::Result;
 use rocket::launch;
 
 #[launch]

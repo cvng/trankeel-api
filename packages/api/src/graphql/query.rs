@@ -33,6 +33,6 @@ fn map_vec<T: Clone, U: From<T>>(vec: Vec<T>) -> Vec<U> {
     vec.iter().map(|item| item.clone().into()).collect()
 }
 
-fn map_err(err: piteo_core::error::Error) -> async_graphql::Error {
+fn map_err(err: piteo_core::Error) -> async_graphql::Error {
     async_graphql::Error::new(err.to_string())
 }
