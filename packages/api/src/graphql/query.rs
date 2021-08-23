@@ -2,7 +2,6 @@ use crate::graphql::person::Person;
 use crate::graphql::property::Property;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo_core;
 use piteo_core::auth;
 use piteo_core::properties;
 use piteo_core::AuthId;
