@@ -3,3 +3,7 @@ members = [
   "packages/api",
   "packages/core",
 ]
+
+# https://github.com/yaahc/color-eyre#improving-perf-on-debug-builds
+[profile.dev.package.backtrace]
+opt-level = 3

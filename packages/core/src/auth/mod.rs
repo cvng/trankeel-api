@@ -1,11 +1,19 @@
 use crate::database::Conn;
 use crate::schema::user;
-use crate::AuthId;
 use crate::Result;
 use diesel::dsl::FindBy;
 use diesel::prelude::*;
 
 // # Models
+
+/// Authentication ID
+pub struct AuthId(pub(crate) String);
+
+impl AuthId {
+    pub fn new(auth_id: &str) -> Self {
+        Self(auth_id.into())
+    }
+}
 
 #[derive(Queryable)]
 pub struct Person {
@@ -24,7 +32,7 @@ pub struct Person {
 // # Queries
 
 pub fn first_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Person> {
-    by_auth_id(auth_id).first(conn)
+    by_auth_id(auth_id).first(conn).map_err(|err| err.into())
 }
 
 // # Utils

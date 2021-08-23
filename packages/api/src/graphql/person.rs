@@ -1,5 +1,3 @@
-use piteo_core as core;
-
 #[derive(async_graphql::SimpleObject)]
 pub struct Person {
     auth_id: Option<String>,
@@ -13,8 +11,8 @@ pub struct Person {
     account_id: Option<String>,
 }
 
-impl From<core::auth::Person> for Person {
-    fn from(item: core::auth::Person) -> Self {
+impl From<piteo_core::Person> for Person {
+    fn from(item: piteo_core::Person) -> Self {
         Self {
             auth_id: item.auth_id,
             email: item.email,

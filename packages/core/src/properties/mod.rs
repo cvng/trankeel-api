@@ -42,4 +42,5 @@ pub fn load_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Vec<Property>> {
         .left_join(user::table.on(user::accountId.eq(property::accountId)))
         .filter(user::authId.eq(&auth_id.0))
         .load(conn)
+        .map_err(|err| err.into())
 }

@@ -1,5 +1,3 @@
-use piteo_core as core;
-
 #[derive(async_graphql::SimpleObject)]
 pub struct Property {
     account_id: Option<String>,
@@ -26,8 +24,8 @@ pub struct Property {
     lender_id: String,
 }
 
-impl From<core::properties::Property> for Property {
-    fn from(item: core::properties::Property) -> Self {
+impl From<piteo_core::Property> for Property {
+    fn from(item: piteo_core::Property) -> Self {
         Self {
             account_id: item.account_id.map(|id| id.to_string()),
             build_period: item.build_period,

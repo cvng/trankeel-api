@@ -2,7 +2,7 @@ use crate::graphql::person::Person;
 use crate::graphql::property::Property;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo_core as core;
+use piteo_core;
 use piteo_core::auth;
 use piteo_core::properties;
 use piteo_core::AuthId;
@@ -34,6 +34,6 @@ fn map_vec<T: Clone, U: From<T>>(vec: Vec<T>) -> Vec<U> {
     vec.iter().map(|item| item.clone().into()).collect()
 }
 
-fn map_err(err: core::Error) -> async_graphql::Error {
+fn map_err(err: piteo_core::error::Error) -> async_graphql::Error {
     async_graphql::Error::new(err.to_string())
 }
