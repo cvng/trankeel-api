@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": "true",
   "scripts": {
-    "start": "cargo run",
+    "start": "cargo watch -x run",
     "test": "cargo test",
     "lint": "cargo clippy",
     "fmt": "cargo fmt",
+    "migrate": "diesel migration run",
     "generate": "cargo run -p piteo-cli"
   }
 }

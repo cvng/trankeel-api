@@ -18,12 +18,12 @@ impl<'r> FromRequest<'r> for Token {
 
     async fn from_request(request: &'r rocket::Request<'_>) -> Outcome<Self, Self::Error> {
         match request.headers().get_one("authorization") {
-            Some(auth_id) => Outcome::Success(Self(AuthId::new(auth_id))),
+            Some(auth_id) => Outcome::Success(Self(AuthId::new(auth_id.into()))),
             None => {
                 // Fallback to authentication ID from env in debug.
                 if cfg!(debug_assertions) {
                     if let Ok(auth_id) = env::var("FIREBASE_ADMIN_USER_ID") {
-                        return Outcome::Success(Self(AuthId::new(auth_id.as_str())));
+                        return Outcome::Success(Self(AuthId::new(auth_id)));
                     }
                 }
                 Outcome::Failure((Status::Unauthorized, Error::Unauthorized))
