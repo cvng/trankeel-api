@@ -1,8 +1,5 @@
 [workspace]
-members = [
-  "packages/api",
-  "packages/core",
-]
+members = ["packages/*"]
 
 # https://github.com/yaahc/color-eyre#improving-perf-on-debug-builds
 [profile.dev.package.backtrace]

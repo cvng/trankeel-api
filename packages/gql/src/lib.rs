@@ -2,16 +2,19 @@ mod person;
 mod property;
 mod query;
 
-use crate::graphql::query::Query;
-use crate::Result;
+pub use async_graphql::http;
+
+use crate::query::Query;
 use async_graphql::extensions::ApolloTracing;
 use async_graphql::EmptyMutation;
 use async_graphql::EmptySubscription;
 use async_graphql::Schema;
-use color_eyre::eyre::Context;
 use piteo_core::build_connection_pool;
+use piteo_core::error::Context;
 use piteo_core::DbPool;
 use std::env;
+
+type Result<T> = std::result::Result<T, piteo_core::Error>;
 
 /// Piteo GraphQL schema.
 pub type PiteoSchema = Schema<Query, EmptyMutation, EmptySubscription>;

@@ -2,10 +2,10 @@
 extern crate diesel;
 
 mod database;
-mod error;
 mod schema;
 
 pub mod auth;
+pub mod error;
 pub mod properties;
 
 pub use crate::auth::AuthId;
