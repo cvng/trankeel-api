@@ -1,0 +1,12 @@
+{
+  "name": "piteo",
+  "version": "0.1.0",
+  "private": "true",
+  "scripts": {
+    "start": "cargo run",
+    "test": "cargo test",
+    "lint": "cargo clippy",
+    "fmt": "cargo fmt",
+    "generate": "cargo run -p piteo-cli"
+  }
+}
