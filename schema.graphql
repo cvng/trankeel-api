@@ -1,0 +1,42 @@
+type Person {
+	authId: String
+	email: String!
+	firstName: String
+	lastName: String
+	photoUrl: String
+	role: String
+	id: String!
+	phoneNumber: String
+	accountId: String
+}
+type Property {
+	accountId: String
+	buildPeriod: String
+	buildingLegalStatus: String
+	commonSpaces: String
+	energyClass: String
+	equipments: String
+	gasEmission: String
+	heatingMethod: String
+	housingType: String
+	name: String!
+	note: String
+	nticEquipments: String
+	otherSpaces: String
+	tax: Float
+	roomCount: String!
+	status: String
+	surface: Int!
+	tenantPrivateSpaces: String
+	usageType: String
+	waterHeatingMethod: String
+	id: String!
+	lenderId: String!
+}
+type Query {
+	viewer: Person!
+	properties: [Property!]!
+}
+schema {
+	query: Query
+}

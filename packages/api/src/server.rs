@@ -1,4 +1,3 @@
-use crate::graphql;
 use crate::routes::graphql_playground;
 use crate::routes::graphql_query;
 use crate::routes::graphql_request;
@@ -9,7 +8,7 @@ use rocket::Rocket;
 
 /// Build Piteo Web server. https://rocket.rs
 pub fn server() -> Result<Rocket<Build>> {
-    let schema = graphql::build_schema()?;
+    let schema = piteo_graphql::build_schema()?;
 
     let server = rocket::build().manage(schema).mount(
         "/",

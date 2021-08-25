@@ -1,16 +1,10 @@
 [package]
-name = "piteo-api"
+name = "piteo-graphql"
 version = "0.1.0"
 edition = "2018"
-default-run = "piteo-api"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 async-graphql = { version = "2.9.10", git = "https://github.com/async-graphql/async-graphql", features = ["apollo_tracing"] }
-async-graphql-rocket = { version = "2.0.8", git = "https://github.com/async-graphql/async-graphql" }
-dotenv = "0.15.0"
-color-eyre = "0.5.11"
 piteo-core = { path = "../core" }
-piteo-graphql = { path = "../gql" }
-rocket = { version = "0.5.0-rc.1", default-features = false }

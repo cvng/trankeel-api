@@ -1,5 +1,5 @@
-use crate::graphql::person::Person;
-use crate::graphql::property::Property;
+use crate::person::Person;
+use crate::property::Property;
 use async_graphql::Context;
 use async_graphql::Result;
 use piteo_core::auth;

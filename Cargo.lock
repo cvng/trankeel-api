@@ -1056,7 +1056,16 @@ dependencies = [
  "color-eyre",
  "dotenv",
  "piteo-core",
+ "piteo-graphql",
  "rocket",
+]
+
+[[package]]
+name = "piteo-cli"
+version = "0.1.0"
+dependencies = [
+ "dotenv",
+ "piteo-graphql",
 ]
 
 [[package]]
@@ -1066,6 +1075,14 @@ dependencies = [
  "diesel",
  "eyre",
  "uuid",
+]
+
+[[package]]
+name = "piteo-graphql"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "piteo-core",
 ]
 
 [[package]]

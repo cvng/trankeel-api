@@ -1,6 +1,5 @@
 //! Piteo.
 
-mod graphql;
 mod guards;
 mod routes;
 mod server;
