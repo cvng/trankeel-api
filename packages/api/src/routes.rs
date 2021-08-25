@@ -1,9 +1,9 @@
 use crate::guards::Token;
-use async_graphql::http::playground_source;
-use async_graphql::http::GraphQLPlaygroundConfig;
 use async_graphql_rocket::Query;
 use async_graphql_rocket::Request;
 use async_graphql_rocket::Response;
+use piteo_graphql::http::playground_source;
+use piteo_graphql::http::GraphQLPlaygroundConfig;
 use piteo_graphql::PiteoSchema;
 use rocket::get;
 use rocket::post;

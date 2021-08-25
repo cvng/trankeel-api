@@ -2,6 +2,8 @@ mod person;
 mod property;
 mod query;
 
+pub use async_graphql::http;
+
 use crate::query::Query;
 use async_graphql::extensions::ApolloTracing;
 use async_graphql::EmptyMutation;
