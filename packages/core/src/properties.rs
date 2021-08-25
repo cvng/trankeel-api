@@ -1,6 +1,7 @@
 use crate::database::Conn;
 use crate::schema::property;
 use crate::schema::user;
+use crate::Address;
 use crate::AuthId;
 use diesel::prelude::*;
 use eyre::Error;
@@ -10,7 +11,7 @@ use eyre::Error;
 #[derive(Clone, Queryable)]
 pub struct Property {
     pub account_id: Option<uuid::Uuid>,
-    // pub address: Jsonb,
+    pub address: Address,
     pub build_period: Option<String>,
     pub building_legal_status: Option<String>,
     pub common_spaces: Option<String>,
@@ -40,7 +41,7 @@ pub fn load_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Vec<Property>, E
     property::table
         .select(property::all_columns)
         .left_join(user::table.on(user::accountId.eq(property::accountId)))
-        .filter(user::authId.eq(&auth_id.0))
+        .filter(user::authId.eq(&auth_id.inner()))
         .load(conn)
         .map_err(|err| err.into())
 }

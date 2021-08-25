@@ -43,7 +43,6 @@ table! {
         accountId -> Uuid,
         depositAmount -> Nullable<Numeric>,
         effectDate -> Timestamp,
-        endedDate -> Nullable<Timestamp>,
         signatureDate -> Nullable<Timestamp>,
         rentAmount -> Numeric,
         rentChargesAmount -> Nullable<Numeric>,
@@ -53,6 +52,8 @@ table! {
         propertyId -> Uuid,
         id -> Uuid,
         data -> Nullable<Jsonb>,
+        expiredAt -> Nullable<Timestamp>,
+        renewDate -> Nullable<Timestamp>,
     }
 }
 
@@ -85,7 +86,7 @@ table! {
 table! {
     property (id) {
         accountId -> Nullable<Uuid>,
-        // address -> Jsonb,
+        address -> Jsonb,
         buildPeriod -> Nullable<Text>,
         buildingLegalStatus -> Nullable<Text>,
         commonSpaces -> Nullable<Text>,
@@ -123,6 +124,7 @@ table! {
         leaseId -> Uuid,
         receiptId -> Nullable<Uuid>,
         transactionId -> Nullable<Uuid>,
+        noticeId -> Nullable<Uuid>,
     }
 }
 
@@ -160,11 +162,11 @@ table! {
 
 table! {
     user (id) {
-        authId -> Nullable<Text>,
+        authId -> Text,
         email -> Text,
         firstName -> Nullable<Text>,
         lastName -> Nullable<Text>,
-        // address -> Nullable<Jsonb>,
+        address -> Nullable<Jsonb>,
         photoURL -> Nullable<Text>,
         role -> Nullable<Text>,
         id -> Uuid,
