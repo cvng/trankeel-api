@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "name": "piteo",
+      "path": "."
+    },
+    {
+      "name": "piteo-web",
+      "path": "packages/web"
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "matklad.rust-analyzer",
+      "graphql.vscode-graphql",
+      "dbaeumer.vscode-eslint"
+    ]
+  }
+}

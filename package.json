@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": "true",
   "scripts": {
-    "start": "cargo watch -x run",
-    "test": "cargo test",
+    "dev": "cargo watch -x run",
+    "build": "cargo build",
+    "start": "cargo run",
     "lint": "cargo clippy",
+    "test": "cargo test",
     "fmt": "cargo fmt",
-    "migrate": "diesel migration run",
-    "generate": "cargo run -p piteo-cli"
+    "generate": "cargo run -p piteo-cli",
+    "migrate": "diesel migration run"
   }
 }
