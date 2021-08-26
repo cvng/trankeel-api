@@ -1,0 +1,57 @@
+# Piteo GraphQL operations.
+
+################################################################################
+
+# Queries
+
+query Test {
+  __schema {
+    types {
+      name
+    }
+  }
+}
+
+#  User
+
+query User {
+  user: viewer {
+    id
+    email
+    firstName
+    lastName
+  }
+}
+
+# Property
+
+query PropertyList {
+  properties {
+    id
+    name
+    address {
+      city
+      line1
+      line2
+      postalCode
+    }
+    roomCount
+    note
+    surface
+    status
+    energyClass
+    gasEmission
+    tenantPrivateSpaces
+    equipments
+    nticEquipments
+    otherSpaces
+    commonSpaces
+    waterHeatingMethod
+    heatingMethod
+    tax
+    buildPeriod
+    housingType
+    buildingLegalStatus
+    usageType
+  }
+}

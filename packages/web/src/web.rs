@@ -1,3 +1,5 @@
+use std::process::Command;
+
 fn main() {
-  println!("Welcome to Next.js!");
+  Command::new("npx").arg("next").arg("start").status().ok();
 }
