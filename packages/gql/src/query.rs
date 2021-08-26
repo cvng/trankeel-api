@@ -1,5 +1,5 @@
-use crate::person::Person;
-use crate::property::Property;
+use crate::objects::Person;
+use crate::objects::Property;
 use async_graphql::Context;
 use async_graphql::Result;
 use piteo_core::person;
@@ -7,7 +7,6 @@ use piteo_core::properties;
 use piteo_core::AuthId;
 use piteo_core::DbPool;
 
-/// Query object.
 pub struct Query;
 
 #[async_graphql::Object]
