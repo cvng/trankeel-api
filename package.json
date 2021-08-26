@@ -7,7 +7,6 @@
     "build": "cargo build",
     "start": "cargo run",
     "lint": "cargo clippy",
-    "check": "cargo check",
     "test": "cargo test",
     "fmt": "cargo fmt",
     "generate": "cargo run -p piteo-cli",
