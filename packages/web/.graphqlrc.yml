@@ -1,0 +1,23 @@
+schema: ../../schema.graphql
+
+documents: ./src/**/*.graphql
+
+extensions:
+  codegen:
+    generates:
+      ./src/types.ts:
+        plugins:
+          - typescript
+          - typescript-operations
+          - typed-document-node
+        config:
+          declarationKind: interface
+          defaultScalarType: string
+    hooks:
+      afterAllFileWrite:
+        - prettier --write
+
+  endpoints:
+    default:
+      method: POST
+      url: "http://localhost:5000/graphql"

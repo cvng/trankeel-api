@@ -1,8 +1,8 @@
 [package]
-name = "piteo-api"
+name = "piteo"
 version = "0.1.0"
 edition = "2018"
-default-run = "piteo-api"
+default-run = "piteo"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
