@@ -1,5 +1,14 @@
+type Address {
+	city: String!
+	line1: String!
+	line2: String
+	postalCode: String!
+}
+type Mutation {
+	userCreateWithAccount: String!
+}
 type Person {
-	authId: String
+	authId: String!
 	email: String!
 	firstName: String
 	lastName: String
@@ -11,6 +20,7 @@ type Person {
 }
 type Property {
 	accountId: String
+	address: Address!
 	buildPeriod: String
 	buildingLegalStatus: String
 	commonSpaces: String
@@ -39,4 +49,5 @@ type Query {
 }
 schema {
 	query: Query
+	mutation: Mutation
 }

@@ -1,9 +1,24 @@
+// # Objects
+
 #[derive(async_graphql::SimpleObject)]
 pub struct Address {
     city: String,
     line1: String,
     line2: Option<String>,
     postal_code: String,
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Person {
+    auth_id: String,
+    email: String,
+    first_name: Option<String>,
+    last_name: Option<String>,
+    photo_url: Option<String>,
+    role: Option<String>,
+    id: String,
+    phone_number: Option<String>,
+    account_id: Option<String>,
 }
 
 #[derive(async_graphql::SimpleObject)]
@@ -33,6 +48,8 @@ pub struct Property {
     lender_id: String,
 }
 
+// # Impls
+
 impl From<piteo_core::Address> for Address {
     fn from(item: piteo_core::Address) -> Self {
         Self {
@@ -40,6 +57,22 @@ impl From<piteo_core::Address> for Address {
             line1: item.line1.unwrap_or_default(),
             line2: item.line2,
             postal_code: item.postal_code.unwrap_or_default(),
+        }
+    }
+}
+
+impl From<piteo_core::Person> for Person {
+    fn from(item: piteo_core::Person) -> Self {
+        Self {
+            auth_id: item.auth_id.inner().to_string(),
+            email: item.email,
+            first_name: item.first_name,
+            last_name: item.last_name,
+            photo_url: item.photo_url,
+            role: item.role,
+            id: item.id.to_string(),
+            phone_number: item.phone_number,
+            account_id: item.account_id.map(|id| id.to_string()),
         }
     }
 }
