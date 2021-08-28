@@ -1,6 +1,7 @@
+mod account;
 mod auth_id;
 mod person;
 
-pub use self::auth_id::AuthId;
-pub use self::person::first_by_auth_id;
-pub use self::person::Person;
+pub use crate::auth::auth_id::AuthId;
+pub use crate::auth::person::first_by_auth_id;
+pub use crate::auth::person::Person;
