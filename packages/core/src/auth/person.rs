@@ -27,7 +27,7 @@ pub struct Person {
 
 impl Person {
     pub fn display_name(&self) -> String {
-        LegalEntity::display_name(self)
+        self.to_string()
     }
 }
 
