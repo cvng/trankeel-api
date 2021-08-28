@@ -2,7 +2,7 @@ use diesel::deserialize::FromSql;
 use diesel::pg::Pg;
 use diesel::sql_types::Text;
 
-#[derive(FromSqlRow)]
+#[derive(Clone, FromSqlRow)]
 pub struct AuthId(String);
 
 impl AuthId {
@@ -12,6 +12,12 @@ impl AuthId {
 
     pub fn inner(&self) -> &str {
         &self.0
+    }
+}
+
+impl Default for AuthId {
+    fn default() -> Self {
+        Self(Default::default())
     }
 }
 

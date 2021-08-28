@@ -4,22 +4,48 @@ type Address {
 	line2: String
 	postalCode: String!
 }
+scalar AuthID
+scalar DateTime
+scalar Decimal
+type Lease {
+	accountId: ID!
+	depositAmount: Decimal
+	effectDate: DateTime!
+	signatureDate: DateTime
+	rentAmount: Decimal!
+	rentChargesAmount: Decimal
+	type: LeaseType!
+	leaseId: ID
+	propertyId: ID!
+	id: ID!
+	data: LeaseData
+	expiredAt: DateTime
+	renewDate: DateTime
+}
+type LeaseData {
+	duration: String
+	rentPaymentMethod: String
+}
+enum LeaseType {
+	FURNISHED
+	NAKED
+}
 type Mutation {
 	userCreateWithAccount: String!
 }
 type Person {
-	authId: String!
+	authId: AuthID!
 	email: String!
 	firstName: String
 	lastName: String
 	photoUrl: String
 	role: String
-	id: String!
+	id: ID!
 	phoneNumber: String
-	accountId: String
+	accountId: ID
 }
 type Property {
-	accountId: String
+	accountId: ID
 	address: Address!
 	buildPeriod: String
 	buildingLegalStatus: String
@@ -40,12 +66,30 @@ type Property {
 	tenantPrivateSpaces: String
 	usageType: String
 	waterHeatingMethod: String
-	id: String!
-	lenderId: String!
+	id: ID!
+	lenderId: ID!
 }
 type Query {
 	viewer: Person!
 	properties: [Property!]!
+	tenants: [Tenant!]!
+	leases: [Lease!]!
+}
+type Tenant {
+	accountId: ID!
+	apl: Boolean!
+	authId: AuthID
+	birthdate: DateTime!
+	birthplace: String
+	email: String!
+	firstName: String!
+	lastName: String!
+	note: String
+	phoneNumber: String
+	role: String
+	id: ID!
+	leaseId: ID
+	visaleId: String
 }
 schema {
 	query: Query

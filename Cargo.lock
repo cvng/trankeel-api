@@ -37,6 +37,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "arrayvec"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
+
+[[package]]
 name = "async-graphql"
 version = "2.9.10"
 source = "git+https://github.com/async-graphql/async-graphql#f2e7c1a80ce148d9f9c3b596fa3ae7729fbcee3a"
@@ -192,6 +198,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4521f3e3d031370679b3b140beb36dfe4801b09ac77e30c61941f97df3ef28b"
 
 [[package]]
+name = "bigdecimal"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1374191e2dd25f9ae02e3aa95041ed5d747fc77b3c102b49fe2dd9a8117a6244"
+dependencies = [
+ "num-bigint",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
 name = "binascii"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -272,6 +289,7 @@ dependencies = [
  "libc",
  "num-integer",
  "num-traits",
+ "serde",
  "time 0.1.43",
  "winapi",
 ]
@@ -394,9 +412,14 @@ version = "1.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bba51ca66f57261fd17cadf8b73e4775cc307d0521d855de3f5de91a8f074e0e"
 dependencies = [
+ "bigdecimal",
  "bitflags",
  "byteorder",
+ "chrono",
  "diesel_derives",
+ "num-bigint",
+ "num-integer",
+ "num-traits",
  "pq-sys",
  "r2d2",
  "serde_json",
@@ -884,6 +907,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "num-bigint"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "090c7f9998ee0ff65aa5b723e4009f7b217707f1fb5ea551329cc4d6231fb304"
+dependencies = [
+ "autocfg",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
 name = "num-integer"
 version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1072,8 +1106,10 @@ dependencies = [
 name = "piteo-core"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "diesel",
  "eyre",
+ "rust_decimal",
  "serde",
  "serde_json",
  "uuid",
@@ -1085,6 +1121,7 @@ version = "0.1.0"
 dependencies = [
  "async-graphql",
  "piteo-core",
+ "serde",
 ]
 
 [[package]]
@@ -1345,6 +1382,18 @@ dependencies = [
  "time 0.2.27",
  "tokio",
  "uncased",
+]
+
+[[package]]
+name = "rust_decimal"
+version = "1.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c5446d1cf2dfe2d6367c8b27f2082bdf011e60e76fa1fcd140047f535156d6e7"
+dependencies = [
+ "arrayvec",
+ "diesel",
+ "num-traits",
+ "serde",
 ]
 
 [[package]]
