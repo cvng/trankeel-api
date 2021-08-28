@@ -84,20 +84,25 @@ pub struct Person {
     email: String,
     first_name: Option<String>,
     last_name: Option<String>,
+    address: Option<Address>,
+    #[graphql(name = "photoURL")]
     photo_url: Option<String>,
     role: Option<String>,
     id: ID,
     phone_number: Option<String>,
     account_id: Option<ID>,
+    display_name: String,
 }
 
 impl From<piteo_core::Person> for Person {
     fn from(item: piteo_core::Person) -> Self {
         Self {
+            display_name: item.display_name(),
             auth_id: item.auth_id.into(),
             email: item.email,
             first_name: item.first_name,
             last_name: item.last_name,
+            address: item.address.map(Address::from),
             photo_url: item.photo_url,
             role: item.role,
             id: item.id.into(),
