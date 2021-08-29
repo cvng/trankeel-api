@@ -1,4 +1,4 @@
-use crate::guards::Token;
+use crate::guards::AuthGuard;
 use async_graphql_rocket::Query;
 use async_graphql_rocket::Request;
 use async_graphql_rocket::Response;
@@ -16,7 +16,11 @@ pub fn graphql_playground() -> content::Html<String> {
 }
 
 #[get("/graphql?<query..>")]
-pub async fn graphql_query(schema: &State<PiteoSchema>, query: Query, _token: Token) -> Response {
+pub async fn graphql_query(
+    schema: &State<PiteoSchema>,
+    query: Query,
+    _auth: AuthGuard,
+) -> Response {
     query.execute(schema).await
 }
 
@@ -24,8 +28,8 @@ pub async fn graphql_query(schema: &State<PiteoSchema>, query: Query, _token: To
 pub async fn graphql_request(
     schema: &State<PiteoSchema>,
     request: Request,
-    token: Token,
+    auth: AuthGuard,
 ) -> Response {
-    let request = request.data(token.0);
+    let request = request.data(auth.inner());
     request.execute(schema).await
 }
