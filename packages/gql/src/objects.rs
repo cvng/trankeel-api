@@ -1,11 +1,50 @@
 use crate::enums::LeaseType;
 use crate::enums::RentStatus;
+use crate::query::map_err;
 use crate::scalars::AuthId;
 use crate::scalars::DateTime;
 use crate::scalars::Decimal;
+use async_graphql::Result;
 use async_graphql::ID;
+use async_graphql::*;
+use piteo_core::auth;
+use piteo_core::DbPool;
+use std::convert::TryInto;
 
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_simple_object.html
+
+#[derive(async_graphql::SimpleObject)]
+#[graphql(complex)]
+pub struct Account {
+    plan_id: Option<ID>,
+    status: Option<String>,
+    stripe_customer_id: Option<String>,
+    stripe_subscription_id: Option<String>,
+    trial_end: Option<DateTime>,
+    owner_id: String,
+    id: ID,
+}
+
+#[async_graphql::ComplexObject]
+impl Account {
+    async fn plan(&self, _ctx: &Context<'_>) -> Result<Option<Plan>> {
+        Ok(None)
+    }
+}
+
+impl From<piteo_core::Account> for Account {
+    fn from(item: piteo_core::Account) -> Self {
+        Self {
+            plan_id: item.plan_id.map(ID::from),
+            status: item.status,
+            stripe_customer_id: item.stripe_customer_id,
+            stripe_subscription_id: item.stripe_subscription_id,
+            trial_end: item.trial_end.map(DateTime::from),
+            owner_id: item.owner_id,
+            id: item.id.into(),
+        }
+    }
+}
 
 #[derive(async_graphql::SimpleObject)]
 pub struct Address {
@@ -79,32 +118,59 @@ impl From<piteo_core::LeaseData> for LeaseData {
 }
 
 #[derive(async_graphql::SimpleObject)]
+#[graphql(complex)]
 pub struct Person {
     auth_id: AuthId,
     email: String,
     first_name: Option<String>,
     last_name: Option<String>,
+    address: Option<Address>,
+    #[graphql(name = "photoURL")]
     photo_url: Option<String>,
     role: Option<String>,
     id: ID,
     phone_number: Option<String>,
-    account_id: Option<ID>,
+    account_id: ID,
+    display_name: String,
+}
+
+#[async_graphql::ComplexObject]
+impl Person {
+    async fn account(&self, ctx: &Context<'_>) -> Result<Account> {
+        let account_id = self.account_id.clone();
+
+        match auth::find_by_id(&ctx.data::<DbPool>()?.get()?, account_id.try_into()?) {
+            Ok(account) => Ok(account.into()),
+            Err(err) => Err(map_err(err)),
+        }
+    }
 }
 
 impl From<piteo_core::Person> for Person {
     fn from(item: piteo_core::Person) -> Self {
         Self {
+            display_name: item.display_name(),
             auth_id: item.auth_id.into(),
             email: item.email,
             first_name: item.first_name,
             last_name: item.last_name,
+            address: item.address.map(Address::from),
             photo_url: item.photo_url,
             role: item.role,
             id: item.id.into(),
             phone_number: item.phone_number,
-            account_id: item.account_id.map(ID::from),
+            account_id: item.account_id.unwrap_or_default().into(),
         }
     }
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Plan {
+    code: String,
+    price: Option<Decimal>,
+    subtitle: Option<String>,
+    title: Option<String>,
+    id: ID,
 }
 
 #[derive(async_graphql::SimpleObject)]

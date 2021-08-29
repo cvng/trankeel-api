@@ -1,4 +1,4 @@
 pub mod tenant;
 
-pub use self::tenant::load_by_auth_id;
-pub use self::tenant::Tenant;
+pub use crate::tenants::tenant::load_by_auth_id;
+pub use crate::tenants::tenant::Tenant;

@@ -25,6 +25,14 @@ pub struct Person {
     pub account_id: Option<uuid::Uuid>,
 }
 
+impl Person {
+    pub fn display_name(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl LegalEntity for Person {}
+
 impl Display for Person {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -40,8 +48,6 @@ impl Display for Person {
         )
     }
 }
-
-impl LegalEntity for Person {}
 
 // # Queries
 

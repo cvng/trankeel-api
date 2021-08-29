@@ -6,6 +6,7 @@ mod database;
 mod schema;
 
 pub mod auth;
+pub mod billing;
 pub mod error;
 pub mod leases;
 pub mod properties;
@@ -14,8 +15,10 @@ pub mod tenants;
 pub use chrono;
 pub use decimal;
 
+pub use crate::auth::Account;
 pub use crate::auth::AuthId;
 pub use crate::auth::Person;
+pub use crate::billing::Plan;
 pub use crate::common::Address;
 pub use crate::database::build_connection_pool;
 pub use crate::database::DbPool;
