@@ -1,3 +1,13 @@
+type Account {
+	planId: ID
+	status: String
+	stripeCustomerId: String
+	stripeSubscriptionId: String
+	trialEnd: DateTime
+	ownerId: String!
+	id: ID!
+	plan: Plan
+}
 type Address {
 	city: String!
 	line1: String!
@@ -38,11 +48,21 @@ type Person {
 	email: String!
 	firstName: String
 	lastName: String
-	photoUrl: String
+	address: Address
+	photoURL: String
 	role: String
 	id: ID!
 	phoneNumber: String
-	accountId: ID
+	accountId: ID!
+	displayName: String!
+	account: Account!
+}
+type Plan {
+	code: String!
+	price: Decimal
+	subtitle: String
+	title: String
+	id: ID!
 }
 type Property {
 	accountId: ID
