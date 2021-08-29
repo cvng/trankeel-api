@@ -2,6 +2,7 @@ use piteo_core::AuthId;
 use rocket::http::Status;
 use rocket::request::FromRequest;
 use rocket::request::Outcome;
+use rocket::Request;
 use serde::Deserialize;
 use serde::Serialize;
 use std::env;
@@ -37,7 +38,7 @@ impl AuthGuard {
 impl<'r> FromRequest<'r> for AuthGuard {
     type Error = Error;
 
-    async fn from_request(request: &'r rocket::Request<'_>) -> Outcome<Self, Self::Error> {
+    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let maybe_token = request.headers().get_one("authorization");
 
         let auth_id = match maybe_token {
