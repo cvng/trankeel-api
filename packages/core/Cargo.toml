@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 diesel = { version = "1.4.7", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }
 eyre = "0.6.5"
-rust_chrono = { package = "chrono", version = "0.4", features = ["serde"] }
+rust_chrono = { package = "chrono", version = "0.4.19", features = ["serde"] }
 rust_decimal = { package = "rust_decimal", version = "1.15", features = ["db-diesel-postgres"] }
 rust_uuid = { package = "uuid", version = "0.8.2" }
 serde = "1.0"
