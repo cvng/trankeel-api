@@ -27,7 +27,13 @@ pub struct Person {
 
 impl Person {
     pub fn display_name(&self) -> String {
-        self.to_string()
+        [&self.first_name, &self.last_name]
+            .iter()
+            .filter_map(|&v| v.clone())
+            .collect::<Vec<String>>()
+            .join(" ")
+            .trim()
+            .to_string()
     }
 }
 
@@ -35,17 +41,7 @@ impl LegalEntity for Person {}
 
 impl Display for Person {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            [&self.first_name, &self.last_name]
-                .iter()
-                .filter_map(|&v| v.clone())
-                .collect::<Vec<String>>()
-                .join(" ")
-                .trim()
-                .to_string()
-        )
+        write!(f, "{}", &self.display_name())
     }
 }
 

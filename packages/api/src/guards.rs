@@ -44,7 +44,7 @@ impl<'r> FromRequest<'r> for AuthGuard {
         let auth_id = match maybe_token {
             Some(token) => {
                 // Verify ID token from request in production (release).
-                match jsonwebtoken::dangerous_insecure_decode::<DecodedIdToken>(&token) {
+                match jsonwebtoken::dangerous_insecure_decode::<DecodedIdToken>(token) {
                     Ok(data) => data.claims.sub,
                     _ => return Outcome::Failure((Status::Unauthorized, Error::Invalid)),
                 }
@@ -58,6 +58,6 @@ impl<'r> FromRequest<'r> for AuthGuard {
             }
         };
 
-        Outcome::Success(Self(AuthId::new(auth_id.into())))
+        Outcome::Success(Self(AuthId::new(auth_id)))
     }
 }

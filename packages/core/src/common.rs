@@ -1,24 +1,59 @@
+use crate::locale;
 use diesel::deserialize;
 use diesel::deserialize::FromSql;
 use diesel::pg::Pg;
 use diesel::sql_types::Jsonb;
 use serde::Deserialize;
 use serde::Serialize;
+use std::fmt;
 use std::fmt::Display;
 
-pub trait LegalEntity: Display {
-    fn display_name(&self) -> String {
-        self.to_string()
-    }
-}
+pub trait LegalEntity: Display {}
 
 #[derive(Clone, Serialize, Deserialize, Debug, FromSqlRow)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
     pub city: Option<String>,
+    pub country: Option<String>,
     pub line1: Option<String>,
     pub line2: Option<String>,
     pub postal_code: Option<String>,
+}
+
+impl Address {
+    pub fn inline(&self) -> String {
+        [
+            &self.line1,
+            &self.line2,
+            &self.postal_code,
+            &self.city,
+            &self.country,
+        ]
+        .iter()
+        .filter_map(|&v| v.clone())
+        .collect::<Vec<String>>()
+        .join(", ")
+        .trim()
+        .to_string()
+    }
+}
+
+impl Display for Address {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.inline())
+    }
+}
+
+impl Default for Address {
+    fn default() -> Self {
+        Self {
+            city: Default::default(),
+            country: Some(locale::DEFAULT_COUNTRY.into()),
+            line1: Default::default(),
+            line2: Default::default(),
+            postal_code: Default::default(),
+        }
+    }
 }
 
 impl FromSql<Jsonb, Pg> for Address {

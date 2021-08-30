@@ -12,6 +12,10 @@ scalar!(DateTime);
 
 scalar!(Decimal);
 
+scalar!(Email);
+
+scalar!(PhoneNumber);
+
 #[derive(Serialize, Deserialize)]
 pub struct AuthId(String);
 
@@ -38,3 +42,9 @@ impl From<decimal::Decimal> for Decimal {
         Self(item)
     }
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct Email(String);
+
+#[derive(Serialize, Deserialize)]
+pub struct PhoneNumber(String);

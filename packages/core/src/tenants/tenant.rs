@@ -5,6 +5,13 @@ use crate::AuthId;
 use diesel::prelude::*;
 use eyre::Error;
 
+pub enum TenantStatus {
+    Gone,
+    Late,
+    New,
+    Uptodate,
+}
+
 // # Models
 
 #[derive(Clone, Queryable)]
@@ -27,11 +34,24 @@ pub struct Tenant {
 
 // # Queries
 
-pub fn load_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Vec<Tenant>, Error> {
-    tenant::table
+pub fn load_by_auth_id(
+    conn: &Conn,
+    auth_id: &AuthId,
+    id: Option<uuid::Uuid>,
+) -> Result<Vec<Tenant>, Error> {
+    let auth_id = auth_id.clone();
+
+    let query = tenant::table
         .select(tenant::all_columns)
         .left_join(user::table.on(user::accountId.eq(tenant::accountId.nullable())))
-        .filter(user::authId.eq(&auth_id.inner()))
-        .load(conn)
-        .map_err(|err| err.into())
+        .filter(user::authId.eq(auth_id.inner()));
+
+    if let Some(id) = id {
+        return query
+            .filter(tenant::id.eq(id))
+            .load(conn)
+            .map_err(|err| err.into());
+    }
+
+    query.load(conn).map_err(|err| err.into())
 }
