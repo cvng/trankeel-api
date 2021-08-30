@@ -1,6 +1,5 @@
 use async_graphql::scalar;
-use piteo_core::chrono;
-use piteo_core::decimal;
+use piteo_core::Amount;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -26,19 +25,19 @@ impl From<piteo_core::AuthId> for AuthId {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct DateTime(chrono::NaiveDateTime);
+pub struct DateTime(piteo_core::DateTime);
 
-impl From<chrono::NaiveDateTime> for DateTime {
-    fn from(item: chrono::NaiveDateTime) -> Self {
+impl From<piteo_core::DateTime> for DateTime {
+    fn from(item: piteo_core::DateTime) -> Self {
         Self(item)
     }
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Decimal(decimal::Decimal);
+pub struct Decimal(Amount);
 
-impl From<decimal::Decimal> for Decimal {
-    fn from(item: decimal::Decimal) -> Self {
+impl From<Amount> for Decimal {
+    fn from(item: Amount) -> Self {
         Self(item)
     }
 }

@@ -3,6 +3,7 @@ use crate::database::Conn;
 use crate::schema::user;
 use crate::Address;
 use crate::AuthId;
+use crate::Id;
 use diesel::dsl::FindBy;
 use diesel::prelude::*;
 use eyre::Error;
@@ -20,9 +21,9 @@ pub struct Person {
     pub address: Option<Address>,
     pub photo_url: Option<String>,
     pub role: Option<String>,
-    pub id: uuid::Uuid,
+    pub id: Id,
     pub phone_number: Option<String>,
-    pub account_id: Option<uuid::Uuid>,
+    pub account_id: Option<Id>,
 }
 
 impl Person {
