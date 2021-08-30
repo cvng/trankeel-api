@@ -262,6 +262,7 @@ type Tenant {
 	email: String!
 	firstName: String!
 	lastName: String!
+	displayName: String!
 	note: String
 	phoneNumber: String
 	role: String
@@ -273,7 +274,6 @@ type Tenant {
 	status: TenantStatus!
 	fullName: String!
 	shortName: String!
-	displayName: String!
 	lastTransaction: Transaction
 	propertyName: String
 	rentPayedThisYear: String
