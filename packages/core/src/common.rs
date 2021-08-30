@@ -8,7 +8,31 @@ use serde::Serialize;
 use std::fmt;
 use std::fmt::Display;
 
-pub trait LegalEntity: Display {}
+pub trait Name {
+    fn first_name(&self) -> String;
+
+    fn last_name(&self) -> String;
+
+    fn full_name(&self) -> String {
+        self.display_name()
+    }
+
+    fn short_name(&self) -> String {
+        self.display_name()
+    }
+
+    fn display_name(&self) -> String {
+        [&self.first_name(), &self.last_name()]
+            .iter()
+            .filter_map(|&v| Some(v.clone()))
+            .collect::<Vec<String>>()
+            .join(" ")
+            .trim()
+            .to_string()
+    }
+}
+
+pub trait LegalEntity {}
 
 pub type Id = rust_uuid::Uuid;
 

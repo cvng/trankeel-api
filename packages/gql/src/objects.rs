@@ -13,6 +13,7 @@ use async_graphql::ID;
 use async_graphql::*;
 use piteo_core::auth;
 use piteo_core::DbPool;
+use piteo_core::Name;
 use std::convert::TryInto;
 
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_simple_object.html
@@ -448,6 +449,7 @@ pub struct Tenant {
     email: String,
     first_name: String,
     last_name: String,
+    display_name: String,
     note: Option<String>,
     phone_number: Option<String>,
     role: Option<String>,
@@ -460,7 +462,6 @@ pub struct Tenant {
     status: TenantStatus,
     full_name: String,
     short_name: String,
-    display_name: String,
     last_transaction: Option<Transaction>,
     property_name: Option<String>,
     rent_payed_this_year: Option<String>,
@@ -472,6 +473,8 @@ pub struct Tenant {
 impl From<piteo_core::Tenant> for Tenant {
     fn from(item: piteo_core::Tenant) -> Self {
         Self {
+            display_name: item.display_name(),
+            full_name: item.full_name(),
             account_id: item.account_id.into(),
             apl: item.apl,
             auth_id: item.auth_id.map(AuthId::from),
@@ -489,9 +492,7 @@ impl From<piteo_core::Tenant> for Tenant {
             account: None,
             property: None,
             status: TenantStatus::New,
-            full_name: String::new(),
             short_name: String::new(),
-            display_name: String::new(),
             last_transaction: None,
             property_name: None,
             rent_payed_this_year: None,

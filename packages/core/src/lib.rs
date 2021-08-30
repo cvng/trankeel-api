@@ -23,6 +23,7 @@ pub use crate::common::Address;
 pub use crate::common::Amount;
 pub use crate::common::DateTime;
 pub use crate::common::Id;
+pub use crate::common::Name;
 pub use crate::database::build_connection_pool;
 pub use crate::database::DbPool;
 pub use crate::error::Error;
