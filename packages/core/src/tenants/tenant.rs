@@ -1,3 +1,4 @@
+use crate::common::Name;
 use crate::database::Conn;
 use crate::schema::tenant;
 use crate::schema::user;
@@ -32,6 +33,16 @@ pub struct Tenant {
     pub id: Id,
     pub lease_id: Option<Id>,
     pub visale_id: Option<String>,
+}
+
+impl Name for Tenant {
+    fn first_name(&self) -> String {
+        self.first_name.clone()
+    }
+
+    fn last_name(&self) -> String {
+        self.last_name.clone()
+    }
 }
 
 // # Queries

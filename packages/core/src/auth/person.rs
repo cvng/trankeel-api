@@ -4,6 +4,7 @@ use crate::schema::user;
 use crate::Address;
 use crate::AuthId;
 use crate::Id;
+use crate::Name;
 use diesel::dsl::FindBy;
 use diesel::prelude::*;
 use eyre::Error;
@@ -26,15 +27,13 @@ pub struct Person {
     pub account_id: Option<Id>,
 }
 
-impl Person {
-    pub fn display_name(&self) -> String {
-        [&self.first_name, &self.last_name]
-            .iter()
-            .filter_map(|&v| v.clone())
-            .collect::<Vec<String>>()
-            .join(" ")
-            .trim()
-            .to_string()
+impl Name for Person {
+    fn first_name(&self) -> String {
+        self.first_name.clone().unwrap_or_default()
+    }
+
+    fn last_name(&self) -> String {
+        self.last_name.clone().unwrap_or_default()
     }
 }
 

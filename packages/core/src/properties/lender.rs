@@ -21,7 +21,7 @@ pub struct Lender {
 
 impl Lender {
     pub fn display_name(&self) -> String {
-        "".to_string()
+        Default::default()
     }
 }
 

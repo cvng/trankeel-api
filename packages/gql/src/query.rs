@@ -1,10 +1,14 @@
 use crate::enums::TenantStatus;
+use crate::objects::File;
+use crate::objects::Invoice;
 use crate::objects::Lease;
 use crate::objects::Lender;
 use crate::objects::Person;
+use crate::objects::Plan;
 use crate::objects::Property;
 use crate::objects::Summary;
 use crate::objects::Tenant;
+use crate::objects::Transaction;
 use crate::scalars::DateTime;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -88,6 +92,22 @@ impl Query {
         let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
 
         Ok(properties::all_lenders(&conn, auth_id, id).and_then(map_res)?)
+    }
+
+    async fn transactions(&self, _ctx: &Context<'_>, _id: Option<ID>) -> Result<Vec<Transaction>> {
+        Ok(Vec::new())
+    }
+
+    async fn invoices(&self, _ctx: &Context<'_>) -> Result<Vec<Invoice>> {
+        Ok(Vec::new())
+    }
+
+    async fn plans(&self, _ctx: &Context<'_>) -> Result<Vec<Plan>> {
+        Ok(Vec::new())
+    }
+
+    async fn files(&self, _ctx: &Context<'_>) -> Result<Vec<File>> {
+        Ok(Vec::new())
     }
 }
 
