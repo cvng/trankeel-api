@@ -95,7 +95,7 @@ pub struct File {
     filename: Option<String>,
     preview_url: Option<String>,
     status: Option<String>,
-    r#type_: String,
+    r#type: String,
     updated_at: Option<DateTime>,
     id: ID,
 }

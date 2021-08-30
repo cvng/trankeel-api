@@ -5,7 +5,7 @@ pub struct File {
     pub filename: Option<String>,
     pub preview_url: Option<String>,
     pub status: Option<String>,
-    pub r#type_: String,
+    pub r#type: String,
     pub updated_at: Option<chrono::NaiveDateTime>,
     pub id: uuid::Uuid,
 }
