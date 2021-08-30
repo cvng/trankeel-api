@@ -2,7 +2,6 @@ use crate::enums::LeaseStatus;
 use crate::enums::LeaseType;
 use crate::enums::RentStatus;
 use crate::enums::TenantStatus;
-use crate::query::map_err;
 use crate::scalars::AuthId;
 use crate::scalars::DateTime;
 use crate::scalars::Decimal;
@@ -215,7 +214,7 @@ impl Person {
 
         match auth::find_by_id(&ctx.data::<DbPool>()?.get()?, account_id.try_into()?) {
             Ok(account) => Ok(account.into()),
-            Err(err) => Err(map_err(err)),
+            Err(err) => Err(err.into()),
         }
     }
 }

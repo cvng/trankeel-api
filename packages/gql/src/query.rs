@@ -23,10 +23,10 @@ pub struct Query;
 #[async_graphql::Object]
 impl Query {
     async fn viewer(&self, ctx: &Context<'_>) -> Result<Person> {
-        match auth::first_by_auth_id(&ctx.data::<DbPool>()?.get()?, ctx.data::<AuthId>()?) {
-            Ok(person) => Ok(person.into()),
-            Err(err) => Err(map_err(err)),
-        }
+        let conn = ctx.data::<DbPool>()?.get()?;
+        let auth_id = ctx.data::<AuthId>()?;
+
+        Ok(auth::find(&conn, auth_id).map(Person::from)?)
     }
 
     async fn properties(
@@ -35,14 +35,11 @@ impl Query {
         id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Property>> {
-        match properties::load_by_auth_id(
-            &ctx.data::<DbPool>()?.get()?,
-            ctx.data::<AuthId>()?,
-            id.map(|id| Id::parse_str(&id).unwrap_or_default()),
-        ) {
-            Ok(properties) => Ok(map_vec(properties)),
-            Err(err) => Err(map_err(err)),
-        }
+        let conn = ctx.data::<DbPool>()?.get()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
+
+        Ok(properties::all_properties(&conn, auth_id, id).and_then(map_res)?)
     }
 
     async fn summary(
@@ -51,10 +48,7 @@ impl Query {
         _since: Option<DateTime>,
         _until: Option<DateTime>,
     ) -> Result<Summary> {
-        match reports::get_summary() {
-            Ok(summary) => Ok(summary.into()),
-            Err(err) => Err(map_err(err)),
-        }
+        Ok(reports::get_summary().map(Summary::from)?)
     }
 
     async fn tenants(
@@ -64,14 +58,11 @@ impl Query {
         _query: Option<String>,
         _status: Option<TenantStatus>,
     ) -> Result<Vec<Tenant>> {
-        match tenants::load_by_auth_id(
-            &ctx.data::<DbPool>()?.get()?,
-            ctx.data::<AuthId>()?,
-            id.map(|id| Id::parse_str(&id).unwrap_or_default()),
-        ) {
-            Ok(tenants) => Ok(map_vec(tenants)),
-            Err(err) => Err(map_err(err)),
-        }
+        let conn = ctx.data::<DbPool>()?.get()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
+
+        Ok(tenants::all_tenants(&conn, auth_id, id).and_then(map_res)?)
     }
 
     async fn leases(
@@ -80,10 +71,10 @@ impl Query {
         _id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Lease>> {
-        match leases::load_by_auth_id(&ctx.data::<DbPool>()?.get()?, ctx.data::<AuthId>()?) {
-            Ok(leases) => Ok(map_vec(leases)),
-            Err(err) => Err(map_err(err)),
-        }
+        let conn = ctx.data::<DbPool>()?.get()?;
+        let auth_id = ctx.data::<AuthId>()?;
+
+        Ok(leases::all_leases(&conn, auth_id).and_then(map_res)?)
     }
 
     async fn lenders(
@@ -92,23 +83,20 @@ impl Query {
         id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Lender>> {
-        match properties::load_lenders_by_auth_id(
-            &ctx.data::<DbPool>()?.get()?,
-            ctx.data::<AuthId>()?,
-            id.map(|id| Id::parse_str(&id).unwrap_or_default()),
-        ) {
-            Ok(leases) => Ok(map_vec(leases)),
-            Err(err) => Err(map_err(err)),
-        }
+        let conn = ctx.data::<DbPool>()?.get()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
+
+        Ok(properties::all_lenders(&conn, auth_id, id).and_then(map_res)?)
     }
 }
 
 // # Utils
 
-fn map_vec<T: Clone, U: From<T>>(vec: Vec<T>) -> Vec<U> {
-    vec.iter().map(|item| item.clone().into()).collect()
-}
-
-pub fn map_err(err: piteo_core::Error) -> async_graphql::Error {
-    async_graphql::Error::new(err.to_string())
+fn map_res<T, U>(vec: Vec<T>) -> std::result::Result<Vec<U>, piteo_core::Error>
+where
+    T: Clone,
+    U: From<T>,
+{
+    Ok(vec.iter().map(|item| item.clone().into()).collect())
 }

@@ -72,7 +72,7 @@ impl Lease {
 
 // # Queries
 
-pub fn load_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Vec<Lease>, Error> {
+pub fn all_leases(conn: &Conn, auth_id: &AuthId) -> Result<Vec<Lease>, Error> {
     lease::table
         .select(lease::all_columns)
         .left_join(user::table.on(user::accountId.eq(lease::accountId.nullable())))
