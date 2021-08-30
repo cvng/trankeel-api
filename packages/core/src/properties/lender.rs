@@ -1,6 +1,3 @@
-use std::fmt;
-use std::fmt::Display;
-
 use crate::common::LegalEntity;
 use crate::database::Conn;
 use crate::schema::lender;
@@ -8,6 +5,8 @@ use crate::schema::user;
 use crate::AuthId;
 use diesel::prelude::*;
 use eyre::Error;
+use std::fmt;
+use std::fmt::Display;
 use uuid::Uuid;
 
 // # Models
