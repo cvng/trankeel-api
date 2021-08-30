@@ -75,7 +75,7 @@ impl From<piteo_core::Address> for Address {
 
 #[derive(async_graphql::SimpleObject)]
 pub struct Company {
-    address: Address,
+    address: Option<Address>,
     display_name: String,
     email: Email,
     id: ID,
@@ -84,6 +84,13 @@ pub struct Company {
     legal_entity_type: String, // LegalEntityType
     legal_entity_type_other: String,
     phone_number: PhoneNumber,
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Feature {
+    available: bool,
+    title: String,
+    key: String,
 }
 
 #[derive(async_graphql::SimpleObject)]
@@ -97,6 +104,17 @@ pub struct File {
     r#type: String,
     updated_at: Option<DateTime>,
     id: ID,
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Invoice {
+    id: ID,
+    number: usize,
+    amount_paid: Decimal,
+    invoice_pdf: String,
+    period_end: DateTime,
+    status: String,
+    plan_code: String,
 }
 
 #[derive(async_graphql::SimpleObject)]
@@ -194,7 +212,7 @@ impl From<piteo_core::Lender> for Lender {
 #[graphql(name = "User")]
 pub struct Person {
     auth_id: AuthId,
-    email: String,
+    email: Email,
     first_name: Option<String>,
     last_name: Option<String>,
     address: Option<Address>,
@@ -210,12 +228,10 @@ pub struct Person {
 #[async_graphql::ComplexObject]
 impl Person {
     async fn account(&self, ctx: &Context<'_>) -> Result<Account> {
-        let account_id = self.account_id.clone();
+        let conn = ctx.data::<DbPool>()?.get()?;
+        let account_id = self.account_id.clone().try_into()?;
 
-        match auth::find_by_id(&ctx.data::<DbPool>()?.get()?, account_id.try_into()?) {
-            Ok(account) => Ok(account.into()),
-            Err(err) => Err(err.into()),
-        }
+        Ok(auth::find_by_id(&conn, account_id).map(Account::from)?)
     }
 }
 
@@ -224,7 +240,7 @@ impl From<piteo_core::Person> for Person {
         Self {
             display_name: item.display_name(),
             auth_id: item.auth_id.into(),
-            email: item.email,
+            email: item.email.into(),
             first_name: item.first_name,
             last_name: item.last_name,
             address: item.address.map(Address::from),
@@ -244,6 +260,7 @@ pub struct Plan {
     subtitle: Option<String>,
     title: Option<String>,
     id: ID,
+    features: Vec<Feature>,
 }
 
 #[derive(async_graphql::SimpleObject)]
@@ -274,7 +291,7 @@ pub struct Property {
     //
     expected_rents: Option<Decimal>,
     collected_rents: Option<Decimal>,
-    lender: Option<Person>,
+    lender: Option<Lender>,
     leases: Vec<Lease>,
 }
 
@@ -415,6 +432,13 @@ impl From<piteo_core::Summary> for Summary {
 }
 
 #[derive(async_graphql::SimpleObject)]
+pub struct Task {
+    id: ID,
+    status: String,
+    progress: usize,
+}
+
+#[derive(async_graphql::SimpleObject)]
 pub struct Tenant {
     account_id: ID,
     apl: bool,
@@ -485,4 +509,6 @@ pub struct Transaction {
     amount: Decimal,
     account_id: ID,
     r#type: String,
+    //
+    lease: Option<Lease>,
 }

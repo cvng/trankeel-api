@@ -1,4 +1,5 @@
 mod enums;
+mod inputs;
 mod mutation;
 mod objects;
 mod query;
