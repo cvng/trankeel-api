@@ -10,11 +10,11 @@ use std::fmt::Display;
 
 pub trait LegalEntity: Display {}
 
-pub type Id = uuid::Uuid;
+pub type Id = rust_uuid::Uuid;
 
 pub type Amount = rust_decimal::Decimal;
 
-pub type DateTime = chrono::NaiveDateTime;
+pub type DateTime = rust_chrono::NaiveDateTime;
 
 #[derive(Clone, Serialize, Deserialize, Debug, FromSqlRow)]
 #[serde(rename_all = "camelCase")]

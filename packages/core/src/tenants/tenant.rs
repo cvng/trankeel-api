@@ -3,6 +3,7 @@ use crate::schema::tenant;
 use crate::schema::user;
 use crate::AuthId;
 use crate::DateTime;
+use crate::Id;
 use diesel::prelude::*;
 use eyre::Error;
 
@@ -17,7 +18,7 @@ pub enum TenantStatus {
 
 #[derive(Clone, Queryable)]
 pub struct Tenant {
-    pub account_id: uuid::Uuid,
+    pub account_id: Id,
     pub apl: bool,
     pub auth_id: Option<crate::AuthId>,
     pub birthdate: DateTime,
@@ -28,8 +29,8 @@ pub struct Tenant {
     pub note: Option<String>,
     pub phone_number: Option<String>,
     pub role: Option<String>,
-    pub id: uuid::Uuid,
-    pub lease_id: Option<uuid::Uuid>,
+    pub id: Id,
+    pub lease_id: Option<Id>,
     pub visale_id: Option<String>,
 }
 
@@ -38,7 +39,7 @@ pub struct Tenant {
 pub fn load_by_auth_id(
     conn: &Conn,
     auth_id: &AuthId,
-    id: Option<uuid::Uuid>,
+    id: Option<Id>,
 ) -> Result<Vec<Tenant>, Error> {
     let auth_id = auth_id.clone();
 

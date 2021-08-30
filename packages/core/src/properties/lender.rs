@@ -3,20 +3,20 @@ use crate::database::Conn;
 use crate::schema::lender;
 use crate::schema::user;
 use crate::AuthId;
+use crate::Id;
 use diesel::prelude::*;
 use eyre::Error;
 use std::fmt;
 use std::fmt::Display;
-use uuid::Uuid;
 
 // # Models
 
 #[derive(Clone, Queryable)]
 pub struct Lender {
-    pub id: Uuid,
-    pub account_id: Uuid,
-    pub individual_id: Option<Uuid>,
-    pub company_id: Option<Uuid>,
+    pub id: Id,
+    pub account_id: Id,
+    pub individual_id: Option<Id>,
+    pub company_id: Option<Id>,
 }
 
 impl Lender {
@@ -38,7 +38,7 @@ impl Display for Lender {
 pub fn load_lenders_by_auth_id(
     conn: &Conn,
     auth_id: &AuthId,
-    id: Option<Uuid>,
+    id: Option<Id>,
 ) -> Result<Vec<Lender>, Error> {
     let auth_id = auth_id.clone();
 

@@ -5,13 +5,14 @@ use crate::schema::user;
 use crate::Amount;
 use crate::AuthId;
 use crate::DateTime;
-use chrono::Utc;
+use crate::Id;
 use diesel::deserialize;
 use diesel::deserialize::FromSql;
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::sql_types::Text;
 use eyre::Error;
+use rust_chrono::Utc;
 
 pub enum LeaseStatus {
     Active,
@@ -38,16 +39,16 @@ impl FromSql<Text, Pg> for LeaseType {
 
 #[derive(Clone, Queryable)]
 pub struct Lease {
-    pub account_id: uuid::Uuid,
+    pub account_id: Id,
     pub deposit_amount: Option<Amount>,
     pub effect_date: DateTime,
     pub signature_date: Option<DateTime>,
     pub rent_amount: Amount,
     pub rent_charges_amount: Option<Amount>,
     pub r#type: LeaseType,
-    pub lease_id: Option<uuid::Uuid>,
-    pub property_id: uuid::Uuid,
-    pub id: uuid::Uuid,
+    pub lease_id: Option<Id>,
+    pub property_id: Id,
+    pub id: Id,
     pub data: Option<LeaseData>,
     pub expired_at: Option<DateTime>,
     pub renew_date: Option<DateTime>,
@@ -60,7 +61,7 @@ impl Lease {
 
     pub fn status(&self) -> LeaseStatus {
         if self.expired_at.is_some()
-            && Utc::now() > chrono::DateTime::<Utc>::from_utc(self.expired_at.unwrap(), Utc)
+            && Utc::now() > rust_chrono::DateTime::<Utc>::from_utc(self.expired_at.unwrap(), Utc)
         {
             LeaseStatus::Ended
         } else {

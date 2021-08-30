@@ -6,10 +6,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = { version = "0.4", features = ["serde"] }
 diesel = { version = "1.4.7", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }
 eyre = "0.6.5"
-rust_decimal = { version = "1.15", features = ["db-diesel-postgres"] }
+rust_chrono = { package = "chrono", version = "0.4", features = ["serde"] }
+rust_decimal = { package = "rust_decimal", version = "1.15", features = ["db-diesel-postgres"] }
+rust_uuid = { package = "uuid", version = "0.8.2" }
 serde = "1.0"
 serde_json = "1.0"
-uuid = "0.8.2"

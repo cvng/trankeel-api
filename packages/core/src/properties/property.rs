@@ -3,6 +3,7 @@ use crate::schema::property;
 use crate::schema::user;
 use crate::Address;
 use crate::AuthId;
+use crate::Id;
 use diesel::prelude::*;
 use eyre::Error;
 
@@ -10,7 +11,7 @@ use eyre::Error;
 
 #[derive(Clone, Queryable)]
 pub struct Property {
-    pub account_id: Option<uuid::Uuid>,
+    pub account_id: Option<Id>,
     pub address: Address,
     pub build_period: Option<String>,
     pub building_legal_status: Option<String>,
@@ -31,8 +32,8 @@ pub struct Property {
     pub tenant_private_spaces: Option<String>,
     pub usage_type: Option<String>,
     pub water_heating_method: Option<String>,
-    pub id: uuid::Uuid,
-    pub lender_id: uuid::Uuid,
+    pub id: Id,
+    pub lender_id: Id,
 }
 
 // # Queries
@@ -40,7 +41,7 @@ pub struct Property {
 pub fn load_by_auth_id(
     conn: &Conn,
     auth_id: &AuthId,
-    id: Option<uuid::Uuid>,
+    id: Option<Id>,
 ) -> Result<Vec<Property>, Error> {
     let auth_id = auth_id.clone();
 

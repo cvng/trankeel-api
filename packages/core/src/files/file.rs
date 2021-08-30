@@ -1,4 +1,5 @@
 use crate::DateTime;
+use crate::Id;
 
 pub struct File {
     pub created_at: Option<DateTime>,
@@ -9,5 +10,5 @@ pub struct File {
     pub status: Option<String>,
     pub r#type: String,
     pub updated_at: Option<DateTime>,
-    pub id: uuid::Uuid,
+    pub id: Id,
 }
