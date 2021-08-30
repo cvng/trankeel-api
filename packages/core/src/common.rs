@@ -24,7 +24,7 @@ pub trait Name {
     fn display_name(&self) -> String {
         [&self.first_name(), &self.last_name()]
             .iter()
-            .filter_map(|&v| Some(v.clone()))
+            .map(|&v| v.clone())
             .collect::<Vec<String>>()
             .join(" ")
             .trim()
