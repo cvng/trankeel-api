@@ -38,7 +38,7 @@ pub struct Property {
 
 // # Queries
 
-pub fn load_by_auth_id(
+pub fn all_properties(
     conn: &Conn,
     auth_id: &AuthId,
     id: Option<Id>,

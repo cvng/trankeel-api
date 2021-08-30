@@ -26,7 +26,7 @@ impl Query {
         let conn = ctx.data::<DbPool>()?.get()?;
         let auth_id = ctx.data::<AuthId>()?;
 
-        Ok(auth::first_by_auth_id(&conn, auth_id).map(Person::from)?)
+        Ok(auth::find(&conn, auth_id).map(Person::from)?)
     }
 
     async fn properties(
@@ -39,7 +39,7 @@ impl Query {
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
 
-        Ok(properties::load_by_auth_id(&conn, auth_id, id).and_then(map_res)?)
+        Ok(properties::all_properties(&conn, auth_id, id).and_then(map_res)?)
     }
 
     async fn summary(
@@ -62,7 +62,7 @@ impl Query {
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
 
-        Ok(tenants::load_by_auth_id(&conn, auth_id, id).and_then(map_res)?)
+        Ok(tenants::all_tenants(&conn, auth_id, id).and_then(map_res)?)
     }
 
     async fn leases(
@@ -74,7 +74,7 @@ impl Query {
         let conn = ctx.data::<DbPool>()?.get()?;
         let auth_id = ctx.data::<AuthId>()?;
 
-        Ok(leases::load_by_auth_id(&conn, auth_id).and_then(map_res)?)
+        Ok(leases::all_leases(&conn, auth_id).and_then(map_res)?)
     }
 
     async fn lenders(
@@ -87,7 +87,7 @@ impl Query {
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
 
-        Ok(properties::load_lenders_by_auth_id(&conn, auth_id, id).and_then(map_res)?)
+        Ok(properties::all_lenders(&conn, auth_id, id).and_then(map_res)?)
     }
 }
 

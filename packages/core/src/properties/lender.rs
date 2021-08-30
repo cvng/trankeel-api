@@ -35,11 +35,7 @@ impl Display for Lender {
 
 // # Queries
 
-pub fn load_lenders_by_auth_id(
-    conn: &Conn,
-    auth_id: &AuthId,
-    id: Option<Id>,
-) -> Result<Vec<Lender>, Error> {
+pub fn all_lenders(conn: &Conn, auth_id: &AuthId, id: Option<Id>) -> Result<Vec<Lender>, Error> {
     let auth_id = auth_id.clone();
 
     let query = lender::table

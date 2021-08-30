@@ -36,11 +36,7 @@ pub struct Tenant {
 
 // # Queries
 
-pub fn load_by_auth_id(
-    conn: &Conn,
-    auth_id: &AuthId,
-    id: Option<Id>,
-) -> Result<Vec<Tenant>, Error> {
+pub fn all_tenants(conn: &Conn, auth_id: &AuthId, id: Option<Id>) -> Result<Vec<Tenant>, Error> {
     let auth_id = auth_id.clone();
 
     let query = tenant::table
