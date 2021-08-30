@@ -1,4 +1,5 @@
 use crate::Amount;
+use crate::DateTime;
 use diesel::deserialize;
 use diesel::deserialize::FromSql;
 use diesel::pg::Pg;
@@ -30,7 +31,7 @@ pub struct LeaseData {
     pub rent_maj_decree_reference_amount: Option<Amount>,
     pub rent_majoration_decree: Option<bool>,
     pub rent_max_evolution_relocation: Option<bool>,
-    pub rent_payment_date: Option<chrono::NaiveDateTime>,
+    pub rent_payment_date: Option<DateTime>,
     pub rent_payment_method: Option<String>, // Option<RentPaymentMethod>,
     pub rent_payment_place: Option<String>,
     pub rent_periodicity: Option<String>, // Option<LeaseRentPeriodicity>,

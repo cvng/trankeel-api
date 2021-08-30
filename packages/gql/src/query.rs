@@ -14,9 +14,9 @@ use piteo_core::leases;
 use piteo_core::properties;
 use piteo_core::reports;
 use piteo_core::tenants;
-use piteo_core::uuid;
 use piteo_core::AuthId;
 use piteo_core::DbPool;
+use piteo_core::Id;
 
 pub struct Query;
 
@@ -38,7 +38,7 @@ impl Query {
         match properties::load_by_auth_id(
             &ctx.data::<DbPool>()?.get()?,
             ctx.data::<AuthId>()?,
-            id.map(|id| uuid::Uuid::parse_str(&id).unwrap_or_default()),
+            id.map(|id| Id::parse_str(&id).unwrap_or_default()),
         ) {
             Ok(properties) => Ok(map_vec(properties)),
             Err(err) => Err(map_err(err)),
@@ -67,7 +67,7 @@ impl Query {
         match tenants::load_by_auth_id(
             &ctx.data::<DbPool>()?.get()?,
             ctx.data::<AuthId>()?,
-            id.map(|id| uuid::Uuid::parse_str(&id).unwrap_or_default()),
+            id.map(|id| Id::parse_str(&id).unwrap_or_default()),
         ) {
             Ok(tenants) => Ok(map_vec(tenants)),
             Err(err) => Err(map_err(err)),
@@ -95,7 +95,7 @@ impl Query {
         match properties::load_lenders_by_auth_id(
             &ctx.data::<DbPool>()?.get()?,
             ctx.data::<AuthId>()?,
-            id.map(|id| uuid::Uuid::parse_str(&id).unwrap_or_default()),
+            id.map(|id| Id::parse_str(&id).unwrap_or_default()),
         ) {
             Ok(leases) => Ok(map_vec(leases)),
             Err(err) => Err(map_err(err)),

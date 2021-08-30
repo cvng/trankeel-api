@@ -1,4 +1,5 @@
 use crate::Amount;
+use crate::DateTime;
 use diesel::deserialize;
 use diesel::deserialize::FromSql;
 use diesel::pg::Pg;
@@ -26,8 +27,8 @@ impl FromSql<Text, Pg> for RentStatus {
 #[derive(Queryable)]
 pub struct Rent {
     pub id: uuid::Uuid,
-    pub period_end: chrono::NaiveDateTime,
-    pub period_start: chrono::NaiveDateTime,
+    pub period_end: DateTime,
+    pub period_start: DateTime,
     pub amount: Amount,
     pub charges_amount: Option<Amount>,
     pub full_amount: Amount,

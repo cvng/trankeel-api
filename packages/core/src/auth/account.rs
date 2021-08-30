@@ -1,5 +1,6 @@
 use crate::database::Conn;
 use crate::schema::account;
+use crate::DateTime;
 use diesel::prelude::*;
 use eyre::Error;
 
@@ -11,7 +12,7 @@ pub struct Account {
     pub status: Option<String>,
     pub stripe_customer_id: Option<String>,
     pub stripe_subscription_id: Option<String>,
-    pub trial_end: Option<chrono::NaiveDateTime>,
+    pub trial_end: Option<DateTime>,
     pub owner_id: String,
     pub id: uuid::Uuid,
 }

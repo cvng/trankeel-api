@@ -10,6 +10,8 @@ use std::fmt::Display;
 
 pub trait LegalEntity: Display {}
 
+pub type Id = uuid::Uuid;
+
 pub type Amount = rust_decimal::Decimal;
 
 pub type DateTime = chrono::NaiveDateTime;

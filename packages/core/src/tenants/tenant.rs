@@ -2,6 +2,7 @@ use crate::database::Conn;
 use crate::schema::tenant;
 use crate::schema::user;
 use crate::AuthId;
+use crate::DateTime;
 use diesel::prelude::*;
 use eyre::Error;
 
@@ -19,7 +20,7 @@ pub struct Tenant {
     pub account_id: uuid::Uuid,
     pub apl: bool,
     pub auth_id: Option<crate::AuthId>,
-    pub birthdate: chrono::NaiveDateTime,
+    pub birthdate: DateTime,
     pub birthplace: Option<String>,
     pub email: String,
     pub first_name: String,

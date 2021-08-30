@@ -4,7 +4,7 @@ use crate::schema::lease;
 use crate::schema::user;
 use crate::Amount;
 use crate::AuthId;
-use chrono::DateTime;
+use crate::DateTime;
 use chrono::Utc;
 use diesel::deserialize;
 use diesel::deserialize::FromSql;
@@ -40,8 +40,8 @@ impl FromSql<Text, Pg> for LeaseType {
 pub struct Lease {
     pub account_id: uuid::Uuid,
     pub deposit_amount: Option<Amount>,
-    pub effect_date: chrono::NaiveDateTime,
-    pub signature_date: Option<chrono::NaiveDateTime>,
+    pub effect_date: DateTime,
+    pub signature_date: Option<DateTime>,
     pub rent_amount: Amount,
     pub rent_charges_amount: Option<Amount>,
     pub r#type: LeaseType,
@@ -49,8 +49,8 @@ pub struct Lease {
     pub property_id: uuid::Uuid,
     pub id: uuid::Uuid,
     pub data: Option<LeaseData>,
-    pub expired_at: Option<chrono::NaiveDateTime>,
-    pub renew_date: Option<chrono::NaiveDateTime>,
+    pub expired_at: Option<DateTime>,
+    pub renew_date: Option<DateTime>,
 }
 
 impl Lease {
@@ -60,7 +60,7 @@ impl Lease {
 
     pub fn status(&self) -> LeaseStatus {
         if self.expired_at.is_some()
-            && Utc::now() > DateTime::<Utc>::from_utc(self.expired_at.unwrap(), Utc)
+            && Utc::now() > chrono::DateTime::<Utc>::from_utc(self.expired_at.unwrap(), Utc)
         {
             LeaseStatus::Ended
         } else {
@@ -89,7 +89,7 @@ mod tests {
             Self {
                 account_id: Default::default(),
                 deposit_amount: Default::default(),
-                effect_date: chrono::NaiveDateTime::from_timestamp(0, 0),
+                effect_date: DateTime::from_timestamp(0, 0),
                 signature_date: Default::default(),
                 rent_amount: Default::default(),
                 rent_charges_amount: Default::default(),

@@ -1,11 +1,11 @@
 use crate::Amount;
-use chrono::NaiveDateTime;
+use crate::DateTime;
 use eyre::Error;
 
 /// Synthesis of collected rents.
 pub struct Summary {
-    pub since: NaiveDateTime,
-    pub until: NaiveDateTime,
+    pub since: DateTime,
+    pub until: DateTime,
     //
     pub amount_expected: Amount,
     pub amount_received: Amount,
@@ -38,8 +38,8 @@ pub struct Summary {
 impl Default for Summary {
     fn default() -> Self {
         Self {
-            since: NaiveDateTime::from_timestamp(0, 0),
-            until: NaiveDateTime::from_timestamp(0, 0),
+            since: DateTime::from_timestamp(0, 0),
+            until: DateTime::from_timestamp(0, 0),
             amount_expected: Default::default(),
             amount_received: Default::default(),
             amount_settled: Default::default(),
