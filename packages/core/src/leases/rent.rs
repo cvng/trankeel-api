@@ -1,3 +1,4 @@
+use crate::Amount;
 use diesel::deserialize;
 use diesel::deserialize::FromSql;
 use diesel::pg::Pg;
@@ -27,9 +28,9 @@ pub struct Rent {
     pub id: uuid::Uuid,
     pub period_end: chrono::NaiveDateTime,
     pub period_start: chrono::NaiveDateTime,
-    pub amount: decimal::Decimal,
-    pub charges_amount: Option<decimal::Decimal>,
-    pub full_amount: decimal::Decimal,
+    pub amount: Amount,
+    pub charges_amount: Option<Amount>,
+    pub full_amount: Amount,
     pub status: RentStatus,
     pub account_id: uuid::Uuid,
     pub lease_id: uuid::Uuid,

@@ -1,5 +1,6 @@
 use crate::database::Conn;
 use crate::schema::plan;
+use crate::Amount;
 use diesel::prelude::*;
 use eyre::Error;
 
@@ -8,7 +9,7 @@ use eyre::Error;
 #[derive(Queryable)]
 pub struct Plan {
     pub code: String,
-    pub price: Option<decimal::Decimal>,
+    pub price: Option<Amount>,
     pub subtitle: Option<String>,
     pub title: Option<String>,
     pub id: uuid::Uuid,

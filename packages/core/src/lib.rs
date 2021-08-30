@@ -16,7 +16,7 @@ pub mod reports;
 pub mod tenants;
 
 pub use chrono;
-pub use decimal;
+pub use rust_decimal;
 pub use uuid;
 
 pub use crate::auth::Account;
@@ -24,6 +24,8 @@ pub use crate::auth::AuthId;
 pub use crate::auth::Person;
 pub use crate::billing::Plan;
 pub use crate::common::Address;
+pub use crate::common::Amount;
+pub use crate::common::DateTime;
 pub use crate::database::build_connection_pool;
 pub use crate::database::DbPool;
 pub use crate::error::Error;

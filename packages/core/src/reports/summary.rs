@@ -1,5 +1,5 @@
+use crate::Amount;
 use chrono::NaiveDateTime;
-use decimal::Decimal;
 use eyre::Error;
 
 /// Synthesis of collected rents.
@@ -7,11 +7,11 @@ pub struct Summary {
     pub since: NaiveDateTime,
     pub until: NaiveDateTime,
     //
-    pub amount_expected: Decimal,
-    pub amount_received: Decimal,
-    pub amount_settled: Decimal,
-    pub amount_partial: Decimal,
-    pub amount_pending: Decimal,
+    pub amount_expected: Amount,
+    pub amount_received: Amount,
+    pub amount_settled: Amount,
+    pub amount_partial: Amount,
+    pub amount_pending: Amount,
     //
     pub n_expected: usize,
     pub n_received: usize,

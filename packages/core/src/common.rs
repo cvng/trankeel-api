@@ -10,6 +10,10 @@ use std::fmt::Display;
 
 pub trait LegalEntity: Display {}
 
+pub type Amount = rust_decimal::Decimal;
+
+pub type DateTime = chrono::NaiveDateTime;
+
 #[derive(Clone, Serialize, Deserialize, Debug, FromSqlRow)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
