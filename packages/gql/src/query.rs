@@ -1,13 +1,20 @@
+use crate::enums::TenantStatus;
 use crate::objects::Lease;
+use crate::objects::Lender;
 use crate::objects::Person;
 use crate::objects::Property;
+use crate::objects::Summary;
 use crate::objects::Tenant;
+use crate::scalars::DateTime;
 use async_graphql::Context;
 use async_graphql::Result;
+use async_graphql::ID;
 use piteo_core::auth;
 use piteo_core::leases;
 use piteo_core::properties;
+use piteo_core::reports;
 use piteo_core::tenants;
+use piteo_core::uuid;
 use piteo_core::AuthId;
 use piteo_core::DbPool;
 
@@ -22,22 +29,74 @@ impl Query {
         }
     }
 
-    async fn properties(&self, ctx: &Context<'_>) -> Result<Vec<Property>> {
-        match properties::load_by_auth_id(&ctx.data::<DbPool>()?.get()?, ctx.data::<AuthId>()?) {
+    async fn properties(
+        &self,
+        ctx: &Context<'_>,
+        id: Option<ID>,
+        _query: Option<String>,
+    ) -> Result<Vec<Property>> {
+        match properties::load_by_auth_id(
+            &ctx.data::<DbPool>()?.get()?,
+            ctx.data::<AuthId>()?,
+            id.map(|id| uuid::Uuid::parse_str(&id).unwrap_or_default()),
+        ) {
             Ok(properties) => Ok(map_vec(properties)),
             Err(err) => Err(map_err(err)),
         }
     }
 
-    async fn tenants(&self, ctx: &Context<'_>) -> Result<Vec<Tenant>> {
-        match tenants::load_by_auth_id(&ctx.data::<DbPool>()?.get()?, ctx.data::<AuthId>()?) {
+    async fn summary(
+        &self,
+        _ctx: &Context<'_>,
+        _since: Option<DateTime>,
+        _until: Option<DateTime>,
+    ) -> Result<Summary> {
+        match reports::get_summary() {
+            Ok(summary) => Ok(summary.into()),
+            Err(err) => Err(map_err(err)),
+        }
+    }
+
+    async fn tenants(
+        &self,
+        ctx: &Context<'_>,
+        id: Option<ID>,
+        _query: Option<String>,
+        _status: Option<TenantStatus>,
+    ) -> Result<Vec<Tenant>> {
+        match tenants::load_by_auth_id(
+            &ctx.data::<DbPool>()?.get()?,
+            ctx.data::<AuthId>()?,
+            id.map(|id| uuid::Uuid::parse_str(&id).unwrap_or_default()),
+        ) {
             Ok(tenants) => Ok(map_vec(tenants)),
             Err(err) => Err(map_err(err)),
         }
     }
 
-    async fn leases(&self, ctx: &Context<'_>) -> Result<Vec<Lease>> {
+    async fn leases(
+        &self,
+        ctx: &Context<'_>,
+        _id: Option<ID>,
+        _query: Option<String>,
+    ) -> Result<Vec<Lease>> {
         match leases::load_by_auth_id(&ctx.data::<DbPool>()?.get()?, ctx.data::<AuthId>()?) {
+            Ok(leases) => Ok(map_vec(leases)),
+            Err(err) => Err(map_err(err)),
+        }
+    }
+
+    async fn lenders(
+        &self,
+        ctx: &Context<'_>,
+        id: Option<ID>,
+        _query: Option<String>,
+    ) -> Result<Vec<Lender>> {
+        match properties::load_lenders_by_auth_id(
+            &ctx.data::<DbPool>()?.get()?,
+            ctx.data::<AuthId>()?,
+            id.map(|id| uuid::Uuid::parse_str(&id).unwrap_or_default()),
+        ) {
             Ok(leases) => Ok(map_vec(leases)),
             Err(err) => Err(map_err(err)),
         }

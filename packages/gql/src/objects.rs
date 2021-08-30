@@ -1,9 +1,14 @@
+use crate::enums::LeaseStatus;
 use crate::enums::LeaseType;
 use crate::enums::RentStatus;
+use crate::enums::TenantStatus;
 use crate::query::map_err;
 use crate::scalars::AuthId;
 use crate::scalars::DateTime;
 use crate::scalars::Decimal;
+use crate::scalars::Email;
+use crate::scalars::PhoneNumber;
+use crate::unions::Identity;
 use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
@@ -49,20 +54,50 @@ impl From<piteo_core::Account> for Account {
 #[derive(async_graphql::SimpleObject)]
 pub struct Address {
     city: String,
+    country: String,
     line1: String,
     line2: Option<String>,
     postal_code: String,
+    inline: String,
 }
 
 impl From<piteo_core::Address> for Address {
     fn from(item: piteo_core::Address) -> Self {
         Self {
+            inline: item.inline(),
             city: item.city.unwrap_or_default(),
+            country: item.country.unwrap_or_default(),
             line1: item.line1.unwrap_or_default(),
             line2: item.line2,
             postal_code: item.postal_code.unwrap_or_default(),
         }
     }
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Company {
+    address: Address,
+    display_name: String,
+    email: Email,
+    id: ID,
+    legal_entity: String,
+    legal_entity_identifier: String,
+    legal_entity_type: String, // LegalEntityType
+    legal_entity_type_other: String,
+    phone_number: PhoneNumber,
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct File {
+    created_at: DateTime,
+    download_url: Option<String>,
+    external_id: Option<String>,
+    filename: Option<String>,
+    preview_url: Option<String>,
+    status: Option<String>,
+    r#type: String,
+    updated_at: Option<DateTime>,
+    id: ID,
 }
 
 #[derive(async_graphql::SimpleObject)]
@@ -73,42 +108,57 @@ pub struct Lease {
     signature_date: Option<DateTime>,
     rent_amount: Decimal,
     rent_charges_amount: Option<Decimal>,
+    rent_full_amount: Decimal,
     r#type: LeaseType,
     lease_id: Option<ID>,
     property_id: ID,
     id: ID,
-    data: Option<LeaseData>,
+    data: Option<LeaseFurnishedData>,
     expired_at: Option<DateTime>,
     renew_date: Option<DateTime>,
+    status: LeaseStatus,
+    //
+    lease: Option<File>,
+    rents: Vec<Rent>,
+    tenants: Vec<Tenant>,
+    account: Option<Account>,
+    property: Option<Property>,
 }
 
 impl From<piteo_core::Lease> for Lease {
     fn from(item: piteo_core::Lease) -> Self {
         Self {
+            status: item.status().into(),
             account_id: item.account_id.into(),
             deposit_amount: item.deposit_amount.map(Decimal::from),
             effect_date: item.effect_date.into(),
             signature_date: item.signature_date.map(DateTime::from),
             rent_amount: item.rent_amount.into(),
             rent_charges_amount: item.rent_charges_amount.map(Decimal::from),
+            rent_full_amount: item.rent_full_amount().into(),
             r#type: item.r#type.into(),
             lease_id: item.lease_id.map(ID::from),
             property_id: item.property_id.into(),
             id: item.id.into(),
-            data: item.data.map(LeaseData::from),
+            data: item.data.map(LeaseFurnishedData::from),
             expired_at: item.expired_at.map(DateTime::from),
             renew_date: item.renew_date.map(DateTime::from),
+            rents: Vec::new(),
+            tenants: Vec::new(),
+            lease: None,
+            account: None,
+            property: None,
         }
     }
 }
 
 #[derive(async_graphql::SimpleObject)]
-pub struct LeaseData {
+pub struct LeaseFurnishedData {
     duration: Option<String>,
     rent_payment_method: Option<String>,
 }
 
-impl From<piteo_core::LeaseData> for LeaseData {
+impl From<piteo_core::LeaseData> for LeaseFurnishedData {
     fn from(item: piteo_core::LeaseData) -> Self {
         Self {
             duration: item.duration,
@@ -118,7 +168,31 @@ impl From<piteo_core::LeaseData> for LeaseData {
 }
 
 #[derive(async_graphql::SimpleObject)]
+pub struct Lender {
+    id: ID,
+    account_id: ID,
+    individual_id: Option<ID>,
+    company_id: Option<ID>,
+    display_name: String,
+    identity: Option<Identity>,
+}
+
+impl From<piteo_core::Lender> for Lender {
+    fn from(item: piteo_core::Lender) -> Self {
+        Self {
+            display_name: item.display_name(),
+            id: item.id.into(),
+            account_id: item.account_id.into(),
+            individual_id: item.individual_id.map(ID::from),
+            company_id: item.company_id.map(ID::from),
+            identity: None,
+        }
+    }
+}
+
+#[derive(async_graphql::SimpleObject)]
 #[graphql(complex)]
+#[graphql(name = "User")]
 pub struct Person {
     auth_id: AuthId,
     email: String,
@@ -198,6 +272,11 @@ pub struct Property {
     water_heating_method: Option<String>,
     id: ID,
     lender_id: ID,
+    //
+    expected_rents: Option<Decimal>,
+    collected_rents: Option<Decimal>,
+    lender: Option<Person>,
+    leases: Vec<Lease>,
 }
 
 impl From<piteo_core::Property> for Property {
@@ -226,6 +305,10 @@ impl From<piteo_core::Property> for Property {
             water_heating_method: item.water_heating_method,
             id: item.id.into(),
             lender_id: item.lender_id.into(),
+            expected_rents: None,
+            collected_rents: None,
+            lender: None,
+            leases: Vec::new(),
         }
     }
 }
@@ -241,14 +324,94 @@ pub struct Rent {
     status: RentStatus,
     account_id: ID,
     lease_id: ID,
-    receipt_id: ID,
-    transaction_id: ID,
+    receipt_id: Option<ID>,
+    transaction_id: Option<ID>,
     notice_id: Option<ID>,
+    //
+    transactions: Vec<Transaction>,
 }
 
 impl From<piteo_core::Rent> for Rent {
-    fn from(_item: piteo_core::Rent) -> Self {
-        todo!()
+    fn from(item: piteo_core::Rent) -> Self {
+        Self {
+            id: item.id.into(),
+            period_end: item.period_end.into(),
+            period_start: item.period_start.into(),
+            amount: item.amount.into(),
+            charges_amount: item.charges_amount.map(Decimal::from),
+            full_amount: item.full_amount.into(),
+            status: item.status.into(),
+            account_id: item.account_id.into(),
+            lease_id: item.lease_id.into(),
+            receipt_id: item.receipt_id.map(ID::from),
+            transaction_id: item.transaction_id.map(ID::from),
+            notice_id: item.notice_id.map(ID::from),
+            transactions: Vec::new(),
+        }
+    }
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Summary {
+    since: DateTime,
+    until: DateTime,
+    //
+    amount_expected: Decimal,
+    amount_received: Decimal,
+    amount_settled: Decimal,
+    amount_partial: Decimal,
+    amount_pending: Decimal,
+    //
+    n_expected: usize,
+    n_received: usize,
+    n_settled: usize,
+    n_partial: usize,
+    n_pending: usize,
+    //
+    ratio_expected: f64,
+    ratio_received: f64,
+    ratio_settled: f64,
+    ratio_partial: f64,
+    ratio_pending: f64,
+    //
+    variation_expected: f64,
+    variation_received: f64,
+    variation_settled: f64,
+    variation_partial: f64,
+    variation_pending: f64,
+    //
+    payment_rate: f64,
+    occupation_rate: f64,
+}
+
+impl From<piteo_core::Summary> for Summary {
+    fn from(item: piteo_core::Summary) -> Self {
+        Summary {
+            since: item.since.into(),
+            until: item.until.into(),
+            amount_expected: item.amount_expected.into(),
+            amount_received: item.amount_received.into(),
+            amount_settled: item.amount_settled.into(),
+            amount_partial: item.amount_partial.into(),
+            amount_pending: item.amount_pending.into(),
+            n_expected: item.n_expected,
+            n_received: item.n_received,
+            n_settled: item.n_settled,
+            n_partial: item.n_partial,
+            n_pending: item.n_pending,
+            ratio_expected: item.ratio_expected,
+            ratio_received: item.ratio_received,
+            ratio_settled: item.ratio_settled,
+            ratio_partial: item.ratio_partial,
+            ratio_pending: item.ratio_pending,
+            variation_expected: item.variation_expected,
+            variation_received: item.variation_received,
+            variation_settled: item.variation_settled,
+            variation_partial: item.variation_partial,
+            variation_pending: item.variation_pending,
+            payment_rate: item.payment_rate,
+            occupation_rate: item.occupation_rate,
+        }
     }
 }
 
@@ -268,6 +431,19 @@ pub struct Tenant {
     id: ID,
     lease_id: Option<ID>,
     visale_id: Option<String>,
+    //
+    account: Option<Account>,
+    property: Option<Property>,
+    status: TenantStatus,
+    full_name: String,
+    short_name: String,
+    display_name: String,
+    last_transaction: Option<Transaction>,
+    property_name: Option<String>,
+    rent_payed_this_year: Option<String>,
+    unpaid_rent_amount: Option<String>,
+    files: Vec<File>,
+    lease: Option<Lease>,
 }
 
 impl From<piteo_core::Tenant> for Tenant {
@@ -287,6 +463,27 @@ impl From<piteo_core::Tenant> for Tenant {
             id: item.id.into(),
             lease_id: item.lease_id.map(ID::from),
             visale_id: item.visale_id,
+            account: None,
+            property: None,
+            status: TenantStatus::New,
+            full_name: String::new(),
+            short_name: String::new(),
+            display_name: String::new(),
+            last_transaction: None,
+            property_name: None,
+            rent_payed_this_year: None,
+            unpaid_rent_amount: None,
+            files: Vec::new(),
+            lease: None,
         }
     }
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Transaction {
+    id: ID,
+    date: DateTime,
+    amount: Decimal,
+    account_id: ID,
+    r#type: String,
 }
