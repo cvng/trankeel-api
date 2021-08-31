@@ -285,7 +285,7 @@ impl From<piteo_core::RentPaymentMethod> for RentPaymentMethod {
 
 #[derive(async_graphql::Enum, Copy, Clone, Eq, PartialEq)]
 pub enum RentChargesRecuperationMode {
-    Packages,
+    Package,
     Periodic,
     Reel,
 }
@@ -293,7 +293,7 @@ pub enum RentChargesRecuperationMode {
 impl From<piteo_core::RentChargesRecuperationMode> for RentChargesRecuperationMode {
     fn from(item: piteo_core::RentChargesRecuperationMode) -> Self {
         match item {
-            piteo_core::RentChargesRecuperationMode::Package => Self::Packages,
+            piteo_core::RentChargesRecuperationMode::Package => Self::Package,
             piteo_core::RentChargesRecuperationMode::Periodic => Self::Periodic,
             piteo_core::RentChargesRecuperationMode::Reel => Self::Reel,
         }

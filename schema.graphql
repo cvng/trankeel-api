@@ -451,7 +451,7 @@ type Rent {
 	transactions: [Transaction!]
 }
 enum RentChargesRecuperationMode {
-	PACKAGES
+	PACKAGE
 	PERIODIC
 	REEL
 }
