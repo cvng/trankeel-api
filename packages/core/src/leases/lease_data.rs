@@ -7,17 +7,47 @@ use diesel::sql_types::Jsonb;
 use serde::Deserialize;
 use serde::Serialize;
 
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub enum LeaseFurnishedDuration {
+    NineMonths,
+    OneYear,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub enum RentChargesRecuperationMode {
+    Package,
+    Periodic,
+    Reel,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub enum LeaseRentReferenceIrl {
+    AprilFirstSemesterY2021,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub enum RentPaymentMethod {
+    After,
+    Before,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub enum LeaseRentPeriodicity {
+    Annualy,
+    Monthly,
+}
+
 // # Models
 
 #[derive(Clone, Serialize, Deserialize, Debug, FromSqlRow)]
 #[serde(rename_all = "camelCase")]
 pub struct LeaseData {
-    pub charges_recuperation_mode: Option<String>, // Option<RentChargesRecuperationMode>,
+    pub charges_recuperation_mode: Option<RentChargesRecuperationMode>,
     pub charges_revision_method: Option<String>,
     pub colocation_insurance_lender: Option<bool>,
     pub colocation_insurance_monthly_amount: Option<Amount>,
     pub colocation_insurance_total_amount: Option<Amount>,
-    pub duration: Option<String>, // Option<LeaseFurnishedDuration>,
+    pub duration: Option<LeaseFurnishedDuration>,
     pub lender_fee_cap: Option<Amount>,
     pub lender_fee_cap_other: Option<String>,
     pub lender_fee_cap_prestations: Option<Amount>,
@@ -25,16 +55,16 @@ pub struct LeaseData {
     pub rent_complement: Option<Amount>,
     pub rent_complement_property_justification: Option<String>,
     pub rent_first_amount: Option<Amount>,
-    pub rent_irl: Option<String>, // Option<LeaseRentReferenceIrl>,
+    pub rent_irl: Option<LeaseRentReferenceIrl>,
     pub rent_irl_revision_date: Option<String>,
     pub rent_maj_decree_increased_amount: Option<Amount>,
     pub rent_maj_decree_reference_amount: Option<Amount>,
     pub rent_majoration_decree: Option<bool>,
     pub rent_max_evolution_relocation: Option<bool>,
     pub rent_payment_date: Option<DateTime>,
-    pub rent_payment_method: Option<String>, // Option<RentPaymentMethod>,
+    pub rent_payment_method: Option<RentPaymentMethod>,
     pub rent_payment_place: Option<String>,
-    pub rent_periodicity: Option<String>, // Option<LeaseRentPeriodicity>,
+    pub rent_periodicity: Option<LeaseRentPeriodicity>,
     pub rent_underestimated_method: Option<String>,
     pub rent_underestimated_monthly_variation: Option<Amount>,
     pub resolutary_clause: Option<String>,
