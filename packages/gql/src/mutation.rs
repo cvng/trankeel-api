@@ -20,7 +20,7 @@ use crate::objects::Property;
 use crate::objects::Task;
 use crate::objects::Tenant;
 use crate::objects::Transaction;
-use async_graphql::Error;
+use crate::wip;
 use async_graphql::Result;
 use async_graphql::ID;
 
@@ -29,78 +29,78 @@ pub struct Mutation;
 #[async_graphql::Object]
 impl Mutation {
     async fn user_create_with_account(&self, _input: UserWithAccountInput) -> Result<Account> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn account_update_payment_method(&self, _input: AccountUpdateInput) -> Result<Account> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn account_activate_plan(&self, _input: AccountActivatePlanInput) -> Result<Account> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn tenant_create(&self, _input: TenantInput) -> Result<Tenant> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn tenant_update(&self, _input: TenantUpdateInput) -> Result<Tenant> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn tenant_delete(&self, _id: ID) -> Result<ID> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn property_create(&self, _input: PropertyInput) -> Result<Property> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn property_update(&self, _input: PropertyUpdateInput) -> Result<Property> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn property_delete(&self, _id: ID) -> Result<ID> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn lease_furnished_create(&self, _input: LeaseFurnishedInput) -> Result<Lease> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn lease_delete(&self, _id: ID) -> Result<ID> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn lease_furnished_update(&self, _input: LeaseFurnishedUpdateInput) -> Result<Lease> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn lender_individual_update(
         &self,
         _input: LenderIndividualUpdateInput,
     ) -> Result<Lender> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn transaction_create(&self, _input: TransactionInput) -> Result<Transaction> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn transaction_delete(&self, _id: ID) -> Result<ID> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn file_upload(&self, _input: FileInput) -> Result<File> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn import_upload(&self, _input: ImportInput) -> Result<Task> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 
     async fn rent_receipt_create(&self, _input: RentReceiptInput) -> Result<RentReceiptPayload> {
-        Err(Error::new("todo!()"))
+        Err(wip())
     }
 }
 

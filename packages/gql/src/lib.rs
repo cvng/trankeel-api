@@ -16,6 +16,10 @@ use async_graphql::Schema;
 use piteo_core::error::Context;
 use piteo_core::DbPool;
 use std::env;
+use std::fs::File;
+use std::io::Write;
+
+const SCHEMA_PATH: &str = "schema.graphql";
 
 type Result<T> = std::result::Result<T, piteo_core::Error>;
 
@@ -34,9 +38,26 @@ pub fn build_schema() -> Result<PiteoSchema> {
     Ok(schema)
 }
 
+/// Print the schema in SDL format. https://async-graphql.github.io/async-graphql/en/sdl_export.html
+pub fn write_schema() -> Result<()> {
+    let path = SCHEMA_PATH;
+    let schema_sdl = build_schema().unwrap().sdl();
+
+    let mut file = File::create(path).unwrap();
+    file.write_all(schema_sdl.as_bytes()).unwrap();
+
+    println!("💫 GraphQL schema printed at {}", path);
+
+    Ok(())
+}
+
 /// Build database pool from env.
 fn db_pool_from_env() -> Result<DbPool> {
     let database_url = env::var("DATABASE_URL").context("DATABASE_URL must be set.")?;
 
     piteo_core::build_connection_pool(&database_url)
+}
+
+fn wip() -> async_graphql::Error {
+    async_graphql::Error::new("wip!()")
 }

@@ -1,46 +1,57 @@
 type Account {
 	planId: ID
-	status: String
+	status: SubscriptionStatus
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	trialEnd: DateTime
-	ownerId: String!
+	ownerId: String
 	id: ID!
 	plan: Plan
 }
 input AccountActivatePlanInput {
-	id: String!
+	id: ID!
+	name: String!
+	planCode: PlanCode!
 }
 input AccountUpdateInput {
-	id: String!
+	id: ID!
+	paymentMethodId: ID!
 }
 type Address {
 	city: String!
-	country: String!
+	country: String
 	line1: String!
 	line2: String
 	postalCode: String!
 	inline: String!
 }
-scalar AuthID
+input AddressInput {
+	city: String!
+	country: String
+	line1: String!
+	line2: String
+	postalCode: String!
+}
+scalar AuthenticationID
 type Company {
 	address: Address
 	displayName: String!
 	email: Email!
 	id: ID!
 	legalEntity: String!
-	legalEntityIdentifier: String!
-	legalEntityType: String!
-	legalEntityTypeOther: String!
-	phoneNumber: PhoneNumber!
+	legalEntityIdentifier: String
+	legalEntityType: LegalEntityType
+	legalEntityTypeOther: String
+	phoneNumber: PhoneNumber
 }
+scalar Date
 scalar DateTime
 scalar Decimal
 scalar Email
 type Feature {
 	available: Boolean!
 	title: String!
-	key: String!
+	key: String
 }
 type File {
 	createdAt: DateTime!
@@ -48,17 +59,37 @@ type File {
 	externalId: String
 	filename: String
 	previewUrl: String
-	status: String
-	type: String!
+	status: FileStatus
+	type: FileType!
 	updatedAt: DateTime
 	id: ID!
 }
 input FileInput {
-	id: String!
+	downloadUrl: String!
+	type: FileType!
+}
+"""
+https://www.pdfmonkey.io/fr/doc/api/generer-un-document
+"""
+enum FileStatus {
+	DRAFT
+	FAILURE
+	GENERATING
+	PENDING
+	SUCCESS
+}
+enum FileType {
+	PAYMENT_NOTICE
+	LEASE_DOCUMENT
+	RENT_RECEIPT
 }
 union Identity = | User | Company
 input ImportInput {
-	id: String!
+	files: [FileInput!]!
+	source: ImportSource!
+}
+enum ImportSource {
+	RENTILA
 }
 type Invoice {
 	id: ID!
@@ -67,7 +98,7 @@ type Invoice {
 	invoicePdf: String!
 	periodEnd: DateTime!
 	status: String!
-	planCode: String!
+	planCode: PlanCode!
 }
 type Lease {
 	accountId: ID!
@@ -86,20 +117,119 @@ type Lease {
 	renewDate: DateTime
 	status: LeaseStatus!
 	lease: File
-	rents: [Rent!]!
+	rents: [Rent!]
 	tenants: [Tenant!]!
 	account: Account
 	property: Property
 }
 type LeaseFurnishedData {
-	duration: String
-	rentPaymentMethod: String
+	chargesRecuperationMode: RentChargesRecuperationMode
+	chargesRevisionMethod: String
+	colocationInsuranceLender: Boolean
+	colocationInsuranceMonthlyAmount: Decimal
+	colocationInsuranceTotalAmount: Decimal
+	duration: LeaseFurnishedDuration
+	lenderFeeCap: Decimal
+	lenderFeeCapOther: String
+	lenderFeeCapPrestations: Decimal
+	otherConditions: String
+	rentComplement: Decimal
+	rentComplementPropertyJustification: String
+	rentFirstAmount: Decimal
+	rentIrl: LeaseRentReferenceIrl
+	rentIrlRevisionDate: String
+	rentMajDecreeIncreasedAmount: Decimal
+	rentMajDecreeReferenceAmount: Decimal
+	rentMajorationDecree: Boolean
+	rentMaxEvolutionRelocation: Boolean
+	rentPaymentDate: DateTime
+	rentPaymentMethod: RentPaymentMethod
+	rentPaymentPlace: String
+	rentPeriodicity: LeaseRentPeriodicity
+	rentUnderestimatedMethod: String
+	rentUnderestimatedMonthlyVariation: Decimal
+	resolutaryClause: String
+	solidarityClause: String
+	tenantFeeCapNewRental: Decimal
+	tenantFeeCapPrestations: Decimal
+	tenantFeeCapReportByMeter: Decimal
+	tenantFeeCapReportPrestations: Decimal
+	tenantLastRentAmount: Decimal
+	tenantLastRentReceivedDate: String
+	tenantLastRentRevisionDate: String
+	worksDecenceSinceLastRental: String
+	worksRentDecreaseTenant: String
+	worksRentIncreaseLender: String
+}
+input LeaseFurnishedDataInput {
+	chargesRecuperationMode: RentChargesRecuperationMode
+	chargesRevisionMethod: String
+	colocationInsuranceLender: Boolean
+	colocationInsuranceMonthlyAmount: Decimal
+	colocationInsuranceTotalAmount: Decimal
+	duration: LeaseFurnishedDuration
+	lenderFeeCap: Decimal
+	lenderFeeCapOther: String
+	lenderFeeCapPrestations: Decimal
+	otherConditions: String
+	rentComplement: Decimal
+	rentComplementPropertyJustification: String
+	rentFirstAmount: Decimal
+	rentIrl: LeaseRentReferenceIrl
+	rentIrlRevisionDate: Date
+	rentMajDecreeIncreasedAmount: Decimal
+	rentMajDecreeReferenceAmount: Decimal
+	rentMajorationDecree: Boolean
+	rentMaxEvolutionRelocation: Boolean
+	rentPaymentDate: Date
+	rentPaymentMethod: RentPaymentMethod
+	rentPaymentPlace: String
+	rentPeriodicity: LeaseRentPeriodicity
+	rentUnderestimatedMethod: String
+	rentUnderestimatedMonthlyVariation: Decimal
+	resolutaryClause: String
+	solidarityClause: String
+	tenantFeeCapNewRental: Decimal
+	tenantFeeCapPrestations: Decimal
+	tenantFeeCapReportByMeter: Decimal
+	tenantFeeCapReportPrestations: Decimal
+	tenantLastRentAmount: Decimal
+	tenantLastRentReceivedDate: Date
+	tenantLastRentRevisionDate: Date
+	worksDecenceSinceLastRental: String
+	worksRentDecreaseTenant: String
+	worksRentIncreaseLender: String
+}
+enum LeaseFurnishedDuration {
+	NINE_MONTHS
+	ONE_YEAR
 }
 input LeaseFurnishedInput {
-	id: String!
+	data: LeaseFurnishedDataInput
+	depositAmount: Decimal
+	effectDate: Date!
+	renewDate: Date
+	file: FileInput
+	propertyId: ID!
+	rentAmount: Decimal!
+	rentChargesAmount: Decimal
+	signatureDate: Date
+	tenantIds: [ID!]!
 }
 input LeaseFurnishedUpdateInput {
-	id: String!
+	data: LeaseFurnishedDataInput
+	file: FileInput
+	id: ID!
+}
+enum LeaseRentPeriodicity {
+	ANNUALY
+	MONTHLY
+}
+"""
+https://www.service-public.fr/particuliers/vosdroits/F13723
+"""
+enum LeaseRentReferenceIrl {
+	APRIL_FIRST_SEMESTER_Y2021
 }
 enum LeaseStatus {
 	ACTIVE
@@ -109,16 +239,28 @@ enum LeaseType {
 	FURNISHED
 	NAKED
 }
+enum LegalEntityType {
+	EURL
+	OTHER
+	SA
+	SARL
+	SAS
+	SASU
+	SCI
+	SCP
+	SNC
+}
 type Lender {
 	id: ID!
-	accountId: ID!
+	accountId: ID
 	individualId: ID
 	companyId: ID
 	displayName: String!
 	identity: Identity
 }
 input LenderIndividualUpdateInput {
-	id: String!
+	id: ID!
+	individual: UserUpdateInput!
 }
 type Mutation {
 	userCreateWithAccount(input: UserWithAccountInput!): Account!
@@ -142,47 +284,144 @@ type Mutation {
 }
 scalar PhoneNumber
 type Plan {
-	code: String!
+	code: PlanCode!
 	price: Decimal
 	subtitle: String
 	title: String
 	id: ID!
 	features: [Feature!]!
 }
+enum PlanCode {
+	SOLO
+}
 type Property {
+	account: Account
 	accountId: ID
 	address: Address!
-	buildPeriod: String
-	buildingLegalStatus: String
+	buildPeriod: PropertyBuildPeriodType
+	buildingLegalStatus: PropertyBuildingLegalStatus
 	commonSpaces: String
-	energyClass: String
+	energyClass: PropertyEnergyClass
 	equipments: String
-	gasEmission: String
-	heatingMethod: String
-	housingType: String
+	gasEmission: PropertyGasEmission
+	heatingMethod: PropertyUsageType
+	housingType: PropertyUsageType
 	name: String!
 	note: String
 	nticEquipments: String
 	otherSpaces: String
 	tax: Float
-	roomCount: String!
-	status: String
+	roomCount: PropertyRoomType!
+	status: PropertyStatus
 	surface: Int!
 	tenantPrivateSpaces: String
-	usageType: String
-	waterHeatingMethod: String
+	usageType: PropertyHabitationUsageType
+	waterHeatingMethod: PropertyUsageType
 	id: ID!
-	lenderId: ID!
+	lenderId: ID
 	expectedRents: Decimal
 	collectedRents: Decimal
 	lender: Lender
-	leases: [Lease!]!
+	leases: [Lease!]
+}
+enum PropertyBuildPeriodType {
+	BEFORE_Y1949
+	FROM_Y1949Y1974
+	FROM_Y1975Y1989
+	FROM_Y1990Y2005
+	FROM_Y2005
+}
+enum PropertyBuildingLegalStatus {
+	COPRO
+	MONO
+}
+enum PropertyEnergyClass {
+	A
+	B
+	C
+	D
+	E
+	F
+	G
+}
+enum PropertyGasEmission {
+	A
+	B
+	C
+	D
+	E
+	F
+	G
+}
+enum PropertyHabitationUsageType {
+	HABITATION
+	MIXTE
 }
 input PropertyInput {
-	id: String!
+	address: AddressInput!
+	buildPeriod: PropertyBuildPeriodType!
+	buildingLegalStatus: PropertyBuildingLegalStatus!
+	commonSpaces: String
+	energyClass: PropertyEnergyClass
+	equipments: String
+	gasEmission: PropertyGasEmission
+	heatingMethod: PropertyUsageType!
+	housingType: PropertyUsageType!
+	lenderId: ID!
+	name: String!
+	note: String
+	nticEquipments: String
+	otherSpaces: String
+	roomCount: PropertyRoomType!
+	status: PropertyStatus
+	surface: Float!
+	tax: Decimal
+	tenantPrivateSpaces: String
+	usageType: PropertyHabitationUsageType!
+	waterHeatingMethod: PropertyUsageType!
+}
+enum PropertyRoomType {
+	OTHER
+	T1
+	T2
+	T3
+	T4
+	T5
+	T6
+}
+enum PropertyStatus {
+	FOR_SALE
+	INACTIVE
+	RENTED
+	UNDER_CONSTRUCTION
+	UNRENTED
 }
 input PropertyUpdateInput {
-	id: String!
+	address: AddressInput
+	buildPeriod: PropertyBuildPeriodType
+	buildingLegalStatus: PropertyBuildingLegalStatus
+	commonSpaces: String
+	energyClass: PropertyEnergyClass
+	equipments: String
+	gasEmission: PropertyGasEmission
+	heatingMethod: PropertyUsageType
+	housingType: PropertyUsageType
+	id: ID!
+	name: String
+	note: String
+	nticEquipments: String
+	otherSpaces: String
+	roomCount: PropertyRoomType
+	status: PropertyStatus
+	surface: Float
+	tax: Decimal
+	tenantPrivateSpaces: String
+	usageType: PropertyHabitationUsageType
+	waterHeatingMethod: PropertyUsageType
+}
+enum PropertyUsageType {
+	COLLECTIVE
+	INDIVIDUAL
 }
 type Query {
 	viewer: User!
@@ -204,15 +443,25 @@ type Rent {
 	chargesAmount: Decimal
 	fullAmount: Decimal!
 	status: RentStatus!
-	accountId: ID!
 	leaseId: ID!
 	receiptId: ID
 	transactionId: ID
 	noticeId: ID
-	transactions: [Transaction!]!
+	delay: Int
+	transactions: [Transaction!]
+}
+enum RentChargesRecuperationMode {
+	PACKAGE
+	PERIODIC
+	REEL
+}
+enum RentPaymentMethod {
+	AFTER
+	BEFORE
 }
 input RentReceiptInput {
-	id: String!
+	leaseId: ID!
+	sendMail: Boolean
 }
 type RentReceiptPayload {
 	receipt: File!
@@ -221,6 +470,18 @@ enum RentStatus {
 	PARTIAL
 	PENDING
 	SETTLED
+}
+"""
+https://stripe.com/docs/billing/subscriptions/overview#subscription-states
+"""
+enum SubscriptionStatus {
+	ACTIVE
+	CANCELED
+	INCOMPLETE
+	INCOMPLETE_EXPIRED
+	PAST_DUE
+	TRIALING
+	UNPAID
 }
 type Summary {
 	since: DateTime!
@@ -255,8 +516,8 @@ type Task {
 }
 type Tenant {
 	accountId: ID!
-	apl: Boolean!
-	authId: AuthID
+	apl: Boolean
+	authId: AuthenticationID
 	birthdate: DateTime!
 	birthplace: String
 	email: String!
@@ -271,18 +532,26 @@ type Tenant {
 	visaleId: String
 	account: Account
 	property: Property
-	status: TenantStatus!
+	status: TenantStatus
 	fullName: String!
-	shortName: String!
+	shortName: String
 	lastTransaction: Transaction
 	propertyName: String
 	rentPayedThisYear: String
-	unpaidRentAmount: String
-	files: [File!]!
+	unpaidRentAmount: Int
+	files: [File!]
 	lease: Lease
 }
 input TenantInput {
-	id: String!
+	apl: Boolean
+	birthdate: Date!
+	birthplace: String
+	email: Email!
+	firstName: String!
+	lastName: String!
+	note: String
+	phoneNumber: PhoneNumber
+	visaleId: String
 }
 enum TenantStatus {
 	GONE
@@ -291,35 +560,72 @@ enum TenantStatus {
 	UPTODATE
 }
 input TenantUpdateInput {
-	id: String!
+	apl: Boolean
+	birthdate: Date
+	birthplace: String
+	email: Email
+	id: ID!
+	firstName: String
+	lastName: String
+	note: String
+	phoneNumber: PhoneNumber
+	visaleId: String
 }
 type Transaction {
 	id: ID!
 	date: DateTime!
 	amount: Decimal!
 	accountId: ID!
-	type: String!
+	type: TransactionType!
 	lease: Lease
 }
 input TransactionInput {
-	id: String!
+	amount: Decimal!
+	leaseId: ID!
+	date: Date!
+	type: TransactionType
+}
+enum TransactionType {
+	INSURANCE_HAB
+	INSURANCE_PNO
+	INVOICE
+	LOAN_INTEREST
+	LOAN_PAYMENT
+	OTHER
+	RENT
 }
 type User {
-	authId: AuthID!
+	authId: AuthenticationID
 	email: Email!
 	firstName: String
 	lastName: String
 	address: Address
 	photoURL: String
-	role: String
+	role: UserRole
 	id: ID!
-	phoneNumber: String
-	accountId: ID!
+	phoneNumber: PhoneNumber
+	accountId: ID
 	displayName: String!
-	account: Account!
+	accounts: [Account!]
+	account: Account
+}
+enum UserRole {
+	ADMIN
+	USER
+	VIEWER
+}
+input UserUpdateInput {
+	address: AddressInput!
+	firstName: String!
+	lastName: String!
 }
 input UserWithAccountInput {
-	id: String!
+	address: AddressInput
+	authId: AuthenticationID!
+	email: Email!
+	firstName: String!
+	lastName: String!
+	skipCreateCustomer: Boolean
 }
 schema {
 	query: Query

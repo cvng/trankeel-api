@@ -13,11 +13,11 @@ pub struct Summary {
     pub amount_partial: Amount,
     pub amount_pending: Amount,
     //
-    pub n_expected: usize,
-    pub n_received: usize,
-    pub n_settled: usize,
-    pub n_partial: usize,
-    pub n_pending: usize,
+    pub n_expected: u32,
+    pub n_received: u32,
+    pub n_settled: u32,
+    pub n_partial: u32,
+    pub n_pending: u32,
     //
     pub ratio_expected: f64,
     pub ratio_received: f64,

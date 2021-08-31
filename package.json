@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": "true",
   "scripts": {
-    "dev": "cargo watch -x run",
+    "dev": "cargo watch -i schema.graphql -x run",
     "build": "cargo build",
     "start": "cargo run",
     "lint": "cargo clippy",
