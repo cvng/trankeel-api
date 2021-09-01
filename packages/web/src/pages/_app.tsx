@@ -12,11 +12,17 @@ if (typeof window !== "undefined") {
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
-    <ApolloProvider client={piteoClient()}>
-      <Elements stripe={stripePromise()}>
-          <Component {...pageProps} />
-        </Elements>
-    </ApolloProvider>
+    <div suppressHydrationWarning>
+      {typeof window !== "undefined"
+        ? (
+          <ApolloProvider client={piteoClient()}>
+            <Elements stripe={stripePromise()}>
+              <Component {...pageProps} />
+            </Elements>
+          </ApolloProvider>
+        )
+        : null}
+    </div>
   );
 };
 
