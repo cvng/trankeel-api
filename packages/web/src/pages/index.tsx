@@ -1,9 +1,14 @@
+import { useQuery } from "@apollo/client";
 import Head from "next/head";
 import Image from "next/image";
+import { UserQuery } from "src/helpers";
 import { capitalize } from "../kit/lib";
 import styles from "../styles/Home.module.css";
 
 const Home = () => {
+  const { error, data } = useQuery(UserQuery);
+  console.log({ error, data });
+
   return (
     <div className={styles.container}>
       <Head>
