@@ -331,6 +331,13 @@ export class ContractHelper {
       [RentPaymentMethod.After, _("rent_payment_method_after")],
     ]);
   }
+  static furnishedDuration(): Map<LeaseFurnishedDuration, string> {
+    return new Map<LeaseFurnishedDuration, string>([
+      [LeaseFurnishedDuration.NineMonths, _("nine_months")],
+      [LeaseFurnishedDuration.OneYear,  _("one_year")],
+    ]);
+  }
+
 }
 
 export function fileTypeMap(): Map<FileType, string> {
