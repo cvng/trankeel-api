@@ -41,10 +41,10 @@ pub fn build_schema() -> Result<PiteoSchema> {
 /// Print the schema in SDL format. https://async-graphql.github.io/async-graphql/en/sdl_export.html
 pub fn write_schema() -> Result<()> {
     let path = SCHEMA_PATH;
-    let schema_sdl = build_schema().unwrap().sdl();
+    let schema = build_schema()?;
 
-    let mut file = File::create(path).unwrap();
-    file.write_all(schema_sdl.as_bytes()).unwrap();
+    let mut file = File::create(path)?;
+    file.write_all(schema.sdl().as_bytes())?;
 
     println!("💫 GraphQL schema printed at {}", path);
 
