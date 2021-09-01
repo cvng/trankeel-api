@@ -1,4 +1,4 @@
-import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+import gql from "graphql-tag";
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
@@ -17,7 +17,7 @@ export interface Scalars {
   AuthenticationID: string;
   Date: string;
   DateTime: string;
-  Decimal: number;
+  Decimal: string;
   Email: string;
   PhoneNumber: string;
 }
@@ -1001,99 +1001,114 @@ export enum __DirectiveLocation {
 
 export type TestQueryVariables = Exact<{ [key: string]: never }>;
 
-export type TestQuery = { __typename?: "Query" } & {
-  __schema: { __typename?: "__Schema" } & {
-    types: Array<{ __typename?: "__Type" } & Pick<__Type, "name">>;
+export type TestQuery = {
+  __typename?: "Query";
+  __schema: {
+    __typename?: "__Schema";
+    types: Array<{ __typename?: "__Type"; name?: Maybe<string> }>;
   };
 };
 
 export type UserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type UserQuery = { __typename?: "Query" } & {
-  user: { __typename?: "User" } & Pick<
-    User,
-    "id" | "email" | "firstName" | "lastName" | "displayName" | "photoURL"
-  > & {
-      address?: Maybe<
-        { __typename?: "Address" } & Pick<
-          Address,
-          "line1" | "line2" | "city" | "postalCode"
-        >
-      >;
-      account?: Maybe<
-        { __typename?: "Account" } & Pick<
-          Account,
-          "id" | "status" | "trialEnd"
-        > & { plan?: Maybe<{ __typename?: "Plan" } & Pick<Plan, "code">> }
-      >;
-    };
+export type UserQuery = {
+  __typename?: "Query";
+  user: {
+    __typename?: "User";
+    id: string;
+    email: string;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+    displayName: string;
+    photoURL?: Maybe<string>;
+    address?: Maybe<{
+      __typename?: "Address";
+      line1: string;
+      line2?: Maybe<string>;
+      city: string;
+      postalCode: string;
+    }>;
+    account?: Maybe<{
+      __typename?: "Account";
+      id: string;
+      status?: Maybe<SubscriptionStatus>;
+      trialEnd?: Maybe<string>;
+      plan?: Maybe<{ __typename?: "Plan"; code: PlanCode }>;
+    }>;
+  };
 };
 
 export type LenderQueryVariables = Exact<{ [key: string]: never }>;
 
-export type LenderQuery = { __typename?: "Query" } & {
-  lenders: Array<
-    { __typename?: "Lender" } & Pick<
-      Lender,
-      "id" | "accountId" | "displayName"
-    > & {
-        identity?: Maybe<
-          | ({ __typename?: "User" } & Pick<
-              User,
-              "id" | "email" | "displayName" | "firstName" | "lastName"
-            > & {
-                address?: Maybe<
-                  { __typename?: "Address" } & Pick<
-                    Address,
-                    "inline" | "line1" | "line2" | "city" | "postalCode"
-                  >
-                >;
-              })
-          | ({ __typename?: "Company" } & Pick<
-              Company,
-              | "id"
-              | "email"
-              | "displayName"
-              | "legalEntity"
-              | "legalEntityIdentifier"
-            > & {
-                address?: Maybe<
-                  { __typename?: "Address" } & Pick<
-                    Address,
-                    "inline" | "line1" | "line2" | "city" | "postalCode"
-                  >
-                >;
-              })
-        >;
-      }
-  >;
+export type LenderQuery = {
+  __typename?: "Query";
+  lenders: Array<{
+    __typename?: "Lender";
+    id: string;
+    accountId?: Maybe<string>;
+    displayName: string;
+    identity?: Maybe<
+      | {
+          __typename?: "User";
+          id: string;
+          email: string;
+          displayName: string;
+          firstName?: Maybe<string>;
+          lastName?: Maybe<string>;
+          address?: Maybe<{
+            __typename?: "Address";
+            inline: string;
+            line1: string;
+            line2?: Maybe<string>;
+            city: string;
+            postalCode: string;
+          }>;
+        }
+      | {
+          __typename?: "Company";
+          id: string;
+          email: string;
+          displayName: string;
+          legalEntity: string;
+          legalEntityIdentifier?: Maybe<string>;
+          address?: Maybe<{
+            __typename?: "Address";
+            inline: string;
+            line1: string;
+            line2?: Maybe<string>;
+            city: string;
+            postalCode: string;
+          }>;
+        }
+    >;
+  }>;
 };
 
 export type TenantWithRentalReceiptsQueryVariables = Exact<{
   id: Scalars["ID"];
 }>;
 
-export type TenantWithRentalReceiptsQuery = { __typename?: "Query" } & {
-  tenants: Array<
-    { __typename?: "Tenant" } & Pick<
-      Tenant,
-      | "id"
-      | "firstName"
-      | "lastName"
-      | "fullName"
-      | "email"
-      | "phoneNumber"
-      | "propertyName"
-      | "rentPayedThisYear"
-      | "unpaidRentAmount"
-      | "status"
-      | "note"
-    > & {
-        lastTransaction?: Maybe<
-          { __typename?: "Transaction" } & Pick<Transaction, "date" | "amount">
-        >;
-      }
-  >;
+export type TenantWithRentalReceiptsQuery = {
+  __typename?: "Query";
+  tenants: Array<{
+    __typename?: "Tenant";
+    id: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: Maybe<string>;
+    propertyName?: Maybe<string>;
+    rentPayedThisYear?: Maybe<string>;
+    unpaidRentAmount?: Maybe<number>;
+    status?: Maybe<TenantStatus>;
+    note?: Maybe<string>;
+    lastTransaction?: Maybe<{
+      __typename?: "Transaction";
+      date: string;
+      amount: string;
+    }>;
+  }>;
 };
 
 export type TenantListQueryVariables = Exact<{
@@ -1102,121 +1117,111 @@ export type TenantListQueryVariables = Exact<{
   status?: Maybe<TenantStatus>;
 }>;
 
-export type TenantListQuery = { __typename?: "Query" } & {
-  tenants: Array<
-    { __typename?: "Tenant" } & Pick<
-      Tenant,
-      | "id"
-      | "firstName"
-      | "lastName"
-      | "fullName"
-      | "email"
-      | "phoneNumber"
-      | "propertyName"
-      | "rentPayedThisYear"
-      | "unpaidRentAmount"
-      | "status"
-      | "note"
-      | "visaleId"
-      | "apl"
-      | "birthdate"
-      | "birthplace"
-      | "displayName"
-      | "accountId"
-    > & {
-        lastTransaction?: Maybe<
-          { __typename?: "Transaction" } & Pick<
-            Transaction,
-            "id" | "date" | "amount" | "accountId" | "type"
-          >
-        >;
-        files?: Maybe<
-          Array<
-            { __typename?: "File" } & Pick<
-              File,
-              "id" | "filename" | "createdAt" | "type" | "downloadUrl"
-            >
-          >
-        >;
-        lease?: Maybe<
-          { __typename?: "Lease" } & Pick<
-            Lease,
-            | "id"
-            | "type"
-            | "status"
-            | "rentFullAmount"
-            | "rentAmount"
-            | "rentChargesAmount"
-            | "effectDate"
-            | "renewDate"
-            | "signatureDate"
-            | "depositAmount"
-            | "accountId"
-            | "propertyId"
-          > & {
-              rents?: Maybe<
-                Array<
-                  { __typename?: "Rent" } & Pick<
-                    Rent,
-                    | "id"
-                    | "periodStart"
-                    | "periodEnd"
-                    | "fullAmount"
-                    | "amount"
-                    | "status"
-                    | "leaseId"
-                  >
-                >
-              >;
-              data?: Maybe<
-                { __typename?: "LeaseFurnishedData" } & Pick<
-                  LeaseFurnishedData,
-                  "duration"
-                >
-              >;
-              account?: Maybe<{ __typename?: "Account" } & Pick<Account, "id">>;
-              property?: Maybe<
-                { __typename?: "Property" } & Pick<
-                  Property,
-                  | "id"
-                  | "buildPeriod"
-                  | "buildingLegalStatus"
-                  | "heatingMethod"
-                  | "housingType"
-                  | "name"
-                  | "roomCount"
-                  | "surface"
-                  | "usageType"
-                  | "waterHeatingMethod"
-                > & {
-                    address: { __typename?: "Address" } & Pick<
-                      Address,
-                      "city" | "inline" | "line1" | "postalCode"
-                    >;
-                  }
-              >;
-              tenants: Array<
-                { __typename?: "Tenant" } & Pick<
-                  Tenant,
-                  | "id"
-                  | "displayName"
-                  | "email"
-                  | "firstName"
-                  | "lastName"
-                  | "accountId"
-                  | "birthdate"
-                  | "fullName"
-                > & {
-                    account?: Maybe<
-                      { __typename?: "Account" } & Pick<Account, "id">
-                    >;
-                  }
-              >;
-            }
-        >;
-        account?: Maybe<{ __typename?: "Account" } & Pick<Account, "id">>;
-      }
-  >;
+export type TenantListQuery = {
+  __typename?: "Query";
+  tenants: Array<{
+    __typename?: "Tenant";
+    id: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: Maybe<string>;
+    propertyName?: Maybe<string>;
+    rentPayedThisYear?: Maybe<string>;
+    unpaidRentAmount?: Maybe<number>;
+    status?: Maybe<TenantStatus>;
+    note?: Maybe<string>;
+    visaleId?: Maybe<string>;
+    apl?: Maybe<boolean>;
+    birthdate: string;
+    birthplace?: Maybe<string>;
+    displayName: string;
+    accountId: string;
+    lastTransaction?: Maybe<{
+      __typename?: "Transaction";
+      id: string;
+      date: string;
+      amount: string;
+      accountId: string;
+      type: TransactionType;
+    }>;
+    files?: Maybe<
+      Array<{
+        __typename?: "File";
+        id: string;
+        filename?: Maybe<string>;
+        createdAt: string;
+        type: FileType;
+        downloadUrl?: Maybe<string>;
+      }>
+    >;
+    lease?: Maybe<{
+      __typename?: "Lease";
+      id: string;
+      type: LeaseType;
+      status: LeaseStatus;
+      rentFullAmount: string;
+      rentAmount: string;
+      rentChargesAmount?: Maybe<string>;
+      effectDate: string;
+      renewDate?: Maybe<string>;
+      signatureDate?: Maybe<string>;
+      depositAmount?: Maybe<string>;
+      accountId: string;
+      propertyId: string;
+      rents?: Maybe<
+        Array<{
+          __typename?: "Rent";
+          id: string;
+          periodStart: string;
+          periodEnd: string;
+          fullAmount: string;
+          amount: string;
+          status: RentStatus;
+          leaseId: string;
+        }>
+      >;
+      data?: Maybe<{
+        __typename?: "LeaseFurnishedData";
+        duration?: Maybe<LeaseFurnishedDuration>;
+      }>;
+      account?: Maybe<{ __typename?: "Account"; id: string }>;
+      property?: Maybe<{
+        __typename?: "Property";
+        id: string;
+        buildPeriod?: Maybe<PropertyBuildPeriodType>;
+        buildingLegalStatus?: Maybe<PropertyBuildingLegalStatus>;
+        heatingMethod?: Maybe<PropertyUsageType>;
+        housingType?: Maybe<PropertyUsageType>;
+        name: string;
+        roomCount: PropertyRoomType;
+        surface: number;
+        usageType?: Maybe<PropertyHabitationUsageType>;
+        waterHeatingMethod?: Maybe<PropertyUsageType>;
+        address: {
+          __typename?: "Address";
+          city: string;
+          inline: string;
+          line1: string;
+          postalCode: string;
+        };
+      }>;
+      tenants: Array<{
+        __typename?: "Tenant";
+        id: string;
+        displayName: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        accountId: string;
+        birthdate: string;
+        fullName: string;
+        account?: Maybe<{ __typename?: "Account"; id: string }>;
+      }>;
+    }>;
+    account?: Maybe<{ __typename?: "Account"; id: string }>;
+  }>;
 };
 
 export type LeaseListQueryVariables = Exact<{
@@ -1224,110 +1229,105 @@ export type LeaseListQueryVariables = Exact<{
   query?: Maybe<Scalars["String"]>;
 }>;
 
-export type LeaseListQuery = { __typename?: "Query" } & {
-  leases: Array<
-    { __typename?: "Lease" } & Pick<
-      Lease,
-      | "id"
-      | "accountId"
-      | "propertyId"
-      | "status"
-      | "rentFullAmount"
-      | "effectDate"
-      | "rentAmount"
-      | "depositAmount"
-      | "rentChargesAmount"
-    > & {
-        account?: Maybe<{ __typename?: "Account" } & Pick<Account, "id">>;
-        property?: Maybe<
-          { __typename?: "Property" } & Pick<
-            Property,
-            | "id"
-            | "buildPeriod"
-            | "buildingLegalStatus"
-            | "heatingMethod"
-            | "housingType"
-            | "name"
-            | "roomCount"
-            | "surface"
-            | "usageType"
-            | "waterHeatingMethod"
-          > & {
-              address: { __typename?: "Address" } & Pick<
-                Address,
-                "city" | "inline" | "line1" | "postalCode"
-              >;
-            }
-        >;
-        tenants: Array<
-          { __typename?: "Tenant" } & Pick<
-            Tenant,
-            | "id"
-            | "email"
-            | "displayName"
-            | "firstName"
-            | "lastName"
-            | "fullName"
-            | "accountId"
-            | "birthdate"
-          > & {
-              account?: Maybe<{ __typename?: "Account" } & Pick<Account, "id">>;
-            }
-        >;
-        file?: Maybe<
-          { __typename?: "File" } & Pick<File, "id" | "downloadUrl" | "type">
-        >;
-        data?: Maybe<
-          { __typename?: "LeaseFurnishedData" } & Pick<
-            LeaseFurnishedData,
-            "duration" | "rentPaymentMethod"
-          >
-        >;
-      }
-  >;
+export type LeaseListQuery = {
+  __typename?: "Query";
+  leases: Array<{
+    __typename?: "Lease";
+    id: string;
+    accountId: string;
+    propertyId: string;
+    status: LeaseStatus;
+    rentFullAmount: string;
+    effectDate: string;
+    rentAmount: string;
+    depositAmount?: Maybe<string>;
+    rentChargesAmount?: Maybe<string>;
+    account?: Maybe<{ __typename?: "Account"; id: string }>;
+    property?: Maybe<{
+      __typename?: "Property";
+      id: string;
+      buildPeriod?: Maybe<PropertyBuildPeriodType>;
+      buildingLegalStatus?: Maybe<PropertyBuildingLegalStatus>;
+      heatingMethod?: Maybe<PropertyUsageType>;
+      housingType?: Maybe<PropertyUsageType>;
+      name: string;
+      roomCount: PropertyRoomType;
+      surface: number;
+      usageType?: Maybe<PropertyHabitationUsageType>;
+      waterHeatingMethod?: Maybe<PropertyUsageType>;
+      address: {
+        __typename?: "Address";
+        city: string;
+        inline: string;
+        line1: string;
+        postalCode: string;
+      };
+    }>;
+    tenants: Array<{
+      __typename?: "Tenant";
+      id: string;
+      email: string;
+      displayName: string;
+      firstName: string;
+      lastName: string;
+      fullName: string;
+      accountId: string;
+      birthdate: string;
+      account?: Maybe<{ __typename?: "Account"; id: string }>;
+    }>;
+    file?: Maybe<{
+      __typename?: "File";
+      id: string;
+      downloadUrl?: Maybe<string>;
+      type: FileType;
+    }>;
+    data?: Maybe<{
+      __typename?: "LeaseFurnishedData";
+      duration?: Maybe<LeaseFurnishedDuration>;
+      rentPaymentMethod?: Maybe<RentPaymentMethod>;
+    }>;
+  }>;
 };
 
 export type LeaseQueryVariables = Exact<{
   id: Scalars["ID"];
 }>;
 
-export type LeaseQuery = { __typename?: "Query" } & {
-  leases: Array<
-    { __typename?: "Lease" } & Pick<
-      Lease,
-      | "id"
-      | "accountId"
-      | "status"
-      | "rentFullAmount"
-      | "effectDate"
-      | "rentAmount"
-      | "depositAmount"
-      | "rentChargesAmount"
-    > & {
-        tenants: Array<
-          { __typename?: "Tenant" } & Pick<Tenant, "id" | "fullName">
-        >;
-        file?: Maybe<{ __typename?: "File" } & Pick<File, "downloadUrl">>;
-        data?: Maybe<
-          { __typename?: "LeaseFurnishedData" } & Pick<
-            LeaseFurnishedData,
-            "duration" | "rentPaymentMethod"
-          >
-        >;
-      }
-  >;
+export type LeaseQuery = {
+  __typename?: "Query";
+  leases: Array<{
+    __typename?: "Lease";
+    id: string;
+    accountId: string;
+    status: LeaseStatus;
+    rentFullAmount: string;
+    effectDate: string;
+    rentAmount: string;
+    depositAmount?: Maybe<string>;
+    rentChargesAmount?: Maybe<string>;
+    tenants: Array<{ __typename?: "Tenant"; id: string; fullName: string }>;
+    file?: Maybe<{ __typename?: "File"; downloadUrl?: Maybe<string> }>;
+    data?: Maybe<{
+      __typename?: "LeaseFurnishedData";
+      duration?: Maybe<LeaseFurnishedDuration>;
+      rentPaymentMethod?: Maybe<RentPaymentMethod>;
+    }>;
+  }>;
 };
 
 export type ContractRequirementDataQueryVariables = Exact<{
   query?: Maybe<Scalars["String"]>;
 }>;
 
-export type ContractRequirementDataQuery = { __typename?: "Query" } & {
-  tenants: Array<
-    { __typename?: "Tenant" } & Pick<Tenant, "id" | "fullName" | "status"> & {
-        lease?: Maybe<{ __typename?: "Lease" } & Pick<Lease, "id">>;
-      }
-  >;
+export type ContractRequirementDataQuery = {
+  __typename?: "Query";
+  tenants: Array<{
+    __typename?: "Tenant";
+    id: string;
+    fullName: string;
+    status?: Maybe<TenantStatus>;
+    lease?: Maybe<{ __typename?: "Lease"; id: string }>;
+  }>;
 };
 
 export type PropertyListQueryVariables = Exact<{
@@ -1335,188 +1335,184 @@ export type PropertyListQueryVariables = Exact<{
   query?: Maybe<Scalars["String"]>;
 }>;
 
-export type PropertyListQuery = { __typename?: "Query" } & {
-  properties: Array<
-    { __typename?: "Property" } & Pick<
-      Property,
-      | "id"
-      | "name"
-      | "roomCount"
-      | "note"
-      | "collectedRents"
-      | "surface"
-      | "status"
-      | "energyClass"
-      | "gasEmission"
-      | "tenantPrivateSpaces"
-      | "equipments"
-      | "nticEquipments"
-      | "otherSpaces"
-      | "commonSpaces"
-      | "waterHeatingMethod"
-      | "heatingMethod"
-      | "tax"
-      | "buildPeriod"
-      | "housingType"
-      | "buildingLegalStatus"
-      | "usageType"
-    > & {
-        address: { __typename?: "Address" } & Pick<
-          Address,
-          "city" | "country" | "inline" | "line1" | "line2" | "postalCode"
-        >;
-        lender?: Maybe<
-          { __typename?: "Lender" } & Pick<Lender, "id" | "displayName">
-        >;
-        leases?: Maybe<
-          Array<
-            { __typename?: "Lease" } & Pick<
-              Lease,
-              | "id"
-              | "status"
-              | "type"
-              | "effectDate"
-              | "renewDate"
-              | "signatureDate"
-              | "rentAmount"
-              | "depositAmount"
-              | "rentChargesAmount"
-              | "rentFullAmount"
-              | "accountId"
-              | "propertyId"
-            > & {
-                account?: Maybe<
-                  { __typename?: "Account" } & Pick<Account, "id">
-                >;
-                tenants: Array<
-                  { __typename?: "Tenant" } & Pick<
-                    Tenant,
-                    | "id"
-                    | "fullName"
-                    | "status"
-                    | "displayName"
-                    | "email"
-                    | "firstName"
-                    | "lastName"
-                    | "accountId"
-                    | "birthdate"
-                  > & {
-                      account?: Maybe<
-                        { __typename?: "Account" } & Pick<Account, "id">
-                      >;
-                    }
-                >;
-                property?: Maybe<
-                  { __typename?: "Property" } & Pick<
-                    Property,
-                    | "id"
-                    | "buildPeriod"
-                    | "buildingLegalStatus"
-                    | "heatingMethod"
-                    | "housingType"
-                    | "name"
-                    | "roomCount"
-                    | "surface"
-                    | "usageType"
-                    | "waterHeatingMethod"
-                  > & {
-                      address: { __typename?: "Address" } & Pick<
-                        Address,
-                        "city" | "inline" | "line1" | "postalCode"
-                      >;
-                      lender?: Maybe<
-                        { __typename?: "Lender" } & Pick<
-                          Lender,
-                          "id" | "displayName"
-                        >
-                      >;
-                    }
-                >;
-              }
-          >
-        >;
-      }
-  >;
+export type PropertyListQuery = {
+  __typename?: "Query";
+  properties: Array<{
+    __typename?: "Property";
+    id: string;
+    name: string;
+    roomCount: PropertyRoomType;
+    note?: Maybe<string>;
+    collectedRents?: Maybe<string>;
+    surface: number;
+    status?: Maybe<PropertyStatus>;
+    energyClass?: Maybe<PropertyEnergyClass>;
+    gasEmission?: Maybe<PropertyGasEmission>;
+    tenantPrivateSpaces?: Maybe<string>;
+    equipments?: Maybe<string>;
+    nticEquipments?: Maybe<string>;
+    otherSpaces?: Maybe<string>;
+    commonSpaces?: Maybe<string>;
+    waterHeatingMethod?: Maybe<PropertyUsageType>;
+    heatingMethod?: Maybe<PropertyUsageType>;
+    tax?: Maybe<number>;
+    buildPeriod?: Maybe<PropertyBuildPeriodType>;
+    housingType?: Maybe<PropertyUsageType>;
+    buildingLegalStatus?: Maybe<PropertyBuildingLegalStatus>;
+    usageType?: Maybe<PropertyHabitationUsageType>;
+    address: {
+      __typename?: "Address";
+      city: string;
+      country?: Maybe<string>;
+      inline: string;
+      line1: string;
+      line2?: Maybe<string>;
+      postalCode: string;
+    };
+    lender?: Maybe<{ __typename?: "Lender"; id: string; displayName: string }>;
+    leases?: Maybe<
+      Array<{
+        __typename?: "Lease";
+        id: string;
+        status: LeaseStatus;
+        type: LeaseType;
+        effectDate: string;
+        renewDate?: Maybe<string>;
+        signatureDate?: Maybe<string>;
+        rentAmount: string;
+        depositAmount?: Maybe<string>;
+        rentChargesAmount?: Maybe<string>;
+        rentFullAmount: string;
+        accountId: string;
+        propertyId: string;
+        account?: Maybe<{ __typename?: "Account"; id: string }>;
+        tenants: Array<{
+          __typename?: "Tenant";
+          id: string;
+          fullName: string;
+          status?: Maybe<TenantStatus>;
+          displayName: string;
+          email: string;
+          firstName: string;
+          lastName: string;
+          accountId: string;
+          birthdate: string;
+          account?: Maybe<{ __typename?: "Account"; id: string }>;
+        }>;
+        property?: Maybe<{
+          __typename?: "Property";
+          id: string;
+          buildPeriod?: Maybe<PropertyBuildPeriodType>;
+          buildingLegalStatus?: Maybe<PropertyBuildingLegalStatus>;
+          heatingMethod?: Maybe<PropertyUsageType>;
+          housingType?: Maybe<PropertyUsageType>;
+          name: string;
+          roomCount: PropertyRoomType;
+          surface: number;
+          usageType?: Maybe<PropertyHabitationUsageType>;
+          waterHeatingMethod?: Maybe<PropertyUsageType>;
+          address: {
+            __typename?: "Address";
+            city: string;
+            inline: string;
+            line1: string;
+            postalCode: string;
+          };
+          lender?: Maybe<{
+            __typename?: "Lender";
+            id: string;
+            displayName: string;
+          }>;
+        }>;
+      }>
+    >;
+  }>;
 };
 
 export type TransactionQueryVariables = Exact<{
   id: Scalars["ID"];
 }>;
 
-export type TransactionQuery = { __typename?: "Query" } & {
-  transactions: Array<
-    { __typename?: "Transaction" } & Pick<
-      Transaction,
-      "id" | "date" | "amount" | "type"
-    > & { lease?: Maybe<{ __typename?: "Lease" } & Pick<Lease, "id">> }
-  >;
+export type TransactionQuery = {
+  __typename?: "Query";
+  transactions: Array<{
+    __typename?: "Transaction";
+    id: string;
+    date: string;
+    amount: string;
+    type: TransactionType;
+    lease?: Maybe<{ __typename?: "Lease"; id: string }>;
+  }>;
 };
 
 export type InvoiceListQueryVariables = Exact<{ [key: string]: never }>;
 
-export type InvoiceListQuery = { __typename?: "Query" } & {
-  invoices: Array<
-    { __typename?: "Invoice" } & Pick<
-      Invoice,
-      | "id"
-      | "number"
-      | "amountPaid"
-      | "invoicePdf"
-      | "periodEnd"
-      | "status"
-      | "planCode"
-    >
-  >;
+export type InvoiceListQuery = {
+  __typename?: "Query";
+  invoices: Array<{
+    __typename?: "Invoice";
+    id: string;
+    number: number;
+    amountPaid: string;
+    invoicePdf: string;
+    periodEnd: string;
+    status: string;
+    planCode: PlanCode;
+  }>;
 };
 
 export type PricingPlansQueryVariables = Exact<{ [key: string]: never }>;
 
-export type PricingPlansQuery = { __typename?: "Query" } & {
-  plans: Array<
-    { __typename?: "Plan" } & Pick<
-      Plan,
-      "title" | "subtitle" | "id" | "price" | "code"
-    > & {
-        features: Array<
-          { __typename?: "Feature" } & Pick<
-            Feature,
-            "available" | "title" | "key"
-          >
-        >;
-      }
-  >;
+export type PricingPlansQuery = {
+  __typename?: "Query";
+  plans: Array<{
+    __typename?: "Plan";
+    title?: Maybe<string>;
+    subtitle?: Maybe<string>;
+    id: string;
+    price?: Maybe<string>;
+    code: PlanCode;
+    features: Array<{
+      __typename?: "Feature";
+      available: boolean;
+      title: string;
+      key?: Maybe<string>;
+    }>;
+  }>;
 };
 
 export type RentalReceiptDataQueryVariables = Exact<{ [key: string]: never }>;
 
-export type RentalReceiptDataQuery = { __typename?: "Query" } & {
-  tenants: Array<
-    { __typename?: "Tenant" } & Pick<
-      Tenant,
-      "id" | "firstName" | "lastName" | "fullName" | "propertyName"
-    > & {
-        lease?: Maybe<
-          { __typename?: "Lease" } & Pick<
-            Lease,
-            "id" | "rentAmount" | "rentChargesAmount" | "rentFullAmount"
-          > & {
-              property?: Maybe<
-                { __typename?: "Property" } & Pick<Property, "id"> & {
-                    address: { __typename?: "Address" } & Pick<
-                      Address,
-                      | "city"
-                      | "country"
-                      | "inline"
-                      | "line1"
-                      | "line2"
-                      | "postalCode"
-                    >;
-                  }
-              >;
-            }
-        >;
-      }
-  >;
+export type RentalReceiptDataQuery = {
+  __typename?: "Query";
+  tenants: Array<{
+    __typename?: "Tenant";
+    id: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    propertyName?: Maybe<string>;
+    lease?: Maybe<{
+      __typename?: "Lease";
+      id: string;
+      rentAmount: string;
+      rentChargesAmount?: Maybe<string>;
+      rentFullAmount: string;
+      property?: Maybe<{
+        __typename?: "Property";
+        id: string;
+        address: {
+          __typename?: "Address";
+          city: string;
+          country?: Maybe<string>;
+          inline: string;
+          line1: string;
+          line2?: Maybe<string>;
+          postalCode: string;
+        };
+      }>;
+    }>;
+  }>;
 };
 
 export type RentReceivedSummaryQueryVariables = Exact<{
@@ -1524,3515 +1520,1000 @@ export type RentReceivedSummaryQueryVariables = Exact<{
   until: Scalars["DateTime"];
 }>;
 
-export type RentReceivedSummaryQuery = { __typename?: "Query" } & {
-  rentReceivedSummary: { __typename?: "Summary" } & Pick<
-    Summary,
-    | "since"
-    | "until"
-    | "amountExpected"
-    | "amountReceived"
-    | "amountSettled"
-    | "amountPartial"
-    | "amountPending"
-    | "nExpected"
-    | "nReceived"
-    | "nSettled"
-    | "nPartial"
-    | "nPending"
-    | "ratioExpected"
-    | "ratioReceived"
-    | "ratioSettled"
-    | "ratioPartial"
-    | "ratioPending"
-    | "variationExpected"
-    | "variationReceived"
-    | "variationSettled"
-    | "variationPartial"
-    | "variationPending"
-    | "paymentRate"
-    | "occupationRate"
-  >;
+export type RentReceivedSummaryQuery = {
+  __typename?: "Query";
+  rentReceivedSummary: {
+    __typename?: "Summary";
+    since: string;
+    until: string;
+    amountExpected: string;
+    amountReceived: string;
+    amountSettled: string;
+    amountPartial: string;
+    amountPending: string;
+    nExpected: number;
+    nReceived: number;
+    nSettled: number;
+    nPartial: number;
+    nPending: number;
+    ratioExpected: number;
+    ratioReceived: number;
+    ratioSettled: number;
+    ratioPartial: number;
+    ratioPending: number;
+    variationExpected: number;
+    variationReceived: number;
+    variationSettled: number;
+    variationPartial: number;
+    variationPending: number;
+    paymentRate: number;
+    occupationRate: number;
+  };
 };
 
 export type RentReceivedStatusQueryVariables = Exact<{ [key: string]: never }>;
 
-export type RentReceivedStatusQuery = { __typename?: "Query" } & {
-  properties: Array<
-    { __typename?: "Property" } & Pick<
-      Property,
-      "id" | "name" | "collectedRents" | "expectedRents"
-    > & {
-        leases?: Maybe<
-          Array<
-            { __typename?: "Lease" } & Pick<Lease, "id" | "rentFullAmount"> & {
-                property?: Maybe<
-                  { __typename?: "Property" } & {
-                    lender?: Maybe<
-                      { __typename?: "Lender" } & Pick<Lender, "id"> & {
-                          identity?: Maybe<
-                            | ({ __typename?: "User" } & {
-                                address?: Maybe<
-                                  { __typename?: "Address" } & Pick<
-                                    Address,
-                                    "inline"
-                                  >
-                                >;
-                              })
-                            | ({ __typename?: "Company" } & {
-                                address?: Maybe<
-                                  { __typename?: "Address" } & Pick<
-                                    Address,
-                                    "inline"
-                                  >
-                                >;
-                              })
-                          >;
-                        }
-                    >;
-                  }
-                >;
-                tenants: Array<
-                  { __typename?: "Tenant" } & Pick<
-                    Tenant,
-                    "id" | "fullName" | "shortName"
-                  >
-                >;
-                rents?: Maybe<
-                  Array<
-                    { __typename?: "Rent" } & Pick<
-                      Rent,
-                      | "id"
-                      | "periodStart"
-                      | "periodEnd"
-                      | "fullAmount"
-                      | "amount"
-                      | "status"
-                      | "leaseId"
-                    > & {
-                        transactions?: Maybe<
-                          Array<
-                            { __typename?: "Transaction" } & Pick<
-                              Transaction,
-                              "id"
-                            >
-                          >
-                        >;
-                      }
-                  >
-                >;
-              }
-          >
+export type RentReceivedStatusQuery = {
+  __typename?: "Query";
+  properties: Array<{
+    __typename?: "Property";
+    id: string;
+    name: string;
+    collectedRents?: Maybe<string>;
+    expectedRents?: Maybe<string>;
+    leases?: Maybe<
+      Array<{
+        __typename?: "Lease";
+        id: string;
+        rentFullAmount: string;
+        property?: Maybe<{
+          __typename?: "Property";
+          lender?: Maybe<{
+            __typename?: "Lender";
+            id: string;
+            identity?: Maybe<
+              | {
+                  __typename?: "User";
+                  address?: Maybe<{ __typename?: "Address"; inline: string }>;
+                }
+              | {
+                  __typename?: "Company";
+                  address?: Maybe<{ __typename?: "Address"; inline: string }>;
+                }
+            >;
+          }>;
+        }>;
+        tenants: Array<{
+          __typename?: "Tenant";
+          id: string;
+          fullName: string;
+          shortName?: Maybe<string>;
+        }>;
+        rents?: Maybe<
+          Array<{
+            __typename?: "Rent";
+            id: string;
+            periodStart: string;
+            periodEnd: string;
+            fullAmount: string;
+            amount: string;
+            status: RentStatus;
+            leaseId: string;
+            transactions?: Maybe<
+              Array<{ __typename?: "Transaction"; id: string }>
+            >;
+          }>
         >;
-      }
-  >;
+      }>
+    >;
+  }>;
 };
 
 export type FileQueryVariables = Exact<{ [key: string]: never }>;
 
-export type FileQuery = { __typename?: "Query" } & {
-  files: Array<
-    { __typename?: "File" } & Pick<
-      File,
-      "id" | "filename" | "type" | "createdAt" | "downloadUrl"
-    >
-  >;
+export type FileQuery = {
+  __typename?: "Query";
+  files: Array<{
+    __typename?: "File";
+    id: string;
+    filename?: Maybe<string>;
+    type: FileType;
+    createdAt: string;
+    downloadUrl?: Maybe<string>;
+  }>;
 };
 
 export type UserCreateWithAccountMutationVariables = Exact<{
   input: UserWithAccountInput;
 }>;
 
-export type UserCreateWithAccountMutation = { __typename?: "Mutation" } & {
-  accountCreate: { __typename?: "Account" } & Pick<Account, "id">;
+export type UserCreateWithAccountMutation = {
+  __typename?: "Mutation";
+  accountCreate: { __typename?: "Account"; id: string };
 };
 
 export type AccountUpdatePaymentMethodMutationVariables = Exact<{
   input: AccountUpdateInput;
 }>;
 
-export type AccountUpdatePaymentMethodMutation = { __typename?: "Mutation" } & {
-  accountUpdatePaymentMethod: { __typename?: "Account" } & Pick<Account, "id">;
+export type AccountUpdatePaymentMethodMutation = {
+  __typename?: "Mutation";
+  accountUpdatePaymentMethod: { __typename?: "Account"; id: string };
 };
 
 export type AccountActivatePlanMutationVariables = Exact<{
   input: AccountActivatePlanInput;
 }>;
 
-export type AccountActivatePlanMutation = { __typename?: "Mutation" } & {
-  accountActivatePlan: { __typename?: "Account" } & Pick<
-    Account,
-    "id" | "status" | "trialEnd"
-  >;
+export type AccountActivatePlanMutation = {
+  __typename?: "Mutation";
+  accountActivatePlan: {
+    __typename?: "Account";
+    id: string;
+    status?: Maybe<SubscriptionStatus>;
+    trialEnd?: Maybe<string>;
+  };
 };
 
 export type TenantCreateMutationVariables = Exact<{
   input: TenantInput;
 }>;
 
-export type TenantCreateMutation = { __typename?: "Mutation" } & {
-  tenant: { __typename?: "Tenant" } & Pick<
-    Tenant,
-    | "id"
-    | "firstName"
-    | "lastName"
-    | "fullName"
-    | "email"
-    | "phoneNumber"
-    | "propertyName"
-    | "rentPayedThisYear"
-    | "unpaidRentAmount"
-    | "status"
-    | "note"
-  > & {
-      lastTransaction?: Maybe<
-        { __typename?: "Transaction" } & Pick<Transaction, "date" | "amount">
-      >;
-    };
+export type TenantCreateMutation = {
+  __typename?: "Mutation";
+  tenant: {
+    __typename?: "Tenant";
+    id: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: Maybe<string>;
+    propertyName?: Maybe<string>;
+    rentPayedThisYear?: Maybe<string>;
+    unpaidRentAmount?: Maybe<number>;
+    status?: Maybe<TenantStatus>;
+    note?: Maybe<string>;
+    lastTransaction?: Maybe<{
+      __typename?: "Transaction";
+      date: string;
+      amount: string;
+    }>;
+  };
 };
 
 export type TenantUpdateMutationVariables = Exact<{
   input: TenantUpdateInput;
 }>;
 
-export type TenantUpdateMutation = { __typename?: "Mutation" } & {
-  tenantUpdate: { __typename?: "Tenant" } & Pick<Tenant, "id">;
+export type TenantUpdateMutation = {
+  __typename?: "Mutation";
+  tenantUpdate: { __typename?: "Tenant"; id: string };
 };
 
 export type TenantDeleteMutationVariables = Exact<{
   id: Scalars["ID"];
 }>;
 
-export type TenantDeleteMutation = { __typename?: "Mutation" } & {
-  tenantId: Mutation["tenantDelete"];
+export type TenantDeleteMutation = {
+  __typename?: "Mutation";
+  tenantId: string;
 };
 
 export type PropertyCreateMutationVariables = Exact<{
   input: PropertyInput;
 }>;
 
-export type PropertyCreateMutation = { __typename?: "Mutation" } & {
-  propertyCreate: { __typename?: "Property" } & Pick<Property, "id">;
+export type PropertyCreateMutation = {
+  __typename?: "Mutation";
+  propertyCreate: { __typename?: "Property"; id: string };
 };
 
 export type PropertyUpdateMutationVariables = Exact<{
   input: PropertyUpdateInput;
 }>;
 
-export type PropertyUpdateMutation = { __typename?: "Mutation" } & {
-  propertyUpdate: { __typename?: "Property" } & Pick<Property, "id">;
+export type PropertyUpdateMutation = {
+  __typename?: "Mutation";
+  propertyUpdate: { __typename?: "Property"; id: string };
 };
 
 export type PropertyDeleteMutationVariables = Exact<{
   id: Scalars["ID"];
 }>;
 
-export type PropertyDeleteMutation = { __typename?: "Mutation" } & Pick<
-  Mutation,
-  "propertyDelete"
->;
+export type PropertyDeleteMutation = {
+  __typename?: "Mutation";
+  propertyDelete: string;
+};
 
 export type LeaseCreateMutationVariables = Exact<{
   input: LeaseFurnishedInput;
 }>;
 
-export type LeaseCreateMutation = { __typename?: "Mutation" } & {
-  leaseCreate: { __typename?: "Lease" } & Pick<Lease, "id">;
+export type LeaseCreateMutation = {
+  __typename?: "Mutation";
+  leaseCreate: { __typename?: "Lease"; id: string };
 };
 
 export type LeaseDeleteMutationVariables = Exact<{
   id: Scalars["ID"];
 }>;
 
-export type LeaseDeleteMutation = { __typename?: "Mutation" } & Pick<
-  Mutation,
-  "leaseDelete"
->;
+export type LeaseDeleteMutation = {
+  __typename?: "Mutation";
+  leaseDelete: string;
+};
 
 export type ContractDeleteMutationVariables = Exact<{
   id: Scalars["ID"];
 }>;
 
-export type ContractDeleteMutation = { __typename?: "Mutation" } & {
-  leaseId: Mutation["leaseDelete"];
+export type ContractDeleteMutation = {
+  __typename?: "Mutation";
+  leaseId: string;
 };
 
 export type ContractUpdateMutationVariables = Exact<{
   input: LeaseFurnishedUpdateInput;
 }>;
 
-export type ContractUpdateMutation = { __typename?: "Mutation" } & {
-  leaseUpdate: { __typename?: "Lease" } & Pick<Lease, "id">;
+export type ContractUpdateMutation = {
+  __typename?: "Mutation";
+  leaseUpdate: { __typename?: "Lease"; id: string };
 };
 
 export type LenderIndividualUpdateMutationVariables = Exact<{
   input: LenderIndividualUpdateInput;
 }>;
 
-export type LenderIndividualUpdateMutation = { __typename?: "Mutation" } & {
-  lenderIndividualUpdate: { __typename?: "Lender" } & Pick<Lender, "id">;
+export type LenderIndividualUpdateMutation = {
+  __typename?: "Mutation";
+  lenderIndividualUpdate: { __typename?: "Lender"; id: string };
 };
 
 export type TransactionCreateMutationVariables = Exact<{
   input: TransactionInput;
 }>;
 
-export type TransactionCreateMutation = { __typename?: "Mutation" } & {
-  transactionCreate: { __typename?: "Transaction" } & Pick<Transaction, "id">;
+export type TransactionCreateMutation = {
+  __typename?: "Mutation";
+  transactionCreate: { __typename?: "Transaction"; id: string };
 };
 
 export type TransactionDeleteMutationVariables = Exact<{
   id: Scalars["ID"];
 }>;
 
-export type TransactionDeleteMutation = { __typename?: "Mutation" } & {
-  transactionId: Mutation["transactionDelete"];
+export type TransactionDeleteMutation = {
+  __typename?: "Mutation";
+  transactionId: string;
 };
 
 export type FileUploadMutationVariables = Exact<{
   input: FileInput;
 }>;
 
-export type FileUploadMutation = { __typename?: "Mutation" } & {
-  fileUpload: { __typename?: "File" } & Pick<File, "id">;
+export type FileUploadMutation = {
+  __typename?: "Mutation";
+  fileUpload: { __typename?: "File"; id: string };
 };
 
 export type ImportUploadMutationVariables = Exact<{
   input: ImportInput;
 }>;
 
-export type ImportUploadMutation = { __typename?: "Mutation" } & {
-  importUpload: { __typename?: "Task" } & Pick<
-    Task,
-    "id" | "status" | "progress"
-  >;
+export type ImportUploadMutation = {
+  __typename?: "Mutation";
+  importUpload: {
+    __typename?: "Task";
+    id: string;
+    status: string;
+    progress: number;
+  };
 };
 
 export type RentReceiptCreateMutationVariables = Exact<{
   input: RentReceiptInput;
 }>;
 
-export type RentReceiptCreateMutation = { __typename?: "Mutation" } & {
-  rentReceiptCreate: { __typename?: "RentReceiptPayload" } & {
-    receipt: { __typename?: "File" } & Pick<File, "id" | "downloadUrl">;
+export type RentReceiptCreateMutation = {
+  __typename?: "Mutation";
+  rentReceiptCreate: {
+    __typename?: "RentReceiptPayload";
+    receipt: { __typename?: "File"; id: string; downloadUrl?: Maybe<string> };
   };
 };
 
-export const TestDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "Test" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "__schema" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "types" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "name" } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<TestQuery, TestQueryVariables>;
-export const UserDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "User" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            alias: { kind: "Name", value: "user" },
-            name: { kind: "Name", value: "viewer" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "email" } },
-                { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                { kind: "Field", name: { kind: "Name", value: "displayName" } },
-                { kind: "Field", name: { kind: "Name", value: "photoURL" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "address" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "line1" } },
-                      { kind: "Field", name: { kind: "Name", value: "line2" } },
-                      { kind: "Field", name: { kind: "Name", value: "city" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "postalCode" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "account" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "status" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "plan" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "code" },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "trialEnd" },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<UserQuery, UserQueryVariables>;
-export const LenderDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "Lender" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "lenders" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "accountId" } },
-                { kind: "Field", name: { kind: "Name", value: "displayName" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "identity" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "InlineFragment",
-                        typeCondition: {
-                          kind: "NamedType",
-                          name: { kind: "Name", value: "Company" },
-                        },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "email" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "displayName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "legalEntity" },
-                            },
-                            {
-                              kind: "Field",
-                              name: {
-                                kind: "Name",
-                                value: "legalEntityIdentifier",
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "address" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "inline" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "line1" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "line2" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "city" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "postalCode" },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "InlineFragment",
-                        typeCondition: {
-                          kind: "NamedType",
-                          name: { kind: "Name", value: "User" },
-                        },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "email" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "displayName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "firstName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "lastName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "address" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "inline" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "line1" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "line2" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "city" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "postalCode" },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<LenderQuery, LenderQueryVariables>;
-export const TenantWithRentalReceiptsDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "TenantWithRentalReceipts" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "tenants" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                { kind: "Field", name: { kind: "Name", value: "fullName" } },
-                { kind: "Field", name: { kind: "Name", value: "email" } },
-                { kind: "Field", name: { kind: "Name", value: "phoneNumber" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "lastTransaction" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "date" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "amount" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "propertyName" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "rentPayedThisYear" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "unpaidRentAmount" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                { kind: "Field", name: { kind: "Name", value: "note" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  TenantWithRentalReceiptsQuery,
-  TenantWithRentalReceiptsQueryVariables
->;
-export const TenantListDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "TenantList" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "query" },
-          },
-          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "status" },
-          },
-          type: {
-            kind: "NamedType",
-            name: { kind: "Name", value: "TenantStatus" },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "tenants" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "query" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "query" },
-                },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "status" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "status" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                { kind: "Field", name: { kind: "Name", value: "fullName" } },
-                { kind: "Field", name: { kind: "Name", value: "email" } },
-                { kind: "Field", name: { kind: "Name", value: "phoneNumber" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "lastTransaction" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "date" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "amount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "accountId" },
-                      },
-                      { kind: "Field", name: { kind: "Name", value: "type" } },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "propertyName" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "rentPayedThisYear" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "unpaidRentAmount" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                { kind: "Field", name: { kind: "Name", value: "note" } },
-                { kind: "Field", name: { kind: "Name", value: "visaleId" } },
-                { kind: "Field", name: { kind: "Name", value: "apl" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "files" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "filename" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "createdAt" },
-                      },
-                      { kind: "Field", name: { kind: "Name", value: "type" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "downloadUrl" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "lease" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "type" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "status" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rents" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "periodStart" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "periodEnd" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "fullAmount" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "amount" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "status" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "leaseId" },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentFullAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentChargesAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "effectDate" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "renewDate" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "signatureDate" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "depositAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "data" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "InlineFragment",
-                              typeCondition: {
-                                kind: "NamedType",
-                                name: {
-                                  kind: "Name",
-                                  value: "LeaseFurnishedData",
-                                },
-                              },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "duration" },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "accountId" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "account" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "propertyId" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "property" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "address" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "city" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "inline" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "line1" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "postalCode" },
-                                  },
-                                ],
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "buildPeriod" },
-                            },
-                            {
-                              kind: "Field",
-                              name: {
-                                kind: "Name",
-                                value: "buildingLegalStatus",
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "heatingMethod" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "housingType" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "name" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "roomCount" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "surface" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "usageType" },
-                            },
-                            {
-                              kind: "Field",
-                              name: {
-                                kind: "Name",
-                                value: "waterHeatingMethod",
-                              },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "tenants" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "displayName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "email" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "firstName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "lastName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "accountId" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "account" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "id" },
-                                  },
-                                ],
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "birthdate" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "fullName" },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-                { kind: "Field", name: { kind: "Name", value: "birthdate" } },
-                { kind: "Field", name: { kind: "Name", value: "birthplace" } },
-                { kind: "Field", name: { kind: "Name", value: "displayName" } },
-                { kind: "Field", name: { kind: "Name", value: "accountId" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "account" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<TenantListQuery, TenantListQueryVariables>;
-export const LeaseListDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "LeaseList" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "query" },
-          },
-          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "leases" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "query" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "query" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "accountId" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "account" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                    ],
-                  },
-                },
-                { kind: "Field", name: { kind: "Name", value: "propertyId" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "property" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "address" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "city" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "inline" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "line1" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "postalCode" },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "buildPeriod" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "buildingLegalStatus" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "heatingMethod" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "housingType" },
-                      },
-                      { kind: "Field", name: { kind: "Name", value: "name" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "roomCount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "surface" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "usageType" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "waterHeatingMethod" },
-                      },
-                    ],
-                  },
-                },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "tenants" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "email" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "displayName" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "firstName" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "lastName" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "fullName" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "accountId" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "account" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "birthdate" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  alias: { kind: "Name", value: "file" },
-                  name: { kind: "Name", value: "lease" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "downloadUrl" },
-                      },
-                      { kind: "Field", name: { kind: "Name", value: "type" } },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "rentFullAmount" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "effectDate" } },
-                { kind: "Field", name: { kind: "Name", value: "rentAmount" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "depositAmount" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "rentChargesAmount" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "data" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "InlineFragment",
-                        typeCondition: {
-                          kind: "NamedType",
-                          name: { kind: "Name", value: "LeaseFurnishedData" },
-                        },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "duration" },
-                            },
-                            {
-                              kind: "Field",
-                              name: {
-                                kind: "Name",
-                                value: "rentPaymentMethod",
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<LeaseListQuery, LeaseListQueryVariables>;
-export const LeaseDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "Lease" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "leases" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "accountId" } },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "tenants" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "fullName" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  alias: { kind: "Name", value: "file" },
-                  name: { kind: "Name", value: "lease" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "downloadUrl" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "rentFullAmount" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "effectDate" } },
-                { kind: "Field", name: { kind: "Name", value: "rentAmount" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "depositAmount" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "rentChargesAmount" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "data" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "InlineFragment",
-                        typeCondition: {
-                          kind: "NamedType",
-                          name: { kind: "Name", value: "LeaseFurnishedData" },
-                        },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "duration" },
-                            },
-                            {
-                              kind: "Field",
-                              name: {
-                                kind: "Name",
-                                value: "rentPaymentMethod",
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<LeaseQuery, LeaseQueryVariables>;
-export const ContractRequirementDataDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "ContractRequirementData" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "query" },
-          },
-          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "tenants" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "query" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "query" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "fullName" } },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "lease" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  ContractRequirementDataQuery,
-  ContractRequirementDataQueryVariables
->;
-export const PropertyListDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "PropertyList" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "query" },
-          },
-          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "properties" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "query" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "query" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "name" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "address" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "city" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "country" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "inline" },
-                      },
-                      { kind: "Field", name: { kind: "Name", value: "line1" } },
-                      { kind: "Field", name: { kind: "Name", value: "line2" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "postalCode" },
-                      },
-                    ],
-                  },
-                },
-                { kind: "Field", name: { kind: "Name", value: "roomCount" } },
-                { kind: "Field", name: { kind: "Name", value: "note" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "lender" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "displayName" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "collectedRents" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "surface" } },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                { kind: "Field", name: { kind: "Name", value: "energyClass" } },
-                { kind: "Field", name: { kind: "Name", value: "gasEmission" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "tenantPrivateSpaces" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "equipments" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "nticEquipments" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "otherSpaces" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "commonSpaces" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "waterHeatingMethod" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "heatingMethod" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "tax" } },
-                { kind: "Field", name: { kind: "Name", value: "buildPeriod" } },
-                { kind: "Field", name: { kind: "Name", value: "housingType" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "buildingLegalStatus" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "usageType" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "leases" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "status" },
-                      },
-                      { kind: "Field", name: { kind: "Name", value: "type" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "effectDate" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "renewDate" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "signatureDate" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "depositAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentChargesAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentFullAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "accountId" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "account" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "tenants" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "fullName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "status" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "displayName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "email" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "firstName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "lastName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "accountId" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "account" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "id" },
-                                  },
-                                ],
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "birthdate" },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "propertyId" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "property" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "address" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "city" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "inline" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "line1" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "postalCode" },
-                                  },
-                                ],
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "buildPeriod" },
-                            },
-                            {
-                              kind: "Field",
-                              name: {
-                                kind: "Name",
-                                value: "buildingLegalStatus",
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "heatingMethod" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "housingType" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "lender" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "id" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: {
-                                      kind: "Name",
-                                      value: "displayName",
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "name" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "roomCount" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "surface" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "usageType" },
-                            },
-                            {
-                              kind: "Field",
-                              name: {
-                                kind: "Name",
-                                value: "waterHeatingMethod",
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<PropertyListQuery, PropertyListQueryVariables>;
-export const TransactionDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "Transaction" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "transactions" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "date" } },
-                { kind: "Field", name: { kind: "Name", value: "amount" } },
-                { kind: "Field", name: { kind: "Name", value: "type" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "lease" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<TransactionQuery, TransactionQueryVariables>;
-export const InvoiceListDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "InvoiceList" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "invoices" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "number" } },
-                { kind: "Field", name: { kind: "Name", value: "amountPaid" } },
-                { kind: "Field", name: { kind: "Name", value: "invoicePdf" } },
-                { kind: "Field", name: { kind: "Name", value: "periodEnd" } },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                { kind: "Field", name: { kind: "Name", value: "planCode" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<InvoiceListQuery, InvoiceListQueryVariables>;
-export const PricingPlansDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "PricingPlans" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "plans" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "title" } },
-                { kind: "Field", name: { kind: "Name", value: "subtitle" } },
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "price" } },
-                { kind: "Field", name: { kind: "Name", value: "code" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "features" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "available" },
-                      },
-                      { kind: "Field", name: { kind: "Name", value: "title" } },
-                      { kind: "Field", name: { kind: "Name", value: "key" } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<PricingPlansQuery, PricingPlansQueryVariables>;
-export const RentalReceiptDataDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "RentalReceiptData" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "tenants" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                { kind: "Field", name: { kind: "Name", value: "fullName" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "propertyName" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "lease" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "property" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "address" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "city" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "country" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "inline" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "line1" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "line2" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "postalCode" },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentChargesAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentFullAmount" },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  RentalReceiptDataQuery,
-  RentalReceiptDataQueryVariables
->;
-export const RentReceivedSummaryDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "RentReceivedSummary" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "since" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "DateTime" },
-            },
-          },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "until" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "DateTime" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            alias: { kind: "Name", value: "rentReceivedSummary" },
-            name: { kind: "Name", value: "summary" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "since" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "since" },
-                },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "until" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "until" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "since" } },
-                { kind: "Field", name: { kind: "Name", value: "until" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "amountExpected" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "amountReceived" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "amountSettled" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "amountPartial" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "amountPending" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "nExpected" } },
-                { kind: "Field", name: { kind: "Name", value: "nReceived" } },
-                { kind: "Field", name: { kind: "Name", value: "nSettled" } },
-                { kind: "Field", name: { kind: "Name", value: "nPartial" } },
-                { kind: "Field", name: { kind: "Name", value: "nPending" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "ratioExpected" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "ratioReceived" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "ratioSettled" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "ratioPartial" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "ratioPending" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "variationExpected" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "variationReceived" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "variationSettled" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "variationPartial" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "variationPending" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "paymentRate" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "occupationRate" },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  RentReceivedSummaryQuery,
-  RentReceivedSummaryQueryVariables
->;
-export const RentReceivedStatusDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "RentReceivedStatus" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "properties" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "name" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "collectedRents" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "expectedRents" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "leases" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "property" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "lender" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "id" },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "identity" },
-                                    selectionSet: {
-                                      kind: "SelectionSet",
-                                      selections: [
-                                        {
-                                          kind: "InlineFragment",
-                                          typeCondition: {
-                                            kind: "NamedType",
-                                            name: {
-                                              kind: "Name",
-                                              value: "User",
-                                            },
-                                          },
-                                          selectionSet: {
-                                            kind: "SelectionSet",
-                                            selections: [
-                                              {
-                                                kind: "Field",
-                                                name: {
-                                                  kind: "Name",
-                                                  value: "address",
-                                                },
-                                                selectionSet: {
-                                                  kind: "SelectionSet",
-                                                  selections: [
-                                                    {
-                                                      kind: "Field",
-                                                      name: {
-                                                        kind: "Name",
-                                                        value: "inline",
-                                                      },
-                                                    },
-                                                  ],
-                                                },
-                                              },
-                                            ],
-                                          },
-                                        },
-                                        {
-                                          kind: "InlineFragment",
-                                          typeCondition: {
-                                            kind: "NamedType",
-                                            name: {
-                                              kind: "Name",
-                                              value: "Company",
-                                            },
-                                          },
-                                          selectionSet: {
-                                            kind: "SelectionSet",
-                                            selections: [
-                                              {
-                                                kind: "Field",
-                                                name: {
-                                                  kind: "Name",
-                                                  value: "address",
-                                                },
-                                                selectionSet: {
-                                                  kind: "SelectionSet",
-                                                  selections: [
-                                                    {
-                                                      kind: "Field",
-                                                      name: {
-                                                        kind: "Name",
-                                                        value: "inline",
-                                                      },
-                                                    },
-                                                  ],
-                                                },
-                                              },
-                                            ],
-                                          },
-                                        },
-                                      ],
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "tenants" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "fullName" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "shortName" },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rentFullAmount" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "rents" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "id" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "periodStart" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "periodEnd" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "fullAmount" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "amount" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "status" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "leaseId" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "transactions" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "id" },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  RentReceivedStatusQuery,
-  RentReceivedStatusQueryVariables
->;
-export const FileDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "File" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "files" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "filename" } },
-                { kind: "Field", name: { kind: "Name", value: "type" } },
-                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
-                { kind: "Field", name: { kind: "Name", value: "downloadUrl" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<FileQuery, FileQueryVariables>;
-export const UserCreateWithAccountDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "UserCreateWithAccount" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "UserWithAccountInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            alias: { kind: "Name", value: "accountCreate" },
-            name: { kind: "Name", value: "userCreateWithAccount" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  UserCreateWithAccountMutation,
-  UserCreateWithAccountMutationVariables
->;
-export const AccountUpdatePaymentMethodDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "AccountUpdatePaymentMethod" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "AccountUpdateInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "accountUpdatePaymentMethod" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  AccountUpdatePaymentMethodMutation,
-  AccountUpdatePaymentMethodMutationVariables
->;
-export const AccountActivatePlanDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "AccountActivatePlan" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "AccountActivatePlanInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "accountActivatePlan" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                { kind: "Field", name: { kind: "Name", value: "trialEnd" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  AccountActivatePlanMutation,
-  AccountActivatePlanMutationVariables
->;
-export const TenantCreateDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "TenantCreate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "TenantInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            alias: { kind: "Name", value: "tenant" },
-            name: { kind: "Name", value: "tenantCreate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                { kind: "Field", name: { kind: "Name", value: "fullName" } },
-                { kind: "Field", name: { kind: "Name", value: "email" } },
-                { kind: "Field", name: { kind: "Name", value: "phoneNumber" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "lastTransaction" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "date" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "amount" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "propertyName" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "rentPayedThisYear" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "unpaidRentAmount" },
-                },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                { kind: "Field", name: { kind: "Name", value: "note" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  TenantCreateMutation,
-  TenantCreateMutationVariables
->;
-export const TenantUpdateDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "TenantUpdate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "TenantUpdateInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "tenantUpdate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  TenantUpdateMutation,
-  TenantUpdateMutationVariables
->;
-export const TenantDeleteDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "TenantDelete" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            alias: { kind: "Name", value: "tenantId" },
-            name: { kind: "Name", value: "tenantDelete" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  TenantDeleteMutation,
-  TenantDeleteMutationVariables
->;
-export const PropertyCreateDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "PropertyCreate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "PropertyInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "propertyCreate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  PropertyCreateMutation,
-  PropertyCreateMutationVariables
->;
-export const PropertyUpdateDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "PropertyUpdate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "PropertyUpdateInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "propertyUpdate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  PropertyUpdateMutation,
-  PropertyUpdateMutationVariables
->;
-export const PropertyDeleteDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "PropertyDelete" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "propertyDelete" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  PropertyDeleteMutation,
-  PropertyDeleteMutationVariables
->;
-export const LeaseCreateDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "LeaseCreate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "LeaseFurnishedInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            alias: { kind: "Name", value: "leaseCreate" },
-            name: { kind: "Name", value: "leaseFurnishedCreate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  LeaseCreateMutation,
-  LeaseCreateMutationVariables
->;
-export const LeaseDeleteDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "LeaseDelete" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "leaseDelete" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  LeaseDeleteMutation,
-  LeaseDeleteMutationVariables
->;
-export const ContractDeleteDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "ContractDelete" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            alias: { kind: "Name", value: "leaseId" },
-            name: { kind: "Name", value: "leaseDelete" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  ContractDeleteMutation,
-  ContractDeleteMutationVariables
->;
-export const ContractUpdateDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "ContractUpdate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "LeaseFurnishedUpdateInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            alias: { kind: "Name", value: "leaseUpdate" },
-            name: { kind: "Name", value: "leaseFurnishedUpdate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  ContractUpdateMutation,
-  ContractUpdateMutationVariables
->;
-export const LenderIndividualUpdateDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "LenderIndividualUpdate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "LenderIndividualUpdateInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "lenderIndividualUpdate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  LenderIndividualUpdateMutation,
-  LenderIndividualUpdateMutationVariables
->;
-export const TransactionCreateDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "TransactionCreate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "TransactionInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "transactionCreate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  TransactionCreateMutation,
-  TransactionCreateMutationVariables
->;
-export const TransactionDeleteDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "TransactionDelete" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            alias: { kind: "Name", value: "transactionId" },
-            name: { kind: "Name", value: "transactionDelete" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  TransactionDeleteMutation,
-  TransactionDeleteMutationVariables
->;
-export const FileUploadDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "FileUpload" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "FileInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "fileUpload" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<FileUploadMutation, FileUploadMutationVariables>;
-export const ImportUploadDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "ImportUpload" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "ImportInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "importUpload" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                { kind: "Field", name: { kind: "Name", value: "progress" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  ImportUploadMutation,
-  ImportUploadMutationVariables
->;
-export const RentReceiptCreateDocument = ({
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "RentReceiptCreate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "RentReceiptInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "rentReceiptCreate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "receipt" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "downloadUrl" },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown) as DocumentNode<
-  RentReceiptCreateMutation,
-  RentReceiptCreateMutationVariables
->;
+export const Test = gql`
+  query Test {
+    __schema {
+      types {
+        name
+      }
+    }
+  }
+`;
+export const User = gql`
+  query User {
+    user: viewer {
+      id
+      email
+      firstName
+      lastName
+      displayName
+      photoURL
+      address {
+        line1
+        line2
+        city
+        postalCode
+      }
+      account {
+        id
+        status
+        plan {
+          code
+        }
+        trialEnd
+      }
+    }
+  }
+`;
+export const Lender = gql`
+  query Lender {
+    lenders {
+      id
+      accountId
+      displayName
+      identity {
+        ... on Company {
+          id
+          email
+          displayName
+          legalEntity
+          legalEntityIdentifier
+          address {
+            inline
+            line1
+            line2
+            city
+            postalCode
+          }
+        }
+        ... on User {
+          id
+          email
+          displayName
+          firstName
+          lastName
+          address {
+            inline
+            line1
+            line2
+            city
+            postalCode
+          }
+        }
+      }
+    }
+  }
+`;
+export const TenantWithRentalReceipts = gql`
+  query TenantWithRentalReceipts($id: ID!) {
+    tenants(id: $id) {
+      id
+      firstName
+      lastName
+      fullName
+      email
+      phoneNumber
+      lastTransaction {
+        date
+        amount
+      }
+      propertyName
+      rentPayedThisYear
+      unpaidRentAmount
+      status
+      note
+    }
+  }
+`;
+export const TenantList = gql`
+  query TenantList($id: ID, $query: String, $status: TenantStatus) {
+    tenants(id: $id, query: $query, status: $status) {
+      id
+      firstName
+      lastName
+      fullName
+      email
+      phoneNumber
+      lastTransaction {
+        id
+        date
+        amount
+        accountId
+        type
+      }
+      propertyName
+      rentPayedThisYear
+      unpaidRentAmount
+      status
+      note
+      visaleId
+      apl
+      files {
+        id
+        filename
+        createdAt
+        type
+        downloadUrl
+      }
+      lease {
+        id
+        type
+        status
+        rents {
+          id
+          periodStart
+          periodEnd
+          fullAmount
+          amount
+          status
+          leaseId
+        }
+        rentFullAmount
+        rentAmount
+        rentChargesAmount
+        effectDate
+        renewDate
+        signatureDate
+        rentAmount
+        depositAmount
+        data {
+          ... on LeaseFurnishedData {
+            duration
+          }
+        }
+        accountId
+        account {
+          id
+        }
+        propertyId
+        property {
+          id
+          address {
+            city
+            inline
+            line1
+            postalCode
+          }
+          buildPeriod
+          buildingLegalStatus
+          heatingMethod
+          housingType
+          name
+          roomCount
+          surface
+          usageType
+          waterHeatingMethod
+        }
+        tenants {
+          id
+          displayName
+          email
+          firstName
+          lastName
+          accountId
+          account {
+            id
+          }
+          birthdate
+          fullName
+        }
+      }
+      birthdate
+      birthplace
+      displayName
+      accountId
+      account {
+        id
+      }
+    }
+  }
+`;
+export const LeaseList = gql`
+  query LeaseList($id: ID, $query: String) {
+    leases(id: $id, query: $query) {
+      id
+      accountId
+      account {
+        id
+      }
+      propertyId
+      property {
+        id
+        address {
+          city
+          inline
+          line1
+          postalCode
+        }
+        buildPeriod
+        buildingLegalStatus
+        heatingMethod
+        housingType
+        name
+        roomCount
+        surface
+        usageType
+        waterHeatingMethod
+      }
+      status
+      tenants {
+        id
+        email
+        displayName
+        firstName
+        lastName
+        fullName
+        accountId
+        account {
+          id
+        }
+        birthdate
+      }
+      file: lease {
+        id
+        downloadUrl
+        type
+      }
+      rentFullAmount
+      effectDate
+      rentAmount
+      depositAmount
+      rentChargesAmount
+      data {
+        ... on LeaseFurnishedData {
+          duration
+          rentPaymentMethod
+        }
+      }
+    }
+  }
+`;
+export const Lease = gql`
+  query Lease($id: ID!) {
+    leases(id: $id) {
+      id
+      accountId
+      status
+      tenants {
+        id
+        fullName
+      }
+      file: lease {
+        downloadUrl
+      }
+      rentFullAmount
+      effectDate
+      rentAmount
+      depositAmount
+      rentChargesAmount
+      data {
+        ... on LeaseFurnishedData {
+          duration
+          rentPaymentMethod
+        }
+      }
+    }
+  }
+`;
+export const ContractRequirementData = gql`
+  query ContractRequirementData($query: String) {
+    tenants(query: $query) {
+      id
+      fullName
+      status
+      lease {
+        id
+      }
+    }
+  }
+`;
+export const PropertyList = gql`
+  query PropertyList($id: ID, $query: String) {
+    properties(id: $id, query: $query) {
+      id
+      name
+      address {
+        city
+        country
+        inline
+        line1
+        line2
+        postalCode
+      }
+      roomCount
+      note
+      lender {
+        id
+        displayName
+      }
+      collectedRents
+      surface
+      status
+      energyClass
+      gasEmission
+      tenantPrivateSpaces
+      equipments
+      nticEquipments
+      otherSpaces
+      commonSpaces
+      waterHeatingMethod
+      heatingMethod
+      tax
+      buildPeriod
+      housingType
+      buildingLegalStatus
+      usageType
+      leases {
+        id
+        status
+        type
+        effectDate
+        renewDate
+        signatureDate
+        rentAmount
+        depositAmount
+        rentChargesAmount
+        rentFullAmount
+        accountId
+        account {
+          id
+        }
+        tenants {
+          id
+          fullName
+          status
+          displayName
+          email
+          firstName
+          lastName
+          accountId
+          account {
+            id
+          }
+          birthdate
+        }
+        propertyId
+        property {
+          id
+          address {
+            city
+            inline
+            line1
+            postalCode
+          }
+          buildPeriod
+          buildingLegalStatus
+          heatingMethod
+          housingType
+          lender {
+            id
+            displayName
+          }
+          name
+          roomCount
+          surface
+          usageType
+          waterHeatingMethod
+        }
+      }
+    }
+  }
+`;
+export const Transaction = gql`
+  query Transaction($id: ID!) {
+    transactions(id: $id) {
+      id
+      date
+      amount
+      type
+      lease {
+        id
+      }
+    }
+  }
+`;
+export const InvoiceList = gql`
+  query InvoiceList {
+    invoices {
+      id
+      number
+      amountPaid
+      invoicePdf
+      periodEnd
+      status
+      planCode
+    }
+  }
+`;
+export const PricingPlans = gql`
+  query PricingPlans {
+    plans {
+      title
+      subtitle
+      id
+      price
+      code
+      features {
+        available
+        title
+        key
+      }
+    }
+  }
+`;
+export const RentalReceiptData = gql`
+  query RentalReceiptData {
+    tenants {
+      id
+      firstName
+      lastName
+      fullName
+      propertyName
+      lease {
+        id
+        property {
+          id
+          address {
+            city
+            country
+            inline
+            line1
+            line2
+            postalCode
+          }
+        }
+        rentAmount
+        rentChargesAmount
+        rentFullAmount
+      }
+    }
+  }
+`;
+export const RentReceivedSummary = gql`
+  query RentReceivedSummary($since: DateTime!, $until: DateTime!) {
+    rentReceivedSummary: summary(since: $since, until: $until) {
+      since
+      until
+      amountExpected
+      amountReceived
+      amountSettled
+      amountPartial
+      amountPending
+      nExpected
+      nReceived
+      nSettled
+      nPartial
+      nPending
+      ratioExpected
+      ratioReceived
+      ratioSettled
+      ratioPartial
+      ratioPending
+      variationExpected
+      variationReceived
+      variationSettled
+      variationPartial
+      variationPending
+      paymentRate
+      occupationRate
+    }
+  }
+`;
+export const RentReceivedStatus = gql`
+  query RentReceivedStatus {
+    properties {
+      id
+      name
+      collectedRents
+      expectedRents
+      leases {
+        id
+        property {
+          lender {
+            id
+            identity {
+              ... on User {
+                address {
+                  inline
+                }
+              }
+              ... on Company {
+                address {
+                  inline
+                }
+              }
+            }
+          }
+        }
+        tenants {
+          id
+          fullName
+          shortName
+        }
+        rentFullAmount
+        rents {
+          id
+          periodStart
+          periodEnd
+          fullAmount
+          amount
+          status
+          leaseId
+          transactions {
+            id
+          }
+        }
+      }
+    }
+  }
+`;
+export const File = gql`
+  query File {
+    files {
+      id
+      filename
+      type
+      createdAt
+      downloadUrl
+    }
+  }
+`;
+export const UserCreateWithAccount = gql`
+  mutation UserCreateWithAccount($input: UserWithAccountInput!) {
+    accountCreate: userCreateWithAccount(input: $input) {
+      id
+    }
+  }
+`;
+export const AccountUpdatePaymentMethod = gql`
+  mutation AccountUpdatePaymentMethod($input: AccountUpdateInput!) {
+    accountUpdatePaymentMethod(input: $input) {
+      id
+    }
+  }
+`;
+export const AccountActivatePlan = gql`
+  mutation AccountActivatePlan($input: AccountActivatePlanInput!) {
+    accountActivatePlan(input: $input) {
+      id
+      status
+      trialEnd
+    }
+  }
+`;
+export const TenantCreate = gql`
+  mutation TenantCreate($input: TenantInput!) {
+    tenant: tenantCreate(input: $input) {
+      id
+      firstName
+      lastName
+      fullName
+      email
+      phoneNumber
+      lastTransaction {
+        date
+        amount
+      }
+      propertyName
+      rentPayedThisYear
+      unpaidRentAmount
+      status
+      note
+    }
+  }
+`;
+export const TenantUpdate = gql`
+  mutation TenantUpdate($input: TenantUpdateInput!) {
+    tenantUpdate(input: $input) {
+      id
+    }
+  }
+`;
+export const TenantDelete = gql`
+  mutation TenantDelete($id: ID!) {
+    tenantId: tenantDelete(id: $id)
+  }
+`;
+export const PropertyCreate = gql`
+  mutation PropertyCreate($input: PropertyInput!) {
+    propertyCreate(input: $input) {
+      id
+    }
+  }
+`;
+export const PropertyUpdate = gql`
+  mutation PropertyUpdate($input: PropertyUpdateInput!) {
+    propertyUpdate(input: $input) {
+      id
+    }
+  }
+`;
+export const PropertyDelete = gql`
+  mutation PropertyDelete($id: ID!) {
+    propertyDelete(id: $id)
+  }
+`;
+export const LeaseCreate = gql`
+  mutation LeaseCreate($input: LeaseFurnishedInput!) {
+    leaseCreate: leaseFurnishedCreate(input: $input) {
+      id
+    }
+  }
+`;
+export const LeaseDelete = gql`
+  mutation LeaseDelete($id: ID!) {
+    leaseDelete(id: $id)
+  }
+`;
+export const ContractDelete = gql`
+  mutation ContractDelete($id: ID!) {
+    leaseId: leaseDelete(id: $id)
+  }
+`;
+export const ContractUpdate = gql`
+  mutation ContractUpdate($input: LeaseFurnishedUpdateInput!) {
+    leaseUpdate: leaseFurnishedUpdate(input: $input) {
+      id
+    }
+  }
+`;
+export const LenderIndividualUpdate = gql`
+  mutation LenderIndividualUpdate($input: LenderIndividualUpdateInput!) {
+    lenderIndividualUpdate(input: $input) {
+      id
+    }
+  }
+`;
+export const TransactionCreate = gql`
+  mutation TransactionCreate($input: TransactionInput!) {
+    transactionCreate(input: $input) {
+      id
+    }
+  }
+`;
+export const TransactionDelete = gql`
+  mutation TransactionDelete($id: ID!) {
+    transactionId: transactionDelete(id: $id)
+  }
+`;
+export const FileUpload = gql`
+  mutation FileUpload($input: FileInput!) {
+    fileUpload(input: $input) {
+      id
+    }
+  }
+`;
+export const ImportUpload = gql`
+  mutation ImportUpload($input: ImportInput!) {
+    importUpload(input: $input) {
+      id
+      status
+      progress
+    }
+  }
+`;
+export const RentReceiptCreate = gql`
+  mutation RentReceiptCreate($input: RentReceiptInput!) {
+    rentReceiptCreate(input: $input) {
+      receipt {
+        id
+        downloadUrl
+      }
+    }
+  }
+`;

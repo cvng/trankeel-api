@@ -1,0 +1,21 @@
+# https://www.graphql-code-generator.com/docs/plugins/typescript
+
+overwrite: true
+
+schema: "../../schema.graphql"
+
+documents: "src/**/*.graphql"
+
+generates:
+  src/types.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-document-nodes"
+    config:
+      declarationKind: "interface"
+      defaultScalarType: "string"
+
+hooks:
+  afterAllFileWrite:
+    - "prettier --write"
