@@ -1,0 +1,693 @@
+# Piteo GraphQL operations.
+
+################################################################################
+
+# Queries
+
+query Test {
+  __schema {
+    types {
+      name
+    }
+  }
+}
+
+#  User
+
+query User {
+  user: viewer {
+    id
+    email
+    firstName
+    lastName
+    displayName
+    photoURL
+    address {
+      line1
+      line2
+      city
+      postalCode
+    }
+    account {
+      id
+      status
+      plan {
+        code
+      }
+      trialEnd
+    }
+  }
+}
+
+# Lender
+
+query Lender {
+  lenders {
+    id
+    accountId
+    displayName
+    identity {
+      ... on Company {
+        id
+        email
+        displayName
+        legalEntity
+        legalEntityIdentifier
+        address {
+          inline
+          line1
+          line2
+          city
+          postalCode
+        }
+      }
+      ... on User {
+        id
+        email
+        displayName
+        firstName
+        lastName
+        address {
+          inline
+          line1
+          line2
+          city
+          postalCode
+        }
+      }
+    }
+  }
+}
+
+# Tenant
+query TenantWithRentalReceipts($id: ID!) {
+  tenants(id: $id) {
+    id
+    firstName
+    lastName
+    fullName
+    email
+    phoneNumber
+    lastTransaction {
+      date
+      amount
+    }
+    propertyName
+    rentPayedThisYear
+    unpaidRentAmount
+    status
+    note
+  }
+}
+
+query TenantList($id: ID, $query: String, $status: TenantStatus) {
+  tenants(id: $id, query: $query, status: $status) {
+    id
+    firstName
+    lastName
+    fullName
+    email
+    phoneNumber
+    lastTransaction {
+      id
+      date
+      amount
+      accountId
+      type
+    }
+    propertyName
+    rentPayedThisYear
+    unpaidRentAmount
+    status
+    note
+    visaleId
+    apl
+    files {
+      id
+      filename
+      createdAt
+      type
+      downloadUrl
+    }
+    lease {
+      id
+      type
+      status
+      rents {
+        id
+        periodStart
+        periodEnd
+        fullAmount
+        amount
+        status
+        leaseId
+      }
+      rentFullAmount
+      rentAmount
+      rentChargesAmount
+      effectDate
+      renewDate
+      signatureDate
+      rentAmount
+      depositAmount
+      data {
+        ... on LeaseFurnishedData {
+          duration
+        }
+      }
+      accountId
+      account {
+        id
+      }
+      propertyId
+      property {
+        id
+        address {
+          city
+          inline
+          line1
+          postalCode
+        }
+        buildPeriod
+        buildingLegalStatus
+        heatingMethod
+        housingType
+        name
+        roomCount
+        surface
+        usageType
+        waterHeatingMethod
+      }
+      tenants {
+        id
+        displayName
+        email
+        firstName
+        lastName
+        accountId
+        account {
+          id
+        }
+        birthdate
+        fullName
+      }
+    }
+    birthdate
+    birthplace
+    displayName
+    accountId
+    account {
+      id
+    }
+  }
+}
+
+# Lease
+
+query LeaseList($id: ID, $query: String) {
+  leases(id: $id, query: $query) {
+    id
+    accountId
+    account {
+      id
+    }
+    propertyId
+    property {
+      id
+      address {
+        city
+        inline
+        line1
+        postalCode
+      }
+      buildPeriod
+      buildingLegalStatus
+      heatingMethod
+      housingType
+      name
+      roomCount
+      surface
+      usageType
+      waterHeatingMethod
+    }
+    status
+    tenants {
+      id
+      email
+      displayName
+      firstName
+      lastName
+      fullName
+      accountId
+      account {
+        id
+      }
+      birthdate
+    }
+    file: lease {
+      id
+      downloadUrl
+      type
+    }
+    rentFullAmount
+    effectDate
+    rentAmount
+    depositAmount
+    rentChargesAmount
+    data {
+      ... on LeaseFurnishedData {
+        duration
+        rentPaymentMethod
+      }
+    }
+  }
+}
+
+query Lease($id: ID!) {
+  leases(id: $id) {
+    id
+    accountId
+    status
+    tenants {
+      id
+      fullName
+    }
+    file: lease {
+      downloadUrl
+    }
+    rentFullAmount
+    effectDate
+    rentAmount
+    depositAmount
+    rentChargesAmount
+    data {
+      ... on LeaseFurnishedData {
+        duration
+        rentPaymentMethod
+      }
+    }
+  }
+}
+
+query ContractRequirementData($query: String) {
+  tenants(query: $query) {
+    id
+    fullName
+    status
+    lease {
+      id
+    }
+  }
+}
+
+# Property
+
+query PropertyList($id: ID, $query: String) {
+  properties(id: $id, query: $query) {
+    id
+    name
+    address {
+      city
+      country
+      inline
+      line1
+      line2
+      postalCode
+    }
+    roomCount
+    note
+    lender {
+      id
+      displayName
+    }
+    collectedRents
+    surface
+    status
+    energyClass
+    gasEmission
+    tenantPrivateSpaces
+    equipments
+    nticEquipments
+    otherSpaces
+    commonSpaces
+    waterHeatingMethod
+    heatingMethod
+    tax
+    buildPeriod
+    housingType
+    buildingLegalStatus
+    usageType
+    leases {
+      id
+      status
+      type
+      effectDate
+      renewDate
+      signatureDate
+      rentAmount
+      depositAmount
+      rentChargesAmount
+      rentFullAmount
+      accountId
+      account {
+        id
+      }
+      tenants {
+        id
+        fullName
+        status
+        displayName
+        email
+        firstName
+        lastName
+        accountId
+        account {
+          id
+        }
+        birthdate
+      }
+      propertyId
+      property {
+        id
+        address {
+          city
+          inline
+          line1
+          postalCode
+        }
+        buildPeriod
+        buildingLegalStatus
+        heatingMethod
+        housingType
+        lender {
+          id
+          displayName
+        }
+        name
+        roomCount
+        surface
+        usageType
+        waterHeatingMethod
+      }
+    }
+  }
+}
+
+# Transaction
+
+query Transaction($id: ID!) {
+  transactions(id: $id) {
+    id
+    date
+    amount
+    type
+    lease {
+      id
+    }
+  }
+}
+
+# Invoice
+
+query InvoiceList {
+  invoices {
+    id
+    number
+    amountPaid
+    invoicePdf
+    periodEnd
+    status
+    planCode
+  }
+}
+
+# Pricing plans
+
+query PricingPlans {
+  plans {
+    title
+    subtitle
+    id
+    price
+    code
+    features {
+      available
+      title
+      key
+    }
+  }
+}
+
+# Rental receipt
+
+query RentalReceiptData {
+  tenants {
+    id
+    firstName
+    lastName
+    fullName
+    propertyName
+    lease {
+      id
+      property {
+        id
+        address {
+          city
+          country
+          inline
+          line1
+          line2
+          postalCode
+        }
+      }
+      rentAmount
+      rentChargesAmount
+      rentFullAmount
+    }
+  }
+}
+
+# Rent
+
+query RentReceivedSummary($since: DateTime!, $until: DateTime!) {
+  rentReceivedSummary: summary(since: $since, until: $until) {
+    since
+    until
+    #
+    amountExpected
+    amountReceived
+    amountSettled
+    amountPartial
+    amountPending
+    #
+    nExpected
+    nReceived
+    nSettled
+    nPartial
+    nPending
+    #
+    ratioExpected
+    ratioReceived
+    ratioSettled
+    ratioPartial
+    ratioPending
+    #
+    variationExpected
+    variationReceived
+    variationSettled
+    variationPartial
+    variationPending
+    #
+    paymentRate
+    occupationRate
+  }
+}
+
+query RentReceivedStatus {
+  properties {
+    id
+    name
+    collectedRents
+    expectedRents
+    leases {
+      id
+      property {
+        lender {
+          id
+          identity {
+            ... on User {
+              address {
+                inline
+              }
+            }
+            ... on Company {
+              address {
+                inline
+              }
+            }
+          }
+        }
+      }
+      tenants {
+        id
+        fullName
+        shortName
+      }
+      rentFullAmount
+      rents {
+        id
+        periodStart
+        periodEnd
+        fullAmount
+        amount
+        status
+        leaseId
+        transactions {
+          id
+        }
+      }
+    }
+  }
+}
+
+# Files
+
+query File {
+  files {
+    id
+    filename
+    type
+    createdAt
+    downloadUrl
+  }
+}
+
+################################################################################
+
+# Mutations
+
+mutation UserCreateWithAccount($input: UserWithAccountInput!) {
+  accountCreate: userCreateWithAccount(input: $input) {
+    id
+  }
+}
+
+mutation AccountUpdatePaymentMethod($input: AccountUpdateInput!) {
+  accountUpdatePaymentMethod(input: $input) {
+    id
+  }
+}
+
+mutation AccountActivatePlan($input: AccountActivatePlanInput!) {
+  accountActivatePlan(input: $input) {
+    id
+    status
+    trialEnd
+  }
+}
+
+mutation TenantCreate($input: TenantInput!) {
+  tenant: tenantCreate(input: $input) {
+    id
+    firstName
+    lastName
+    fullName
+    email
+    phoneNumber
+    lastTransaction {
+      date
+      amount
+    }
+    propertyName
+    rentPayedThisYear
+    unpaidRentAmount
+    status
+    note
+  }
+}
+
+mutation TenantUpdate($input: TenantUpdateInput!) {
+  tenantUpdate(input: $input) {
+    id
+  }
+}
+
+mutation TenantDelete($id: ID!) {
+  tenantId: tenantDelete(id: $id)
+}
+
+mutation PropertyCreate($input: PropertyInput!) {
+  propertyCreate(input: $input) {
+    id
+  }
+}
+
+mutation PropertyUpdate($input: PropertyUpdateInput!) {
+  propertyUpdate(input: $input) {
+    id
+  }
+}
+
+mutation PropertyDelete($id: ID!) {
+  propertyDelete(id: $id)
+}
+
+mutation LeaseCreate($input: LeaseFurnishedInput!) {
+  leaseCreate: leaseFurnishedCreate(input: $input) {
+    id
+  }
+}
+
+mutation LeaseDelete($id: ID!) {
+  leaseDelete(id: $id)
+}
+
+mutation ContractDelete($id: ID!) {
+  leaseId: leaseDelete(id: $id)
+}
+
+mutation ContractUpdate($input: LeaseFurnishedUpdateInput!) {
+  leaseUpdate: leaseFurnishedUpdate(input: $input) {
+    id
+  }
+}
+
+mutation LenderIndividualUpdate($input: LenderIndividualUpdateInput!) {
+  lenderIndividualUpdate(input: $input) {
+    id
+  }
+}
+
+mutation TransactionCreate($input: TransactionInput!) {
+  transactionCreate(input: $input) {
+    id
+  }
+}
+
+mutation TransactionDelete($id: ID!) {
+  transactionId: transactionDelete(id: $id)
+}
+
+mutation FileUpload($input: FileInput!) {
+  fileUpload(input: $input) {
+    id
+  }
+}
+
+mutation ImportUpload($input: ImportInput!) {
+  importUpload(input: $input) {
+    id
+    status
+    progress
+  }
+}
+
+# Edition d'une quittance
+mutation RentReceiptCreate($input: RentReceiptInput!) {
+  rentReceiptCreate(input: $input) {
+    receipt {
+      id
+      downloadUrl
+    }
+  }
+}
