@@ -1,0 +1,157 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'piteo'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=piteo",
+          "--package=piteo"
+        ],
+        "filter": {
+          "name": "piteo",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'piteo'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=piteo",
+          "--package=piteo"
+        ],
+        "filter": {
+          "name": "piteo",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in library 'piteo-core'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package=piteo-core"
+        ],
+        "filter": {
+          "name": "piteo-core",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in library 'piteo-graphql'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package=piteo-graphql"
+        ],
+        "filter": {
+          "name": "piteo-graphql",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'piteo-cli'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=piteo-cli",
+          "--package=piteo-cli"
+        ],
+        "filter": {
+          "name": "piteo-cli",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'piteo-cli'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=piteo-cli",
+          "--package=piteo-cli"
+        ],
+        "filter": {
+          "name": "piteo-cli",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'piteo-web'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=piteo-web",
+          "--package=piteo-web"
+        ],
+        "filter": {
+          "name": "piteo-web",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'piteo-web'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=piteo-web",
+          "--package=piteo-web"
+        ],
+        "filter": {
+          "name": "piteo-web",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
