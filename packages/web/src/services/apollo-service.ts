@@ -1,10 +1,10 @@
 import { ApolloClient, from, HttpLink, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { ErrorResponse, onError } from "@apollo/client/link/error";
-// import { getIdToken } from "./auth-service";
+import { getIdToken } from "./auth-service";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://piteo-api.herokuapp.com/graphql";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ||
+  "https://piteo-api.herokuapp.com/graphql";
 
 interface Context {
   headers: Record<string, string>;
@@ -38,9 +38,9 @@ function createApolloClient(): ApolloClient<unknown> {
 
 /// Returns an Apollo context setter for auth token.
 async function authRequestHandler(): Promise<Context> {
-  // TODO: const authorization = await getIdToken();
+  const authorization = await getIdToken();
 
-  const nextContext: Context = { headers: { /*authorization*/ } };
+  const nextContext: Context = { headers: authorization ? { authorization } : {} };
 
   return nextContext;
 }
