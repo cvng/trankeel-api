@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import Head from "next/head";
 import Image from "next/image";
-import { UserQuery } from "src/helpers";
+import { UserQuery } from "../helpers";
 import { capitalize } from "../kit/lib";
 import styles from "../styles/Home.module.css";
 
