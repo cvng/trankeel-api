@@ -130,20 +130,27 @@ table! {
 
 table! {
     tenant (id) {
-        accountId -> Uuid,
+        #[sql_name="accountId"]
+        account_id -> Uuid,
         apl -> Bool,
-        authId -> Nullable<Text>,
+        #[sql_name="authId"]
+        auth_id -> Nullable<Text>,
         birthdate -> Timestamp,
         birthplace -> Nullable<Text>,
         email -> Text,
-        firstName -> Text,
-        lastName -> Text,
+        #[sql_name="firstName"]
+        first_name -> Text,
+        #[sql_name="lastName"]
+        last_name -> Text,
         note -> Nullable<Text>,
-        phoneNumber -> Nullable<Text>,
+        #[sql_name="phoneNumber"]
+        phone_number -> Nullable<Text>,
         role -> Nullable<Text>,
         id -> Uuid,
-        leaseId -> Nullable<Uuid>,
-        visaleId -> Nullable<Text>,
+        #[sql_name="leaseId"]
+        lease_id -> Nullable<Uuid>,
+        #[sql_name="visaleId"]
+        visale_id -> Nullable<Text>,
     }
 }
 
@@ -185,7 +192,7 @@ joinable!(lender -> account (accountId));
 joinable!(property -> lender (lenderId));
 joinable!(rent -> lease (leaseId));
 joinable!(rent -> transaction (transactionId));
-joinable!(tenant -> lease (leaseId));
+joinable!(tenant -> lease (lease_id));
 joinable!(transaction -> lease (leaseId));
 
 allow_tables_to_appear_in_same_query!(
