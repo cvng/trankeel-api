@@ -1,3 +1,3 @@
 mod file;
 
-pub use crate::files::file::*;
+pub use self::file::*;

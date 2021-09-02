@@ -231,6 +231,23 @@ pub enum LegalEntityType {
     Snc,
 }
 
+impl From<String> for LegalEntityType {
+    fn from(item: String) -> Self {
+        match item.as_str() {
+            "EURL" => Self::Eurl,
+            "OTHER" => Self::Other,
+            "SA" => Self::Sa,
+            "SARL" => Self::Sarl,
+            "SAS" => Self::Sas,
+            "SASU" => Self::Sasu,
+            "SCI" => Self::Sci,
+            "SCP" => Self::Scp,
+            "SNC" => Self::Snc,
+            _ => unimplemented!(),
+        }
+    }
+}
+
 #[derive(async_graphql::Enum, Copy, Clone, Eq, PartialEq)]
 pub enum LeaseNakedDuration {
     ThreeYears,

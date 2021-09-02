@@ -1,3 +1,3 @@
 mod summary;
 
-pub use crate::reports::summary::*;
+pub use self::summary::*;

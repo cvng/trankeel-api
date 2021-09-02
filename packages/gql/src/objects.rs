@@ -33,11 +33,12 @@ use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
 use piteo_core::auth;
+use piteo_core::owners;
 use piteo_core::DbPool;
 use piteo_core::Name;
 use std::convert::TryInto;
 
-// # Objects. https://async-graphql.github.io/async-graphql/en/define_simple_object.html
+// # Objects. https://async-graphql.github.io/async-graphql/en/define_complex_object.html
 
 #[derive(async_graphql::SimpleObject)]
 #[graphql(complex)]
@@ -106,6 +107,22 @@ pub struct Company {
     legal_entity_type: Option<LegalEntityType>,
     legal_entity_type_other: Option<String>,
     phone_number: Option<PhoneNumber>,
+}
+
+impl From<piteo_core::Company> for Company {
+    fn from(item: piteo_core::Company) -> Self {
+        Self {
+            display_name: item.display_name(),
+            address: item.address.map(Into::into),
+            email: item.email.into(),
+            id: item.id.into(),
+            legal_entity: item.legal_entity,
+            legal_entity_identifier: item.legal_entity_identifier,
+            legal_entity_type: item.legal_entity_type.map(Into::into),
+            legal_entity_type_other: item.legal_entity_type_other,
+            phone_number: item.phone_number.map(Into::into),
+        }
+    }
 }
 
 #[derive(async_graphql::SimpleObject)]
@@ -286,26 +303,35 @@ impl From<piteo_core::LeaseData> for LeaseFurnishedData {
     }
 }
 
-#[derive(async_graphql::SimpleObject)]
-pub struct Lender {
-    id: ID,
-    account_id: Option<ID>,
-    individual_id: Option<ID>,
-    company_id: Option<ID>,
-    display_name: String,
-    identity: Option<Identity>,
+pub struct Lender(piteo_core::Lender);
+
+#[async_graphql::Object]
+impl Lender {
+    async fn id(&self) -> ID {
+        self.0.id.into()
+    }
+    async fn account_id(&self) -> ID {
+        self.0.account_id.into()
+    }
+    async fn individual_id(&self) -> Option<ID> {
+        self.0.individual_id.map(Into::into)
+    }
+    async fn company_id(&self) -> Option<ID> {
+        self.0.company_id.map(Into::into)
+    }
+    async fn display_name(&self, ctx: &Context<'_>) -> Result<String> {
+        let conn = ctx.data::<DbPool>()?.get()?;
+        Ok(owners::get_identity(&conn, self.0.id)?.display_name())
+    }
+    async fn identity(&self, ctx: &Context<'_>) -> Result<Identity> {
+        let conn = ctx.data::<DbPool>()?.get()?;
+        Ok(owners::get_identity(&conn, self.0.id)?.into())
+    }
 }
 
 impl From<piteo_core::Lender> for Lender {
     fn from(item: piteo_core::Lender) -> Self {
-        Self {
-            display_name: item.display_name(),
-            id: item.id.into(),
-            account_id: Some(item.account_id.into()),
-            individual_id: item.individual_id.map(ID::from),
-            company_id: item.company_id.map(ID::from),
-            identity: None,
-        }
+        Self(item)
     }
 }
 
@@ -370,71 +396,101 @@ pub struct Plan {
     features: Vec<Feature>,
 }
 
-#[derive(async_graphql::SimpleObject)]
-pub struct Property {
-    account: Option<Account>,
-    account_id: Option<ID>,
-    address: Address,
-    build_period: Option<PropertyBuildPeriodType>,
-    building_legal_status: Option<PropertyBuildingLegalStatus>,
-    common_spaces: Option<String>,
-    energy_class: Option<PropertyEnergyClass>,
-    equipments: Option<String>,
-    gas_emission: Option<PropertyGasEmission>,
-    heating_method: Option<PropertyUsageType>,
-    housing_type: Option<PropertyUsageType>,
-    name: String,
-    note: Option<String>,
-    ntic_equipments: Option<String>,
-    other_spaces: Option<String>,
-    tax: Option<f64>,
-    room_count: PropertyRoomType,
-    status: Option<PropertyStatus>,
-    surface: i32,
-    tenant_private_spaces: Option<String>,
-    usage_type: Option<PropertyHabitationUsageType>,
-    water_heating_method: Option<PropertyUsageType>,
-    id: ID,
-    lender_id: Option<ID>,
+pub struct Property(piteo_core::Property);
+
+#[async_graphql::Object]
+impl Property {
+    async fn account(&self) -> Option<Account> {
+        None
+    }
+    async fn account_id(&self) -> Option<ID> {
+        self.0.account_id.map(Into::into)
+    }
+    async fn address(&self) -> Address {
+        self.0.address.clone().into()
+    }
+    async fn build_period(&self) -> Option<PropertyBuildPeriodType> {
+        self.0.build_period.clone().map(Into::into)
+    }
+    async fn building_legal_status(&self) -> Option<PropertyBuildingLegalStatus> {
+        self.0.building_legal_status.clone().map(Into::into)
+    }
+    async fn common_spaces(&self) -> Option<String> {
+        self.0.common_spaces.clone()
+    }
+    async fn energy_class(&self) -> Option<PropertyEnergyClass> {
+        self.0.energy_class.clone().map(Into::into)
+    }
+    async fn equipments(&self) -> Option<String> {
+        self.0.equipments.clone()
+    }
+    async fn gas_emission(&self) -> Option<PropertyGasEmission> {
+        self.0.gas_emission.clone().map(Into::into)
+    }
+    async fn heating_method(&self) -> Option<PropertyUsageType> {
+        self.0.heating_method.clone().map(Into::into)
+    }
+    async fn housing_type(&self) -> Option<PropertyUsageType> {
+        self.0.housing_type.clone().map(Into::into)
+    }
+    async fn name(&self) -> String {
+        self.0.name.clone()
+    }
+    async fn note(&self) -> Option<String> {
+        self.0.note.clone()
+    }
+    async fn ntic_equipments(&self) -> Option<String> {
+        self.0.ntic_equipments.clone()
+    }
+    async fn other_spaces(&self) -> Option<String> {
+        self.0.other_spaces.clone()
+    }
+    async fn tax(&self) -> Option<f64> {
+        self.0.tax
+    }
+    async fn room_count(&self) -> PropertyRoomType {
+        self.0.room_count.clone().into()
+    }
+    async fn status(&self) -> Option<PropertyStatus> {
+        self.0.status.clone().map(Into::into)
+    }
+    async fn surface(&self) -> i32 {
+        self.0.surface
+    }
+    async fn tenant_private_spaces(&self) -> Option<String> {
+        self.0.tenant_private_spaces.clone()
+    }
+    async fn usage_type(&self) -> Option<PropertyHabitationUsageType> {
+        self.0.usage_type.clone().map(Into::into)
+    }
+    async fn water_heating_method(&self) -> Option<PropertyUsageType> {
+        self.0.water_heating_method.clone().map(Into::into)
+    }
+    async fn id(&self) -> ID {
+        self.0.id.into()
+    }
+    async fn lender_id(&self) -> ID {
+        self.0.lender_id.into()
+    }
     //
-    expected_rents: Option<Decimal>,
-    collected_rents: Option<Decimal>,
-    lender: Option<Lender>,
-    leases: Option<Vec<Lease>>,
+    async fn expected_rents(&self) -> Option<Decimal> {
+        None
+    }
+    async fn collected_rents(&self) -> Option<Decimal> {
+        None
+    }
+    async fn lender(&self, ctx: &Context<'_>) -> Result<Lender> {
+        let conn = ctx.data::<DbPool>()?.get()?;
+        Ok(owners::lender_by_id(&conn, self.0.lender_id)?.into())
+    }
+    async fn leases(&self) -> Option<Vec<Lease>> {
+        None
+    }
 }
 
 impl From<piteo_core::Property> for Property {
     fn from(item: piteo_core::Property) -> Self {
-        Self {
-            account_id: item.account_id.map(ID::from),
-            address: item.address.into(),
-            build_period: item.build_period.map(Into::into),
-            building_legal_status: item.building_legal_status.map(Into::into),
-            common_spaces: item.common_spaces,
-            energy_class: item.energy_class.map(Into::into),
-            equipments: item.equipments,
-            gas_emission: item.gas_emission.map(Into::into),
-            heating_method: item.heating_method.map(Into::into),
-            housing_type: item.housing_type.map(Into::into),
-            name: item.name,
-            note: item.note,
-            ntic_equipments: item.ntic_equipments,
-            other_spaces: item.other_spaces,
-            tax: item.tax,
-            room_count: item.room_count.into(),
-            status: item.status.map(Into::into),
-            surface: item.surface,
-            tenant_private_spaces: item.tenant_private_spaces,
-            usage_type: item.usage_type.map(Into::into),
-            water_heating_method: item.water_heating_method.map(Into::into),
-            id: item.id.into(),
-            lender_id: Some(item.lender_id.into()),
-            account: None,
-            expected_rents: None,
-            collected_rents: None,
-            lender: None,
-            leases: Some(Vec::new()),
-        }
+        Self(item)
     }
 }
 
