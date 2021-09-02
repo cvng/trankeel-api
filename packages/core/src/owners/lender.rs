@@ -5,7 +5,6 @@ use crate::companies::Company;
 use crate::database::Conn;
 use crate::schema::lender;
 use crate::schema::user;
-use crate::wip;
 use crate::AuthId;
 use crate::Id;
 use crate::Name;
@@ -44,14 +43,22 @@ impl LegalEntity for Lender {}
 pub fn get_identity(conn: &Conn, id: Id) -> Result<Identity, Error> {
     let lender = lender_by_id(conn, id)?;
 
-    if let Some(individual_id) = lender.individual_id {
-        let individual = auth::person_by_id(conn, &individual_id)?;
-        Ok(Identity::Individual(individual))
-    } else if let Some(company_id) = lender.company_id {
-        let company = companies::find(conn, &company_id)?;
-        Ok(Identity::Company(company))
-    } else {
-        Err(wip())
+    match lender {
+        Lender {
+            individual_id: Some(individual_id),
+            ..
+        } => {
+            let individual = auth::person_by_id(conn, &individual_id)?;
+            Ok(Identity::Individual(individual))
+        }
+        Lender {
+            company_id: Some(company_id),
+            ..
+        } => {
+            let company = companies::find(conn, &company_id)?;
+            Ok(Identity::Company(company))
+        }
+        _ => Err(Error::msg("Identity not found")),
     }
 }
 

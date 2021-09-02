@@ -47,7 +47,3 @@ pub use crate::properties::Property;
 pub use crate::reports::Summary;
 pub use crate::tenants::Tenant;
 pub use crate::tenants::TenantStatus;
-
-fn wip() -> Error {
-    Error::msg("wip!()")
-}
