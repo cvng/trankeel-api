@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Button, EnvelopeIcon, InboxSearchIcon } from "evergreen-ui";
 import { formatPhoneNumber, toLocaleDateString, translate } from "piteo-kit";
 import * as React from "react";
