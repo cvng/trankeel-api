@@ -302,11 +302,11 @@ export enum LegalEntityType {
 export interface Lender {
   __typename?: "Lender";
   id: Scalars["ID"];
-  accountId?: Maybe<Scalars["ID"]>;
+  accountId: Scalars["ID"];
   individualId?: Maybe<Scalars["ID"]>;
   companyId?: Maybe<Scalars["ID"]>;
   displayName: Scalars["String"];
-  identity?: Maybe<Identity>;
+  identity: Identity;
 }
 
 export interface LenderIndividualUpdateInput {
@@ -1045,9 +1045,9 @@ export type LenderQuery = {
   lenders: Array<{
     __typename?: "Lender";
     id: string;
-    accountId?: Maybe<string>;
+    accountId: string;
     displayName: string;
-    identity?: Maybe<
+    identity:
       | {
           __typename?: "User";
           id: string;
@@ -1079,8 +1079,7 @@ export type LenderQuery = {
             city: string;
             postalCode: string;
           }>;
-        }
-    >;
+        };
   }>;
 };
 
@@ -1571,7 +1570,7 @@ export type RentReceivedStatusQuery = {
           lender?: Maybe<{
             __typename?: "Lender";
             id: string;
-            identity?: Maybe<
+            identity:
               | {
                   __typename?: "User";
                   address?: Maybe<{ __typename?: "Address"; inline: string }>;
@@ -1579,8 +1578,7 @@ export type RentReceivedStatusQuery = {
               | {
                   __typename?: "Company";
                   address?: Maybe<{ __typename?: "Address"; inline: string }>;
-                }
-            >;
+                };
           }>;
         }>;
         tenants: Array<{

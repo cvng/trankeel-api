@@ -469,8 +469,8 @@ impl Property {
     async fn id(&self) -> ID {
         self.0.id.into()
     }
-    async fn lender_id(&self) -> ID {
-        self.0.lender_id.into()
+    async fn lender_id(&self) -> Option<ID> {
+        Some(self.0.lender_id.into())
     }
     //
     async fn expected_rents(&self) -> Option<Decimal> {
@@ -479,12 +479,12 @@ impl Property {
     async fn collected_rents(&self) -> Option<Decimal> {
         None
     }
-    async fn lender(&self, ctx: &Context<'_>) -> Result<Lender> {
+    async fn lender(&self, ctx: &Context<'_>) -> Result<Option<Lender>> {
         let conn = ctx.data::<DbPool>()?.get()?;
-        Ok(owners::lender_by_id(&conn, self.0.lender_id)?.into())
+        Ok(Some(owners::lender_by_id(&conn, self.0.lender_id)?.into()))
     }
     async fn leases(&self) -> Option<Vec<Lease>> {
-        None
+        Some(Vec::new())
     }
 }
 
