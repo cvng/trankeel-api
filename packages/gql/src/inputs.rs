@@ -133,6 +133,22 @@ pub struct TenantInput {
     visale_id: Option<String>,
 }
 
+impl From<TenantInput> for piteo_core::tenants::TenantInput {
+    fn from(item: TenantInput) -> Self {
+        Self {
+            apl: item.apl,
+            birthdate: item.birthdate.into(),
+            birthplace: item.birthplace,
+            email: item.email.into(),
+            first_name: item.first_name,
+            last_name: item.last_name,
+            note: item.note,
+            phone_number: item.phone_number.map(Into::into),
+            visale_id: item.visale_id,
+        }
+    }
+}
+
 #[derive(async_graphql::InputObject)]
 pub struct TenantUpdateInput {
     apl: Option<bool>,

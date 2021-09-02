@@ -31,12 +31,24 @@ impl From<piteo_core::AuthId> for AuthId {
 #[derive(Serialize, Deserialize)]
 pub struct Date(piteo_core::DateTime);
 
+impl From<Date> for piteo_core::DateTime {
+    fn from(item: Date) -> Self {
+        item.0
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct DateTime(piteo_core::DateTime);
 
 impl From<piteo_core::DateTime> for DateTime {
     fn from(item: piteo_core::DateTime) -> Self {
         Self(item)
+    }
+}
+
+impl From<DateTime> for piteo_core::DateTime {
+    fn from(item: DateTime) -> Self {
+        item.0
     }
 }
 
@@ -58,12 +70,24 @@ impl From<String> for Email {
     }
 }
 
+impl From<Email> for String {
+    fn from(item: Email) -> Self {
+        item.0
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct PhoneNumber(String);
 
 impl From<String> for PhoneNumber {
     fn from(item: String) -> Self {
         Self(item)
+    }
+}
+
+impl From<PhoneNumber> for String {
+    fn from(item: PhoneNumber) -> Self {
+        item.0
     }
 }
 

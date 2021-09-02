@@ -52,7 +52,7 @@ pub fn all_tenants(conn: &Conn, auth_id: &AuthId, id: Option<Id>) -> Result<Vec<
 
     let query = tenant::table
         .select(tenant::all_columns)
-        .left_join(user::table.on(user::accountId.eq(tenant::accountId.nullable())))
+        .left_join(user::table.on(user::accountId.eq(tenant::account_id.nullable())))
         .filter(user::authId.eq(auth_id.inner()));
 
     if let Some(id) = id {

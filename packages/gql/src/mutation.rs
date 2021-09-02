@@ -21,8 +21,12 @@ use crate::objects::Task;
 use crate::objects::Tenant;
 use crate::objects::Transaction;
 use crate::wip;
+use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
+use piteo_core::tenants;
+use piteo_core::AuthId;
+use piteo_core::DbPool;
 
 pub struct Mutation;
 
@@ -40,8 +44,10 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn tenant_create(&self, _input: TenantInput) -> Result<Tenant> {
-        Err(wip())
+    async fn tenant_create(&self, ctx: &Context<'_>, input: TenantInput) -> Result<Tenant> {
+        let conn = ctx.data::<DbPool>()?.get()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        Ok(tenants::create_tenant(&conn, auth_id, input.into())?.into())
     }
 
     async fn tenant_update(&self, _input: TenantUpdateInput) -> Result<Tenant> {
