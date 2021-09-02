@@ -252,11 +252,11 @@ enum LegalEntityType {
 }
 type Lender {
 	id: ID!
-	accountId: ID
+	accountId: ID!
 	individualId: ID
 	companyId: ID
 	displayName: String!
-	identity: Identity
+	identity: Identity!
 }
 input LenderIndividualUpdateInput {
 	id: ID!
@@ -318,10 +318,10 @@ type Property {
 	usageType: PropertyHabitationUsageType
 	waterHeatingMethod: PropertyUsageType
 	id: ID!
-	lenderId: ID
+	lenderId: ID!
 	expectedRents: Decimal
 	collectedRents: Decimal
-	lender: Lender
+	lender: Lender!
 	leases: [Lease!]
 }
 enum PropertyBuildPeriodType {

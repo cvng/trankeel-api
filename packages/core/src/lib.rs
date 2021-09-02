@@ -8,9 +8,11 @@ mod schema;
 
 pub mod auth;
 pub mod billing;
+pub mod companies;
 pub mod error;
 pub mod files;
 pub mod leases;
+pub mod owners;
 pub mod properties;
 pub mod reports;
 pub mod tenants;
@@ -24,6 +26,7 @@ pub use crate::common::Amount;
 pub use crate::common::DateTime;
 pub use crate::common::Id;
 pub use crate::common::Name;
+pub use crate::companies::Company;
 pub use crate::database::build_connection_pool;
 pub use crate::database::DbPool;
 pub use crate::error::Error;
@@ -38,8 +41,13 @@ pub use crate::leases::Rent;
 pub use crate::leases::RentChargesRecuperationMode;
 pub use crate::leases::RentPaymentMethod;
 pub use crate::leases::RentStatus;
-pub use crate::properties::Lender;
+pub use crate::owners::Identity;
+pub use crate::owners::Lender;
 pub use crate::properties::Property;
 pub use crate::reports::Summary;
 pub use crate::tenants::Tenant;
 pub use crate::tenants::TenantStatus;
+
+fn wip() -> Error {
+    Error::msg("wip!()")
+}
