@@ -8,7 +8,7 @@ import {
 } from "evergreen-ui";
 import { FormikProps } from "formik";
 import React from "react";
-import Tour from "reactour";
+// import Tour from "reactour";
 import { Tenant, TransactionInput } from "../../types";
 import { TransactionRentValidator } from "../../validators";
 import { EmptyDataset, NAV_BAR_HEIGHT, PageContent } from "../common";
@@ -117,6 +117,7 @@ export const RentReceiptAddPage: React.FunctionComponent<
     </Pane>}
   >
     {/* Visite guidée */}
+    {/*
     <Tour
       steps={steps}
       accentColor={"#1259B1"}
@@ -124,6 +125,7 @@ export const RentReceiptAddPage: React.FunctionComponent<
       rounded={5}
       onRequestClose={() => setTourEnabled(false)}
     />
+    */}
 
     <FlexRow height={window.innerHeight - NAV_BAR_HEIGHT}>
       <RentReceiptTenantSelection
