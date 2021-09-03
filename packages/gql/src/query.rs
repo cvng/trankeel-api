@@ -1,4 +1,3 @@
-use crate::enums::TenantStatus;
 use crate::objects::File;
 use crate::objects::Invoice;
 use crate::objects::Lease;
@@ -22,6 +21,7 @@ use piteo_core::tenants;
 use piteo_core::AuthId;
 use piteo_core::DbPool;
 use piteo_core::Id;
+use piteo_core::TenantStatus;
 
 pub struct Query;
 

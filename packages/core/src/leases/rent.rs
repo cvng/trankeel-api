@@ -1,27 +1,7 @@
 use crate::Amount;
 use crate::DateTime;
 use crate::Id;
-use diesel::deserialize;
-use diesel::deserialize::FromSql;
-use diesel::pg::Pg;
-use diesel::sql_types::Text;
-
-pub enum RentStatus {
-    Partial,
-    Pending,
-    Settled,
-}
-
-impl FromSql<Text, Pg> for RentStatus {
-    fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
-        match bytes {
-            Some(b"PARTIAL") => Ok(RentStatus::Partial),
-            Some(b"PENDING") => Ok(RentStatus::Pending),
-            Some(b"SETTLED") => Ok(RentStatus::Settled),
-            _ => Err("Unrecognized enum variant".into()),
-        }
-    }
-}
+use piteo_data::RentStatus;
 
 // # Models
 

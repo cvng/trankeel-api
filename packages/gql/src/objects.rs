@@ -1,27 +1,3 @@
-use crate::enums::FileStatus;
-use crate::enums::FileType;
-use crate::enums::LeaseFurnishedDuration;
-use crate::enums::LeaseRentPeriodicity;
-use crate::enums::LeaseRentReferenceIrl;
-use crate::enums::LeaseStatus;
-use crate::enums::LeaseType;
-use crate::enums::LegalEntityType;
-use crate::enums::PlanCode;
-use crate::enums::PropertyBuildPeriodType;
-use crate::enums::PropertyBuildingLegalStatus;
-use crate::enums::PropertyEnergyClass;
-use crate::enums::PropertyGasEmission;
-use crate::enums::PropertyHabitationUsageType;
-use crate::enums::PropertyRoomType;
-use crate::enums::PropertyStatus;
-use crate::enums::PropertyUsageType;
-use crate::enums::RentChargesRecuperationMode;
-use crate::enums::RentPaymentMethod;
-use crate::enums::RentStatus;
-use crate::enums::SubscriptionStatus;
-use crate::enums::TenantStatus;
-use crate::enums::TransactionType;
-use crate::enums::UserRole;
 use crate::scalars::AuthId;
 use crate::scalars::DateTime;
 use crate::scalars::Decimal;
@@ -35,7 +11,31 @@ use async_graphql::*;
 use piteo_core::auth;
 use piteo_core::owners;
 use piteo_core::DbPool;
+use piteo_core::FileStatus;
+use piteo_core::FileType;
+use piteo_core::LeaseFurnishedDuration;
+use piteo_core::LeaseRentPeriodicity;
+use piteo_core::LeaseRentReferenceIrl;
+use piteo_core::LeaseStatus;
+use piteo_core::LeaseType;
+use piteo_core::LegalEntityType;
 use piteo_core::Name;
+use piteo_core::PlanCode;
+use piteo_core::PropertyBuildPeriodType;
+use piteo_core::PropertyBuildingLegalStatus;
+use piteo_core::PropertyEnergyClass;
+use piteo_core::PropertyGasEmission;
+use piteo_core::PropertyHabitationUsageType;
+use piteo_core::PropertyRoomType;
+use piteo_core::PropertyStatus;
+use piteo_core::PropertyUsageType;
+use piteo_core::RentChargesRecuperationMode;
+use piteo_core::RentPaymentMethod;
+use piteo_core::RentStatus;
+use piteo_core::SubscriptionStatus;
+use piteo_core::TenantStatus;
+use piteo_core::TransactionType;
+use piteo_core::UserRole;
 use std::convert::TryInto;
 
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_complex_object.html
@@ -184,7 +184,7 @@ pub struct Lease {
 impl From<piteo_core::Lease> for Lease {
     fn from(item: piteo_core::Lease) -> Self {
         Self {
-            status: item.status().into(),
+            status: item.status(),
             account_id: item.account_id.into(),
             deposit_amount: item.deposit_amount.map(Decimal::from),
             effect_date: item.effect_date.into(),
@@ -192,7 +192,7 @@ impl From<piteo_core::Lease> for Lease {
             rent_amount: item.rent_amount.into(),
             rent_charges_amount: item.rent_charges_amount.map(Decimal::from),
             rent_full_amount: item.rent_full_amount().into(),
-            r#type: item.r#type.into(),
+            r#type: item.r#type,
             lease_id: item.lease_id.map(ID::from),
             property_id: item.property_id.into(),
             id: item.id.into(),
@@ -521,7 +521,7 @@ impl From<piteo_core::Rent> for Rent {
             amount: item.amount.into(),
             charges_amount: item.charges_amount.map(Decimal::from),
             full_amount: item.full_amount.into(),
-            status: item.status.into(),
+            status: item.status,
             lease_id: item.lease_id.into(),
             receipt_id: item.receipt_id.map(ID::from),
             transaction_id: item.transaction_id.map(ID::from),

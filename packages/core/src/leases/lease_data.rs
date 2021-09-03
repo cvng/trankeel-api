@@ -4,43 +4,13 @@ use diesel::deserialize;
 use diesel::deserialize::FromSql;
 use diesel::pg::Pg;
 use diesel::sql_types::Jsonb;
+use piteo_data::LeaseFurnishedDuration;
+use piteo_data::LeaseRentPeriodicity;
+use piteo_data::LeaseRentReferenceIrl;
+use piteo_data::RentChargesRecuperationMode;
+use piteo_data::RentPaymentMethod;
 use serde::Deserialize;
 use serde::Serialize;
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum LeaseFurnishedDuration {
-    NineMonths,
-    OneYear,
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum RentChargesRecuperationMode {
-    Package,
-    Periodic,
-    Reel,
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum LeaseRentReferenceIrl {
-    AprilFirstSemesterY2021,
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum RentPaymentMethod {
-    After,
-    Before,
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum LeaseRentPeriodicity {
-    Annualy,
-    Monthly,
-}
 
 // # Models
 

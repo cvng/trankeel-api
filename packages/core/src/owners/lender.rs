@@ -1,5 +1,4 @@
 use crate::auth;
-use crate::common::LegalEntity;
 use crate::companies;
 use crate::companies::Company;
 use crate::database::Conn;
@@ -7,6 +6,7 @@ use crate::schema::lender;
 use crate::schema::user;
 use crate::AuthId;
 use crate::Id;
+use crate::LegalEntity;
 use crate::Name;
 use crate::Person;
 use diesel::prelude::*;

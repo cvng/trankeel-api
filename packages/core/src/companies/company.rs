@@ -1,8 +1,8 @@
-use crate::common::LegalEntity;
 use crate::database::Conn;
 use crate::schema::company;
 use crate::Address;
 use crate::Id;
+use crate::LegalEntity;
 use diesel::prelude::*;
 use eyre::Error;
 

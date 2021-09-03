@@ -1,9 +1,9 @@
-use crate::common::LegalEntity;
 use crate::database::Conn;
 use crate::schema::user;
 use crate::Address;
 use crate::AuthId;
 use crate::Id;
+use crate::LegalEntity;
 use crate::Name;
 use diesel::dsl::FindBy;
 use diesel::prelude::*;

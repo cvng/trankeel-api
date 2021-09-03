@@ -6,34 +6,11 @@ use crate::Amount;
 use crate::AuthId;
 use crate::DateTime;
 use crate::Id;
-use diesel::deserialize;
-use diesel::deserialize::FromSql;
-use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::sql_types::Text;
 use eyre::Error;
+use piteo_data::LeaseStatus;
+use piteo_data::LeaseType;
 use rust_chrono::Utc;
-
-pub enum LeaseStatus {
-    Active,
-    Ended,
-}
-
-#[derive(Clone, FromSqlRow)]
-pub enum LeaseType {
-    Furnished,
-    Naked,
-}
-
-impl FromSql<Text, Pg> for LeaseType {
-    fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
-        match bytes {
-            Some(b"FURNISHED") => Ok(LeaseType::Furnished),
-            Some(b"NAKED") => Ok(LeaseType::Naked),
-            _ => Err("Unrecognized enum variant".into()),
-        }
-    }
-}
 
 // # Models
 

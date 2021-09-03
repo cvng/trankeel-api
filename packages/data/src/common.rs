@@ -34,11 +34,11 @@ pub trait Name {
 
 pub trait LegalEntity {}
 
-pub type Id = rust_uuid::Uuid;
+pub type Id = uuid::Uuid;
 
 pub type Amount = rust_decimal::Decimal;
 
-pub type DateTime = rust_chrono::NaiveDateTime;
+pub type DateTime = chrono::NaiveDateTime;
 
 #[derive(Clone, Serialize, Deserialize, Debug, FromSqlRow)]
 #[serde(rename_all = "camelCase")]
