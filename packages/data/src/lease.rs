@@ -52,13 +52,12 @@ impl Lease {
     }
 
     pub fn status(&self) -> LeaseStatus {
-        if self.expired_at.is_some()
-            && Utc::now() > chrono::DateTime::<Utc>::from_utc(self.expired_at.unwrap(), Utc)
-        {
-            LeaseStatus::Ended
-        } else {
-            LeaseStatus::Active
+        if let Some(expired_at) = self.expired_at {
+            if Utc::now() > chrono::DateTime::<Utc>::from_utc(expired_at.inner(), Utc) {
+                return LeaseStatus::Ended;
+            }
         }
+        LeaseStatus::Active
     }
 }
 
@@ -83,7 +82,7 @@ mod tests {
             Self {
                 account_id: Default::default(),
                 deposit_amount: Default::default(),
-                effect_date: DateTime::from_timestamp(0, 0),
+                effect_date: DateTime::default(),
                 signature_date: Default::default(),
                 rent_amount: Default::default(),
                 rent_charges_amount: Default::default(),

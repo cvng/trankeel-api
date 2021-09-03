@@ -46,7 +46,7 @@ mod tests {
             AuthId::default(),
             TenantInput {
                 apl: Default::default(),
-                birthdate: DateTime::from_timestamp(0, 0),
+                birthdate: DateTime::default(),
                 birthplace: Default::default(),
                 email: "tenant@piteo.dev".into(),
                 first_name: Default::default(),

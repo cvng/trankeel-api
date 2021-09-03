@@ -39,8 +39,8 @@ pub struct Summary {
 impl Default for Summary {
     fn default() -> Self {
         Self {
-            since: DateTime::from_timestamp(0, 0),
-            until: DateTime::from_timestamp(0, 0),
+            since: DateTime::default(),
+            until: DateTime::default(),
             amount_expected: Default::default(),
             amount_received: Default::default(),
             amount_settled: Default::default(),
