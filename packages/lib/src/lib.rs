@@ -17,6 +17,12 @@ pub struct Database<'a>(&'a Conn);
 
 pub struct DatabaseTenantStore<'a>(&'a Conn);
 
+impl<'a> Database<'a> {
+    pub fn new(conn: &'a Conn) -> Self {
+        Self(conn)
+    }
+}
+
 impl<'a> Db<'a> for Database<'a> {
     fn tenants(&self) -> Box<dyn TenantStore + 'a> {
         Box::new(DatabaseTenantStore(self.0))
@@ -69,5 +75,5 @@ pub fn all_tenants(
 }
 
 pub fn create_tenant(conn: &Conn, auth_id: AuthId, data: TenantInput) -> Result<Tenant, Error> {
-    tenants::ops::create_tenant(Database(conn), auth_id, data)
+    tenants::ops::create_tenant(Database::new(conn), auth_id, data)
 }

@@ -37,11 +37,12 @@ pub fn create_tenant<'a>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::database::InMemoryDb;
 
     #[test]
     fn test_create_tenant() {
         let tenant = create_tenant(
-            crate::database::InMemoryDb,
+            InMemoryDb::new(),
             AuthId::default(),
             TenantInput {
                 apl: Default::default(),

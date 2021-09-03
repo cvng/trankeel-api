@@ -39,6 +39,18 @@ pub struct InMemoryDb;
 
 pub struct InMemoryTenantStore(BTreeMap<TenantId, Tenant>);
 
+impl InMemoryDb {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for InMemoryDb {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Db<'_> for InMemoryDb {
     fn tenants(&self) -> Box<dyn TenantStore> {
         Box::new(InMemoryTenantStore(BTreeMap::new()))
