@@ -1,20 +1,3 @@
-use crate::enums::FileType;
-use crate::enums::ImportSource;
-use crate::enums::LeaseFurnishedDuration;
-use crate::enums::LeaseRentPeriodicity;
-use crate::enums::LeaseRentReferenceIrl;
-use crate::enums::PlanCode;
-use crate::enums::PropertyBuildPeriodType;
-use crate::enums::PropertyBuildingLegalStatus;
-use crate::enums::PropertyEnergyClass;
-use crate::enums::PropertyGasEmission;
-use crate::enums::PropertyHabitationUsageType;
-use crate::enums::PropertyRoomType;
-use crate::enums::PropertyStatus;
-use crate::enums::PropertyUsageType;
-use crate::enums::RentChargesRecuperationMode;
-use crate::enums::RentPaymentMethod;
-use crate::enums::TransactionType;
 use crate::scalars::AuthId;
 use crate::scalars::Date;
 use crate::scalars::DateTime;
@@ -22,6 +5,23 @@ use crate::scalars::Decimal;
 use crate::scalars::Email;
 use crate::scalars::PhoneNumber;
 use async_graphql::ID;
+use piteo_core::FileType;
+use piteo_core::ImportSource;
+use piteo_core::LeaseFurnishedDuration;
+use piteo_core::LeaseRentPeriodicity;
+use piteo_core::LeaseRentReferenceIrl;
+use piteo_core::PlanCode;
+use piteo_core::PropertyBuildPeriodType;
+use piteo_core::PropertyBuildingLegalStatus;
+use piteo_core::PropertyEnergyClass;
+use piteo_core::PropertyGasEmission;
+use piteo_core::PropertyHabitationUsageType;
+use piteo_core::PropertyRoomType;
+use piteo_core::PropertyStatus;
+use piteo_core::PropertyUsageType;
+use piteo_core::RentChargesRecuperationMode;
+use piteo_core::RentPaymentMethod;
+use piteo_core::TransactionType;
 
 #[derive(async_graphql::InputObject)]
 pub struct UserWithAccountInput {

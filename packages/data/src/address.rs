@@ -8,39 +8,9 @@ use serde::Serialize;
 use std::fmt;
 use std::fmt::Display;
 
-pub trait Name {
-    fn first_name(&self) -> String;
+// # Types
 
-    fn last_name(&self) -> String;
-
-    fn full_name(&self) -> String {
-        self.display_name()
-    }
-
-    fn short_name(&self) -> String {
-        self.display_name()
-    }
-
-    fn display_name(&self) -> String {
-        [&self.first_name(), &self.last_name()]
-            .iter()
-            .map(|&v| v.clone())
-            .collect::<Vec<String>>()
-            .join(" ")
-            .trim()
-            .to_string()
-    }
-}
-
-pub trait LegalEntity {}
-
-pub type Id = rust_uuid::Uuid;
-
-pub type Amount = rust_decimal::Decimal;
-
-pub type DateTime = rust_chrono::NaiveDateTime;
-
-#[derive(Clone, Serialize, Deserialize, Debug, FromSqlRow)]
+#[derive(Debug, FromSqlRow, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
     pub city: Option<String>,
@@ -49,6 +19,8 @@ pub struct Address {
     pub line2: Option<String>,
     pub postal_code: Option<String>,
 }
+
+// # Impls
 
 impl Address {
     pub fn inline(&self) -> String {

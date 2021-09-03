@@ -1183,9 +1183,20 @@ dependencies = [
 name = "piteo-core"
 version = "0.1.0"
 dependencies = [
- "chrono",
  "diesel",
  "eyre",
+ "piteo-data",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "piteo-data"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "chrono",
+ "diesel",
  "rust_decimal",
  "serde",
  "serde_json",
