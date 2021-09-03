@@ -47,7 +47,7 @@ impl Db<'_> for InMemoryDb {
 
 impl TenantStore for InMemoryTenantStore {
     fn all(&mut self, _auth_id: AuthId, _id: Option<TenantId>) -> Result<Vec<Tenant>, Error> {
-        todo!()
+        Ok(self.0.clone().into_values().collect::<Vec<Tenant>>())
     }
 
     fn insert(&mut self, auth_id: AuthId, data: TenantInput) -> Result<Tenant, Error> {
