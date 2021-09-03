@@ -1,10 +1,24 @@
+use serde::Deserialize;
+use serde::Serialize;
+
 pub type Id = uuid::Uuid;
 
 pub type Amount = rust_decimal::Decimal;
 
-pub type DateTime = chrono::NaiveDateTime;
+#[derive(DieselNewType, Debug, Copy, Clone, Serialize, Deserialize)]
+pub struct DateTime(chrono::NaiveDateTime);
 
-// TODO: impl Default for DateTime {}
+impl DateTime {
+    pub fn inner(&self) -> chrono::NaiveDateTime {
+        self.0
+    }
+}
+
+impl Default for DateTime {
+    fn default() -> Self {
+        Self(chrono::NaiveDateTime::from_timestamp(0, 0))
+    }
+}
 
 pub trait LegalEntity {}
 
