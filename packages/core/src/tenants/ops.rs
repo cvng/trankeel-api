@@ -41,7 +41,7 @@ mod tests {
     #[test]
     fn test_create_tenant() {
         let tenant = create_tenant(
-            crate::InMemoryDb,
+            crate::database::InMemoryDb,
             AuthId::default(),
             TenantInput {
                 apl: Default::default(),
