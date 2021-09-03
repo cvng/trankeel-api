@@ -1,8 +1,8 @@
 #[macro_use]
-extern crate diesel;
+pub extern crate diesel;
 
 mod database;
-mod schema;
+mod interface;
 
 pub mod auth;
 pub mod billing;
@@ -13,6 +13,7 @@ pub mod leases;
 pub mod owners;
 pub mod properties;
 pub mod reports;
+pub mod schema;
 pub mod tenants;
 
 pub use piteo_data::Account;
@@ -58,10 +59,15 @@ pub use piteo_data::RentPaymentMethod;
 pub use piteo_data::RentStatus;
 pub use piteo_data::Summary;
 pub use piteo_data::Tenant;
+pub use piteo_data::TenantId;
 pub use piteo_data::TenantStatus;
 pub use piteo_data::TransactionType;
 pub use piteo_data::UserRole;
 
 pub use crate::database::build_connection_pool;
+pub use crate::database::Conn;
 pub use crate::database::DbPool;
 pub use crate::error::Error;
+pub use crate::interface::Db;
+pub use crate::interface::InMemoryDb;
+pub use crate::interface::TenantStore;

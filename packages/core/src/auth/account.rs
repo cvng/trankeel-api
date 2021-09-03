@@ -16,7 +16,7 @@ pub fn find_by_id(conn: &Conn, id: Id) -> Result<Account, Error> {
         .map_err(|err| err.into())
 }
 
-pub fn get_account_by_auth_id(conn: &Conn, auth_id: &AuthId) -> Result<Account, Error> {
+pub fn get_account_by_auth_id(conn: &Conn, auth_id: AuthId) -> Result<Account, Error> {
     account::table
         .select(account::all_columns)
         .left_join(user::table.on(user::accountId.eq(account::id.nullable())))

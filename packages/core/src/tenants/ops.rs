@@ -1,11 +1,8 @@
-use crate::auth;
-use crate::database::Conn;
+use crate::interface::Db;
 use crate::schema::tenant;
 use crate::AuthId;
 use crate::DateTime;
 use crate::Tenant;
-use diesel::insert_into;
-use diesel::prelude::*;
 use eyre::Error;
 use serde::Deserialize;
 
@@ -27,18 +24,38 @@ pub struct TenantInput {
 
 // # Operations
 
-pub fn create_tenant(conn: &Conn, auth_id: &AuthId, input: TenantInput) -> Result<Tenant, Error> {
-    let account = auth::get_account_by_auth_id(conn, auth_id)?;
+pub fn create_tenant<'a>(
+    db: impl Db<'a>,
+    auth_id: AuthId,
+    data: TenantInput,
+) -> Result<Tenant, Error> {
+    db.tenants().insert(auth_id, data)
+}
 
-    let new_tenant = insert_into(tenant::table)
-        .values((
-            tenant::account_id.eq(account.id),
-            tenant::birthdate.eq(input.birthdate),
-            tenant::email.eq(input.email),
-            tenant::first_name.eq(input.first_name),
-            tenant::last_name.eq(input.last_name),
-        ))
-        .get_result(conn)?;
+// # Tests
 
-    Ok(new_tenant)
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_create_tenant() {
+        let tenant = create_tenant(
+            crate::InMemoryDb,
+            AuthId::default(),
+            TenantInput {
+                apl: Default::default(),
+                birthdate: DateTime::from_timestamp(0, 0),
+                birthplace: Default::default(),
+                email: "tenant@piteo.dev".into(),
+                first_name: Default::default(),
+                last_name: Default::default(),
+                note: Default::default(),
+                phone_number: Default::default(),
+                visale_id: Default::default(),
+            },
+        )
+        .unwrap();
+        assert_eq!(tenant.email, "tenant@piteo.dev");
+    }
 }

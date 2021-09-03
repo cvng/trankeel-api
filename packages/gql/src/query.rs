@@ -17,7 +17,6 @@ use piteo_core::leases;
 use piteo_core::owners;
 use piteo_core::properties;
 use piteo_core::reports;
-use piteo_core::tenants;
 use piteo_core::AuthId;
 use piteo_core::DbPool;
 use piteo_core::Id;
@@ -67,7 +66,7 @@ impl Query {
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
 
-        Ok(tenants::all_tenants(&conn, auth_id, id).and_then(map_res)?)
+        Ok(piteo_lib::all_tenants(&conn, auth_id.clone(), id).and_then(map_res)?)
     }
 
     async fn leases(
