@@ -2,7 +2,6 @@ use crate::Address;
 use crate::Id;
 use crate::LegalEntity;
 use async_graphql::Enum;
-use async_graphql::SimpleObject;
 
 // # Types
 
@@ -21,7 +20,7 @@ pub enum LegalEntityType {
     Snc,
 }
 
-#[derive(Queryable, SimpleObject)]
+#[derive(Queryable)]
 pub struct Company {
     pub address: Option<Address>,
     pub email: String,

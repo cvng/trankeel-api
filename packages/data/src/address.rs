@@ -1,5 +1,4 @@
 use crate::locale;
-use async_graphql::SimpleObject;
 use diesel::deserialize;
 use diesel::deserialize::FromSql;
 use diesel::pg::Pg;
@@ -11,7 +10,7 @@ use std::fmt::Display;
 
 // # Types
 
-#[derive(Debug, FromSqlRow, SimpleObject, Clone, Serialize, Deserialize)]
+#[derive(Debug, FromSqlRow, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
     pub city: Option<String>,
