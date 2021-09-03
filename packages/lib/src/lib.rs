@@ -1,17 +1,17 @@
 use piteo_core::auth;
+use piteo_core::database::Conn;
+use piteo_core::database::Db;
+use piteo_core::database::TenantStore;
 use piteo_core::diesel::insert_into;
 use piteo_core::diesel::prelude::*;
+use piteo_core::error::Error;
 use piteo_core::schema::tenant;
 use piteo_core::schema::user;
 use piteo_core::tenants;
 use piteo_core::tenants::ops::TenantInput;
 use piteo_core::AuthId;
-use piteo_core::Conn;
-use piteo_core::Db;
-use piteo_core::Error;
 use piteo_core::Tenant;
 use piteo_core::TenantId;
-use piteo_core::TenantStore;
 
 pub struct Database<'a>(&'a Conn);
 

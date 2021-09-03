@@ -1,7 +1,7 @@
 pub mod ops;
 
+use crate::database::Db;
 use crate::AuthId;
-use crate::Db;
 use eyre::Error;
 use piteo_data::Tenant;
 use piteo_data::TenantId;

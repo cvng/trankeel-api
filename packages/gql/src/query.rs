@@ -13,12 +13,12 @@ use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
 use piteo_core::auth;
+use piteo_core::database::DbPool;
 use piteo_core::leases;
 use piteo_core::owners;
 use piteo_core::properties;
 use piteo_core::reports;
 use piteo_core::AuthId;
-use piteo_core::DbPool;
 use piteo_core::Id;
 use piteo_core::TenantStatus;
 
@@ -113,7 +113,7 @@ impl Query {
 
 // # Utils
 
-fn map_res<T, U>(vec: Vec<T>) -> std::result::Result<Vec<U>, piteo_core::Error>
+fn map_res<T, U>(vec: Vec<T>) -> std::result::Result<Vec<U>, piteo_core::error::Error>
 where
     T: Clone,
     U: From<T>,

@@ -1,4 +1,4 @@
-use crate::interface::Db;
+use crate::database::Db;
 use crate::schema::tenant;
 use crate::AuthId;
 use crate::DateTime;

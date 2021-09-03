@@ -24,8 +24,8 @@ use crate::wip;
 use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
+use piteo_core::database::DbPool;
 use piteo_core::AuthId;
-use piteo_core::DbPool;
 
 pub struct Mutation;
 
