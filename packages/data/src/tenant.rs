@@ -6,6 +6,8 @@ use async_graphql::Enum;
 
 // # Types
 
+pub type TenantId = Id;
+
 #[derive(Enum, Copy, Clone, Eq, PartialEq)]
 pub enum TenantStatus {
     Gone,
@@ -27,7 +29,7 @@ pub struct Tenant {
     pub note: Option<String>,
     pub phone_number: Option<String>,
     pub role: Option<String>,
-    pub id: Id,
+    pub id: TenantId,
     pub lease_id: Option<Id>,
     pub visale_id: Option<String>,
 }

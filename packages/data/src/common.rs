@@ -4,6 +4,8 @@ pub type Amount = rust_decimal::Decimal;
 
 pub type DateTime = chrono::NaiveDateTime;
 
+// TODO: impl Default for DateTime {}
+
 pub trait LegalEntity {}
 
 pub trait Name {

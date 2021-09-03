@@ -66,5 +66,6 @@ pub use crate::rent::Rent;
 pub use crate::rent::RentStatus;
 pub use crate::summary::Summary;
 pub use crate::tenant::Tenant;
+pub use crate::tenant::TenantId;
 pub use crate::tenant::TenantStatus;
 pub use crate::transaction::TransactionType;

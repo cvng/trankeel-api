@@ -133,7 +133,7 @@ pub struct TenantInput {
     visale_id: Option<String>,
 }
 
-impl From<TenantInput> for piteo_core::tenants::TenantInput {
+impl From<TenantInput> for piteo_core::tenants::ops::TenantInput {
     fn from(item: TenantInput) -> Self {
         Self {
             apl: item.apl,
