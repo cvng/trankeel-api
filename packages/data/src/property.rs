@@ -1,4 +1,8 @@
+use crate::Address;
+use crate::Id;
 use async_graphql::Enum;
+
+// # Types
 
 #[derive(Enum, Copy, Clone, Eq, PartialEq)]
 pub enum PropertyRoomType {
@@ -10,6 +14,93 @@ pub enum PropertyRoomType {
     T5,
     T6,
 }
+
+#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+pub enum PropertyStatus {
+    ForSale,
+    Inactive,
+    Rented,
+    UnderConstruction,
+    Unrented,
+}
+
+#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+pub enum PropertyBuildPeriodType {
+    BeforeY1949,
+    FromY1949Y1974,
+    FromY1975Y1989,
+    FromY1990Y2005,
+    FromY2005,
+}
+
+#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+pub enum PropertyEnergyClass {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+}
+
+#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+pub enum PropertyGasEmission {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+}
+
+#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+pub enum PropertyBuildingLegalStatus {
+    Copro,
+    Mono,
+}
+
+#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+pub enum PropertyHabitationUsageType {
+    Habitation,
+    Mixte,
+}
+
+#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+pub enum PropertyUsageType {
+    Collective,
+    Individual,
+}
+
+#[derive(Queryable, Clone)]
+pub struct Property {
+    pub account_id: Option<Id>,
+    pub address: Address,
+    pub build_period: Option<String>,
+    pub building_legal_status: Option<String>,
+    pub common_spaces: Option<String>,
+    pub energy_class: Option<String>,
+    pub equipments: Option<String>,
+    pub gas_emission: Option<String>,
+    pub heating_method: Option<String>,
+    pub housing_type: Option<String>,
+    pub name: String,
+    pub note: Option<String>,
+    pub ntic_equipments: Option<String>,
+    pub other_spaces: Option<String>,
+    pub tax: Option<f64>,
+    pub room_count: String,
+    pub status: Option<String>,
+    pub surface: i32,
+    pub tenant_private_spaces: Option<String>,
+    pub usage_type: Option<String>,
+    pub water_heating_method: Option<String>,
+    pub id: Id,
+    pub lender_id: Id,
+}
+
+// # Impls
 
 impl From<String> for PropertyRoomType {
     fn from(item: String) -> Self {
@@ -26,15 +117,6 @@ impl From<String> for PropertyRoomType {
     }
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
-pub enum PropertyStatus {
-    ForSale,
-    Inactive,
-    Rented,
-    UnderConstruction,
-    Unrented,
-}
-
 impl From<String> for PropertyStatus {
     fn from(item: String) -> Self {
         match item.as_str() {
@@ -48,15 +130,6 @@ impl From<String> for PropertyStatus {
     }
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
-pub enum PropertyBuildPeriodType {
-    BeforeY1949,
-    FromY1949Y1974,
-    FromY1975Y1989,
-    FromY1990Y2005,
-    FromY2005,
-}
-
 impl From<String> for PropertyBuildPeriodType {
     fn from(item: String) -> Self {
         match item.as_str() {
@@ -68,17 +141,6 @@ impl From<String> for PropertyBuildPeriodType {
             _ => unimplemented!(),
         }
     }
-}
-
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
-pub enum PropertyEnergyClass {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
 }
 
 impl From<String> for PropertyEnergyClass {
@@ -95,17 +157,6 @@ impl From<String> for PropertyEnergyClass {
     }
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
-pub enum PropertyGasEmission {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-}
-
 impl From<String> for PropertyGasEmission {
     fn from(item: String) -> Self {
         match item.as_str() {
@@ -120,12 +171,6 @@ impl From<String> for PropertyGasEmission {
     }
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
-pub enum PropertyBuildingLegalStatus {
-    Copro,
-    Mono,
-}
-
 impl From<String> for PropertyBuildingLegalStatus {
     fn from(item: String) -> Self {
         match item.as_str() {
@@ -136,12 +181,6 @@ impl From<String> for PropertyBuildingLegalStatus {
     }
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
-pub enum PropertyHabitationUsageType {
-    Habitation,
-    Mixte,
-}
-
 impl From<String> for PropertyHabitationUsageType {
     fn from(item: String) -> Self {
         match item.as_str() {
@@ -150,12 +189,6 @@ impl From<String> for PropertyHabitationUsageType {
             _ => unimplemented!(),
         }
     }
-}
-
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
-pub enum PropertyUsageType {
-    Collective,
-    Individual,
 }
 
 impl From<String> for PropertyUsageType {

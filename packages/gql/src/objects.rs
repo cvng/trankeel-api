@@ -10,6 +10,7 @@ use async_graphql::ID;
 use async_graphql::*;
 use piteo_core::auth;
 use piteo_core::owners;
+use piteo_core::AccountStatus;
 use piteo_core::DbPool;
 use piteo_core::FileStatus;
 use piteo_core::FileType;
@@ -32,7 +33,6 @@ use piteo_core::PropertyUsageType;
 use piteo_core::RentChargesRecuperationMode;
 use piteo_core::RentPaymentMethod;
 use piteo_core::RentStatus;
-use piteo_core::SubscriptionStatus;
 use piteo_core::TenantStatus;
 use piteo_core::TransactionType;
 use piteo_core::UserRole;
@@ -44,7 +44,7 @@ use std::convert::TryInto;
 #[graphql(complex)]
 pub struct Account {
     plan_id: Option<ID>,
-    status: Option<SubscriptionStatus>,
+    status: Option<AccountStatus>,
     stripe_customer_id: Option<String>,
     stripe_subscription_id: Option<String>,
     trial_end: Option<DateTime>,
@@ -249,8 +249,8 @@ pub struct LeaseFurnishedData {
     works_rent_increase_lender: Option<String>,
 }
 
-impl From<piteo_core::LeaseData> for LeaseFurnishedData {
-    fn from(item: piteo_core::LeaseData) -> Self {
+impl From<piteo_core::LeaseFurnishedData> for LeaseFurnishedData {
+    fn from(item: piteo_core::LeaseFurnishedData) -> Self {
         Self {
             charges_recuperation_mode: item.charges_recuperation_mode.map(Into::into),
             charges_revision_method: item.charges_revision_method,

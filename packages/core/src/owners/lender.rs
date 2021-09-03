@@ -1,46 +1,16 @@
 use crate::auth;
 use crate::companies;
-use crate::companies::Company;
 use crate::database::Conn;
 use crate::schema::lender;
 use crate::schema::user;
 use crate::AuthId;
 use crate::Id;
-use crate::LegalEntity;
-use crate::Name;
-use crate::Person;
 use diesel::prelude::*;
 use eyre::Error;
+use piteo_data::Lender;
+use piteo_data::LenderIdentity;
 
-pub enum Identity {
-    Individual(Person),
-    Company(Company),
-}
-
-impl Identity {
-    pub fn display_name(&self) -> String {
-        match self {
-            Self::Individual(person) => person.display_name(),
-            Self::Company(company) => company.display_name(),
-        }
-    }
-}
-
-// # Models
-
-#[derive(Clone, Queryable)]
-pub struct Lender {
-    pub id: Id,
-    pub account_id: Id,
-    pub individual_id: Option<Id>,
-    pub company_id: Option<Id>,
-}
-
-impl LegalEntity for Lender {}
-
-// # Queries
-
-pub fn get_identity(conn: &Conn, id: Id) -> Result<Identity, Error> {
+pub fn get_identity(conn: &Conn, id: Id) -> Result<LenderIdentity, Error> {
     let lender = lender_by_id(conn, id)?;
 
     match lender {
@@ -49,14 +19,14 @@ pub fn get_identity(conn: &Conn, id: Id) -> Result<Identity, Error> {
             ..
         } => {
             let individual = auth::person_by_id(conn, &individual_id)?;
-            Ok(Identity::Individual(individual))
+            Ok(LenderIdentity::Individual(individual))
         }
         Lender {
             company_id: Some(company_id),
             ..
         } => {
             let company = companies::find(conn, &company_id)?;
-            Ok(Identity::Company(company))
+            Ok(LenderIdentity::Company(company))
         }
         _ => Err(Error::msg("Identity not found")),
     }

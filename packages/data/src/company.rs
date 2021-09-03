@@ -1,4 +1,12 @@
+use crate::Address;
+use crate::Id;
+use crate::LegalEntity;
 use async_graphql::Enum;
+use async_graphql::SimpleObject;
+
+// # Types
+
+pub type CompanyId = Id;
 
 #[derive(Enum, Copy, Clone, Eq, PartialEq)]
 pub enum LegalEntityType {
@@ -12,6 +20,28 @@ pub enum LegalEntityType {
     Scp,
     Snc,
 }
+
+#[derive(Queryable, SimpleObject)]
+pub struct Company {
+    pub address: Option<Address>,
+    pub email: String,
+    pub legal_entity: String,
+    pub legal_entity_identifier: Option<String>,
+    pub legal_entity_type: Option<String>,
+    pub legal_entity_type_other: Option<String>,
+    pub phone_number: Option<String>,
+    pub id: CompanyId,
+}
+
+// # Impls
+
+impl Company {
+    pub fn display_name(&self) -> String {
+        self.legal_entity.clone()
+    }
+}
+
+impl LegalEntity for Company {}
 
 impl From<String> for LegalEntityType {
     fn from(item: String) -> Self {

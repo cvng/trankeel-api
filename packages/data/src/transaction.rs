@@ -1,5 +1,7 @@
 use async_graphql::Enum;
 
+// # Types
+
 #[derive(Enum, Copy, Clone, Eq, PartialEq)]
 pub enum TransactionType {
     InsuranceHab,
@@ -10,6 +12,8 @@ pub enum TransactionType {
     Other,
     Rent,
 }
+
+// # Impls
 
 impl From<String> for TransactionType {
     fn from(item: String) -> Self {

@@ -4,6 +4,8 @@ use crate::Id;
 use crate::Name;
 use async_graphql::Enum;
 
+// # Types
+
 #[derive(Enum, Copy, Clone, Eq, PartialEq)]
 pub enum TenantStatus {
     Gone,
@@ -29,6 +31,8 @@ pub struct Tenant {
     pub lease_id: Option<Id>,
     pub visale_id: Option<String>,
 }
+
+// # Impls
 
 impl Name for Tenant {
     fn first_name(&self) -> String {
