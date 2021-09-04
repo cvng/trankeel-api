@@ -4,6 +4,9 @@ use crate::database::LenderStore;
 use crate::database::TenantStore;
 use crate::database::UserStore;
 use eyre::Error;
+use piteo_data::Account;
+use piteo_data::AccountData;
+use piteo_data::AccountId;
 use piteo_data::AuthId;
 use piteo_data::Tenant;
 use piteo_data::TenantData;
@@ -11,6 +14,8 @@ use piteo_data::TenantId;
 use std::collections::BTreeMap;
 
 pub struct InMemoryDb;
+
+pub struct InMemoryAccountStore(BTreeMap<AccountId, Account>);
 
 pub struct InMemoryTenantStore(BTreeMap<TenantId, Tenant>);
 
@@ -28,7 +33,7 @@ impl Default for InMemoryDb {
 
 impl Db<'_> for InMemoryDb {
     fn accounts(&self) -> Box<dyn AccountStore> {
-        todo!()
+        Box::new(InMemoryAccountStore(BTreeMap::new()))
     }
 
     fn users(&self) -> Box<dyn UserStore> {
@@ -40,6 +45,24 @@ impl Db<'_> for InMemoryDb {
     }
 
     fn lenders(&self) -> Box<dyn LenderStore> {
+        todo!()
+    }
+}
+
+impl AccountStore for InMemoryAccountStore {
+    fn by_auth_id(&mut self, _auth_id: AuthId) -> Result<Account, Error> {
+        Ok(Account {
+            plan_id: Default::default(),
+            status: Default::default(),
+            stripe_customer_id: Default::default(),
+            stripe_subscription_id: Default::default(),
+            trial_end: Default::default(),
+            owner_id: Default::default(),
+            id: Default::default(),
+        })
+    }
+
+    fn create(&mut self, _data: AccountData) -> Result<Account, Error> {
         todo!()
     }
 }
