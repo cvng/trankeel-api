@@ -65,6 +65,10 @@ impl AccountStore for InMemoryAccountStore {
     fn create(&mut self, _data: AccountData) -> Result<Account, Error> {
         todo!()
     }
+
+    fn update(&mut self, _data: Account) -> Result<Account, Error> {
+        todo!()
+    }
 }
 
 impl TenantStore for InMemoryTenantStore {

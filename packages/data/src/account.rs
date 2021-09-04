@@ -3,6 +3,7 @@ use crate::DateTime;
 use crate::Id;
 use crate::PlanId;
 use async_graphql::Enum;
+use diesel_enum_derive::DieselEnum;
 use serde::Deserialize;
 
 // # Types
@@ -10,7 +11,7 @@ use serde::Deserialize;
 pub type AccountId = Id;
 
 /// https://stripe.com/docs/billing/subscriptions/overview#subscription-states
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(DieselEnum, Enum, Debug, Copy, Clone, Eq, PartialEq)]
 #[graphql(name = "SubscriptionStatus")]
 pub enum AccountStatus {
     Active,
@@ -22,10 +23,11 @@ pub enum AccountStatus {
     Unpaid,
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Identifiable, AsChangeset)]
+#[table_name = "account"]
 pub struct Account {
     pub plan_id: Option<PlanId>,
-    pub status: Option<String>,
+    pub status: Option<AccountStatus>,
     pub stripe_customer_id: Option<String>,
     pub stripe_subscription_id: Option<String>,
     pub trial_end: Option<DateTime>,

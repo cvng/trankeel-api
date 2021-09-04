@@ -26,6 +26,8 @@ pub trait AccountStore {
     fn by_auth_id(&mut self, auth_id: AuthId) -> Result<Account, Error>;
 
     fn create(&mut self, data: AccountData) -> Result<Account, Error>;
+
+    fn update(&mut self, data: Account) -> Result<Account, Error>;
 }
 
 pub trait UserStore {

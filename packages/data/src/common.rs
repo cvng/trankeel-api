@@ -16,6 +16,10 @@ impl DateTime {
     pub fn inner(&self) -> chrono::NaiveDateTime {
         self.0
     }
+
+    pub fn from_timestamp(secs: i64, nsecs: u32) -> Self {
+        Self(chrono::NaiveDateTime::from_timestamp(secs, nsecs))
+    }
 }
 
 impl Default for DateTime {

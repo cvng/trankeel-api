@@ -1,5 +1,8 @@
 use crate::database::Db;
+use crate::payment::PaymentProvider;
 use eyre::Error;
+use log::info;
+use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::Address;
 use piteo_data::AuthId;
@@ -34,6 +37,7 @@ pub struct UserWithAccountInput {
 
 pub fn create_user_with_account<'a>(
     db: impl Db<'a>,
+    payment_provider: impl PaymentProvider,
     input: UserWithAccountInput,
 ) -> Result<Person, Error> {
     input.validate()?;
@@ -60,8 +64,31 @@ pub fn create_user_with_account<'a>(
     })?;
 
     if let Some(true) = input.skip_create_customer {
-        // TODO: Create stripe user. https://crates.io/crates/stripe-rust
+        return Ok(user);
     }
+
+    // Create payment user.
+    let customer = payment_provider.create_customer(input.email)?;
+    info!(
+        "Created payment customer {} for account {}",
+        customer.id, account.id
+    );
+
+    // Create payment subscription.
+    let subscription = payment_provider.create_subscription(customer.id.clone())?;
+    info!(
+        "Created payment subscription {} for account {}",
+        subscription.id, account.id
+    );
+
+    // Update the local customer data.
+    db.accounts().update(Account {
+        stripe_customer_id: Some(customer.id),
+        stripe_subscription_id: Some(subscription.id),
+        status: Some(subscription.status),
+        trial_end: Some(subscription.trial_end),
+        ..account
+    })?;
 
     Ok(user)
 }

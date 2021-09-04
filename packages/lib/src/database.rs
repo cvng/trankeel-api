@@ -72,6 +72,10 @@ impl AccountStore for DatabaseAccountStore<'_> {
             .values(data)
             .get_result(self.0)?)
     }
+
+    fn update(&mut self, data: Account) -> Result<Account, Error> {
+        Ok(update(&data).set(&data).get_result(self.0)?)
+    }
 }
 
 impl UserStore for DatabaseUserStore<'_> {

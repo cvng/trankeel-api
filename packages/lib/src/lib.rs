@@ -1,10 +1,12 @@
 mod database;
+mod payment;
 
 use crate::database::Database;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::r2d2::PooledConnection;
 use diesel::PgConnection;
+use payment::Stripe;
 use piteo_core::auth;
 use piteo_core::auth::ops::UserWithAccountInput;
 use piteo_core::error::Context;
@@ -44,5 +46,9 @@ pub fn create_tenant(conn: &Conn, auth_id: AuthId, input: TenantInput) -> Result
 }
 
 pub fn create_user_with_account(conn: &Conn, input: UserWithAccountInput) -> Result<Person, Error> {
-    auth::ops::create_user_with_account(Database::new(conn), input)
+    auth::ops::create_user_with_account(Database::new(conn), Stripe, input)
+}
+
+fn wip() -> Error {
+    Error::msg("wip!()")
 }
