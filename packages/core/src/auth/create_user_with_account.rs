@@ -68,7 +68,7 @@ pub fn create_user_with_account<'a>(
     }
 
     // Create subscription.
-    let subscription = payment_provider.create_subscription(input.email)?;
+    let subscription = payment_provider.create_subscription_with_customer(input.email)?;
     info!(
         "Created subscription {} for account {}",
         subscription.id, account.id
@@ -79,7 +79,7 @@ pub fn create_user_with_account<'a>(
         stripe_customer_id: Some(subscription.customer_id),
         stripe_subscription_id: Some(subscription.id),
         status: Some(subscription.status),
-        trial_end: Some(subscription.trial_end),
+        trial_end: subscription.trial_end,
         ..account
     })?;
 

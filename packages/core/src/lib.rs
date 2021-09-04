@@ -61,6 +61,7 @@ pub use piteo_data::Rent;
 pub use piteo_data::RentChargesRecuperationMode;
 pub use piteo_data::RentPaymentMethod;
 pub use piteo_data::RentStatus;
+pub use piteo_data::Subscription;
 pub use piteo_data::Summary;
 pub use piteo_data::Tenant;
 pub use piteo_data::TenantData;

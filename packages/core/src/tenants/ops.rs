@@ -52,8 +52,8 @@ mod tests {
     use crate::testing::InMemoryDb;
 
     #[test]
-    fn test_create_tenant() {
-        let tenant = create_tenant(
+    fn create_tenant() {
+        let tenant = super::create_tenant(
             InMemoryDb::new(),
             AuthId::default(),
             TenantInput {

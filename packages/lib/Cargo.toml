@@ -8,3 +8,4 @@ edition = "2018"
 [dependencies]
 diesel = { version = "1.4.7", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }
 piteo-core = { path = "../core" }
+stripe-rust = { version = "0.13.0-dev", git = "https://github.com/wyyerd/stripe-rs", features = ["blocking"] }

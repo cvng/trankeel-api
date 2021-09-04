@@ -46,9 +46,10 @@ pub fn create_tenant(conn: &Conn, auth_id: AuthId, input: TenantInput) -> Result
 }
 
 pub fn create_user_with_account(conn: &Conn, input: UserWithAccountInput) -> Result<Person, Error> {
-    auth::ops::create_user_with_account(Database::new(conn), Stripe, input)
+    auth::ops::create_user_with_account(Database::new(conn), Stripe::from_env()?, input)
 }
 
+#[allow(dead_code)]
 fn wip() -> Error {
     Error::msg("wip!()")
 }
