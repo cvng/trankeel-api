@@ -12,14 +12,14 @@ use piteo_data::TenantId;
 
 // # Interfaces
 
-pub trait Db<'a> {
-    fn accounts(&self) -> Box<dyn AccountStore + 'a>;
+pub trait Db {
+    fn accounts(&self) -> Box<dyn AccountStore + '_>;
 
-    fn users(&self) -> Box<dyn UserStore + 'a>;
+    fn users(&self) -> Box<dyn UserStore + '_>;
 
-    fn lenders(&self) -> Box<dyn LenderStore + 'a>;
+    fn lenders(&self) -> Box<dyn LenderStore + '_>;
 
-    fn tenants(&self) -> Box<dyn TenantStore + 'a>;
+    fn tenants(&self) -> Box<dyn TenantStore + '_>;
 }
 
 pub trait AccountStore {

@@ -23,7 +23,7 @@ use piteo_core::Tenant;
 use piteo_core::TenantData;
 use piteo_core::TenantId;
 
-pub struct Database<'a>(&'a DbPool);
+pub struct Database(DbPool);
 
 pub struct DatabaseAccountStore<'a>(&'a DbPool);
 
@@ -33,27 +33,27 @@ pub struct DatabaseTenantStore<'a>(&'a DbPool);
 
 pub struct DatabaseLenderStore<'a>(&'a DbPool);
 
-impl<'a> Database<'a> {
-    pub fn new(pool: &'a DbPool) -> Self {
+impl Database {
+    pub fn new(pool: DbPool) -> Self {
         Self(pool)
     }
 }
 
-impl<'a> Db<'a> for Database<'a> {
-    fn accounts(&self) -> Box<dyn AccountStore + 'a> {
-        Box::new(DatabaseAccountStore(self.0))
+impl Db for Database {
+    fn accounts(&self) -> Box<dyn AccountStore + '_> {
+        Box::new(DatabaseAccountStore(&self.0))
     }
 
-    fn users(&self) -> Box<dyn UserStore + 'a> {
-        Box::new(DatabaseUserStore(self.0))
+    fn users(&self) -> Box<dyn UserStore + '_> {
+        Box::new(DatabaseUserStore(&self.0))
     }
 
-    fn tenants(&self) -> Box<dyn TenantStore + 'a> {
-        Box::new(DatabaseTenantStore(self.0))
+    fn tenants(&self) -> Box<dyn TenantStore + '_> {
+        Box::new(DatabaseTenantStore(&self.0))
     }
 
-    fn lenders(&self) -> Box<dyn piteo_core::database::LenderStore + 'a> {
-        Box::new(DatabaseLenderStore(self.0))
+    fn lenders(&self) -> Box<dyn piteo_core::database::LenderStore + '_> {
+        Box::new(DatabaseLenderStore(&self.0))
     }
 }
 

@@ -8,8 +8,8 @@ use piteo_data::TenantId;
 
 // # Queries
 
-pub fn all_tenants<'a>(
-    db: impl Db<'a>,
+pub fn all_tenants(
+    db: impl Db,
     auth_id: AuthId,
     id: Option<TenantId>,
 ) -> Result<Vec<Tenant>, Error> {

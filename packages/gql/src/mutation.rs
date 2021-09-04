@@ -38,9 +38,11 @@ impl Mutation {
         input: UserWithAccountInput,
     ) -> Result<Person> {
         let pool = ctx.data::<DbPool>()?;
-        Ok(piteo_lib::create_user_with_account(pool, input.into())
-            .await?
-            .into())
+        Ok(
+            piteo_lib::create_user_with_account(pool.clone(), input.into())
+                .await?
+                .into(),
+        )
     }
 
     async fn account_update_payment_method(&self, _input: AccountUpdateInput) -> Result<Account> {
@@ -54,7 +56,7 @@ impl Mutation {
     async fn tenant_create(&self, ctx: &Context<'_>, input: TenantInput) -> Result<Tenant> {
         let pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo_lib::create_tenant(pool, auth_id.clone(), input.into())?.into())
+        Ok(piteo_lib::create_tenant(pool.clone(), auth_id.clone(), input.into())?.into())
     }
 
     async fn tenant_update(&self, _input: TenantUpdateInput) -> Result<Tenant> {

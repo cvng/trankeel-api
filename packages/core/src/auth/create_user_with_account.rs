@@ -35,8 +35,8 @@ pub struct UserWithAccountInput {
 
 // # Operation
 
-pub async fn create_user_with_account<'a>(
-    db: impl Db<'a>,
+pub async fn create_user_with_account(
+    db: impl Db,
     payment_provider: impl PaymentProvider,
     input: UserWithAccountInput,
 ) -> Result<Person, Error> {

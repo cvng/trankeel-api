@@ -23,11 +23,7 @@ pub struct TenantInput {
 
 // # Operations
 
-pub fn create_tenant<'a>(
-    db: impl Db<'a>,
-    auth_id: AuthId,
-    input: TenantInput,
-) -> Result<Tenant, Error> {
+pub fn create_tenant(db: impl Db, auth_id: AuthId, input: TenantInput) -> Result<Tenant, Error> {
     let account = db.accounts().by_auth_id(auth_id)?;
 
     db.tenants().create(TenantData {

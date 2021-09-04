@@ -66,7 +66,7 @@ impl Query {
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
 
-        Ok(piteo_lib::all_tenants(pool, auth_id.clone(), id).and_then(map_res)?)
+        Ok(piteo_lib::all_tenants(pool.clone(), auth_id.clone(), id).and_then(map_res)?)
     }
 
     async fn leases(
