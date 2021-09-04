@@ -13,7 +13,6 @@ use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
 use piteo_core::auth;
-use piteo_core::database::DbPool;
 use piteo_core::leases;
 use piteo_core::owners;
 use piteo_core::properties;
@@ -21,6 +20,7 @@ use piteo_core::reports;
 use piteo_core::AuthId;
 use piteo_core::Id;
 use piteo_core::TenantStatus;
+use piteo_lib::DbPool;
 
 pub struct Query;
 

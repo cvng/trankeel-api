@@ -1,8 +1,5 @@
 use crate::locale;
-use diesel::deserialize;
-use diesel::deserialize::FromSql;
-use diesel::pg::Pg;
-use diesel::sql_types::Jsonb;
+use diesel_as_jsonb::AsJsonb;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt;
@@ -10,7 +7,7 @@ use std::fmt::Display;
 
 // # Types
 
-#[derive(Debug, FromSqlRow, Clone, Serialize, Deserialize)]
+#[derive(Debug, AsJsonb, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
     pub city: Option<String>,
@@ -55,12 +52,5 @@ impl Default for Address {
             line2: Default::default(),
             postal_code: Default::default(),
         }
-    }
-}
-
-impl FromSql<Jsonb, Pg> for Address {
-    fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
-        let value = <serde_json::Value as FromSql<Jsonb, Pg>>::from_sql(bytes)?;
-        Ok(serde_json::from_value(value)?)
     }
 }

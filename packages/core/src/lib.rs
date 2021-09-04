@@ -1,5 +1,4 @@
-#[macro_use]
-pub extern crate diesel;
+mod testing;
 
 pub mod auth;
 pub mod billing;
@@ -11,10 +10,13 @@ pub mod leases;
 pub mod owners;
 pub mod properties;
 pub mod reports;
-pub mod schema;
 pub mod tenants;
 
+pub use piteo_data::schema;
+
 pub use piteo_data::Account;
+pub use piteo_data::AccountData;
+pub use piteo_data::AccountId;
 pub use piteo_data::AccountStatus;
 pub use piteo_data::Address;
 pub use piteo_data::Amount;
@@ -36,9 +38,11 @@ pub use piteo_data::LeaseType;
 pub use piteo_data::LegalEntity;
 pub use piteo_data::LegalEntityType;
 pub use piteo_data::Lender;
+pub use piteo_data::LenderData;
 pub use piteo_data::LenderIdentity;
 pub use piteo_data::Name;
 pub use piteo_data::Person;
+pub use piteo_data::PersonData;
 pub use piteo_data::PersonId;
 pub use piteo_data::Plan;
 pub use piteo_data::PlanCode;
@@ -57,7 +61,11 @@ pub use piteo_data::RentPaymentMethod;
 pub use piteo_data::RentStatus;
 pub use piteo_data::Summary;
 pub use piteo_data::Tenant;
+pub use piteo_data::TenantData;
 pub use piteo_data::TenantId;
 pub use piteo_data::TenantStatus;
 pub use piteo_data::TransactionType;
 pub use piteo_data::UserRole;
+
+// TODO: Move ops to lib then remove this.
+type Conn = diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>;

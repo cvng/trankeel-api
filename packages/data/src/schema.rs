@@ -1,11 +1,16 @@
 table! {
     account (id) {
-        planId -> Nullable<Uuid>,
+        #[sql_name = "planId"]
+        plan_id -> Nullable<Uuid>,
         status -> Nullable<Text>,
-        stripeCustomerId -> Nullable<Text>,
-        stripeSubscriptionId -> Nullable<Text>,
-        trialEnd -> Nullable<Timestamp>,
-        ownerId -> Text,
+        #[sql_name = "stripeCustomerId"]
+        stripe_customer_id -> Nullable<Text>,
+        #[sql_name = "stripeSubscriptionId"]
+        stripe_subscription_id -> Nullable<Text>,
+        #[sql_name = "trialEnd"]
+        trial_end -> Nullable<Timestamp>,
+        #[sql_name = "ownerId"]
+        owner_id -> Text,
         id -> Uuid,
     }
 }
@@ -67,9 +72,12 @@ table! {
 table! {
     lender (id) {
         id -> Uuid,
-        accountId -> Uuid,
-        individualId -> Nullable<Uuid>,
-        companyId -> Nullable<Uuid>,
+        #[sql_name="accountId"]
+        account_id -> Uuid,
+        #[sql_name="individualId"]
+        individual_id -> Nullable<Uuid>,
+        #[sql_name="companyId"]
+        company_id -> Nullable<Uuid>,
     }
 }
 
@@ -169,26 +177,32 @@ table! {
 
 table! {
     user (id) {
-        authId -> Text,
+        #[sql_name = "authId"]
+        auth_id -> Text,
         email -> Text,
-        firstName -> Nullable<Text>,
-        lastName -> Nullable<Text>,
+        #[sql_name = "firstName"]
+        first_name -> Nullable<Text>,
+        #[sql_name = "lastName"]
+        last_name -> Nullable<Text>,
         address -> Nullable<Jsonb>,
-        photoURL -> Nullable<Text>,
+        #[sql_name = "photoURL"]
+        photo_url -> Nullable<Text>,
         role -> Nullable<Text>,
         id -> Uuid,
-        phoneNumber -> Nullable<Text>,
-        accountId -> Nullable<Uuid>,
+        #[sql_name = "phoneNumber"]
+        phone_number -> Nullable<Text>,
+        #[sql_name = "accountId"]
+        account_id -> Nullable<Uuid>,
     }
 }
 
-joinable!(account -> plan (planId));
+joinable!(account -> plan (plan_id));
 joinable!(lease -> account (accountId));
 joinable!(lease -> file (leaseId));
 joinable!(lease -> property (propertyId));
 joinable!(leasetenant -> lease (leaseId));
 joinable!(leasetenant -> tenant (tenantId));
-joinable!(lender -> account (accountId));
+joinable!(lender -> account (account_id));
 joinable!(property -> lender (lenderId));
 joinable!(rent -> lease (leaseId));
 joinable!(rent -> transaction (transactionId));

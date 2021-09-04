@@ -1,11 +1,10 @@
+use crate::schema::user;
 use crate::Address;
+use crate::Email;
 use crate::Id;
 use crate::LegalEntity;
 use crate::Name;
 use async_graphql::Enum;
-use diesel::deserialize::FromSql;
-use diesel::pg::Pg;
-use diesel::sql_types::Text;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Display;
@@ -21,10 +20,11 @@ pub enum UserRole {
     Viewer,
 }
 
-#[derive(FromSqlRow, Clone, Serialize, Deserialize)]
+#[derive(DieselNewType, Debug, Clone, Serialize, Deserialize)]
 pub struct AuthId(String);
 
-#[derive(Queryable)]
+#[derive(Queryable, Identifiable, AsChangeset)]
+#[table_name = "user"]
 pub struct Person {
     pub auth_id: AuthId,
     pub email: String,
@@ -36,6 +36,16 @@ pub struct Person {
     pub id: PersonId,
     pub phone_number: Option<String>,
     pub account_id: Option<Id>,
+}
+
+#[derive(Debug, Deserialize, Insertable)]
+#[table_name = "user"]
+pub struct PersonData {
+    pub address: Option<Address>,
+    pub auth_id: AuthId,
+    pub email: Email,
+    pub first_name: String,
+    pub last_name: String,
 }
 
 // # Impls
@@ -64,13 +74,6 @@ impl AuthId {
 impl Default for AuthId {
     fn default() -> Self {
         Self(Default::default())
-    }
-}
-
-impl FromSql<Text, Pg> for AuthId {
-    fn from_sql(bytes: Option<&[u8]>) -> diesel::deserialize::Result<Self> {
-        let value = <String as FromSql<Text, Pg>>::from_sql(bytes)?;
-        Ok(AuthId::new(value))
     }
 }
 

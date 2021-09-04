@@ -7,15 +7,14 @@ mod scalars;
 mod unions;
 
 pub use async_graphql::http;
-use piteo_core::database;
 
 use crate::mutation::Mutation;
 use crate::query::Query;
 use async_graphql::extensions::ApolloTracing;
 use async_graphql::EmptySubscription;
 use async_graphql::Schema;
-use piteo_core::database::DbPool;
 use piteo_core::error::Context;
+use piteo_lib::DbPool;
 use std::env;
 use std::fs::File;
 use std::io::Write;
@@ -56,7 +55,7 @@ pub fn write_schema() -> Result<()> {
 fn db_pool_from_env() -> Result<DbPool> {
     let database_url = env::var("DATABASE_URL").context("DATABASE_URL must be set.")?;
 
-    database::build_connection_pool(&database_url)
+    piteo_lib::build_connection_pool(&database_url)
 }
 
 fn wip() -> async_graphql::Error {

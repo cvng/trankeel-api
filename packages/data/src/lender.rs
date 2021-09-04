@@ -1,8 +1,13 @@
+use crate::schema::lender;
+use crate::AccountId;
 use crate::Company;
+use crate::CompanyId;
 use crate::Id;
 use crate::LegalEntity;
 use crate::Name;
 use crate::Person;
+use crate::PersonId;
+use serde::Deserialize;
 
 // # Types
 
@@ -19,6 +24,14 @@ pub struct Lender {
     pub account_id: Id,
     pub individual_id: Option<Id>,
     pub company_id: Option<Id>,
+}
+
+#[derive(Deserialize, Insertable)]
+#[table_name = "lender"]
+pub struct LenderData {
+    pub account_id: AccountId,
+    pub individual_id: Option<PersonId>,
+    pub company_id: Option<CompanyId>,
 }
 
 // # Impls

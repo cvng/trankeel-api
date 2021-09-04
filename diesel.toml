@@ -2,5 +2,5 @@
 # see diesel.rs/guides/configuring-diesel-cli
 
 [print_schema]
-file = "packages/core/src/schema.rs"
+file = "packages/data/src/schema.rs"
 filter = { except_tables = ["_prisma_migrations"] }
