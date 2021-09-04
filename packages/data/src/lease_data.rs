@@ -14,7 +14,7 @@ pub enum LeaseData {
     LeaseFurnishedData(LeaseFurnishedData),
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LeaseFurnishedDuration {
     NineMonths,
@@ -22,20 +22,20 @@ pub enum LeaseFurnishedDuration {
 }
 
 /// https://www.service-public.fr/particuliers/vosdroits/F13723
-#[derive(Enum, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LeaseRentReferenceIrl {
     AprilFirstSemesterY2021,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LeaseRentPeriodicity {
     Annualy,
     Monthly,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum RentChargesRecuperationMode {
     Package,
@@ -43,21 +43,21 @@ pub enum RentChargesRecuperationMode {
     Reel,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum RentPaymentMethod {
     After,
     Before,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LeaseNakedDuration {
     ThreeYears,
     SixYears,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, FromSqlRow)]
+#[derive(Clone, Debug, Serialize, Deserialize, FromSqlRow)]
 #[serde(rename_all = "camelCase")]
 pub struct LeaseFurnishedData {
     pub charges_recuperation_mode: Option<RentChargesRecuperationMode>,

@@ -31,7 +31,7 @@ impl Default for InMemoryDb {
     }
 }
 
-impl Db<'_> for InMemoryDb {
+impl Db for InMemoryDb {
     fn accounts(&self) -> Box<dyn AccountStore> {
         Box::new(InMemoryAccountStore(BTreeMap::new()))
     }
@@ -63,6 +63,10 @@ impl AccountStore for InMemoryAccountStore {
     }
 
     fn create(&mut self, _data: AccountData) -> Result<Account, Error> {
+        todo!()
+    }
+
+    fn update(&mut self, _data: Account) -> Result<Account, Error> {
         todo!()
     }
 }

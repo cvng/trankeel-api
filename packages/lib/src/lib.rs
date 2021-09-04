@@ -1,10 +1,12 @@
 mod database;
+mod payment;
 
 use crate::database::Database;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::r2d2::PooledConnection;
 use diesel::PgConnection;
+use payment::Stripe;
 use piteo_core::auth;
 use piteo_core::auth::ops::UserWithAccountInput;
 use piteo_core::error::Context;
@@ -32,17 +34,25 @@ pub fn build_connection_pool(database_url: &str) -> Result<DbPool, Error> {
 }
 
 pub fn all_tenants(
-    conn: &Conn,
+    pool: DbPool,
     auth_id: AuthId,
     id: Option<TenantId>,
 ) -> Result<Vec<Tenant>, Error> {
-    tenants::all_tenants(Database::new(conn), auth_id, id)
+    tenants::all_tenants(Database::new(pool), auth_id, id)
 }
 
-pub fn create_tenant(conn: &Conn, auth_id: AuthId, input: TenantInput) -> Result<Tenant, Error> {
-    tenants::ops::create_tenant(Database::new(conn), auth_id, input)
+pub fn create_tenant(pool: DbPool, auth_id: AuthId, input: TenantInput) -> Result<Tenant, Error> {
+    tenants::ops::create_tenant(Database::new(pool), auth_id, input)
 }
 
-pub fn create_user_with_account(conn: &Conn, input: UserWithAccountInput) -> Result<Person, Error> {
-    auth::ops::create_user_with_account(Database::new(conn), input)
+pub async fn create_user_with_account(
+    pool: DbPool,
+    input: UserWithAccountInput,
+) -> Result<Person, Error> {
+    auth::ops::create_user_with_account(Database::new(pool), Stripe::from_env()?, input).await
+}
+
+#[allow(dead_code)]
+fn wip() -> Error {
+    Error::msg("wip!()")
 }

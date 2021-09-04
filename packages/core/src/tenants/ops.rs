@@ -23,11 +23,7 @@ pub struct TenantInput {
 
 // # Operations
 
-pub fn create_tenant<'a>(
-    db: impl Db<'a>,
-    auth_id: AuthId,
-    input: TenantInput,
-) -> Result<Tenant, Error> {
+pub fn create_tenant(db: impl Db, auth_id: AuthId, input: TenantInput) -> Result<Tenant, Error> {
     let account = db.accounts().by_auth_id(auth_id)?;
 
     db.tenants().create(TenantData {
@@ -49,12 +45,11 @@ pub fn create_tenant<'a>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::testing::InMemoryDb;
 
     #[test]
     fn test_create_tenant() {
         let tenant = create_tenant(
-            InMemoryDb::new(),
+            crate::testing::InMemoryDb::new(),
             AuthId::default(),
             TenantInput {
                 apl: Default::default(),

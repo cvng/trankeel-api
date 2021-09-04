@@ -9,12 +9,16 @@ pub type Email = String;
 
 pub type PhoneNumber = String;
 
-#[derive(DieselNewType, Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct DateTime(chrono::NaiveDateTime);
 
 impl DateTime {
     pub fn inner(&self) -> chrono::NaiveDateTime {
         self.0
+    }
+
+    pub fn from_timestamp(secs: i64, nsecs: u32) -> Self {
+        Self(chrono::NaiveDateTime::from_timestamp(secs, nsecs))
     }
 }
 

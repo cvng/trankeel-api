@@ -13,17 +13,17 @@ use std::fmt::Display;
 
 pub type PersonId = Id;
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum UserRole {
     Admin,
     User,
     Viewer,
 }
 
-#[derive(DieselNewType, Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct AuthId(String);
 
-#[derive(Queryable, Identifiable, AsChangeset)]
+#[derive(AsChangeset, Identifiable, Queryable)]
 #[table_name = "user"]
 pub struct Person {
     pub auth_id: AuthId,
@@ -119,7 +119,7 @@ mod tests {
     }
 
     #[test]
-    fn display_name() {
+    fn test_display_name() {
         let person = Person {
             first_name: Some("John".to_string()),
             last_name: Some("DOE".to_string()),

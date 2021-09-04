@@ -11,7 +11,7 @@ use serde::Serialize;
 
 // # Types
 
-#[derive(Debug, Enum, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum RentStatus {
     Partial,

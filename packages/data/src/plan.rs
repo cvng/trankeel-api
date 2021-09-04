@@ -6,7 +6,7 @@ use async_graphql::Enum;
 
 pub type PlanId = Id;
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum PlanCode {
     Solo,
 }

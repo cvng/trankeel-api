@@ -1,3 +1,4 @@
+pub mod create_user_with_account;
 pub mod ops;
 
 use crate::schema::account;

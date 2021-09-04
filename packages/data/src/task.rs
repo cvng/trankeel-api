@@ -2,7 +2,7 @@ use async_graphql::Enum;
 
 // # Types
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum TaskStatus {
     Completed,
     Failed,
