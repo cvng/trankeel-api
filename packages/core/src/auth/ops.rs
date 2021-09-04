@@ -8,6 +8,8 @@ use piteo_data::Person;
 use piteo_data::PersonData;
 use validator::Validate;
 
+// # Inputs
+
 #[derive(Clone)]
 pub struct AddressInput {
     pub city: String,
@@ -27,6 +29,44 @@ pub struct UserWithAccountInput {
     pub last_name: String,
     pub skip_create_customer: Option<bool>,
 }
+
+// # Ops
+
+pub fn create_user_with_account<'a>(
+    db: impl Db<'a>,
+    input: UserWithAccountInput,
+) -> Result<Person, Error> {
+    input.validate()?;
+
+    // Create user.
+    let user = db.users().create(input.clone().into())?;
+
+    // Create account.
+    let account = db.accounts().create(AccountData {
+        owner_id: user.id.to_string(),
+    })?;
+
+    // Update user account.
+    let user = db.users().update(Person {
+        account_id: Some(account.id),
+        ..user
+    })?;
+
+    // Create lender.
+    let _lender = db.lenders().create(LenderData {
+        account_id: account.id,
+        individual_id: Some(user.id),
+        company_id: None,
+    })?;
+
+    if let Some(true) = input.skip_create_customer {
+        // TODO: Create stripe user. https://crates.io/crates/stripe-rust
+    }
+
+    Ok(user)
+}
+
+// # Impls
 
 impl From<AddressInput> for Address {
     fn from(item: AddressInput) -> Self {
@@ -50,36 +90,4 @@ impl From<UserWithAccountInput> for PersonData {
             last_name: item.last_name,
         }
     }
-}
-
-pub fn create_user_with_account<'a>(
-    db: impl Db<'a>,
-    input: UserWithAccountInput,
-) -> Result<Person, Error> {
-    input.validate()?;
-
-    // Create user.
-    let mut user = db.users().create(input.clone().into())?;
-
-    // Create account.
-    let account = db.accounts().create(AccountData {
-        owner_id: user.id.to_string(),
-    })?;
-
-    // Update user account.
-    user.account_id = Some(account.id);
-    let user = db.users().update(user)?;
-
-    // Create lender.
-    let _lender = db.lenders().create(LenderData {
-        account_id: account.id,
-        individual_id: Some(user.id),
-        company_id: None,
-    })?;
-
-    if let Some(true) = input.skip_create_customer {
-        // TODO: Create stripe user. https://crates.io/crates/stripe-rust
-    }
-
-    Ok(user)
 }
