@@ -1,7 +1,7 @@
-use crate::database::Conn;
 use crate::schema::property;
 use crate::schema::user;
 use crate::AuthId;
+use crate::Conn;
 use crate::Id;
 use diesel::prelude::*;
 use eyre::Error;
@@ -18,8 +18,8 @@ pub fn all_properties(
 
     let query = property::table
         .select(property::all_columns)
-        .left_join(user::table.on(user::accountId.eq(property::accountId)))
-        .filter(user::authId.eq(auth_id.inner()));
+        .left_join(user::table.on(user::account_id.eq(property::accountId)))
+        .filter(user::auth_id.eq(auth_id.inner()));
 
     if let Some(id) = id {
         return query

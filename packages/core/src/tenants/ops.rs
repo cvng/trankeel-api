@@ -1,24 +1,23 @@
 use crate::database::Db;
-use crate::schema::tenant;
 use crate::AuthId;
 use crate::DateTime;
 use crate::Tenant;
 use eyre::Error;
-use serde::Deserialize;
+use piteo_data::Email;
+use piteo_data::PhoneNumber;
+use piteo_data::TenantData;
 
 // # Inputs
 
-#[derive(Deserialize, Insertable)]
-#[table_name = "tenant"]
 pub struct TenantInput {
     pub apl: Option<bool>,
     pub birthdate: DateTime,
     pub birthplace: Option<String>,
-    pub email: String,
+    pub email: Email,
     pub first_name: String,
     pub last_name: String,
     pub note: Option<String>,
-    pub phone_number: Option<String>,
+    pub phone_number: Option<PhoneNumber>,
     pub visale_id: Option<String>,
 }
 
@@ -27,9 +26,22 @@ pub struct TenantInput {
 pub fn create_tenant<'a>(
     db: impl Db<'a>,
     auth_id: AuthId,
-    data: TenantInput,
+    input: TenantInput,
 ) -> Result<Tenant, Error> {
-    db.tenants().insert(auth_id, data)
+    let account = db.accounts().by_auth_id(auth_id)?;
+
+    db.tenants().create(TenantData {
+        account_id: account.id,
+        apl: input.apl,
+        birthdate: input.birthdate,
+        birthplace: input.birthplace,
+        email: input.email,
+        first_name: input.first_name,
+        last_name: input.last_name,
+        note: input.note,
+        phone_number: input.phone_number,
+        visale_id: input.visale_id,
+    })
 }
 
 // # Tests
@@ -37,7 +49,7 @@ pub fn create_tenant<'a>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::database::InMemoryDb;
+    use crate::testing::InMemoryDb;
 
     #[test]
     fn test_create_tenant() {

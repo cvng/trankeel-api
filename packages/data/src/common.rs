@@ -5,6 +5,10 @@ pub type Id = uuid::Uuid;
 
 pub type Amount = rust_decimal::Decimal;
 
+pub type Email = String;
+
+pub type PhoneNumber = String;
+
 #[derive(DieselNewType, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct DateTime(chrono::NaiveDateTime);
 

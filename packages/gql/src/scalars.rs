@@ -28,6 +28,12 @@ impl From<piteo_core::AuthId> for AuthId {
     }
 }
 
+impl From<AuthId> for piteo_core::AuthId {
+    fn from(item: AuthId) -> Self {
+        Self::new(item.0)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct Date(piteo_core::DateTime);
 

@@ -33,6 +33,19 @@ pub struct UserWithAccountInput {
     skip_create_customer: Option<bool>,
 }
 
+impl From<UserWithAccountInput> for piteo_core::auth::ops::UserWithAccountInput {
+    fn from(item: UserWithAccountInput) -> Self {
+        Self {
+            auth_id: item.auth_id.into(),
+            email: item.email.into(),
+            first_name: item.first_name,
+            last_name: item.last_name,
+            address: item.address.map(Into::into),
+            skip_create_customer: item.skip_create_customer,
+        }
+    }
+}
+
 #[derive(async_graphql::InputObject)]
 pub struct UserInput {
     address: AddressInput,
@@ -68,6 +81,18 @@ pub struct AddressInput {
     line1: String,
     line2: Option<String>,
     postal_code: String,
+}
+
+impl From<AddressInput> for piteo_core::auth::ops::AddressInput {
+    fn from(item: AddressInput) -> Self {
+        Self {
+            city: item.city,
+            country: item.country,
+            line1: item.line1,
+            line2: item.line2,
+            postal_code: item.postal_code,
+        }
+    }
 }
 
 #[derive(async_graphql::InputObject)]

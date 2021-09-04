@@ -1,5 +1,5 @@
-use crate::database::Conn;
 use crate::schema::company;
+use crate::Conn;
 use crate::PersonId;
 use diesel::prelude::*;
 use eyre::Error;

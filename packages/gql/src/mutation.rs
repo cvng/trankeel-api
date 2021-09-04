@@ -16,6 +16,7 @@ use crate::objects::Account;
 use crate::objects::File;
 use crate::objects::Lease;
 use crate::objects::Lender;
+use crate::objects::Person;
 use crate::objects::Property;
 use crate::objects::Task;
 use crate::objects::Tenant;
@@ -24,15 +25,20 @@ use crate::wip;
 use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
-use piteo_core::database::DbPool;
 use piteo_core::AuthId;
+use piteo_lib::DbPool;
 
 pub struct Mutation;
 
 #[async_graphql::Object]
 impl Mutation {
-    async fn user_create_with_account(&self, _input: UserWithAccountInput) -> Result<Account> {
-        Err(wip())
+    async fn user_create_with_account(
+        &self,
+        ctx: &Context<'_>,
+        input: UserWithAccountInput,
+    ) -> Result<Person> {
+        let conn = ctx.data::<DbPool>()?.get()?;
+        Ok(piteo_lib::create_user_with_account(&conn, input.into())?.into())
     }
 
     async fn account_update_payment_method(&self, _input: AccountUpdateInput) -> Result<Account> {

@@ -9,7 +9,6 @@ use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
 use piteo_core::auth;
-use piteo_core::database::DbPool;
 use piteo_core::owners;
 use piteo_core::AccountStatus;
 use piteo_core::FileStatus;
@@ -36,6 +35,7 @@ use piteo_core::RentStatus;
 use piteo_core::TenantStatus;
 use piteo_core::TransactionType;
 use piteo_core::UserRole;
+use piteo_lib::DbPool;
 use std::convert::TryInto;
 
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_complex_object.html
@@ -641,7 +641,7 @@ impl From<piteo_core::Tenant> for Tenant {
             full_name: item.full_name(),
             account_id: item.account_id.into(),
             apl: Some(item.apl),
-            auth_id: item.auth_id.map(AuthId::from),
+            auth_id: item.auth_id.map(Into::into),
             birthdate: item.birthdate.into(),
             birthplace: item.birthplace,
             email: item.email,

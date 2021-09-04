@@ -1,8 +1,13 @@
+use crate::schema::tenant;
+use crate::AccountId;
 use crate::AuthId;
 use crate::DateTime;
+use crate::Email;
 use crate::Id;
 use crate::Name;
+use crate::PhoneNumber;
 use async_graphql::Enum;
+use serde::Deserialize;
 
 // # Types
 
@@ -31,6 +36,21 @@ pub struct Tenant {
     pub role: Option<String>,
     pub id: TenantId,
     pub lease_id: Option<Id>,
+    pub visale_id: Option<String>,
+}
+
+#[derive(Deserialize, Insertable)]
+#[table_name = "tenant"]
+pub struct TenantData {
+    pub account_id: AccountId,
+    pub apl: Option<bool>,
+    pub birthdate: DateTime,
+    pub birthplace: Option<String>,
+    pub email: Email,
+    pub first_name: String,
+    pub last_name: String,
+    pub note: Option<String>,
+    pub phone_number: Option<PhoneNumber>,
     pub visale_id: Option<String>,
 }
 

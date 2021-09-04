@@ -263,7 +263,7 @@ input LenderIndividualUpdateInput {
 	individual: UserUpdateInput!
 }
 type Mutation {
-	userCreateWithAccount(input: UserWithAccountInput!): Account!
+	userCreateWithAccount(input: UserWithAccountInput!): User!
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
 	tenantCreate(input: TenantInput!): Tenant!
