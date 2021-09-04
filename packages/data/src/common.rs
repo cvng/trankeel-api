@@ -9,7 +9,7 @@ pub type Email = String;
 
 pub type PhoneNumber = String;
 
-#[derive(DieselNewType, Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct DateTime(chrono::NaiveDateTime);
 
 impl DateTime {

@@ -13,14 +13,14 @@ use serde::Serialize;
 
 // # Types
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LeaseStatus {
     Active,
     Ended,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, FromSqlRow, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum, FromSqlRow)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LeaseType {
     Furnished,

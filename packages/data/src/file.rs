@@ -5,7 +5,7 @@ use async_graphql::Enum;
 // # Types
 
 /// https://www.pdfmonkey.io/fr/doc/api/generer-un-document
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum FileStatus {
     Draft,
     Failure,
@@ -14,7 +14,7 @@ pub enum FileStatus {
     Success,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum FileType {
     PaymentNotice,
     LeaseDocument,

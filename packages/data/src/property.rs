@@ -4,7 +4,7 @@ use async_graphql::Enum;
 
 // # Types
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum PropertyRoomType {
     Other,
     T1,
@@ -15,7 +15,7 @@ pub enum PropertyRoomType {
     T6,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum PropertyStatus {
     ForSale,
     Inactive,
@@ -24,7 +24,7 @@ pub enum PropertyStatus {
     Unrented,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum PropertyBuildPeriodType {
     BeforeY1949,
     FromY1949Y1974,
@@ -33,7 +33,7 @@ pub enum PropertyBuildPeriodType {
     FromY2005,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum PropertyEnergyClass {
     A,
     B,
@@ -44,7 +44,7 @@ pub enum PropertyEnergyClass {
     G,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum PropertyGasEmission {
     A,
     B,
@@ -55,25 +55,25 @@ pub enum PropertyGasEmission {
     G,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum PropertyBuildingLegalStatus {
     Copro,
     Mono,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum PropertyHabitationUsageType {
     Habitation,
     Mixte,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum PropertyUsageType {
     Collective,
     Individual,
 }
 
-#[derive(Queryable, Clone)]
+#[derive(Clone, Queryable)]
 pub struct Property {
     pub account_id: Option<Id>,
     pub address: Address,

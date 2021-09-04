@@ -7,7 +7,7 @@ use async_graphql::Enum;
 
 pub type CompanyId = Id;
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum LegalEntityType {
     Eurl,
     Other,

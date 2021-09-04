@@ -7,7 +7,7 @@ use std::fmt::Display;
 
 // # Types
 
-#[derive(Debug, AsJsonb, Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, AsJsonb)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
     pub city: Option<String>,

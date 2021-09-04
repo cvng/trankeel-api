@@ -13,7 +13,7 @@ use serde::Deserialize;
 
 pub type TenantId = Id;
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum TenantStatus {
     Gone,
     Late,
