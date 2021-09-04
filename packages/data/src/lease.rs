@@ -98,7 +98,7 @@ mod tests {
     }
 
     #[test]
-    fn rent_full_amount() {
+    fn test_rent_full_amount() {
         let lease = Lease {
             rent_amount: Amount::new(900, 0),
             rent_charges_amount: None,

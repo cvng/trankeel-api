@@ -119,7 +119,7 @@ mod tests {
     }
 
     #[test]
-    fn display_name() {
+    fn test_display_name() {
         let person = Person {
             first_name: Some("John".to_string()),
             last_name: Some("DOE".to_string()),

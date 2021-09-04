@@ -45,12 +45,11 @@ pub fn create_tenant(db: impl Db, auth_id: AuthId, input: TenantInput) -> Result
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::testing::InMemoryDb;
 
     #[test]
-    fn create_tenant() {
-        let tenant = super::create_tenant(
-            InMemoryDb::new(),
+    fn test_create_tenant() {
+        let tenant = create_tenant(
+            crate::testing::InMemoryDb::new(),
             AuthId::default(),
             TenantInput {
                 apl: Default::default(),
