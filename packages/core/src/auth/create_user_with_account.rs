@@ -35,7 +35,7 @@ pub struct UserWithAccountInput {
 
 // # Operation
 
-pub fn create_user_with_account<'a>(
+pub async fn create_user_with_account<'a>(
     db: impl Db<'a>,
     payment_provider: impl PaymentProvider,
     input: UserWithAccountInput,
@@ -68,7 +68,9 @@ pub fn create_user_with_account<'a>(
     }
 
     // Create subscription.
-    let subscription = payment_provider.create_subscription_with_customer(input.email)?;
+    let subscription = payment_provider
+        .create_subscription_with_customer(input.email)
+        .await?;
     info!(
         "Created subscription {} for account {}",
         subscription.id, account.id

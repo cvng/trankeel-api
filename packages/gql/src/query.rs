@@ -62,11 +62,11 @@ impl Query {
         _query: Option<String>,
         _status: Option<TenantStatus>,
     ) -> Result<Vec<Tenant>> {
-        let conn = ctx.data::<DbPool>()?.get()?;
+        let pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
 
-        Ok(piteo_lib::all_tenants(&conn, auth_id.clone(), id).and_then(map_res)?)
+        Ok(piteo_lib::all_tenants(pool, auth_id.clone(), id).and_then(map_res)?)
     }
 
     async fn leases(

@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use piteo_core::error::Context;
 use piteo_core::error::Error;
 use piteo_core::payment::PaymentProvider;
@@ -21,8 +22,9 @@ impl Stripe {
     }
 }
 
+#[async_trait]
 impl PaymentProvider for Stripe {
-    fn create_subscription_with_customer(&self, email: Email) -> Result<Subscription, Error> {
+    async fn create_subscription_with_customer(&self, email: Email) -> Result<Subscription, Error> {
         let plan_id =
             env::var("STRIPE_DEFAULT_PLAN_ID").context("STRIPE_DEFAULT_PLAN_ID must be set")?;
 
@@ -48,7 +50,9 @@ impl PaymentProvider for Stripe {
             tax_id_data: Default::default(),
         };
 
-        let customer = stripe::Customer::create(self.client(), customer_params).unwrap();
+        let customer = stripe::Customer::create(self.client(), customer_params)
+            .await
+            .unwrap();
 
         // https://stripe.com/docs/api/subscriptions/create
         let subscription_params = stripe::CreateSubscription {
@@ -89,8 +93,9 @@ impl PaymentProvider for Stripe {
             trial_period_days: Default::default(),
         };
 
-        let subscription =
-            stripe::Subscription::create(self.client(), subscription_params).unwrap();
+        let subscription = stripe::Subscription::create(self.client(), subscription_params)
+            .await
+            .unwrap();
 
         Ok(subscription.into())
     }
