@@ -2,9 +2,9 @@ use crate::AccountStatus;
 use crate::DateTime;
 use stripe::Expandable;
 
-type SubscriptionId = String;
+pub type CustomerId = String; // stripe::CustomerId;
 
-type CustomerId = String;
+pub type SubscriptionId = String; // stripe::SubscriptionId;
 
 pub struct Subscription {
     pub id: SubscriptionId,

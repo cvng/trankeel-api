@@ -1,7 +1,9 @@
 use crate::schema::account;
+use crate::CustomerId;
 use crate::DateTime;
 use crate::Id;
 use crate::PlanId;
+use crate::SubscriptionId;
 use async_graphql::Enum;
 use diesel_enum_derive::DieselEnum;
 use serde::Deserialize;
@@ -28,8 +30,8 @@ pub enum AccountStatus {
 pub struct Account {
     pub plan_id: Option<PlanId>,
     pub status: Option<AccountStatus>,
-    pub stripe_customer_id: Option<String>,
-    pub stripe_subscription_id: Option<String>,
+    pub stripe_customer_id: Option<CustomerId>,
+    pub stripe_subscription_id: Option<SubscriptionId>,
     pub trial_end: Option<DateTime>,
     pub owner_id: String, // TODO: PersonId,
     pub id: AccountId,
