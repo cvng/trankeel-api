@@ -1369,11 +1369,21 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 name = "piteo"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
+ "diesel",
+ "piteo-core",
+ "stripe-rust",
+]
+
+[[package]]
+name = "piteo-api"
+version = "0.1.0"
+dependencies = [
  "async-graphql-rocket",
  "color-eyre",
  "dotenv",
  "jsonwebtoken",
- "piteo-core",
+ "piteo",
  "piteo-graphql",
  "rocket",
  "rocket_cors",
@@ -1425,18 +1435,8 @@ name = "piteo-graphql"
 version = "0.1.0"
 dependencies = [
  "async-graphql",
- "piteo-lib",
+ "piteo",
  "serde",
-]
-
-[[package]]
-name = "piteo-lib"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "diesel",
- "piteo-core",
- "stripe-rust",
 ]
 
 [[package]]

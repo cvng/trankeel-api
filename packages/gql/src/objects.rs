@@ -8,34 +8,34 @@ use crate::wip;
 use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
-use piteo_lib::auth;
-use piteo_lib::owners;
-use piteo_lib::AccountStatus;
-use piteo_lib::DbPool;
-use piteo_lib::FileStatus;
-use piteo_lib::FileType;
-use piteo_lib::LeaseFurnishedDuration;
-use piteo_lib::LeaseRentPeriodicity;
-use piteo_lib::LeaseRentReferenceIrl;
-use piteo_lib::LeaseStatus;
-use piteo_lib::LeaseType;
-use piteo_lib::LegalEntityType;
-use piteo_lib::Name;
-use piteo_lib::PlanCode;
-use piteo_lib::PropertyBuildPeriodType;
-use piteo_lib::PropertyBuildingLegalStatus;
-use piteo_lib::PropertyEnergyClass;
-use piteo_lib::PropertyGasEmission;
-use piteo_lib::PropertyHabitationUsageType;
-use piteo_lib::PropertyRoomType;
-use piteo_lib::PropertyStatus;
-use piteo_lib::PropertyUsageType;
-use piteo_lib::RentChargesRecuperationMode;
-use piteo_lib::RentPaymentMethod;
-use piteo_lib::RentStatus;
-use piteo_lib::TenantStatus;
-use piteo_lib::TransactionType;
-use piteo_lib::UserRole;
+use piteo::auth;
+use piteo::owners;
+use piteo::AccountStatus;
+use piteo::DbPool;
+use piteo::FileStatus;
+use piteo::FileType;
+use piteo::LeaseFurnishedDuration;
+use piteo::LeaseRentPeriodicity;
+use piteo::LeaseRentReferenceIrl;
+use piteo::LeaseStatus;
+use piteo::LeaseType;
+use piteo::LegalEntityType;
+use piteo::Name;
+use piteo::PlanCode;
+use piteo::PropertyBuildPeriodType;
+use piteo::PropertyBuildingLegalStatus;
+use piteo::PropertyEnergyClass;
+use piteo::PropertyGasEmission;
+use piteo::PropertyHabitationUsageType;
+use piteo::PropertyRoomType;
+use piteo::PropertyStatus;
+use piteo::PropertyUsageType;
+use piteo::RentChargesRecuperationMode;
+use piteo::RentPaymentMethod;
+use piteo::RentStatus;
+use piteo::TenantStatus;
+use piteo::TransactionType;
+use piteo::UserRole;
 use std::convert::TryInto;
 
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_complex_object.html
@@ -59,8 +59,8 @@ impl Account {
     }
 }
 
-impl From<piteo_lib::Account> for Account {
-    fn from(item: piteo_lib::Account) -> Self {
+impl From<piteo::Account> for Account {
+    fn from(item: piteo::Account) -> Self {
         Self {
             plan_id: item.plan_id.map(Into::into),
             status: item.status.map(Into::into),
@@ -83,8 +83,8 @@ pub struct Address {
     inline: String,
 }
 
-impl From<piteo_lib::Address> for Address {
-    fn from(item: piteo_lib::Address) -> Self {
+impl From<piteo::Address> for Address {
+    fn from(item: piteo::Address) -> Self {
         Self {
             inline: item.inline(),
             city: item.city.unwrap_or_default(),
@@ -109,8 +109,8 @@ pub struct Company {
     phone_number: Option<PhoneNumber>,
 }
 
-impl From<piteo_lib::Company> for Company {
-    fn from(item: piteo_lib::Company) -> Self {
+impl From<piteo::Company> for Company {
+    fn from(item: piteo::Company) -> Self {
         Self {
             display_name: item.display_name(),
             address: item.address.map(Into::into),
@@ -181,8 +181,8 @@ pub struct Lease {
     property: Option<Property>,
 }
 
-impl From<piteo_lib::Lease> for Lease {
-    fn from(item: piteo_lib::Lease) -> Self {
+impl From<piteo::Lease> for Lease {
+    fn from(item: piteo::Lease) -> Self {
         Self {
             status: item.status(),
             account_id: item.account_id.into(),
@@ -249,8 +249,8 @@ pub struct LeaseFurnishedData {
     works_rent_increase_lender: Option<String>,
 }
 
-impl From<piteo_lib::LeaseFurnishedData> for LeaseFurnishedData {
-    fn from(item: piteo_lib::LeaseFurnishedData) -> Self {
+impl From<piteo::LeaseFurnishedData> for LeaseFurnishedData {
+    fn from(item: piteo::LeaseFurnishedData) -> Self {
         Self {
             charges_recuperation_mode: item.charges_recuperation_mode.map(Into::into),
             charges_revision_method: item.charges_revision_method,
@@ -303,7 +303,7 @@ impl From<piteo_lib::LeaseFurnishedData> for LeaseFurnishedData {
     }
 }
 
-pub struct Lender(piteo_lib::Lender);
+pub struct Lender(piteo::Lender);
 
 #[async_graphql::Object]
 impl Lender {
@@ -329,8 +329,8 @@ impl Lender {
     }
 }
 
-impl From<piteo_lib::Lender> for Lender {
-    fn from(item: piteo_lib::Lender) -> Self {
+impl From<piteo::Lender> for Lender {
+    fn from(item: piteo::Lender) -> Self {
         Self(item)
     }
 }
@@ -365,8 +365,8 @@ impl Person {
     }
 }
 
-impl From<piteo_lib::Person> for Person {
-    fn from(item: piteo_lib::Person) -> Self {
+impl From<piteo::Person> for Person {
+    fn from(item: piteo::Person) -> Self {
         Self {
             display_name: item.display_name(),
             auth_id: Some(item.auth_id.into()),
@@ -394,7 +394,7 @@ pub struct Plan {
     features: Vec<Feature>,
 }
 
-pub struct Property(piteo_lib::Property);
+pub struct Property(piteo::Property);
 
 #[async_graphql::Object]
 impl Property {
@@ -486,8 +486,8 @@ impl Property {
     }
 }
 
-impl From<piteo_lib::Property> for Property {
-    fn from(item: piteo_lib::Property) -> Self {
+impl From<piteo::Property> for Property {
+    fn from(item: piteo::Property) -> Self {
         Self(item)
     }
 }
@@ -510,8 +510,8 @@ pub struct Rent {
     transactions: Option<Vec<Transaction>>,
 }
 
-impl From<piteo_lib::Rent> for Rent {
-    fn from(item: piteo_lib::Rent) -> Self {
+impl From<piteo::Rent> for Rent {
+    fn from(item: piteo::Rent) -> Self {
         Self {
             id: item.id.into(),
             period_end: item.period_end.into(),
@@ -563,8 +563,8 @@ pub struct Summary {
     occupation_rate: f64,
 }
 
-impl From<piteo_lib::Summary> for Summary {
-    fn from(item: piteo_lib::Summary) -> Self {
+impl From<piteo::Summary> for Summary {
+    fn from(item: piteo::Summary) -> Self {
         Summary {
             since: item.since.into(),
             until: item.until.into(),
@@ -632,8 +632,8 @@ pub struct Tenant {
     lease: Option<Lease>,
 }
 
-impl From<piteo_lib::Tenant> for Tenant {
-    fn from(item: piteo_lib::Tenant) -> Self {
+impl From<piteo::Tenant> for Tenant {
+    fn from(item: piteo::Tenant) -> Self {
         Self {
             display_name: item.display_name(),
             full_name: item.full_name(),
