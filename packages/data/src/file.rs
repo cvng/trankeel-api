@@ -1,8 +1,12 @@
+use crate::common::Id;
 use crate::DateTime;
-use crate::Id;
 use async_graphql::Enum;
 
 // # Types
+
+pub type FileId = Id;
+
+pub type AttachableId = Id;
 
 /// https://www.pdfmonkey.io/fr/doc/api/generer-un-document
 #[derive(Copy, Clone, PartialEq, Eq, Enum)]

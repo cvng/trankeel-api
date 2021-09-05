@@ -1,5 +1,6 @@
 use crate::database::Db;
 use crate::payment::PaymentProvider;
+use async_graphql::InputObject;
 use eyre::Error;
 use log::info;
 use piteo_data::Account;
@@ -13,7 +14,7 @@ use validator::Validate;
 
 // # Input
 
-#[derive(Clone)]
+#[derive(Clone, InputObject)]
 pub struct AddressInput {
     pub city: String,
     pub country: Option<String>,
@@ -22,12 +23,13 @@ pub struct AddressInput {
     pub postal_code: String,
 }
 
-#[derive(Clone, Validate)]
+#[derive(Clone, InputObject, Validate)]
+#[graphql(name = "UserWithAccountInput")]
 pub struct CreateUserWithAccountInput {
     pub address: Option<AddressInput>,
     pub auth_id: AuthId,
     #[validate(email)]
-    pub email: String,
+    pub email: String, // Email,
     pub first_name: String,
     pub last_name: String,
     pub skip_create_customer: Option<bool>,

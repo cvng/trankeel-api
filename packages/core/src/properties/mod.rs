@@ -1,19 +1,9 @@
-pub mod create_property;
-pub mod delete_property;
-pub mod update_property;
+mod property;
+mod property_create;
+mod property_delete;
+mod property_update;
 
-use crate::database::Db;
-use crate::AuthId;
-use eyre::Error;
-use piteo_data::Property;
-use piteo_data::PropertyId;
-
-// # Queries
-
-pub fn all_properties(
-    db: impl Db,
-    auth_id: AuthId,
-    id: Option<PropertyId>,
-) -> Result<Vec<Property>, Error> {
-    db.properties().all(auth_id, id)
-}
+pub use property::*;
+pub use property_create::*;
+pub use property_delete::*;
+pub use property_update::*;

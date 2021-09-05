@@ -12,14 +12,16 @@ use crate::scalars::DateTime;
 use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
-use piteo_core::auth;
-use piteo_core::leases;
-use piteo_core::owners;
-use piteo_core::reports;
-use piteo_core::AuthId;
-use piteo_core::Id;
-use piteo_core::TenantStatus;
+use piteo_lib::auth;
+use piteo_lib::leases;
+use piteo_lib::owners;
+use piteo_lib::reports;
+use piteo_lib::AuthId;
 use piteo_lib::DbPool;
+use piteo_lib::LenderId;
+use piteo_lib::PropertyId;
+use piteo_lib::TenantId;
+use piteo_lib::TenantStatus;
 
 pub struct Query;
 
@@ -39,7 +41,7 @@ impl Query {
     ) -> Result<Vec<Property>> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
+        let id = id.map(|id| PropertyId::parse_str(&id).unwrap_or_default());
         Ok(piteo_lib::all_properties(db_pool.clone(), auth_id.clone(), id).and_then(map_res)?)
     }
 
@@ -61,7 +63,7 @@ impl Query {
     ) -> Result<Vec<Tenant>> {
         let pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
+        let id = id.map(|id| TenantId::parse_str(&id).unwrap_or_default());
 
         Ok(piteo_lib::all_tenants(pool.clone(), auth_id.clone(), id).and_then(map_res)?)
     }
@@ -86,7 +88,7 @@ impl Query {
     ) -> Result<Vec<Lender>> {
         let conn = ctx.data::<DbPool>()?.get()?;
         let auth_id = ctx.data::<AuthId>()?;
-        let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
+        let id = id.map(|id| LenderId::parse_str(&id).unwrap_or_default());
 
         Ok(owners::all_lenders(&conn, auth_id, id).and_then(map_res)?)
     }
@@ -110,7 +112,7 @@ impl Query {
 
 // # Utils
 
-fn map_res<T, U>(vec: Vec<T>) -> std::result::Result<Vec<U>, piteo_core::error::Error>
+fn map_res<T, U>(vec: Vec<T>) -> std::result::Result<Vec<U>, piteo_lib::error::Error>
 where
     T: Clone,
     U: From<T>,

@@ -1,7 +1,6 @@
 use crate::database::Db;
 use crate::AuthId;
 use eyre::Error;
-use piteo_data::Id;
 use piteo_data::TenantId;
 use validator::Validate;
 
@@ -9,7 +8,7 @@ use validator::Validate;
 
 #[derive(Validate)]
 pub struct DeleteTenantInput {
-    pub id: Id,
+    pub id: TenantId,
 }
 
 // # Operation

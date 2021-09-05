@@ -1,9 +1,10 @@
+use crate::common::Id;
 use crate::schema::user;
 use crate::Address;
 use crate::Email;
-use crate::Id;
 use crate::LegalEntity;
 use crate::Name;
+use async_graphql::scalar;
 use async_graphql::Enum;
 use serde::Deserialize;
 use serde::Serialize;
@@ -95,6 +96,8 @@ impl Display for Person {
         write!(f, "{}", &self.display_name())
     }
 }
+
+scalar!(AuthId, "AuthenticationID");
 
 // # Tests
 

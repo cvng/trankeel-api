@@ -1,8 +1,8 @@
+use crate::common::Id;
 use crate::schema::lender;
 use crate::AccountId;
 use crate::Company;
 use crate::CompanyId;
-use crate::Id;
 use crate::LegalEntity;
 use crate::Name;
 use crate::Person;

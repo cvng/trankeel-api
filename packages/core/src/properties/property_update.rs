@@ -1,6 +1,7 @@
-use crate::auth::ops::AddressInput;
+use crate::auth::AddressInput;
 use crate::database::Db;
 use crate::AuthId;
+use async_graphql::InputObject;
 use eyre::Error;
 use piteo_data::Amount;
 use piteo_data::Property;
@@ -18,7 +19,8 @@ use validator::Validate;
 
 // # Input
 
-#[derive(Validate)]
+#[derive(Validate, InputObject)]
+#[graphql(name = "PropertyUpdateInput")]
 pub struct UpdatePropertyInput {
     pub address: Option<AddressInput>,
     pub build_period: Option<PropertyBuildPeriodType>,

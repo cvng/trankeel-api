@@ -2,6 +2,7 @@ use crate::database::Db;
 use crate::AuthId;
 use crate::DateTime;
 use crate::Tenant;
+use async_graphql::InputObject;
 use eyre::Error;
 use piteo_data::PhoneNumber;
 use piteo_data::TenantData;
@@ -10,7 +11,8 @@ use validator::Validate;
 
 // # Input
 
-#[derive(Validate)]
+#[derive(Validate, InputObject)]
+#[graphql(name = "TenantUpdateInput")]
 pub struct UpdateTenantInput {
     pub apl: Option<bool>,
     pub birthdate: Option<DateTime>,

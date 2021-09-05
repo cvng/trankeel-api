@@ -4,13 +4,13 @@ use crate::schema::lender;
 use crate::schema::user;
 use crate::AuthId;
 use crate::Conn;
-use crate::Id;
 use diesel::prelude::*;
 use eyre::Error;
 use piteo_data::Lender;
+use piteo_data::LenderId;
 use piteo_data::LenderIdentity;
 
-pub fn get_identity(conn: &Conn, id: Id) -> Result<LenderIdentity, Error> {
+pub fn get_identity(conn: &Conn, id: LenderId) -> Result<LenderIdentity, Error> {
     let lender = lender_by_id(conn, id)?;
 
     match lender {
@@ -32,7 +32,11 @@ pub fn get_identity(conn: &Conn, id: Id) -> Result<LenderIdentity, Error> {
     }
 }
 
-pub fn all_lenders(conn: &Conn, auth_id: &AuthId, id: Option<Id>) -> Result<Vec<Lender>, Error> {
+pub fn all_lenders(
+    conn: &Conn,
+    auth_id: &AuthId,
+    id: Option<LenderId>,
+) -> Result<Vec<Lender>, Error> {
     let auth_id = auth_id.clone();
 
     let query = lender::table
@@ -50,6 +54,6 @@ pub fn all_lenders(conn: &Conn, auth_id: &AuthId, id: Option<Id>) -> Result<Vec<
     query.load(conn).map_err(|err| err.into())
 }
 
-pub fn lender_by_id(conn: &Conn, id: Id) -> Result<Lender, Error> {
+pub fn lender_by_id(conn: &Conn, id: LenderId) -> Result<Lender, Error> {
     lender::table.find(id).first(conn).map_err(|err| err.into())
 }
