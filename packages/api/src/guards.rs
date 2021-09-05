@@ -1,4 +1,4 @@
-use piteo_core::AuthId;
+use piteo::AuthId;
 use rocket::http::Status;
 use rocket::request::FromRequest;
 use rocket::request::Outcome;

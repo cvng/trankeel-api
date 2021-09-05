@@ -7,5 +7,5 @@ edition = "2018"
 
 [dependencies]
 async-graphql = { version = "2.9.10", git = "https://github.com/async-graphql/async-graphql", features = ["apollo_tracing", "uuid"] }
-piteo-lib = { path = "../lib" }
+piteo = { path = "../lib" }
 serde = "1.0"
