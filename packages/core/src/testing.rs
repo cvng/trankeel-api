@@ -76,28 +76,16 @@ impl TenantStore for InMemoryTenantStore {
         Ok(self.0.clone().into_values().collect::<Vec<Tenant>>())
     }
 
-    fn create(&mut self, data: TenantData) -> Result<Tenant, Error> {
+    fn create(&mut self, data: Tenant) -> Result<Tenant, Error> {
         let id = TenantId::new_v4();
-        let account_id = TenantId::new_v4();
-        self.0.insert(
-            id,
-            Tenant {
-                id,
-                account_id,
-                auth_id: None,
-                apl: data.apl.unwrap_or_default(),
-                birthdate: data.birthdate,
-                birthplace: data.birthplace,
-                email: data.email,
-                first_name: data.first_name,
-                last_name: data.last_name,
-                note: data.note,
-                phone_number: data.phone_number,
-                role: None,
-                lease_id: None,
-                visale_id: data.visale_id,
-            },
-        );
-        Ok(self.0.get(&id).ok_or_else(|| Error::msg(""))?.clone())
+        Ok(self.0.entry(id).or_insert(Tenant { id, ..data }).clone())
+    }
+
+    fn update(&mut self, _data: TenantData) -> Result<Tenant, Error> {
+        todo!()
+    }
+
+    fn delete(&mut self, _data: TenantId) -> Result<usize, Error> {
+        todo!()
     }
 }

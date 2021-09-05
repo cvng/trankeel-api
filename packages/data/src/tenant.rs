@@ -21,14 +21,15 @@ pub enum TenantStatus {
     Uptodate,
 }
 
-#[derive(Clone, Queryable)]
+#[derive(Clone, Insertable, Queryable)]
+#[table_name = "tenant"]
 pub struct Tenant {
     pub account_id: Id,
     pub apl: bool,
     pub auth_id: Option<AuthId>,
     pub birthdate: DateTime,
     pub birthplace: Option<String>,
-    pub email: String,
+    pub email: Email,
     pub first_name: String,
     pub last_name: String,
     pub note: Option<String>,
@@ -39,16 +40,17 @@ pub struct Tenant {
     pub visale_id: Option<String>,
 }
 
-#[derive(Deserialize, Insertable)]
+#[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
 #[table_name = "tenant"]
 pub struct TenantData {
-    pub account_id: AccountId,
+    pub id: TenantId,
+    pub account_id: Option<AccountId>,
     pub apl: Option<bool>,
-    pub birthdate: DateTime,
+    pub birthdate: Option<DateTime>,
     pub birthplace: Option<String>,
-    pub email: Email,
-    pub first_name: String,
-    pub last_name: String,
+    pub email: Option<Email>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
     pub visale_id: Option<String>,
