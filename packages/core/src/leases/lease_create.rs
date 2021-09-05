@@ -1,4 +1,5 @@
 use crate::files::FileInput;
+use async_graphql::InputObject;
 use piteo_data::Amount;
 use piteo_data::DateTime;
 use piteo_data::LeaseFurnishedDuration;
@@ -9,7 +10,7 @@ use piteo_data::RentChargesRecuperationMode;
 use piteo_data::RentPaymentMethod;
 use piteo_data::TenantId;
 
-#[derive(async_graphql::InputObject)]
+#[derive(InputObject)]
 pub struct LeaseFurnishedInput {
     data: Option<LeaseFurnishedDataInput>,
     deposit_amount: Option<Amount>,
@@ -24,7 +25,7 @@ pub struct LeaseFurnishedInput {
     // r#type: LeaseType,
 }
 
-#[derive(async_graphql::InputObject)]
+#[derive(InputObject)]
 pub struct LeaseFurnishedDataInput {
     charges_recuperation_mode: Option<RentChargesRecuperationMode>,
     charges_revision_method: Option<String>,

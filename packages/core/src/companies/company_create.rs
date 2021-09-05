@@ -1,7 +1,8 @@
 use crate::auth::AddressInput;
+use async_graphql::InputObject;
 use piteo_data::Email;
 
-#[derive(async_graphql::InputObject)]
+#[derive(InputObject)]
 pub struct CompanyInput {
     address: AddressInput,
     email: Email,

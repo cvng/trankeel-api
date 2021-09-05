@@ -9,7 +9,7 @@ use validator::Validate;
 
 // # Input
 
-#[derive(Validate, InputObject)]
+#[derive(InputObject, Validate)]
 #[graphql(name = "TenantInput")]
 pub struct CreateTenantInput {
     pub apl: Option<bool>,

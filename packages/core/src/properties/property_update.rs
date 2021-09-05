@@ -19,7 +19,7 @@ use validator::Validate;
 
 // # Input
 
-#[derive(Validate, InputObject)]
+#[derive(InputObject, Validate)]
 #[graphql(name = "PropertyUpdateInput")]
 pub struct UpdatePropertyInput {
     pub address: Option<AddressInput>,

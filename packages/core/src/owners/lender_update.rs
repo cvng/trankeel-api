@@ -1,14 +1,15 @@
 use crate::auth::UserUpdateInput;
 use crate::companies::CompanyUpdateInput;
+use async_graphql::InputObject;
 use piteo_data::LenderId;
 
-#[derive(async_graphql::InputObject)]
+#[derive(InputObject)]
 pub struct LenderIndividualUpdateInput {
     id: LenderId,
     individual: UserUpdateInput,
 }
 
-#[derive(async_graphql::InputObject)]
+#[derive(InputObject)]
 pub struct LenderCompanyUpdateInput {
     company: CompanyUpdateInput,
     id: LenderId,

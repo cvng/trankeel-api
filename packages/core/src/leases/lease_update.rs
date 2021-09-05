@@ -1,8 +1,9 @@
 use super::LeaseFurnishedDataInput;
 use crate::files::FileInput;
+use async_graphql::InputObject;
 use piteo_data::LeaseId;
 
-#[derive(async_graphql::InputObject)]
+#[derive(InputObject)]
 pub struct LeaseFurnishedUpdateInput {
     data: Option<LeaseFurnishedDataInput>,
     file: Option<FileInput>,

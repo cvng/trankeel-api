@@ -1,12 +1,13 @@
 use crate::auth::UserInput;
 use crate::companies::CompanyInput;
+use async_graphql::InputObject;
 
-#[derive(async_graphql::InputObject)]
+#[derive(InputObject)]
 pub struct LenderIndividualInput {
     individual: UserInput,
 }
 
-#[derive(async_graphql::InputObject)]
+#[derive(InputObject)]
 pub struct LenderCompanyInput {
     company: CompanyInput,
 }

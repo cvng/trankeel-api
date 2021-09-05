@@ -1,7 +1,7 @@
-mod company;
 mod company_create;
+mod company_filter;
 mod company_update;
 
-pub use self::company::*;
-pub use self::company_create::*;
-pub use self::company_update::*;
+pub use company_create::*;
+pub use company_filter::*;
+pub use company_update::*;

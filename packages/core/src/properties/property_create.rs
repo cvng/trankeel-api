@@ -18,7 +18,7 @@ use validator::Validate;
 
 // # Input
 
-#[derive(Validate, InputObject)]
+#[derive(InputObject, Validate)]
 #[graphql(name = "PropertyInput")]
 pub struct CreatePropertyInput {
     pub address: AddressInput,
