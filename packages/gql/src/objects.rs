@@ -410,28 +410,28 @@ impl Property {
         self.0.address.clone().into()
     }
     async fn build_period(&self) -> Option<PropertyBuildPeriodType> {
-        self.0.build_period.clone().map(Into::into)
+        self.0.build_period.map(Into::into)
     }
     async fn building_legal_status(&self) -> Option<PropertyBuildingLegalStatus> {
-        self.0.building_legal_status.clone().map(Into::into)
+        self.0.building_legal_status.map(Into::into)
     }
     async fn common_spaces(&self) -> Option<String> {
         self.0.common_spaces.clone()
     }
     async fn energy_class(&self) -> Option<PropertyEnergyClass> {
-        self.0.energy_class.clone().map(Into::into)
+        self.0.energy_class.map(Into::into)
     }
     async fn equipments(&self) -> Option<String> {
         self.0.equipments.clone()
     }
     async fn gas_emission(&self) -> Option<PropertyGasEmission> {
-        self.0.gas_emission.clone().map(Into::into)
+        self.0.gas_emission.map(Into::into)
     }
     async fn heating_method(&self) -> Option<PropertyUsageType> {
-        self.0.heating_method.clone().map(Into::into)
+        self.0.heating_method.map(Into::into)
     }
     async fn housing_type(&self) -> Option<PropertyUsageType> {
-        self.0.housing_type.clone().map(Into::into)
+        self.0.housing_type.map(Into::into)
     }
     async fn name(&self) -> String {
         self.0.name.clone()
@@ -445,26 +445,26 @@ impl Property {
     async fn other_spaces(&self) -> Option<String> {
         self.0.other_spaces.clone()
     }
-    async fn tax(&self) -> Option<f64> {
-        self.0.tax
+    async fn tax(&self) -> Option<Decimal> {
+        self.0.tax.map(Into::into)
     }
     async fn room_count(&self) -> PropertyRoomType {
-        self.0.room_count.clone().into()
+        self.0.room_count
     }
     async fn status(&self) -> Option<PropertyStatus> {
-        self.0.status.clone().map(Into::into)
+        self.0.status.map(Into::into)
     }
-    async fn surface(&self) -> i32 {
+    async fn surface(&self) -> f64 {
         self.0.surface
     }
     async fn tenant_private_spaces(&self) -> Option<String> {
         self.0.tenant_private_spaces.clone()
     }
     async fn usage_type(&self) -> Option<PropertyHabitationUsageType> {
-        self.0.usage_type.clone().map(Into::into)
+        self.0.usage_type.map(Into::into)
     }
     async fn water_heating_method(&self) -> Option<PropertyUsageType> {
-        self.0.water_heating_method.clone().map(Into::into)
+        self.0.water_heating_method.map(Into::into)
     }
     async fn id(&self) -> ID {
         self.0.id.into()

@@ -7,6 +7,7 @@ use crate::Name;
 use async_graphql::Enum;
 use serde::Deserialize;
 use serde::Serialize;
+use std::fmt;
 use std::fmt::Display;
 
 // # Types
@@ -90,7 +91,7 @@ impl Name for Person {
 impl LegalEntity for Person {}
 
 impl Display for Person {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", &self.display_name())
     }
 }

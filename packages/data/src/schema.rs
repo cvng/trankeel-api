@@ -93,29 +93,44 @@ table! {
 
 table! {
     property (id) {
-        accountId -> Nullable<Uuid>,
+        #[sql_name="accountId"]
+        account_id -> Nullable<Uuid>,
         address -> Jsonb,
-        buildPeriod -> Nullable<Text>,
-        buildingLegalStatus -> Nullable<Text>,
-        commonSpaces -> Nullable<Text>,
-        energyClass -> Nullable<Text>,
+        #[sql_name="buildPeriod"]
+        build_period -> Nullable<Text>,
+        #[sql_name="buildingLegalStatus"]
+        building_legal_status -> Nullable<Text>,
+        #[sql_name="commonSpaces"]
+        common_spaces -> Nullable<Text>,
+        #[sql_name="energyClass"]
+        energy_class -> Nullable<Text>,
         equipments -> Nullable<Text>,
-        gasEmission -> Nullable<Text>,
-        heatingMethod -> Nullable<Text>,
-        housingType -> Nullable<Text>,
+        #[sql_name="gasEmission"]
+        gas_emission -> Nullable<Text>,
+        #[sql_name="heatingMethod"]
+        heating_method -> Nullable<Text>,
+        #[sql_name="housingType"]
+        housing_type -> Nullable<Text>,
         name -> Text,
         note -> Nullable<Text>,
-        nticEquipments -> Nullable<Text>,
-        otherSpaces -> Nullable<Text>,
-        tax -> Nullable<Float8>,
-        roomCount -> Text,
+        #[sql_name="nticEquipments"]
+        ntic_equipments -> Nullable<Text>,
+        #[sql_name="otherSpaces"]
+        other_spaces -> Nullable<Text>,
+        tax -> Nullable<Numeric>,
+        #[sql_name="roomCount"]
+        room_count -> Text,
         status -> Nullable<Text>,
-        surface -> Int4,
-        tenantPrivateSpaces -> Nullable<Text>,
-        usageType -> Nullable<Text>,
-        waterHeatingMethod -> Nullable<Text>,
+        surface -> Float8,
+        #[sql_name="tenantPrivateSpaces"]
+        tenant_private_spaces -> Nullable<Text>,
+        #[sql_name="usageType"]
+        usage_type -> Nullable<Text>,
+        #[sql_name="waterHeatingMethod"]
+        water_heating_method -> Nullable<Text>,
         id -> Uuid,
-        lenderId -> Uuid,
+        #[sql_name="lenderId"]
+        lender_id -> Uuid,
     }
 }
 
@@ -203,7 +218,7 @@ joinable!(lease -> property (propertyId));
 joinable!(leasetenant -> lease (leaseId));
 joinable!(leasetenant -> tenant (tenantId));
 joinable!(lender -> account (account_id));
-joinable!(property -> lender (lenderId));
+joinable!(property -> lender (lender_id));
 joinable!(rent -> lease (leaseId));
 joinable!(rent -> transaction (transactionId));
 joinable!(tenant -> lease (lease_id));

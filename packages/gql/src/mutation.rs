@@ -1,5 +1,6 @@
 use crate::inputs::AccountActivatePlanInput;
 use crate::inputs::AccountUpdateInput;
+use crate::inputs::CreatePropertyInput;
 use crate::inputs::CreateTenantInput;
 use crate::inputs::CreateUserWithAccountInput;
 use crate::inputs::FileInput;
@@ -7,10 +8,9 @@ use crate::inputs::ImportInput;
 use crate::inputs::LeaseFurnishedInput;
 use crate::inputs::LeaseFurnishedUpdateInput;
 use crate::inputs::LenderIndividualUpdateInput;
-use crate::inputs::PropertyInput;
-use crate::inputs::PropertyUpdateInput;
 use crate::inputs::RentReceiptInput;
 use crate::inputs::TransactionInput;
+use crate::inputs::UpdatePropertyInput;
 use crate::inputs::UpdateTenantInput;
 use crate::objects::Account;
 use crate::objects::File;
@@ -72,16 +72,30 @@ impl Mutation {
         Ok(piteo_lib::delete_tenant(db_pool.clone(), auth_id.clone(), id.try_into()?)?.into())
     }
 
-    async fn property_create(&self, _input: PropertyInput) -> Result<Property> {
-        Err(wip())
+    async fn property_create(
+        &self,
+        ctx: &Context<'_>,
+        input: CreatePropertyInput,
+    ) -> Result<Property> {
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        Ok(piteo_lib::create_property(db_pool.clone(), auth_id.clone(), input.try_into()?)?.into())
     }
 
-    async fn property_update(&self, _input: PropertyUpdateInput) -> Result<Property> {
-        Err(wip())
+    async fn property_update(
+        &self,
+        ctx: &Context<'_>,
+        input: UpdatePropertyInput,
+    ) -> Result<Property> {
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        Ok(piteo_lib::update_property(db_pool.clone(), auth_id.clone(), input.try_into()?)?.into())
     }
 
-    async fn property_delete(&self, _id: ID) -> Result<ID> {
-        Err(wip())
+    async fn property_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        Ok(piteo_lib::delete_property(db_pool.clone(), auth_id.clone(), id.try_into()?)?.into())
     }
 
     async fn lease_furnished_create(&self, _input: LeaseFurnishedInput) -> Result<Lease> {

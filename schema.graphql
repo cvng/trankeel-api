@@ -310,10 +310,10 @@ type Property {
 	note: String
 	nticEquipments: String
 	otherSpaces: String
-	tax: Float
+	tax: Decimal
 	roomCount: PropertyRoomType!
 	status: PropertyStatus
-	surface: Int!
+	surface: Float!
 	tenantPrivateSpaces: String
 	usageType: PropertyHabitationUsageType
 	waterHeatingMethod: PropertyUsageType

@@ -1,6 +1,7 @@
 use crate::database::AccountStore;
 use crate::database::Db;
 use crate::database::LenderStore;
+use crate::database::PropertyStore;
 use crate::database::TenantStore;
 use crate::database::UserStore;
 use eyre::Error;
@@ -50,6 +51,10 @@ impl Db for InMemoryDb {
     }
 
     fn lenders(&self) -> Box<dyn LenderStore> {
+        todo!()
+    }
+
+    fn properties(&self) -> Box<dyn PropertyStore + '_> {
         todo!()
     }
 }

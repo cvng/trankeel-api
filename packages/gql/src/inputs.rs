@@ -87,7 +87,7 @@ pub struct AddressInput {
     postal_code: String,
 }
 
-impl From<AddressInput> for piteo_core::auth::ops::AddressInput {
+impl From<AddressInput> for piteo_lib::AddressInput {
     fn from(item: AddressInput) -> Self {
         Self {
             city: item.city,
@@ -100,7 +100,8 @@ impl From<AddressInput> for piteo_core::auth::ops::AddressInput {
 }
 
 #[derive(async_graphql::InputObject)]
-pub struct PropertyInput {
+#[graphql(name = "PropertyInput")]
+pub struct CreatePropertyInput {
     address: AddressInput,
     build_period: PropertyBuildPeriodType,
     building_legal_status: PropertyBuildingLegalStatus,
@@ -124,8 +125,39 @@ pub struct PropertyInput {
     water_heating_method: PropertyUsageType,
 }
 
+impl TryFrom<CreatePropertyInput> for piteo_lib::CreatePropertyInput {
+    type Error = Error;
+
+    fn try_from(item: CreatePropertyInput) -> Result<Self, Self::Error> {
+        Ok(Self {
+            address: item.address.into(),
+            build_period: item.build_period,
+            building_legal_status: item.building_legal_status,
+            common_spaces: item.common_spaces,
+            energy_class: item.energy_class,
+            equipments: item.equipments,
+            gas_emission: item.gas_emission,
+            heating_method: item.heating_method,
+            housing_type: item.housing_type,
+            lender_id: item.lender_id.try_into()?,
+            name: item.name,
+            note: item.note,
+            ntic_equipments: item.ntic_equipments,
+            other_spaces: item.other_spaces,
+            room_count: item.room_count,
+            status: item.status,
+            surface: item.surface,
+            tax: item.tax.map(Into::into),
+            tenant_private_spaces: item.tenant_private_spaces,
+            usage_type: item.usage_type,
+            water_heating_method: item.water_heating_method,
+        })
+    }
+}
+
 #[derive(async_graphql::InputObject)]
-pub struct PropertyUpdateInput {
+#[graphql(name = "PropertyUpdateInput")]
+pub struct UpdatePropertyInput {
     address: Option<AddressInput>,
     build_period: Option<PropertyBuildPeriodType>,
     building_legal_status: Option<PropertyBuildingLegalStatus>,
@@ -147,6 +179,36 @@ pub struct PropertyUpdateInput {
     tenant_private_spaces: Option<String>,
     usage_type: Option<PropertyHabitationUsageType>,
     water_heating_method: Option<PropertyUsageType>,
+}
+
+impl TryFrom<UpdatePropertyInput> for piteo_lib::UpdatePropertyInput {
+    type Error = Error;
+
+    fn try_from(item: UpdatePropertyInput) -> Result<Self, Self::Error> {
+        Ok(Self {
+            address: item.address.map(Into::into),
+            build_period: item.build_period,
+            building_legal_status: item.building_legal_status,
+            common_spaces: item.common_spaces,
+            energy_class: item.energy_class,
+            equipments: item.equipments,
+            gas_emission: item.gas_emission,
+            heating_method: item.heating_method,
+            housing_type: item.housing_type,
+            id: item.id.try_into()?,
+            name: item.name,
+            note: item.note,
+            ntic_equipments: item.ntic_equipments,
+            other_spaces: item.other_spaces,
+            room_count: item.room_count,
+            status: item.status,
+            surface: item.surface,
+            tax: item.tax.map(Into::into),
+            tenant_private_spaces: item.tenant_private_spaces,
+            usage_type: item.usage_type,
+            water_heating_method: item.water_heating_method,
+        })
+    }
 }
 
 #[derive(async_graphql::InputObject)]

@@ -3,9 +3,9 @@ use crate::AuthId;
 use crate::DateTime;
 use crate::Tenant;
 use eyre::Error;
-use piteo_data::Id;
 use piteo_data::PhoneNumber;
 use piteo_data::TenantData;
+use piteo_data::TenantId;
 use validator::Validate;
 
 // # Input
@@ -17,7 +17,7 @@ pub struct UpdateTenantInput {
     pub birthplace: Option<String>,
     #[validate(email)]
     pub email: Option<String>,
-    pub id: Id,
+    pub id: TenantId,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub note: Option<String>,
