@@ -2,16 +2,16 @@ use crate::database::Database;
 use crate::database::DbPool;
 use crate::payment::Stripe;
 use piteo_core::auth;
-use piteo_core::auth::ops::CreateUserWithAccountInput;
+use piteo_core::auth::CreateUserWithAccountInput;
 use piteo_core::error::Error;
 use piteo_core::properties;
-use piteo_core::properties::create_property::CreatePropertyInput;
-use piteo_core::properties::delete_property::DeletePropertyInput;
-use piteo_core::properties::update_property::UpdatePropertyInput;
+use piteo_core::properties::CreatePropertyInput;
+use piteo_core::properties::DeletePropertyInput;
+use piteo_core::properties::UpdatePropertyInput;
 use piteo_core::tenants;
-use piteo_core::tenants::ops::CreateTenantInput;
-use piteo_core::tenants::ops::DeleteTenantInput;
-use piteo_core::tenants::ops::UpdateTenantInput;
+use piteo_core::tenants::CreateTenantInput;
+use piteo_core::tenants::DeleteTenantInput;
+use piteo_core::tenants::UpdateTenantInput;
 use piteo_core::AuthId;
 use piteo_core::Person;
 use piteo_core::Property;
@@ -25,7 +25,7 @@ pub async fn create_user_with_account(
     pool: DbPool,
     input: CreateUserWithAccountInput,
 ) -> Result<Person, Error> {
-    auth::ops::create_user_with_account(Database::new(pool), Stripe::from_env()?, input).await
+    auth::create_user_with_account(Database::new(pool), Stripe::from_env()?, input).await
 }
 
 // # Tenants
@@ -43,7 +43,7 @@ pub fn create_tenant(
     auth_id: AuthId,
     input: CreateTenantInput,
 ) -> Result<Tenant, Error> {
-    tenants::ops::create_tenant(Database::new(pool), auth_id, input)
+    tenants::create_tenant(Database::new(pool), auth_id, input)
 }
 
 pub fn update_tenant(
@@ -51,11 +51,11 @@ pub fn update_tenant(
     auth_id: AuthId,
     input: UpdateTenantInput,
 ) -> Result<Tenant, Error> {
-    tenants::ops::update_tenant(Database::new(pool), auth_id, input)
+    tenants::update_tenant(Database::new(pool), auth_id, input)
 }
 
 pub fn delete_tenant(pool: DbPool, auth_id: AuthId, id: TenantId) -> Result<TenantId, Error> {
-    tenants::ops::delete_tenant(Database::new(pool), auth_id, DeleteTenantInput { id })
+    tenants::delete_tenant(Database::new(pool), auth_id, DeleteTenantInput { id })
 }
 
 // # Properties
@@ -73,7 +73,7 @@ pub fn create_property(
     auth_id: AuthId,
     input: CreatePropertyInput,
 ) -> Result<Property, Error> {
-    properties::create_property::create_property(Database::new(pool), auth_id, input)
+    properties::create_property(Database::new(pool), auth_id, input)
 }
 
 pub fn update_property(
@@ -81,13 +81,9 @@ pub fn update_property(
     auth_id: AuthId,
     input: UpdatePropertyInput,
 ) -> Result<Property, Error> {
-    properties::update_property::update_property(Database::new(pool), auth_id, input)
+    properties::update_property(Database::new(pool), auth_id, input)
 }
 
 pub fn delete_property(pool: DbPool, auth_id: AuthId, id: PropertyId) -> Result<TenantId, Error> {
-    properties::delete_property::delete_property(
-        Database::new(pool),
-        auth_id,
-        DeletePropertyInput { id },
-    )
+    properties::delete_property(Database::new(pool), auth_id, DeletePropertyInput { id })
 }

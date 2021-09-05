@@ -1,10 +1,11 @@
+use async_graphql::scalar;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt;
 use std::fmt::Display;
 use std::ops::Add;
 
-pub type Id = uuid::Uuid;
+pub(crate) type Id = uuid::Uuid;
 
 pub type Email = String;
 
@@ -81,3 +82,7 @@ pub trait Name {
             .to_string()
     }
 }
+
+scalar!(Amount, "Decimal");
+
+scalar!(DateTime);

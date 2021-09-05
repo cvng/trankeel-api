@@ -9,13 +9,13 @@ type Account {
 	plan: Plan
 }
 input AccountActivatePlanInput {
-	id: ID!
+	id: UUID!
 	name: String!
 	planCode: PlanCode!
 }
 input AccountUpdateInput {
-	id: ID!
-	paymentMethodId: ID!
+	id: UUID!
+	paymentMethodId: String!
 }
 type Address {
 	city: String!
@@ -44,7 +44,6 @@ type Company {
 	legalEntityTypeOther: String
 	phoneNumber: PhoneNumber
 }
-scalar Date
 scalar DateTime
 scalar Decimal
 scalar Email
@@ -176,12 +175,12 @@ input LeaseFurnishedDataInput {
 	rentComplementPropertyJustification: String
 	rentFirstAmount: Decimal
 	rentIrl: LeaseRentReferenceIrl
-	rentIrlRevisionDate: Date
+	rentIrlRevisionDate: DateTime
 	rentMajDecreeIncreasedAmount: Decimal
 	rentMajDecreeReferenceAmount: Decimal
 	rentMajorationDecree: Boolean
 	rentMaxEvolutionRelocation: Boolean
-	rentPaymentDate: Date
+	rentPaymentDate: DateTime
 	rentPaymentMethod: RentPaymentMethod
 	rentPaymentPlace: String
 	rentPeriodicity: LeaseRentPeriodicity
@@ -194,8 +193,8 @@ input LeaseFurnishedDataInput {
 	tenantFeeCapReportByMeter: Decimal
 	tenantFeeCapReportPrestations: Decimal
 	tenantLastRentAmount: Decimal
-	tenantLastRentReceivedDate: Date
-	tenantLastRentRevisionDate: Date
+	tenantLastRentReceivedDate: DateTime
+	tenantLastRentRevisionDate: DateTime
 	worksDecenceSinceLastRental: String
 	worksRentDecreaseTenant: String
 	worksRentIncreaseLender: String
@@ -207,19 +206,19 @@ enum LeaseFurnishedDuration {
 input LeaseFurnishedInput {
 	data: LeaseFurnishedDataInput
 	depositAmount: Decimal
-	effectDate: Date!
-	renewDate: Date
+	effectDate: DateTime!
+	renewDate: DateTime
 	file: FileInput
-	propertyId: ID!
+	propertyId: UUID!
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
-	signatureDate: Date
-	tenantIds: [ID!]!
+	signatureDate: DateTime
+	tenantIds: [UUID!]!
 }
 input LeaseFurnishedUpdateInput {
 	data: LeaseFurnishedDataInput
 	file: FileInput
-	id: ID!
+	id: UUID!
 }
 enum LeaseRentPeriodicity {
 	ANNUALY
@@ -259,7 +258,7 @@ type Lender {
 	identity: Identity!
 }
 input LenderIndividualUpdateInput {
-	id: ID!
+	id: UUID!
 	individual: UserUpdateInput!
 }
 type Mutation {
@@ -367,7 +366,7 @@ input PropertyInput {
 	gasEmission: PropertyGasEmission
 	heatingMethod: PropertyUsageType!
 	housingType: PropertyUsageType!
-	lenderId: ID!
+	lenderId: UUID!
 	name: String!
 	note: String
 	nticEquipments: String
@@ -406,7 +405,7 @@ input PropertyUpdateInput {
 	gasEmission: PropertyGasEmission
 	heatingMethod: PropertyUsageType
 	housingType: PropertyUsageType
-	id: ID!
+	id: UUID!
 	name: String
 	note: String
 	nticEquipments: String
@@ -460,7 +459,7 @@ enum RentPaymentMethod {
 	BEFORE
 }
 input RentReceiptInput {
-	leaseId: ID!
+	leaseId: UUID!
 	sendMail: Boolean
 }
 type RentReceiptPayload {
@@ -544,13 +543,13 @@ type Tenant {
 }
 input TenantInput {
 	apl: Boolean
-	birthdate: Date!
+	birthdate: DateTime!
 	birthplace: String
-	email: Email!
+	email: String!
 	firstName: String!
 	lastName: String!
 	note: String
-	phoneNumber: PhoneNumber
+	phoneNumber: String
 	visaleId: String
 }
 enum TenantStatus {
@@ -561,14 +560,14 @@ enum TenantStatus {
 }
 input TenantUpdateInput {
 	apl: Boolean
-	birthdate: Date
+	birthdate: DateTime
 	birthplace: String
-	email: Email
-	id: ID!
+	email: String
+	id: UUID!
 	firstName: String
 	lastName: String
 	note: String
-	phoneNumber: PhoneNumber
+	phoneNumber: String
 	visaleId: String
 }
 type Transaction {
@@ -581,8 +580,8 @@ type Transaction {
 }
 input TransactionInput {
 	amount: Decimal!
-	leaseId: ID!
-	date: Date!
+	leaseId: UUID!
+	date: DateTime!
 	type: TransactionType
 }
 enum TransactionType {
@@ -594,6 +593,7 @@ enum TransactionType {
 	OTHER
 	RENT
 }
+scalar UUID
 type User {
 	authId: AuthenticationID
 	email: Email!
@@ -622,7 +622,7 @@ input UserUpdateInput {
 input UserWithAccountInput {
 	address: AddressInput
 	authId: AuthenticationID!
-	email: Email!
+	email: String!
 	firstName: String!
 	lastName: String!
 	skipCreateCustomer: Boolean

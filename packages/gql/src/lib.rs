@@ -1,5 +1,3 @@
-mod enums;
-mod inputs;
 mod mutation;
 mod objects;
 mod query;
@@ -13,7 +11,7 @@ use crate::query::Query;
 use async_graphql::extensions::ApolloTracing;
 use async_graphql::EmptySubscription;
 use async_graphql::Schema;
-use piteo_core::error::Context;
+use piteo_lib::error::Context;
 use piteo_lib::DbPool;
 use std::env;
 use std::fs::File;
@@ -21,7 +19,7 @@ use std::io::Write;
 
 const SCHEMA_PATH: &str = "schema.graphql";
 
-type Result<T> = std::result::Result<T, piteo_core::error::Error>;
+type Result<T> = std::result::Result<T, piteo_lib::error::Error>;
 
 /// Piteo GraphQL schema.
 pub type PiteoSchema = Schema<Query, Mutation, EmptySubscription>;

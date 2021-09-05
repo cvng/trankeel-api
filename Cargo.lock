@@ -1392,6 +1392,7 @@ dependencies = [
 name = "piteo-core"
 version = "0.1.0"
 dependencies = [
+ "async-graphql",
  "async-trait",
  "diesel",
  "eyre",
@@ -1424,7 +1425,6 @@ name = "piteo-graphql"
 version = "0.1.0"
 dependencies = [
  "async-graphql",
- "piteo-core",
  "piteo-lib",
  "serde",
 ]

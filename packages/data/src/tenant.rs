@@ -1,9 +1,9 @@
+use crate::common::Id;
 use crate::schema::tenant;
 use crate::AccountId;
 use crate::AuthId;
 use crate::DateTime;
 use crate::Email;
-use crate::Id;
 use crate::Name;
 use crate::PhoneNumber;
 use async_graphql::Enum;

@@ -1,6 +1,6 @@
+use crate::common::Id;
 use crate::Amount;
 use crate::DateTime;
-use crate::Id;
 use crate::LeaseFurnishedData;
 use async_graphql::Enum;
 use chrono::Utc;
@@ -12,6 +12,8 @@ use serde::Deserialize;
 use serde::Serialize;
 
 // # Types
+
+pub type LeaseId = Id;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]

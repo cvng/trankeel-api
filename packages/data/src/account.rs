@@ -1,7 +1,7 @@
+use crate::common::Id;
 use crate::schema::account;
 use crate::CustomerId;
 use crate::DateTime;
-use crate::Id;
 use crate::PlanId;
 use crate::SubscriptionId;
 use async_graphql::Enum;

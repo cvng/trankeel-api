@@ -1,17 +1,3 @@
-use crate::inputs::AccountActivatePlanInput;
-use crate::inputs::AccountUpdateInput;
-use crate::inputs::CreatePropertyInput;
-use crate::inputs::CreateTenantInput;
-use crate::inputs::CreateUserWithAccountInput;
-use crate::inputs::FileInput;
-use crate::inputs::ImportInput;
-use crate::inputs::LeaseFurnishedInput;
-use crate::inputs::LeaseFurnishedUpdateInput;
-use crate::inputs::LenderIndividualUpdateInput;
-use crate::inputs::RentReceiptInput;
-use crate::inputs::TransactionInput;
-use crate::inputs::UpdatePropertyInput;
-use crate::inputs::UpdateTenantInput;
 use crate::objects::Account;
 use crate::objects::File;
 use crate::objects::Lease;
@@ -25,8 +11,22 @@ use crate::wip;
 use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
-use piteo_core::AuthId;
+use piteo_lib::auth::AccountActivatePlanInput;
+use piteo_lib::auth::AccountUpdateInput;
+use piteo_lib::files::FileInput;
+use piteo_lib::imports::ImportInput;
+use piteo_lib::leases::LeaseFurnishedInput;
+use piteo_lib::leases::LeaseFurnishedUpdateInput;
+use piteo_lib::leases::RentReceiptInput;
+use piteo_lib::leases::TransactionInput;
+use piteo_lib::owners::LenderIndividualUpdateInput;
+use piteo_lib::AuthId;
+use piteo_lib::CreatePropertyInput;
+use piteo_lib::CreateTenantInput;
+use piteo_lib::CreateUserWithAccountInput;
 use piteo_lib::DbPool;
+use piteo_lib::UpdatePropertyInput;
+use piteo_lib::UpdateTenantInput;
 use std::convert::TryInto;
 
 pub struct Mutation;
@@ -39,11 +39,9 @@ impl Mutation {
         input: CreateUserWithAccountInput,
     ) -> Result<Person> {
         let db_pool = ctx.data::<DbPool>()?;
-        Ok(
-            piteo_lib::create_user_with_account(db_pool.clone(), input.into())
-                .await?
-                .into(),
-        )
+        Ok(piteo_lib::create_user_with_account(db_pool.clone(), input)
+            .await?
+            .into())
     }
 
     async fn account_update_payment_method(&self, _input: AccountUpdateInput) -> Result<Account> {
@@ -57,13 +55,13 @@ impl Mutation {
     async fn tenant_create(&self, ctx: &Context<'_>, input: CreateTenantInput) -> Result<Tenant> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo_lib::create_tenant(db_pool.clone(), auth_id.clone(), input.into())?.into())
+        Ok(piteo_lib::create_tenant(db_pool.clone(), auth_id.clone(), input)?.into())
     }
 
     async fn tenant_update(&self, ctx: &Context<'_>, input: UpdateTenantInput) -> Result<Tenant> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo_lib::update_tenant(db_pool.clone(), auth_id.clone(), input.try_into()?)?.into())
+        Ok(piteo_lib::update_tenant(db_pool.clone(), auth_id.clone(), input)?.into())
     }
 
     async fn tenant_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
@@ -79,7 +77,7 @@ impl Mutation {
     ) -> Result<Property> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo_lib::create_property(db_pool.clone(), auth_id.clone(), input.try_into()?)?.into())
+        Ok(piteo_lib::create_property(db_pool.clone(), auth_id.clone(), input)?.into())
     }
 
     async fn property_update(
@@ -89,7 +87,7 @@ impl Mutation {
     ) -> Result<Property> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo_lib::update_property(db_pool.clone(), auth_id.clone(), input.try_into()?)?.into())
+        Ok(piteo_lib::update_property(db_pool.clone(), auth_id.clone(), input)?.into())
     }
 
     async fn property_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {

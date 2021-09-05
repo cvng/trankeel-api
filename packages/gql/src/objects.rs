@@ -8,34 +8,34 @@ use crate::wip;
 use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
-use piteo_core::auth;
-use piteo_core::owners;
-use piteo_core::AccountStatus;
-use piteo_core::FileStatus;
-use piteo_core::FileType;
-use piteo_core::LeaseFurnishedDuration;
-use piteo_core::LeaseRentPeriodicity;
-use piteo_core::LeaseRentReferenceIrl;
-use piteo_core::LeaseStatus;
-use piteo_core::LeaseType;
-use piteo_core::LegalEntityType;
-use piteo_core::Name;
-use piteo_core::PlanCode;
-use piteo_core::PropertyBuildPeriodType;
-use piteo_core::PropertyBuildingLegalStatus;
-use piteo_core::PropertyEnergyClass;
-use piteo_core::PropertyGasEmission;
-use piteo_core::PropertyHabitationUsageType;
-use piteo_core::PropertyRoomType;
-use piteo_core::PropertyStatus;
-use piteo_core::PropertyUsageType;
-use piteo_core::RentChargesRecuperationMode;
-use piteo_core::RentPaymentMethod;
-use piteo_core::RentStatus;
-use piteo_core::TenantStatus;
-use piteo_core::TransactionType;
-use piteo_core::UserRole;
+use piteo_lib::auth;
+use piteo_lib::owners;
+use piteo_lib::AccountStatus;
 use piteo_lib::DbPool;
+use piteo_lib::FileStatus;
+use piteo_lib::FileType;
+use piteo_lib::LeaseFurnishedDuration;
+use piteo_lib::LeaseRentPeriodicity;
+use piteo_lib::LeaseRentReferenceIrl;
+use piteo_lib::LeaseStatus;
+use piteo_lib::LeaseType;
+use piteo_lib::LegalEntityType;
+use piteo_lib::Name;
+use piteo_lib::PlanCode;
+use piteo_lib::PropertyBuildPeriodType;
+use piteo_lib::PropertyBuildingLegalStatus;
+use piteo_lib::PropertyEnergyClass;
+use piteo_lib::PropertyGasEmission;
+use piteo_lib::PropertyHabitationUsageType;
+use piteo_lib::PropertyRoomType;
+use piteo_lib::PropertyStatus;
+use piteo_lib::PropertyUsageType;
+use piteo_lib::RentChargesRecuperationMode;
+use piteo_lib::RentPaymentMethod;
+use piteo_lib::RentStatus;
+use piteo_lib::TenantStatus;
+use piteo_lib::TransactionType;
+use piteo_lib::UserRole;
 use std::convert::TryInto;
 
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_complex_object.html
@@ -59,14 +59,14 @@ impl Account {
     }
 }
 
-impl From<piteo_core::Account> for Account {
-    fn from(item: piteo_core::Account) -> Self {
+impl From<piteo_lib::Account> for Account {
+    fn from(item: piteo_lib::Account) -> Self {
         Self {
-            plan_id: item.plan_id.map(ID::from),
+            plan_id: item.plan_id.map(Into::into),
             status: item.status.map(Into::into),
             stripe_customer_id: item.stripe_customer_id,
             stripe_subscription_id: item.stripe_subscription_id,
-            trial_end: item.trial_end.map(DateTime::from),
+            trial_end: item.trial_end.map(Into::into),
             owner_id: Some(item.owner_id),
             id: item.id.into(),
         }
@@ -83,8 +83,8 @@ pub struct Address {
     inline: String,
 }
 
-impl From<piteo_core::Address> for Address {
-    fn from(item: piteo_core::Address) -> Self {
+impl From<piteo_lib::Address> for Address {
+    fn from(item: piteo_lib::Address) -> Self {
         Self {
             inline: item.inline(),
             city: item.city.unwrap_or_default(),
@@ -109,8 +109,8 @@ pub struct Company {
     phone_number: Option<PhoneNumber>,
 }
 
-impl From<piteo_core::Company> for Company {
-    fn from(item: piteo_core::Company) -> Self {
+impl From<piteo_lib::Company> for Company {
+    fn from(item: piteo_lib::Company) -> Self {
         Self {
             display_name: item.display_name(),
             address: item.address.map(Into::into),
@@ -181,24 +181,24 @@ pub struct Lease {
     property: Option<Property>,
 }
 
-impl From<piteo_core::Lease> for Lease {
-    fn from(item: piteo_core::Lease) -> Self {
+impl From<piteo_lib::Lease> for Lease {
+    fn from(item: piteo_lib::Lease) -> Self {
         Self {
             status: item.status(),
             account_id: item.account_id.into(),
-            deposit_amount: item.deposit_amount.map(Decimal::from),
+            deposit_amount: item.deposit_amount.map(Into::into),
             effect_date: item.effect_date.into(),
-            signature_date: item.signature_date.map(DateTime::from),
+            signature_date: item.signature_date.map(Into::into),
             rent_amount: item.rent_amount.into(),
-            rent_charges_amount: item.rent_charges_amount.map(Decimal::from),
+            rent_charges_amount: item.rent_charges_amount.map(Into::into),
             rent_full_amount: item.rent_full_amount().into(),
             r#type: item.r#type,
-            lease_id: item.lease_id.map(ID::from),
+            lease_id: item.lease_id.map(Into::into),
             property_id: item.property_id.into(),
             id: item.id.into(),
-            data: item.data.map(LeaseFurnishedData::from),
-            expired_at: item.expired_at.map(DateTime::from),
-            renew_date: item.renew_date.map(DateTime::from),
+            data: item.data.map(Into::into),
+            expired_at: item.expired_at.map(Into::into),
+            renew_date: item.renew_date.map(Into::into),
             rents: Some(Vec::new()),
             tenants: Vec::new(),
             lease: None,
@@ -249,8 +249,8 @@ pub struct LeaseFurnishedData {
     works_rent_increase_lender: Option<String>,
 }
 
-impl From<piteo_core::LeaseFurnishedData> for LeaseFurnishedData {
-    fn from(item: piteo_core::LeaseFurnishedData) -> Self {
+impl From<piteo_lib::LeaseFurnishedData> for LeaseFurnishedData {
+    fn from(item: piteo_lib::LeaseFurnishedData) -> Self {
         Self {
             charges_recuperation_mode: item.charges_recuperation_mode.map(Into::into),
             charges_revision_method: item.charges_revision_method,
@@ -303,7 +303,7 @@ impl From<piteo_core::LeaseFurnishedData> for LeaseFurnishedData {
     }
 }
 
-pub struct Lender(piteo_core::Lender);
+pub struct Lender(piteo_lib::Lender);
 
 #[async_graphql::Object]
 impl Lender {
@@ -329,8 +329,8 @@ impl Lender {
     }
 }
 
-impl From<piteo_core::Lender> for Lender {
-    fn from(item: piteo_core::Lender) -> Self {
+impl From<piteo_lib::Lender> for Lender {
+    fn from(item: piteo_lib::Lender) -> Self {
         Self(item)
     }
 }
@@ -361,21 +361,19 @@ impl Person {
         let conn = ctx.data::<DbPool>()?.get()?;
         let account_id = self.account_id.clone().ok_or_else(wip)?.try_into()?;
 
-        Ok(Some(
-            auth::find_by_id(&conn, account_id).map(Account::from)?,
-        ))
+        Ok(Some(auth::find_by_id(&conn, account_id).map(Into::into)?))
     }
 }
 
-impl From<piteo_core::Person> for Person {
-    fn from(item: piteo_core::Person) -> Self {
+impl From<piteo_lib::Person> for Person {
+    fn from(item: piteo_lib::Person) -> Self {
         Self {
             display_name: item.display_name(),
             auth_id: Some(item.auth_id.into()),
             email: item.email.into(),
             first_name: item.first_name,
             last_name: item.last_name,
-            address: item.address.map(Address::from),
+            address: item.address.map(Into::into),
             photo_url: item.photo_url,
             role: item.role.map(Into::into),
             id: item.id.into(),
@@ -396,7 +394,7 @@ pub struct Plan {
     features: Vec<Feature>,
 }
 
-pub struct Property(piteo_core::Property);
+pub struct Property(piteo_lib::Property);
 
 #[async_graphql::Object]
 impl Property {
@@ -488,8 +486,8 @@ impl Property {
     }
 }
 
-impl From<piteo_core::Property> for Property {
-    fn from(item: piteo_core::Property) -> Self {
+impl From<piteo_lib::Property> for Property {
+    fn from(item: piteo_lib::Property) -> Self {
         Self(item)
     }
 }
@@ -512,20 +510,20 @@ pub struct Rent {
     transactions: Option<Vec<Transaction>>,
 }
 
-impl From<piteo_core::Rent> for Rent {
-    fn from(item: piteo_core::Rent) -> Self {
+impl From<piteo_lib::Rent> for Rent {
+    fn from(item: piteo_lib::Rent) -> Self {
         Self {
             id: item.id.into(),
             period_end: item.period_end.into(),
             period_start: item.period_start.into(),
             amount: item.amount.into(),
-            charges_amount: item.charges_amount.map(Decimal::from),
+            charges_amount: item.charges_amount.map(Into::into),
             full_amount: item.full_amount.into(),
             status: item.status,
             lease_id: item.lease_id.into(),
-            receipt_id: item.receipt_id.map(ID::from),
-            transaction_id: item.transaction_id.map(ID::from),
-            notice_id: item.notice_id.map(ID::from),
+            receipt_id: item.receipt_id.map(Into::into),
+            transaction_id: item.transaction_id.map(Into::into),
+            notice_id: item.notice_id.map(Into::into),
             delay: None,
             transactions: None,
         }
@@ -565,8 +563,8 @@ pub struct Summary {
     occupation_rate: f64,
 }
 
-impl From<piteo_core::Summary> for Summary {
-    fn from(item: piteo_core::Summary) -> Self {
+impl From<piteo_lib::Summary> for Summary {
+    fn from(item: piteo_lib::Summary) -> Self {
         Summary {
             since: item.since.into(),
             until: item.until.into(),
@@ -634,8 +632,8 @@ pub struct Tenant {
     lease: Option<Lease>,
 }
 
-impl From<piteo_core::Tenant> for Tenant {
-    fn from(item: piteo_core::Tenant) -> Self {
+impl From<piteo_lib::Tenant> for Tenant {
+    fn from(item: piteo_lib::Tenant) -> Self {
         Self {
             display_name: item.display_name(),
             full_name: item.full_name(),
@@ -651,7 +649,7 @@ impl From<piteo_core::Tenant> for Tenant {
             phone_number: item.phone_number,
             role: item.role,
             id: item.id.into(),
-            lease_id: item.lease_id.map(ID::from),
+            lease_id: item.lease_id.map(Into::into),
             visale_id: item.visale_id,
             account: None,
             property: None,

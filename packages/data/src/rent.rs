@@ -1,6 +1,6 @@
+use crate::common::Id;
 use crate::Amount;
 use crate::DateTime;
-use crate::Id;
 use async_graphql::Enum;
 use diesel::deserialize;
 use diesel::deserialize::FromSql;

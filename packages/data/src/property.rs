@@ -1,8 +1,8 @@
+use crate::common::Id;
 use crate::schema::property;
 use crate::AccountId;
 use crate::Address;
 use crate::Amount;
-use crate::Id;
 use crate::LenderId;
 use async_graphql::Enum;
 use diesel_enum_derive::DieselEnum;

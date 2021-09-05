@@ -1,5 +1,5 @@
+use crate::common::Id;
 use crate::Address;
-use crate::Id;
 use crate::LegalEntity;
 use async_graphql::Enum;
 

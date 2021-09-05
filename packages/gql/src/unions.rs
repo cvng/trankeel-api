@@ -8,11 +8,11 @@ pub enum Identity {
     Company(Company),
 }
 
-impl From<piteo_core::LenderIdentity> for Identity {
-    fn from(item: piteo_core::LenderIdentity) -> Self {
+impl From<piteo_lib::LenderIdentity> for Identity {
+    fn from(item: piteo_lib::LenderIdentity) -> Self {
         match item {
-            piteo_core::LenderIdentity::Individual(person) => Identity::User(person.into()),
-            piteo_core::LenderIdentity::Company(company) => Identity::Company(company.into()),
+            piteo_lib::LenderIdentity::Individual(person) => Self::User(person.into()),
+            piteo_lib::LenderIdentity::Company(company) => Self::Company(company.into()),
         }
     }
 }
