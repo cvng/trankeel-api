@@ -67,6 +67,12 @@ impl From<Amount> for Decimal {
     }
 }
 
+impl From<Decimal> for Amount {
+    fn from(item: Decimal) -> Self {
+        item.0
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct Email(String);
 

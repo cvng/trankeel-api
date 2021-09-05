@@ -1,10 +1,18 @@
+use crate::schema::property;
+use crate::AccountId;
 use crate::Address;
+use crate::Amount;
 use crate::Id;
+use crate::LenderId;
 use async_graphql::Enum;
+use diesel_enum_derive::DieselEnum;
+use serde::Deserialize;
 
 // # Types
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+pub type PropertyId = Id;
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 pub enum PropertyRoomType {
     Other,
     T1,
@@ -15,7 +23,7 @@ pub enum PropertyRoomType {
     T6,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 pub enum PropertyStatus {
     ForSale,
     Inactive,
@@ -24,7 +32,7 @@ pub enum PropertyStatus {
     Unrented,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 pub enum PropertyBuildPeriodType {
     BeforeY1949,
     FromY1949Y1974,
@@ -33,7 +41,7 @@ pub enum PropertyBuildPeriodType {
     FromY2005,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 pub enum PropertyEnergyClass {
     A,
     B,
@@ -44,7 +52,7 @@ pub enum PropertyEnergyClass {
     G,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 pub enum PropertyGasEmission {
     A,
     B,
@@ -55,49 +63,78 @@ pub enum PropertyGasEmission {
     G,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 pub enum PropertyBuildingLegalStatus {
     Copro,
     Mono,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 pub enum PropertyHabitationUsageType {
     Habitation,
     Mixte,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 pub enum PropertyUsageType {
     Collective,
     Individual,
 }
 
-#[derive(Clone, Queryable)]
+#[derive(Clone, Insertable, Queryable)]
+#[table_name = "property"]
 pub struct Property {
-    pub account_id: Option<Id>,
+    pub account_id: Option<AccountId>,
     pub address: Address,
-    pub build_period: Option<String>,
-    pub building_legal_status: Option<String>,
+    pub build_period: Option<PropertyBuildPeriodType>,
+    pub building_legal_status: Option<PropertyBuildingLegalStatus>,
     pub common_spaces: Option<String>,
-    pub energy_class: Option<String>,
+    pub energy_class: Option<PropertyEnergyClass>,
     pub equipments: Option<String>,
-    pub gas_emission: Option<String>,
-    pub heating_method: Option<String>,
-    pub housing_type: Option<String>,
+    pub gas_emission: Option<PropertyGasEmission>,
+    pub heating_method: Option<PropertyUsageType>,
+    pub housing_type: Option<PropertyUsageType>,
     pub name: String,
     pub note: Option<String>,
     pub ntic_equipments: Option<String>,
     pub other_spaces: Option<String>,
-    pub tax: Option<f64>,
-    pub room_count: String,
-    pub status: Option<String>,
-    pub surface: i32,
+    pub tax: Option<Amount>,
+    pub room_count: PropertyRoomType,
+    pub status: Option<PropertyStatus>,
+    pub surface: f64,
     pub tenant_private_spaces: Option<String>,
-    pub usage_type: Option<String>,
-    pub water_heating_method: Option<String>,
-    pub id: Id,
-    pub lender_id: Id,
+    pub usage_type: Option<PropertyHabitationUsageType>,
+    pub water_heating_method: Option<PropertyUsageType>,
+    pub id: PropertyId,
+    pub lender_id: LenderId,
+}
+
+#[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
+#[table_name = "property"]
+pub struct PropertyData {
+    pub id: PropertyId,
+    pub account_id: Option<Id>,
+    pub address: Option<Address>,
+    pub build_period: Option<PropertyBuildPeriodType>,
+    pub building_legal_status: Option<PropertyBuildingLegalStatus>,
+    pub common_spaces: Option<String>,
+    pub energy_class: Option<PropertyEnergyClass>,
+    pub equipments: Option<String>,
+    pub gas_emission: Option<PropertyGasEmission>,
+    pub heating_method: Option<PropertyUsageType>,
+    pub housing_type: Option<PropertyUsageType>,
+    pub lender_id: Option<LenderId>,
+    pub name: Option<String>,
+    pub note: Option<String>,
+    pub ntic_equipments: Option<String>,
+    pub other_spaces: Option<String>,
+    pub room_count: Option<PropertyRoomType>,
+    pub status: Option<PropertyStatus>,
+    pub surface: Option<f64>,
+    pub tax: Option<Amount>,
+    pub tenant_private_spaces: Option<String>,
+    pub usage_type: Option<PropertyHabitationUsageType>,
+    pub water_heating_method: Option<PropertyUsageType>,
 }
 
 // # Impls
