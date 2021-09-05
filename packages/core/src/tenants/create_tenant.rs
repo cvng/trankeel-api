@@ -60,7 +60,7 @@ mod tests {
     #[test]
     fn test_create_tenant() {
         let tenant = create_tenant(
-            crate::testing::InMemoryDb::new(),
+            crate::testing::db(),
             AuthId::default(),
             CreateTenantInput {
                 apl: Default::default(),

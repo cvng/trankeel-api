@@ -13,6 +13,11 @@ use piteo_data::TenantData;
 use piteo_data::TenantId;
 use std::collections::BTreeMap;
 
+#[allow(dead_code)]
+pub fn db() -> InMemoryDb {
+    InMemoryDb::new()
+}
+
 pub struct InMemoryDb;
 
 pub struct InMemoryAccountStore(BTreeMap<AccountId, Account>);
