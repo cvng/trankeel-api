@@ -75,12 +75,12 @@ impl Db for Database {
         Box::new(DatabaseUserStore(&self.0))
     }
 
-    fn tenants(&self) -> Box<dyn TenantStore + '_> {
-        Box::new(DatabaseTenantStore(&self.0))
-    }
-
     fn lenders(&self) -> Box<dyn piteo_core::database::LenderStore + '_> {
         Box::new(DatabaseLenderStore(&self.0))
+    }
+
+    fn tenants(&self) -> Box<dyn TenantStore + '_> {
+        Box::new(DatabaseTenantStore(&self.0))
     }
 
     fn properties(&self) -> Box<dyn piteo_core::database::PropertyStore + '_> {
@@ -177,6 +177,22 @@ impl LenderStore for DatabaseLenderStore<'_> {
 }
 
 impl PropertyStore for DatabasePropertyStore<'_> {
+    fn all(&mut self, auth_id: AuthId, id: Option<PropertyId>) -> Result<Vec<Property>> {
+        let query = property::table
+            .select(property::all_columns)
+            .left_join(user::table.on(user::account_id.eq(property::account_id)))
+            .filter(user::auth_id.eq(auth_id.inner()));
+
+        if let Some(id) = id {
+            return query
+                .filter(property::id.eq(id))
+                .load(&self.0.get()?)
+                .map_err(|err| err.into());
+        }
+
+        query.load(&self.0.get()?).map_err(|err| err.into())
+    }
+
     fn create(&mut self, data: Property) -> Result<Property> {
         Ok(insert_into(property::table)
             .values((

@@ -4,6 +4,7 @@ mod payment;
 
 pub use crate::database::build_connection_pool;
 pub use crate::database::DbPool;
+pub use crate::ops::all_properties;
 pub use crate::ops::all_tenants;
 pub use crate::ops::create_property;
 pub use crate::ops::create_tenant;

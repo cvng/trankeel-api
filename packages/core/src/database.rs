@@ -43,6 +43,7 @@ pub trait LenderStore {
 }
 
 pub trait PropertyStore {
+    fn all(&mut self, auth_id: AuthId, id: Option<PropertyId>) -> Result<Vec<Property>>;
     fn create(&mut self, data: Property) -> Result<Property>;
     fn update(&mut self, data: PropertyData) -> Result<Property>;
     fn delete(&mut self, data: PropertyId) -> Result<Deleted>;

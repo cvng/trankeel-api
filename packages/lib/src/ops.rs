@@ -58,7 +58,15 @@ pub fn delete_tenant(pool: DbPool, auth_id: AuthId, id: TenantId) -> Result<Tena
     tenants::ops::delete_tenant(Database::new(pool), auth_id, DeleteTenantInput { id })
 }
 
-// # Tenants
+// # Properties
+
+pub fn all_properties(
+    pool: DbPool,
+    auth_id: AuthId,
+    id: Option<PropertyId>,
+) -> Result<Vec<Property>, Error> {
+    properties::all_properties(Database::new(pool), auth_id, id)
+}
 
 pub fn create_property(
     pool: DbPool,

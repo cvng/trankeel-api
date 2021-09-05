@@ -15,7 +15,6 @@ use async_graphql::ID;
 use piteo_core::auth;
 use piteo_core::leases;
 use piteo_core::owners;
-use piteo_core::properties;
 use piteo_core::reports;
 use piteo_core::AuthId;
 use piteo_core::Id;
@@ -29,7 +28,6 @@ impl Query {
     async fn viewer(&self, ctx: &Context<'_>) -> Result<Person> {
         let conn = ctx.data::<DbPool>()?.get()?;
         let auth_id = ctx.data::<AuthId>()?;
-
         Ok(auth::find(&conn, auth_id).map(Person::from)?)
     }
 
@@ -39,11 +37,10 @@ impl Query {
         id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Property>> {
-        let conn = ctx.data::<DbPool>()?.get()?;
+        let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| Id::parse_str(&id).unwrap_or_default());
-
-        Ok(properties::all_properties(&conn, auth_id, id).and_then(map_res)?)
+        Ok(piteo_lib::all_properties(db_pool.clone(), auth_id.clone(), id).and_then(map_res)?)
     }
 
     async fn summary(
