@@ -5,6 +5,7 @@ use crate::scalars::Decimal;
 use crate::scalars::Email;
 use crate::scalars::PhoneNumber;
 use async_graphql::ID;
+use piteo_core::error::Error;
 use piteo_core::FileType;
 use piteo_core::ImportSource;
 use piteo_core::LeaseFurnishedDuration;
@@ -22,9 +23,12 @@ use piteo_core::PropertyUsageType;
 use piteo_core::RentChargesRecuperationMode;
 use piteo_core::RentPaymentMethod;
 use piteo_core::TransactionType;
+use std::convert::TryFrom;
+use std::convert::TryInto;
 
 #[derive(async_graphql::InputObject)]
-pub struct UserWithAccountInput {
+#[graphql(name = "UserWithAccountInput")]
+pub struct CreateUserWithAccountInput {
     address: Option<AddressInput>,
     auth_id: AuthId,
     email: Email,
@@ -33,8 +37,8 @@ pub struct UserWithAccountInput {
     skip_create_customer: Option<bool>,
 }
 
-impl From<UserWithAccountInput> for piteo_core::auth::ops::UserWithAccountInput {
-    fn from(item: UserWithAccountInput) -> Self {
+impl From<CreateUserWithAccountInput> for piteo_lib::CreateUserWithAccountInput {
+    fn from(item: CreateUserWithAccountInput) -> Self {
         Self {
             auth_id: item.auth_id.into(),
             email: item.email.into(),
@@ -146,7 +150,8 @@ pub struct PropertyUpdateInput {
 }
 
 #[derive(async_graphql::InputObject)]
-pub struct TenantInput {
+#[graphql(name = "TenantInput")]
+pub struct CreateTenantInput {
     apl: Option<bool>,
     birthdate: Date,
     birthplace: Option<String>,
@@ -158,8 +163,8 @@ pub struct TenantInput {
     visale_id: Option<String>,
 }
 
-impl From<TenantInput> for piteo_core::tenants::ops::TenantInput {
-    fn from(item: TenantInput) -> Self {
+impl From<CreateTenantInput> for piteo_lib::CreateTenantInput {
+    fn from(item: CreateTenantInput) -> Self {
         Self {
             apl: item.apl,
             birthdate: item.birthdate.into(),
@@ -175,7 +180,8 @@ impl From<TenantInput> for piteo_core::tenants::ops::TenantInput {
 }
 
 #[derive(async_graphql::InputObject)]
-pub struct TenantUpdateInput {
+#[graphql(name = "TenantUpdateInput")]
+pub struct UpdateTenantInput {
     apl: Option<bool>,
     birthdate: Option<Date>,
     birthplace: Option<String>,
@@ -186,6 +192,25 @@ pub struct TenantUpdateInput {
     note: Option<String>,
     phone_number: Option<PhoneNumber>,
     visale_id: Option<String>,
+}
+
+impl TryFrom<UpdateTenantInput> for piteo_lib::UpdateTenantInput {
+    type Error = Error;
+
+    fn try_from(item: UpdateTenantInput) -> Result<Self, Self::Error> {
+        Ok(Self {
+            apl: item.apl,
+            birthdate: item.birthdate.map(Into::into),
+            birthplace: item.birthplace,
+            email: item.email.map(Into::into),
+            id: item.id.try_into()?,
+            first_name: item.first_name,
+            last_name: item.last_name,
+            note: item.note,
+            phone_number: item.phone_number.map(Into::into),
+            visale_id: item.visale_id,
+        })
+    }
 }
 
 #[derive(async_graphql::InputObject)]

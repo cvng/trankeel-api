@@ -1,12 +1,16 @@
-use crate::DbPool;
+use diesel::delete;
 use diesel::insert_into;
 use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::Pool;
 use diesel::update;
+use diesel::PgConnection;
 use piteo_core::database::AccountStore;
 use piteo_core::database::Db;
 use piteo_core::database::LenderStore;
 use piteo_core::database::TenantStore;
 use piteo_core::database::UserStore;
+use piteo_core::error::Context;
 use piteo_core::error::Error;
 use piteo_core::schema::account;
 use piteo_core::schema::lender;
@@ -22,6 +26,18 @@ use piteo_core::PersonData;
 use piteo_core::Tenant;
 use piteo_core::TenantData;
 use piteo_core::TenantId;
+
+/// Database pool.
+pub type DbPool = Pool<ConnectionManager<PgConnection>>;
+
+/// Build connection pool.
+pub fn build_connection_pool(database_url: &str) -> Result<DbPool, Error> {
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
+
+    Pool::builder()
+        .build(manager)
+        .context(format!("Error connecting to {}", database_url))
+}
 
 pub struct Database(DbPool);
 
@@ -106,10 +122,34 @@ impl TenantStore for DatabaseTenantStore<'_> {
         }
     }
 
-    fn create(&mut self, data: TenantData) -> Result<Tenant, Error> {
+    fn create(&mut self, data: Tenant) -> Result<Tenant, Error> {
         Ok(insert_into(tenant::table)
-            .values(data)
+            .values((
+                tenant::account_id.eq(data.account_id),
+                tenant::apl.eq(data.apl),
+                tenant::auth_id.eq(data.auth_id),
+                tenant::birthdate.eq(data.birthdate),
+                tenant::birthplace.eq(data.birthplace),
+                tenant::email.eq(data.email),
+                tenant::first_name.eq(data.first_name),
+                tenant::last_name.eq(data.last_name),
+                tenant::note.eq(data.note),
+                tenant::phone_number.eq(data.phone_number),
+                tenant::role.eq(data.role),
+                tenant::lease_id.eq(data.lease_id),
+                tenant::visale_id.eq(data.visale_id),
+            ))
             .get_result(&self.0.get()?)?)
+    }
+
+    fn update(&mut self, data: TenantData) -> Result<Tenant, Error> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    }
+
+    fn delete(&mut self, data: TenantId) -> Result<usize, Error> {
+        Ok(delete(tenant::table)
+            .filter(tenant::id.eq(data))
+            .execute(&self.0.get()?)?)
     }
 }
 

@@ -23,7 +23,7 @@ pub struct AddressInput {
 }
 
 #[derive(Clone, Validate)]
-pub struct UserWithAccountInput {
+pub struct CreateUserWithAccountInput {
     pub address: Option<AddressInput>,
     pub auth_id: AuthId,
     #[validate(email)]
@@ -38,7 +38,7 @@ pub struct UserWithAccountInput {
 pub async fn create_user_with_account(
     db: impl Db,
     payment_provider: impl PaymentProvider,
-    input: UserWithAccountInput,
+    input: CreateUserWithAccountInput,
 ) -> Result<Person, Error> {
     input.validate()?;
 
@@ -102,8 +102,8 @@ impl From<AddressInput> for Address {
     }
 }
 
-impl From<UserWithAccountInput> for PersonData {
-    fn from(item: UserWithAccountInput) -> Self {
+impl From<CreateUserWithAccountInput> for PersonData {
+    fn from(item: CreateUserWithAccountInput) -> Self {
         Self {
             address: item.address.map(Into::into),
             auth_id: item.auth_id,

@@ -1,4 +1,7 @@
+pub mod create_tenant;
+pub mod delete_tenant;
 pub mod ops;
+pub mod update_tenant;
 
 use crate::database::Db;
 use crate::AuthId;

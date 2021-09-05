@@ -1,58 +1,15 @@
 mod database;
+mod ops;
 mod payment;
 
-use crate::database::Database;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::Pool;
-use diesel::r2d2::PooledConnection;
-use diesel::PgConnection;
-use payment::Stripe;
-use piteo_core::auth;
-use piteo_core::auth::ops::UserWithAccountInput;
-use piteo_core::error::Context;
-use piteo_core::error::Error;
-use piteo_core::tenants;
-use piteo_core::tenants::ops::TenantInput;
-use piteo_core::AuthId;
-use piteo_core::Person;
-use piteo_core::Tenant;
-use piteo_core::TenantId;
-
-/// Database pool.
-pub type DbPool = Pool<ConnectionManager<PgConnection>>;
-
-/// Database connection.
-pub type Conn = PooledConnection<ConnectionManager<PgConnection>>;
-
-/// Build connection pool.
-pub fn build_connection_pool(database_url: &str) -> Result<DbPool, Error> {
-    let manager = ConnectionManager::<PgConnection>::new(database_url);
-
-    Pool::builder()
-        .build(manager)
-        .context(format!("Error connecting to {}", database_url))
-}
-
-pub fn all_tenants(
-    pool: DbPool,
-    auth_id: AuthId,
-    id: Option<TenantId>,
-) -> Result<Vec<Tenant>, Error> {
-    tenants::all_tenants(Database::new(pool), auth_id, id)
-}
-
-pub fn create_tenant(pool: DbPool, auth_id: AuthId, input: TenantInput) -> Result<Tenant, Error> {
-    tenants::ops::create_tenant(Database::new(pool), auth_id, input)
-}
-
-pub async fn create_user_with_account(
-    pool: DbPool,
-    input: UserWithAccountInput,
-) -> Result<Person, Error> {
-    auth::ops::create_user_with_account(Database::new(pool), Stripe::from_env()?, input).await
-}
-
-#[allow(dead_code)]
-fn wip() -> Error {
-    Error::msg("wip!()")
-}
+pub use crate::database::build_connection_pool;
+pub use crate::database::DbPool;
+pub use crate::ops::all_tenants;
+pub use crate::ops::create_tenant;
+pub use crate::ops::create_user_with_account;
+pub use crate::ops::delete_tenant;
+pub use crate::ops::update_tenant;
+pub use piteo_core::auth::create_user_with_account::CreateUserWithAccountInput;
+pub use piteo_core::tenants::create_tenant::CreateTenantInput;
+pub use piteo_core::tenants::delete_tenant::DeleteTenantInput;
+pub use piteo_core::tenants::update_tenant::UpdateTenantInput;
