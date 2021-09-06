@@ -31,6 +31,7 @@ use piteo_core::LeaseId;
 use piteo_core::LeaseTenant;
 use piteo_core::Lender;
 use piteo_core::LenderData;
+use piteo_core::LenderId;
 use piteo_core::Person;
 use piteo_core::PersonData;
 use piteo_core::Property;
@@ -118,25 +119,42 @@ impl AccountStore for DatabaseAccountStore<'_> {
             .map_err(|err| err.into())
     }
 
-    fn create(&mut self, data: AccountData) -> Result<Account> {
+    fn create(&mut self, data: Account) -> Result<Account> {
         Ok(insert_into(account::table)
-            .values(data)
+            .values((
+                account::plan_id.eq(data.plan_id),
+                account::status.eq(data.status),
+                account::stripe_customer_id.eq(data.stripe_customer_id),
+                account::stripe_subscription_id.eq(data.stripe_subscription_id),
+                account::trial_end.eq(data.trial_end),
+                account::owner_id.eq(data.owner_id),
+            ))
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: Account) -> Result<Account> {
+    fn update(&mut self, data: AccountData) -> Result<Account> {
         Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
     }
 }
 
 impl UserStore for DatabaseUserStore<'_> {
-    fn create(&mut self, data: PersonData) -> Result<Person> {
+    fn create(&mut self, data: Person) -> Result<Person> {
         Ok(insert_into(user::table)
-            .values(data)
+            .values((
+                user::auth_id.eq(data.auth_id),
+                user::email.eq(data.email),
+                user::first_name.eq(data.first_name),
+                user::last_name.eq(data.last_name),
+                user::address.eq(data.address),
+                user::photo_url.eq(data.photo_url),
+                user::role.eq(data.role),
+                user::phone_number.eq(data.phone_number),
+                user::account_id.eq(data.account_id),
+            ))
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: Person) -> Result<Person> {
+    fn update(&mut self, data: PersonData) -> Result<Person> {
         Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
     }
 }
@@ -189,10 +207,25 @@ impl TenantStore for DatabaseTenantStore<'_> {
 }
 
 impl LenderStore for DatabaseLenderStore<'_> {
-    fn create(&mut self, data: LenderData) -> Result<Lender> {
+    fn by_id(&mut self, id: LenderId) -> Result<Lender> {
+        lender::table
+            .find(id)
+            .first(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+
+    fn create(&mut self, data: Lender) -> Result<Lender> {
         Ok(insert_into(lender::table)
-            .values(data)
+            .values((
+                lender::account_id.eq(data.account_id),
+                lender::individual_id.eq(data.individual_id),
+                lender::company_id.eq(data.company_id),
+            ))
             .get_result(&self.0.get()?)?)
+    }
+
+    fn update(&mut self, data: LenderData) -> Result<Lender> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
     }
 }
 

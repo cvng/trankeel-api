@@ -7,7 +7,7 @@ use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::Address;
 use piteo_data::AuthId;
-use piteo_data::LenderData;
+use piteo_data::Lender;
 use piteo_data::Person;
 use piteo_data::PersonData;
 use validator::Validate;
@@ -45,24 +45,42 @@ pub async fn create_user_with_account(
     input.validate()?;
 
     // Create user.
-    let user = db.users().create(input.clone().into())?;
+    let user = db.users().create(Person {
+        id: Default::default(),
+        auth_id: input.auth_id,
+        email: input.email.clone(),
+        first_name: Some(input.first_name),
+        last_name: Some(input.last_name),
+        address: input.address.map(Into::into),
+        photo_url: None,
+        role: None,
+        phone_number: None,
+        account_id: None,
+    })?;
 
     // Create account.
-    let account = db.accounts().create(AccountData {
+    let account = db.accounts().create(Account {
+        id: Default::default(),
         owner_id: user.id.to_string(),
+        plan_id: None,
+        status: None,
+        stripe_customer_id: None,
+        stripe_subscription_id: None,
+        trial_end: None,
     })?;
 
     // Update user account.
-    let user = db.users().update(Person {
+    let user = db.users().update(PersonData {
         account_id: Some(account.id),
-        ..user
+        ..Default::default()
     })?;
 
     // Create lender.
-    let _lender = db.lenders().create(LenderData {
+    let _lender = db.lenders().create(Lender {
         account_id: account.id,
         individual_id: Some(user.id),
         company_id: None,
+        id: Default::default(),
     })?;
 
     if let Some(true) = input.skip_create_customer {
@@ -79,12 +97,12 @@ pub async fn create_user_with_account(
     );
 
     // Update the local customer data.
-    db.accounts().update(Account {
+    db.accounts().update(AccountData {
         stripe_customer_id: Some(subscription.customer_id),
         stripe_subscription_id: Some(subscription.id),
         status: Some(subscription.status),
         trial_end: subscription.trial_end,
-        ..account
+        ..Default::default()
     })?;
 
     Ok(user)
@@ -100,18 +118,6 @@ impl From<AddressInput> for Address {
             line1: Some(item.line1),
             line2: item.line2,
             postal_code: Some(item.postal_code),
-        }
-    }
-}
-
-impl From<CreateUserWithAccountInput> for PersonData {
-    fn from(item: CreateUserWithAccountInput) -> Self {
-        Self {
-            address: item.address.map(Into::into),
-            auth_id: item.auth_id,
-            email: item.email,
-            first_name: item.first_name,
-            last_name: item.last_name,
         }
     }
 }

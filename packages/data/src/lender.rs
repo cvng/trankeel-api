@@ -18,17 +18,19 @@ pub enum LenderIdentity {
     Company(Company),
 }
 
-#[derive(Clone, Queryable)]
+#[derive(Clone, Insertable, Queryable)]
+#[table_name = "lender"]
 pub struct Lender {
     pub id: LenderId,
-    pub account_id: Id,
-    pub individual_id: Option<Id>,
-    pub company_id: Option<Id>,
+    pub account_id: AccountId,
+    pub individual_id: Option<PersonId>,
+    pub company_id: Option<CompanyId>,
 }
 
-#[derive(Deserialize, Insertable)]
+#[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
 #[table_name = "lender"]
 pub struct LenderData {
+    pub id: LenderId,
     pub account_id: AccountId,
     pub individual_id: Option<PersonId>,
     pub company_id: Option<CompanyId>,

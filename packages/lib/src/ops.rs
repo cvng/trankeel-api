@@ -8,6 +8,8 @@ use piteo_core::leases;
 use piteo_core::leases::CreateFurnishedLeaseInput;
 use piteo_core::leases::DeleteLeaseInput;
 use piteo_core::leases::UpdateFurnishedLeaseInput;
+use piteo_core::owners;
+use piteo_core::owners::UpdateIndividualLenderInput;
 use piteo_core::properties;
 use piteo_core::properties::CreatePropertyInput;
 use piteo_core::properties::DeletePropertyInput;
@@ -19,6 +21,7 @@ use piteo_core::tenants::UpdateTenantInput;
 use piteo_core::AuthId;
 use piteo_core::Lease;
 use piteo_core::LeaseId;
+use piteo_core::Lender;
 use piteo_core::Person;
 use piteo_core::Property;
 use piteo_core::PropertyId;
@@ -114,4 +117,14 @@ pub fn update_furnished_lease(
 
 pub fn delete_lease(pool: DbPool, auth_id: AuthId, id: LeaseId) -> Result<LeaseId, Error> {
     leases::delete_lease(Database::new(pool), auth_id, DeleteLeaseInput { id })
+}
+
+// # Lenders
+
+pub fn update_individual_lender(
+    pool: DbPool,
+    auth_id: AuthId,
+    input: UpdateIndividualLenderInput,
+) -> Result<Lender, Error> {
+    owners::update_individual_lender(Database::new(pool), auth_id, input)
 }

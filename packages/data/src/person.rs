@@ -25,7 +25,7 @@ pub enum UserRole {
 #[derive(Clone, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct AuthId(String);
 
-#[derive(AsChangeset, Identifiable, Queryable)]
+#[derive(Clone, Insertable, Queryable)]
 #[table_name = "user"]
 pub struct Person {
     pub auth_id: AuthId,
@@ -40,14 +40,16 @@ pub struct Person {
     pub account_id: Option<Id>,
 }
 
-#[derive(Debug, Deserialize, Insertable)]
+#[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
 #[table_name = "user"]
 pub struct PersonData {
+    pub id: PersonId,
+    pub account_id: Option<Id>,
     pub address: Option<Address>,
-    pub auth_id: AuthId,
-    pub email: Email,
-    pub first_name: String,
-    pub last_name: String,
+    pub auth_id: Option<AuthId>,
+    pub email: Option<Email>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
 }
 
 // # Impls
