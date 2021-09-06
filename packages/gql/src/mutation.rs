@@ -15,10 +15,10 @@ use piteo::auth::AccountActivatePlanInput;
 use piteo::auth::AccountUpdateInput;
 use piteo::files::FileInput;
 use piteo::imports::ImportInput;
-use piteo::leases::LeaseFurnishedInput;
-use piteo::leases::LeaseFurnishedUpdateInput;
+use piteo::leases::CreateFurnishedLeaseInput;
 use piteo::leases::RentReceiptInput;
 use piteo::leases::TransactionInput;
+use piteo::leases::UpdateFurnishedLeaseInput;
 use piteo::owners::LenderIndividualUpdateInput;
 use piteo::AuthId;
 use piteo::CreatePropertyInput;
@@ -96,16 +96,30 @@ impl Mutation {
         Ok(piteo::delete_property(db_pool.clone(), auth_id.clone(), id.try_into()?)?.into())
     }
 
-    async fn lease_furnished_create(&self, _input: LeaseFurnishedInput) -> Result<Lease> {
-        Err(wip())
+    async fn lease_furnished_create(
+        &self,
+        ctx: &Context<'_>,
+        input: CreateFurnishedLeaseInput,
+    ) -> Result<Lease> {
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        Ok(piteo::create_furnished_lease(db_pool.clone(), auth_id.clone(), input)?.into())
     }
 
-    async fn lease_delete(&self, _id: ID) -> Result<ID> {
-        Err(wip())
+    async fn lease_furnished_update(
+        &self,
+        ctx: &Context<'_>,
+        input: UpdateFurnishedLeaseInput,
+    ) -> Result<Lease> {
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        Ok(piteo::update_furnished_lease(db_pool.clone(), auth_id.clone(), input)?.into())
     }
 
-    async fn lease_furnished_update(&self, _input: LeaseFurnishedUpdateInput) -> Result<Lease> {
-        Err(wip())
+    async fn lease_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        Ok(piteo::delete_lease(db_pool.clone(), auth_id.clone(), id.try_into()?)?.into())
     }
 
     async fn lender_individual_update(

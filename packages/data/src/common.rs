@@ -1,4 +1,5 @@
 use async_graphql::scalar;
+use chronoutil::delta;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt;
@@ -42,18 +43,29 @@ impl Display for Amount {
 pub struct DateTime(chrono::NaiveDateTime);
 
 impl DateTime {
+    pub fn from_timestamp(secs: i64, nsecs: u32) -> Self {
+        Self(chrono::NaiveDateTime::from_timestamp(secs, nsecs))
+    }
+
     pub fn inner(&self) -> chrono::NaiveDateTime {
         self.0
     }
 
-    pub fn from_timestamp(secs: i64, nsecs: u32) -> Self {
-        Self(chrono::NaiveDateTime::from_timestamp(secs, nsecs))
+    /// Shift a date by the given number of months. https://docs.rs/chronoutil/0.2.3
+    pub fn shift_months(&self, months: i32) -> DateTime {
+        delta::shift_months(self.inner(), months).into()
     }
 }
 
 impl Default for DateTime {
     fn default() -> Self {
         Self(chrono::NaiveDateTime::from_timestamp(0, 0))
+    }
+}
+
+impl From<chrono::NaiveDateTime> for DateTime {
+    fn from(item: chrono::NaiveDateTime) -> Self {
+        Self(item)
     }
 }
 

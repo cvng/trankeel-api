@@ -57,6 +57,14 @@ impl Db for InMemoryDb {
     fn properties(&self) -> Box<dyn PropertyStore + '_> {
         todo!()
     }
+
+    fn leases(&self) -> Box<dyn crate::database::LeaseStore + '_> {
+        todo!()
+    }
+
+    fn lease_tenants(&self) -> Box<dyn crate::database::LeaseTenantStore + '_> {
+        todo!()
+    }
 }
 
 impl AccountStore for InMemoryAccountStore {

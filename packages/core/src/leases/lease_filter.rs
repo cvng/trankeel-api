@@ -11,7 +11,7 @@ use piteo_data::Lease;
 pub fn all_leases(conn: &Conn, auth_id: &AuthId) -> Result<Vec<Lease>, Error> {
     lease::table
         .select(lease::all_columns)
-        .left_join(user::table.on(user::account_id.eq(lease::accountId.nullable())))
+        .left_join(user::table.on(user::account_id.eq(lease::account_id.nullable())))
         .filter(user::auth_id.eq(&auth_id.inner()))
         .load(conn)
         .map_err(|err| err.into())

@@ -45,27 +45,40 @@ table! {
 
 table! {
     lease (id) {
-        accountId -> Uuid,
-        depositAmount -> Nullable<Numeric>,
-        effectDate -> Timestamp,
-        signatureDate -> Nullable<Timestamp>,
-        rentAmount -> Numeric,
-        rentChargesAmount -> Nullable<Numeric>,
+        #[sql_name = "accountId"]
+        account_id -> Uuid,
+        #[sql_name = "depositAmount"]
+        deposit_amount -> Nullable<Numeric>,
+        #[sql_name = "effectDate"]
+        effect_date -> Timestamp,
+        #[sql_name = "signatureDate"]
+        signature_date -> Nullable<Timestamp>,
+        #[sql_name = "rentAmount"]
+        rent_amount -> Numeric,
+        #[sql_name = "rentChargesAmount"]
+        rent_charges_amount -> Nullable<Numeric>,
         #[sql_name = "type"]
         type_ -> Text,
-        leaseId -> Nullable<Uuid>,
-        propertyId -> Uuid,
+        #[sql_name = "leaseId"]
+        lease_id -> Nullable<Uuid>,
+        #[sql_name = "propertyId"]
+        property_id -> Uuid,
         id -> Uuid,
-        data -> Nullable<Jsonb>,
-        expiredAt -> Nullable<Timestamp>,
-        renewDate -> Nullable<Timestamp>,
+        #[sql_name = "data"]
+        details -> Nullable<Jsonb>,
+        #[sql_name = "expiredAt"]
+        expired_at -> Nullable<Timestamp>,
+        #[sql_name = "renewDate"]
+        renew_date -> Nullable<Timestamp>,
     }
 }
 
 table! {
-    leasetenant (leaseId, tenantId) {
-        leaseId -> Uuid,
-        tenantId -> Uuid,
+    leasetenant (lease_id, tenant_id) {
+        #[sql_name = "leaseId"]
+        lease_id -> Uuid,
+        #[sql_name = "tenantId"]
+        tenant_id -> Uuid,
     }
 }
 
@@ -212,11 +225,11 @@ table! {
 }
 
 joinable!(account -> plan (plan_id));
-joinable!(lease -> account (accountId));
-joinable!(lease -> file (leaseId));
-joinable!(lease -> property (propertyId));
-joinable!(leasetenant -> lease (leaseId));
-joinable!(leasetenant -> tenant (tenantId));
+joinable!(lease -> account (account_id));
+joinable!(lease -> file (lease_id));
+joinable!(lease -> property (property_id));
+joinable!(leasetenant -> lease (lease_id));
+joinable!(leasetenant -> tenant (tenant_id));
 joinable!(lender -> account (account_id));
 joinable!(property -> lender (lender_id));
 joinable!(rent -> lease (leaseId));
