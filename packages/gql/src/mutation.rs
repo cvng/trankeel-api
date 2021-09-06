@@ -124,9 +124,12 @@ impl Mutation {
 
     async fn lender_individual_update(
         &self,
-        _input: UpdateIndividualLenderInput,
+        ctx: &Context<'_>,
+        input: UpdateIndividualLenderInput,
     ) -> Result<Lender> {
-        Err(wip())
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        Ok(piteo::update_individual_lender(db_pool.clone(), auth_id.clone(), input)?.into())
     }
 
     async fn transaction_create(&self, _input: TransactionInput) -> Result<Transaction> {
