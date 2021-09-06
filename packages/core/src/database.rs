@@ -40,32 +40,33 @@ pub trait AccountStore {
 }
 
 pub trait UserStore {
-    fn create(&mut self, data: PersonData) -> Result<Person>;
-    fn update(&mut self, data: Person) -> Result<Person>;
+    fn create(&mut self, data: Person) -> Result<Person>;
+    fn update(&mut self, data: PersonData) -> Result<Person>;
 }
 
 pub trait LenderStore {
-    fn create(&mut self, data: LenderData) -> Result<Lender>;
+    fn create(&mut self, data: Lender) -> Result<Lender>;
+    fn update(&mut self, data: LenderData) -> Result<Lender>;
 }
 
 pub trait PropertyStore {
     fn all(&mut self, auth_id: AuthId, id: Option<PropertyId>) -> Result<Vec<Property>>;
     fn create(&mut self, data: Property) -> Result<Property>;
-    fn update(&mut self, data: PropertyData) -> Result<Property>;
     fn delete(&mut self, data: PropertyId) -> Result<Deleted>;
+    fn update(&mut self, data: PropertyData) -> Result<Property>;
 }
 
 pub trait TenantStore {
     fn all(&mut self, auth_id: AuthId, id: Option<TenantId>) -> Result<Vec<Tenant>>;
     fn create(&mut self, data: Tenant) -> Result<Tenant>;
-    fn update(&mut self, data: TenantData) -> Result<Tenant>;
     fn delete(&mut self, data: TenantId) -> Result<Deleted>;
+    fn update(&mut self, data: TenantData) -> Result<Tenant>;
 }
 
 pub trait LeaseStore {
     fn create(&mut self, data: Lease) -> Result<Lease>;
-    fn update(&mut self, data: LeaseData) -> Result<Lease>;
     fn delete(&mut self, data: LeaseId) -> Result<Deleted>;
+    fn update(&mut self, data: LeaseData) -> Result<Lease>;
 }
 
 pub trait LeaseTenantStore {
