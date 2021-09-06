@@ -3,6 +3,8 @@ use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::AuthId;
 use piteo_data::Lease;
+use piteo_data::LeaseData;
+use piteo_data::LeaseId;
 use piteo_data::LeaseTenant;
 use piteo_data::Lender;
 use piteo_data::LenderData;
@@ -62,6 +64,8 @@ pub trait TenantStore {
 
 pub trait LeaseStore {
     fn create(&mut self, data: Lease) -> Result<Lease>;
+    fn update(&mut self, data: LeaseData) -> Result<Lease>;
+    fn delete(&mut self, data: LeaseId) -> Result<Deleted>;
 }
 
 pub trait LeaseTenantStore {

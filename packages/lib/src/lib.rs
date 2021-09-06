@@ -81,13 +81,4 @@ pub use piteo_core::UserRole;
 
 pub use crate::database::build_connection_pool;
 pub use crate::database::DbPool;
-pub use crate::ops::all_properties;
-pub use crate::ops::all_tenants;
-pub use crate::ops::create_furnished_lease;
-pub use crate::ops::create_property;
-pub use crate::ops::create_tenant;
-pub use crate::ops::create_user_with_account;
-pub use crate::ops::delete_property;
-pub use crate::ops::delete_tenant;
-pub use crate::ops::update_property;
-pub use crate::ops::update_tenant;
+pub use crate::ops::*;

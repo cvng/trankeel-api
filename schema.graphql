@@ -272,8 +272,8 @@ type Mutation {
 	propertyUpdate(input: PropertyUpdateInput!): Property!
 	propertyDelete(id: ID!): ID!
 	leaseFurnishedCreate(input: LeaseFurnishedInput!): Lease!
-	leaseDelete(id: ID!): ID!
 	leaseFurnishedUpdate(input: LeaseFurnishedUpdateInput!): Lease!
+	leaseDelete(id: ID!): ID!
 	lenderIndividualUpdate(input: LenderIndividualUpdateInput!): Lender!
 	transactionCreate(input: TransactionInput!): Transaction!
 	transactionDelete(id: ID!): ID!

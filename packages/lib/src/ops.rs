@@ -6,6 +6,8 @@ use piteo_core::auth::CreateUserWithAccountInput;
 use piteo_core::error::Error;
 use piteo_core::leases;
 use piteo_core::leases::CreateFurnishedLeaseInput;
+use piteo_core::leases::DeleteLeaseInput;
+use piteo_core::leases::UpdateFurnishedLeaseInput;
 use piteo_core::properties;
 use piteo_core::properties::CreatePropertyInput;
 use piteo_core::properties::DeletePropertyInput;
@@ -16,6 +18,7 @@ use piteo_core::tenants::DeleteTenantInput;
 use piteo_core::tenants::UpdateTenantInput;
 use piteo_core::AuthId;
 use piteo_core::Lease;
+use piteo_core::LeaseId;
 use piteo_core::Person;
 use piteo_core::Property;
 use piteo_core::PropertyId;
@@ -99,4 +102,16 @@ pub fn create_furnished_lease(
     input: CreateFurnishedLeaseInput,
 ) -> Result<Lease, Error> {
     leases::create_furnished_lease(Database::new(pool), auth_id, input)
+}
+
+pub fn update_furnished_lease(
+    pool: DbPool,
+    auth_id: AuthId,
+    input: UpdateFurnishedLeaseInput,
+) -> Result<Lease, Error> {
+    leases::update_furnished_lease(Database::new(pool), auth_id, input)
+}
+
+pub fn delete_lease(pool: DbPool, auth_id: AuthId, id: LeaseId) -> Result<LeaseId, Error> {
+    leases::delete_lease(Database::new(pool), auth_id, DeleteLeaseInput { id })
 }

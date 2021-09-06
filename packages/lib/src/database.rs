@@ -26,6 +26,8 @@ use piteo_core::Account;
 use piteo_core::AccountData;
 use piteo_core::AuthId;
 use piteo_core::Lease;
+use piteo_core::LeaseData;
+use piteo_core::LeaseId;
 use piteo_core::LeaseTenant;
 use piteo_core::Lender;
 use piteo_core::LenderData;
@@ -269,6 +271,16 @@ impl LeaseStore for DatabaseLeaseStore<'_> {
                 lease::renew_date.eq(data.renew_date),
             ))
             .get_result(&self.0.get()?)?)
+    }
+
+    fn update(&mut self, data: LeaseData) -> Result<Lease> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    }
+
+    fn delete(&mut self, data: LeaseId) -> Result<Deleted> {
+        Ok(delete(lease::table)
+            .filter(lease::id.eq(data))
+            .execute(&self.0.get()?)?)
     }
 }
 

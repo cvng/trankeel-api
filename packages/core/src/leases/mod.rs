@@ -1,4 +1,5 @@
 mod lease_create;
+mod lease_delete;
 mod lease_filter;
 mod lease_update;
 mod payment_notice_send;
@@ -8,6 +9,7 @@ mod rent_receipt_create;
 mod transaction_create;
 
 pub use lease_create::*;
+pub use lease_delete::*;
 pub use lease_filter::*;
 pub use lease_update::*;
 pub use payment_notice_send::*;

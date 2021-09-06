@@ -3,8 +3,10 @@ use crate::schema::lease;
 use crate::schema::leasetenant;
 use crate::Amount;
 use crate::DateTime;
+use crate::FileId;
 use crate::FurnishedLeaseDetails;
 use crate::LenderId;
+use crate::PropertyId;
 use crate::TenantId;
 use async_graphql::Enum;
 use chrono::Utc;
@@ -43,6 +45,24 @@ pub struct Lease {
     pub lease_id: Option<Id>,
     pub property_id: Id,
     pub id: Id,
+    pub details: Option<FurnishedLeaseDetails>,
+    pub expired_at: Option<DateTime>,
+    pub renew_date: Option<DateTime>,
+}
+
+#[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
+#[table_name = "lease"]
+pub struct LeaseData {
+    pub id: LeaseId,
+    pub account_id: Option<Id>,
+    pub deposit_amount: Option<Amount>,
+    pub effect_date: Option<DateTime>,
+    pub signature_date: Option<DateTime>,
+    pub rent_amount: Option<Amount>,
+    pub rent_charges_amount: Option<Amount>,
+    pub type_: Option<LeaseType>,
+    pub lease_id: Option<FileId>,
+    pub property_id: Option<PropertyId>,
     pub details: Option<FurnishedLeaseDetails>,
     pub expired_at: Option<DateTime>,
     pub renew_date: Option<DateTime>,
