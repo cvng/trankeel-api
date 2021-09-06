@@ -118,13 +118,20 @@ impl AccountStore for DatabaseAccountStore<'_> {
             .map_err(|err| err.into())
     }
 
-    fn create(&mut self, data: AccountData) -> Result<Account> {
+    fn create(&mut self, data: Account) -> Result<Account> {
         Ok(insert_into(account::table)
-            .values(data)
+            .values((
+                account::plan_id.eq(data.plan_id),
+                account::status.eq(data.status),
+                account::stripe_customer_id.eq(data.stripe_customer_id),
+                account::stripe_subscription_id.eq(data.stripe_subscription_id),
+                account::trial_end.eq(data.trial_end),
+                account::owner_id.eq(data.owner_id),
+            ))
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: Account) -> Result<Account> {
+    fn update(&mut self, data: AccountData) -> Result<Account> {
         Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
     }
 }

@@ -35,8 +35,8 @@ pub trait Db {
 
 pub trait AccountStore {
     fn by_auth_id(&mut self, auth_id: AuthId) -> Result<Account>;
-    fn create(&mut self, data: AccountData) -> Result<Account>;
-    fn update(&mut self, data: Account) -> Result<Account>;
+    fn create(&mut self, data: Account) -> Result<Account>;
+    fn update(&mut self, data: AccountData) -> Result<Account>;
 }
 
 pub trait UserStore {

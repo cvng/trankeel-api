@@ -13,7 +13,7 @@ use serde::Deserialize;
 pub type AccountId = Id;
 
 /// https://stripe.com/docs/billing/subscriptions/overview#subscription-states
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 #[graphql(name = "SubscriptionStatus")]
 pub enum AccountStatus {
     Active,
@@ -25,7 +25,7 @@ pub enum AccountStatus {
     Unpaid,
 }
 
-#[derive(AsChangeset, Identifiable, Queryable)]
+#[derive(Clone, Insertable, Queryable)]
 #[table_name = "account"]
 pub struct Account {
     pub plan_id: Option<PlanId>,
@@ -37,10 +37,16 @@ pub struct Account {
     pub id: AccountId,
 }
 
-#[derive(Deserialize, Insertable)]
+#[derive(Deserialize, Default, AsChangeset, Identifiable, Insertable)]
 #[table_name = "account"]
 pub struct AccountData {
-    pub owner_id: String, // TODO: PersonId,
+    pub id: AccountId,
+    pub plan_id: Option<PlanId>,
+    pub status: Option<AccountStatus>,
+    pub stripe_customer_id: Option<CustomerId>,
+    pub stripe_subscription_id: Option<SubscriptionId>,
+    pub trial_end: Option<DateTime>,
+    pub owner_id: Option<String>, // TODO: PersonId,
 }
 
 // # Impls

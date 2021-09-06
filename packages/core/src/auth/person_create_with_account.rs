@@ -59,8 +59,14 @@ pub async fn create_user_with_account(
     })?;
 
     // Create account.
-    let account = db.accounts().create(AccountData {
+    let account = db.accounts().create(Account {
+        id: Default::default(),
         owner_id: user.id.to_string(),
+        plan_id: None,
+        status: None,
+        stripe_customer_id: None,
+        stripe_subscription_id: None,
+        trial_end: None,
     })?;
 
     // Update user account.
@@ -91,12 +97,12 @@ pub async fn create_user_with_account(
     );
 
     // Update the local customer data.
-    db.accounts().update(Account {
+    db.accounts().update(AccountData {
         stripe_customer_id: Some(subscription.customer_id),
         stripe_subscription_id: Some(subscription.id),
         status: Some(subscription.status),
         trial_end: subscription.trial_end,
-        ..account
+        ..Default::default()
     })?;
 
     Ok(user)
