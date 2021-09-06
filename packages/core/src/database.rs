@@ -8,6 +8,7 @@ use piteo_data::LeaseId;
 use piteo_data::LeaseTenant;
 use piteo_data::Lender;
 use piteo_data::LenderData;
+use piteo_data::LenderId;
 use piteo_data::Person;
 use piteo_data::PersonData;
 use piteo_data::Property;
@@ -45,6 +46,7 @@ pub trait UserStore {
 }
 
 pub trait LenderStore {
+    fn by_id(&mut self, id: LenderId) -> Result<Lender>;
     fn create(&mut self, data: Lender) -> Result<Lender>;
     fn update(&mut self, data: LenderData) -> Result<Lender>;
 }

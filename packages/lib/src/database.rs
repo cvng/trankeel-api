@@ -31,6 +31,7 @@ use piteo_core::LeaseId;
 use piteo_core::LeaseTenant;
 use piteo_core::Lender;
 use piteo_core::LenderData;
+use piteo_core::LenderId;
 use piteo_core::Person;
 use piteo_core::PersonData;
 use piteo_core::Property;
@@ -206,6 +207,13 @@ impl TenantStore for DatabaseTenantStore<'_> {
 }
 
 impl LenderStore for DatabaseLenderStore<'_> {
+    fn by_id(&mut self, id: LenderId) -> Result<Lender> {
+        lender::table
+            .find(id)
+            .first(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+
     fn create(&mut self, data: Lender) -> Result<Lender> {
         Ok(insert_into(lender::table)
             .values((

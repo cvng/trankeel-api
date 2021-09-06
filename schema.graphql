@@ -615,9 +615,9 @@ enum UserRole {
 	VIEWER
 }
 input UserUpdateInput {
-	address: AddressInput!
-	firstName: String!
-	lastName: String!
+	address: AddressInput
+	firstName: String
+	lastName: String
 }
 input UserWithAccountInput {
 	address: AddressInput

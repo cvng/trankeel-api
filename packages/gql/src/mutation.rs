@@ -19,7 +19,7 @@ use piteo::leases::CreateFurnishedLeaseInput;
 use piteo::leases::RentReceiptInput;
 use piteo::leases::TransactionInput;
 use piteo::leases::UpdateFurnishedLeaseInput;
-use piteo::owners::LenderIndividualUpdateInput;
+use piteo::owners::UpdateIndividualLenderInput;
 use piteo::AuthId;
 use piteo::CreatePropertyInput;
 use piteo::CreateTenantInput;
@@ -124,7 +124,7 @@ impl Mutation {
 
     async fn lender_individual_update(
         &self,
-        _input: LenderIndividualUpdateInput,
+        _input: UpdateIndividualLenderInput,
     ) -> Result<Lender> {
         Err(wip())
     }
