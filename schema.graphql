@@ -136,7 +136,7 @@ type LeaseFurnishedData {
 	rentComplementPropertyJustification: String
 	rentFirstAmount: Decimal
 	rentIrl: LeaseRentReferenceIrl
-	rentIrlRevisionDate: String
+	rentIrlRevisionDate: DateTime
 	rentMajDecreeIncreasedAmount: Decimal
 	rentMajDecreeReferenceAmount: Decimal
 	rentMajorationDecree: Boolean
@@ -154,8 +154,8 @@ type LeaseFurnishedData {
 	tenantFeeCapReportByMeter: Decimal
 	tenantFeeCapReportPrestations: Decimal
 	tenantLastRentAmount: Decimal
-	tenantLastRentReceivedDate: String
-	tenantLastRentRevisionDate: String
+	tenantLastRentReceivedDate: DateTime
+	tenantLastRentRevisionDate: DateTime
 	worksDecenceSinceLastRental: String
 	worksRentDecreaseTenant: String
 	worksRentIncreaseLender: String

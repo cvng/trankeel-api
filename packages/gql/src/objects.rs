@@ -169,7 +169,8 @@ pub struct Lease {
     lease_id: Option<ID>,
     property_id: ID,
     id: ID,
-    data: Option<LeaseFurnishedData>,
+    #[graphql(name = "data")]
+    details: Option<FurnishedLeaseDetails>,
     expired_at: Option<DateTime>,
     renew_date: Option<DateTime>,
     status: LeaseStatus,
@@ -192,11 +193,11 @@ impl From<piteo::Lease> for Lease {
             rent_amount: item.rent_amount.into(),
             rent_charges_amount: item.rent_charges_amount.map(Into::into),
             rent_full_amount: item.rent_full_amount().into(),
-            r#type: item.r#type,
+            r#type: item.type_,
             lease_id: item.lease_id.map(Into::into),
             property_id: item.property_id.into(),
             id: item.id.into(),
-            data: item.data.map(Into::into),
+            details: item.details.map(Into::into),
             expired_at: item.expired_at.map(Into::into),
             renew_date: item.renew_date.map(Into::into),
             rents: Some(Vec::new()),
@@ -209,7 +210,8 @@ impl From<piteo::Lease> for Lease {
 }
 
 #[derive(async_graphql::SimpleObject)]
-pub struct LeaseFurnishedData {
+#[graphql(name = "LeaseFurnishedData")]
+pub struct FurnishedLeaseDetails {
     charges_recuperation_mode: Option<RentChargesRecuperationMode>,
     charges_revision_method: Option<String>,
     colocation_insurance_lender: Option<bool>,
@@ -224,7 +226,7 @@ pub struct LeaseFurnishedData {
     rent_complement_property_justification: Option<String>,
     rent_first_amount: Option<Decimal>,
     rent_irl: Option<LeaseRentReferenceIrl>,
-    rent_irl_revision_date: Option<String>,
+    rent_irl_revision_date: Option<DateTime>,
     rent_maj_decree_increased_amount: Option<Decimal>,
     rent_maj_decree_reference_amount: Option<Decimal>,
     rent_majoration_decree: Option<bool>,
@@ -242,15 +244,15 @@ pub struct LeaseFurnishedData {
     tenant_fee_cap_report_by_meter: Option<Decimal>,
     tenant_fee_cap_report_prestations: Option<Decimal>,
     tenant_last_rent_amount: Option<Decimal>,
-    tenant_last_rent_received_date: Option<String>,
-    tenant_last_rent_revision_date: Option<String>,
+    tenant_last_rent_received_date: Option<DateTime>,
+    tenant_last_rent_revision_date: Option<DateTime>,
     works_decence_since_last_rental: Option<String>,
     works_rent_decrease_tenant: Option<String>,
     works_rent_increase_lender: Option<String>,
 }
 
-impl From<piteo::LeaseFurnishedData> for LeaseFurnishedData {
-    fn from(item: piteo::LeaseFurnishedData) -> Self {
+impl From<piteo::FurnishedLeaseDetails> for FurnishedLeaseDetails {
+    fn from(item: piteo::FurnishedLeaseDetails) -> Self {
         Self {
             charges_recuperation_mode: item.charges_recuperation_mode.map(Into::into),
             charges_revision_method: item.charges_revision_method,

@@ -2,6 +2,8 @@ use eyre::Error;
 use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::AuthId;
+use piteo_data::Lease;
+use piteo_data::LeaseTenant;
 use piteo_data::Lender;
 use piteo_data::LenderData;
 use piteo_data::Person;
@@ -25,6 +27,8 @@ pub trait Db {
     fn lenders(&self) -> Box<dyn LenderStore + '_>;
     fn tenants(&self) -> Box<dyn TenantStore + '_>;
     fn properties(&self) -> Box<dyn PropertyStore + '_>;
+    fn leases(&self) -> Box<dyn LeaseStore + '_>;
+    fn lease_tenants(&self) -> Box<dyn LeaseTenantStore + '_>;
 }
 
 pub trait AccountStore {
@@ -54,4 +58,12 @@ pub trait TenantStore {
     fn create(&mut self, data: Tenant) -> Result<Tenant>;
     fn update(&mut self, data: TenantData) -> Result<Tenant>;
     fn delete(&mut self, data: TenantId) -> Result<Deleted>;
+}
+
+pub trait LeaseStore {
+    fn create(&mut self, data: Lease) -> Result<Lease>;
+}
+
+pub trait LeaseTenantStore {
+    fn create(&mut self, data: LeaseTenant) -> Result<LeaseTenant>;
 }

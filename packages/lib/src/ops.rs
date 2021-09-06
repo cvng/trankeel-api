@@ -4,6 +4,8 @@ use crate::payment::Stripe;
 use piteo_core::auth;
 use piteo_core::auth::CreateUserWithAccountInput;
 use piteo_core::error::Error;
+use piteo_core::leases;
+use piteo_core::leases::CreateFurnishedLeaseInput;
 use piteo_core::properties;
 use piteo_core::properties::CreatePropertyInput;
 use piteo_core::properties::DeletePropertyInput;
@@ -13,6 +15,7 @@ use piteo_core::tenants::CreateTenantInput;
 use piteo_core::tenants::DeleteTenantInput;
 use piteo_core::tenants::UpdateTenantInput;
 use piteo_core::AuthId;
+use piteo_core::Lease;
 use piteo_core::Person;
 use piteo_core::Property;
 use piteo_core::PropertyId;
@@ -86,4 +89,14 @@ pub fn update_property(
 
 pub fn delete_property(pool: DbPool, auth_id: AuthId, id: PropertyId) -> Result<TenantId, Error> {
     properties::delete_property(Database::new(pool), auth_id, DeletePropertyInput { id })
+}
+
+// # Leases
+
+pub fn create_furnished_lease(
+    pool: DbPool,
+    auth_id: AuthId,
+    input: CreateFurnishedLeaseInput,
+) -> Result<Lease, Error> {
+    leases::create_furnished_lease(Database::new(pool), auth_id, input)
 }

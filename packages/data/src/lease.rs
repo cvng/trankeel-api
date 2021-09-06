@@ -1,13 +1,14 @@
 use crate::common::Id;
+use crate::schema::lease;
+use crate::schema::leasetenant;
 use crate::Amount;
 use crate::DateTime;
-use crate::LeaseFurnishedData;
+use crate::FurnishedLeaseDetails;
+use crate::LenderId;
+use crate::TenantId;
 use async_graphql::Enum;
 use chrono::Utc;
-use diesel::deserialize;
-use diesel::deserialize::FromSql;
-use diesel::pg::Pg;
-use diesel::sql_types::Text;
+use diesel_enum_derive::DieselEnum;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -15,21 +16,22 @@ use serde::Serialize;
 
 pub type LeaseId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LeaseStatus {
     Active,
     Ended,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum, FromSqlRow)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LeaseType {
     Furnished,
     Naked,
 }
 
-#[derive(Clone, Queryable)]
+#[derive(Clone, Insertable, Queryable)]
+#[table_name = "lease"]
 pub struct Lease {
     pub account_id: Id,
     pub deposit_amount: Option<Amount>,
@@ -37,13 +39,20 @@ pub struct Lease {
     pub signature_date: Option<DateTime>,
     pub rent_amount: Amount,
     pub rent_charges_amount: Option<Amount>,
-    pub r#type: LeaseType,
+    pub type_: LeaseType,
     pub lease_id: Option<Id>,
     pub property_id: Id,
     pub id: Id,
-    pub data: Option<LeaseFurnishedData>,
+    pub details: Option<FurnishedLeaseDetails>,
     pub expired_at: Option<DateTime>,
     pub renew_date: Option<DateTime>,
+}
+
+#[derive(Clone, Insertable, Queryable)]
+#[table_name = "leasetenant"]
+pub struct LeaseTenant {
+    pub lease_id: LenderId,
+    pub tenant_id: TenantId,
 }
 
 // # Impls
@@ -63,16 +72,6 @@ impl Lease {
     }
 }
 
-impl FromSql<Text, Pg> for LeaseType {
-    fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
-        match bytes {
-            Some(b"FURNISHED") => Ok(LeaseType::Furnished),
-            Some(b"NAKED") => Ok(LeaseType::Naked),
-            _ => Err("Unrecognized enum variant".into()),
-        }
-    }
-}
-
 // # Tests
 
 #[cfg(test)]
@@ -88,11 +87,11 @@ mod tests {
                 signature_date: Default::default(),
                 rent_amount: Default::default(),
                 rent_charges_amount: Default::default(),
-                r#type: LeaseType::Furnished,
+                type_: LeaseType::Furnished,
                 lease_id: Default::default(),
                 property_id: Default::default(),
                 id: Default::default(),
-                data: Default::default(),
+                details: Default::default(),
                 expired_at: Default::default(),
                 renew_date: Default::default(),
             }

@@ -7,6 +7,8 @@ use diesel::update;
 use diesel::PgConnection;
 use piteo_core::database::AccountStore;
 use piteo_core::database::Db;
+use piteo_core::database::LeaseStore;
+use piteo_core::database::LeaseTenantStore;
 use piteo_core::database::LenderStore;
 use piteo_core::database::PropertyStore;
 use piteo_core::database::TenantStore;
@@ -14,6 +16,8 @@ use piteo_core::database::UserStore;
 use piteo_core::error::Context;
 use piteo_core::error::Error;
 use piteo_core::schema::account;
+use piteo_core::schema::lease;
+use piteo_core::schema::leasetenant;
 use piteo_core::schema::lender;
 use piteo_core::schema::property;
 use piteo_core::schema::tenant;
@@ -21,6 +25,8 @@ use piteo_core::schema::user;
 use piteo_core::Account;
 use piteo_core::AccountData;
 use piteo_core::AuthId;
+use piteo_core::Lease;
+use piteo_core::LeaseTenant;
 use piteo_core::Lender;
 use piteo_core::LenderData;
 use piteo_core::Person;
@@ -60,6 +66,10 @@ pub struct DatabaseLenderStore<'a>(&'a DbPool);
 
 pub struct DatabasePropertyStore<'a>(&'a DbPool);
 
+pub struct DatabaseLeaseStore<'a>(&'a DbPool);
+
+pub struct DatabaseLeaseTenantStore<'a>(&'a DbPool);
+
 impl Database {
     pub fn new(pool: DbPool) -> Self {
         Self(pool)
@@ -75,7 +85,7 @@ impl Db for Database {
         Box::new(DatabaseUserStore(&self.0))
     }
 
-    fn lenders(&self) -> Box<dyn piteo_core::database::LenderStore + '_> {
+    fn lenders(&self) -> Box<dyn LenderStore + '_> {
         Box::new(DatabaseLenderStore(&self.0))
     }
 
@@ -83,8 +93,16 @@ impl Db for Database {
         Box::new(DatabaseTenantStore(&self.0))
     }
 
-    fn properties(&self) -> Box<dyn piteo_core::database::PropertyStore + '_> {
+    fn properties(&self) -> Box<dyn PropertyStore + '_> {
         Box::new(DatabasePropertyStore(&self.0))
+    }
+
+    fn leases(&self) -> Box<dyn LeaseStore + '_> {
+        Box::new(DatabaseLeaseStore(&self.0))
+    }
+
+    fn lease_tenants(&self) -> Box<dyn LeaseTenantStore + '_> {
+        Box::new(DatabaseLeaseTenantStore(&self.0))
     }
 }
 
@@ -230,5 +248,37 @@ impl PropertyStore for DatabasePropertyStore<'_> {
         Ok(delete(property::table)
             .filter(property::id.eq(data))
             .execute(&self.0.get()?)?)
+    }
+}
+
+impl LeaseStore for DatabaseLeaseStore<'_> {
+    fn create(&mut self, data: Lease) -> Result<Lease> {
+        Ok(insert_into(lease::table)
+            .values((
+                lease::account_id.eq(data.account_id),
+                lease::deposit_amount.eq(data.deposit_amount),
+                lease::effect_date.eq(data.effect_date),
+                lease::signature_date.eq(data.signature_date),
+                lease::rent_amount.eq(data.rent_amount),
+                lease::rent_charges_amount.eq(data.rent_charges_amount),
+                lease::type_.eq(data.type_),
+                lease::lease_id.eq(data.lease_id),
+                lease::property_id.eq(data.property_id),
+                lease::details.eq(data.details),
+                lease::expired_at.eq(data.expired_at),
+                lease::renew_date.eq(data.renew_date),
+            ))
+            .get_result(&self.0.get()?)?)
+    }
+}
+
+impl LeaseTenantStore for DatabaseLeaseTenantStore<'_> {
+    fn create(&mut self, data: LeaseTenant) -> Result<LeaseTenant> {
+        Ok(insert_into(leasetenant::table)
+            .values((
+                leasetenant::lease_id.eq(data.lease_id),
+                leasetenant::tenant_id.eq(data.tenant_id),
+            ))
+            .get_result(&self.0.get()?)?)
     }
 }
