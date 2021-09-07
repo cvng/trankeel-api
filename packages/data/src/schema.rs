@@ -8,7 +8,7 @@ table! {
         #[sql_name = "stripeSubscriptionId"]
         stripe_subscription_id -> Nullable<Text>,
         #[sql_name = "trialEnd"]
-        trial_end -> Nullable<Timestamp>,
+        trial_end -> Nullable<Timestamptz>,
         #[sql_name = "ownerId"]
         owner_id -> Text,
         id -> Uuid,
@@ -30,7 +30,7 @@ table! {
 
 table! {
     file (id) {
-        createdAt -> Nullable<Timestamp>,
+        createdAt -> Nullable<Timestamptz>,
         downloadUrl -> Nullable<Text>,
         externalId -> Nullable<Text>,
         filename -> Nullable<Text>,
@@ -38,7 +38,7 @@ table! {
         status -> Nullable<Text>,
         #[sql_name = "type"]
         type_ -> Text,
-        updatedAt -> Nullable<Timestamp>,
+        updatedAt -> Nullable<Timestamptz>,
         id -> Uuid,
     }
 }
@@ -50,9 +50,9 @@ table! {
         #[sql_name = "depositAmount"]
         deposit_amount -> Nullable<Numeric>,
         #[sql_name = "effectDate"]
-        effect_date -> Timestamp,
+        effect_date -> Timestamptz,
         #[sql_name = "signatureDate"]
-        signature_date -> Nullable<Timestamp>,
+        signature_date -> Nullable<Timestamptz>,
         #[sql_name = "rentAmount"]
         rent_amount -> Numeric,
         #[sql_name = "rentChargesAmount"]
@@ -67,9 +67,9 @@ table! {
         #[sql_name = "data"]
         details -> Nullable<Jsonb>,
         #[sql_name = "expiredAt"]
-        expired_at -> Nullable<Timestamp>,
+        expired_at -> Nullable<Timestamptz>,
         #[sql_name = "renewDate"]
-        renew_date -> Nullable<Timestamp>,
+        renew_date -> Nullable<Timestamptz>,
     }
 }
 
@@ -150,8 +150,8 @@ table! {
 table! {
     rent (id) {
         id -> Uuid,
-        periodEnd -> Timestamp,
-        periodStart -> Timestamp,
+        periodEnd -> Timestamptz,
+        periodStart -> Timestamptz,
         amount -> Numeric,
         chargesAmount -> Nullable<Numeric>,
         fullAmount -> Numeric,
@@ -171,7 +171,7 @@ table! {
         apl -> Bool,
         #[sql_name="authId"]
         auth_id -> Nullable<Text>,
-        birthdate -> Timestamp,
+        birthdate -> Timestamptz,
         birthplace -> Nullable<Text>,
         email -> Text,
         #[sql_name="firstName"]
@@ -195,7 +195,7 @@ table! {
         accountId -> Nullable<Uuid>,
         amount -> Numeric,
         leaseId -> Nullable<Uuid>,
-        date -> Timestamp,
+        date -> Timestamptz,
         label -> Nullable<Text>,
         #[sql_name = "type"]
         type_ -> Text,

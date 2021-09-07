@@ -1,4 +1,6 @@
 use async_graphql::scalar;
+use chrono::TimeZone;
+use chrono::Utc;
 use chronoutil::delta;
 use serde::Deserialize;
 use serde::Serialize;
@@ -40,14 +42,14 @@ impl Display for Amount {
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
-pub struct DateTime(chrono::NaiveDateTime);
+pub struct DateTime(chrono::DateTime<Utc>);
 
 impl DateTime {
     pub fn from_timestamp(secs: i64, nsecs: u32) -> Self {
-        Self(chrono::NaiveDateTime::from_timestamp(secs, nsecs))
+        Self(Utc.timestamp(secs, nsecs).into())
     }
 
-    pub fn inner(&self) -> chrono::NaiveDateTime {
+    pub fn inner(&self) -> chrono::DateTime<Utc> {
         self.0
     }
 
@@ -59,12 +61,12 @@ impl DateTime {
 
 impl Default for DateTime {
     fn default() -> Self {
-        Self(chrono::NaiveDateTime::from_timestamp(0, 0))
+        Self::from_timestamp(0, 0)
     }
 }
 
-impl From<chrono::NaiveDateTime> for DateTime {
-    fn from(item: chrono::NaiveDateTime) -> Self {
+impl From<chrono::DateTime<Utc>> for DateTime {
+    fn from(item: chrono::DateTime<Utc>) -> Self {
         Self(item)
     }
 }

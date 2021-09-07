@@ -84,7 +84,7 @@ impl Lease {
 
     pub fn status(&self) -> LeaseStatus {
         if let Some(expired_at) = self.expired_at {
-            if Utc::now() > chrono::DateTime::<Utc>::from_utc(expired_at.inner(), Utc) {
+            if Utc::now() > expired_at.inner() {
                 return LeaseStatus::Ended;
             }
         }
