@@ -11,6 +11,7 @@ use piteo_core::database::LeaseStore;
 use piteo_core::database::LeaseTenantStore;
 use piteo_core::database::LenderStore;
 use piteo_core::database::PropertyStore;
+use piteo_core::database::RentStore;
 use piteo_core::database::TenantStore;
 use piteo_core::database::UserStore;
 use piteo_core::error::Context;
@@ -20,6 +21,7 @@ use piteo_core::schema::lease;
 use piteo_core::schema::leasetenant;
 use piteo_core::schema::lender;
 use piteo_core::schema::property;
+use piteo_core::schema::rent;
 use piteo_core::schema::tenant;
 use piteo_core::schema::user;
 use piteo_core::Account;
@@ -37,6 +39,7 @@ use piteo_core::PersonData;
 use piteo_core::Property;
 use piteo_core::PropertyData;
 use piteo_core::PropertyId;
+use piteo_core::Rent;
 use piteo_core::Tenant;
 use piteo_core::TenantData;
 use piteo_core::TenantId;
@@ -73,6 +76,8 @@ pub struct DatabaseLeaseStore<'a>(&'a DbPool);
 
 pub struct DatabaseLeaseTenantStore<'a>(&'a DbPool);
 
+pub struct DatabaseRentStore<'a>(&'a DbPool);
+
 impl Database {
     pub fn new(pool: DbPool) -> Self {
         Self(pool)
@@ -106,6 +111,10 @@ impl Db for Database {
 
     fn lease_tenants(&self) -> Box<dyn LeaseTenantStore + '_> {
         Box::new(DatabaseLeaseTenantStore(&self.0))
+    }
+
+    fn rents(&self) -> Box<dyn RentStore + '_> {
+        Box::new(DatabaseRentStore(&self.0))
     }
 }
 
@@ -302,6 +311,7 @@ impl LeaseStore for DatabaseLeaseStore<'_> {
                 lease::details.eq(data.details),
                 lease::expired_at.eq(data.expired_at),
                 lease::renew_date.eq(data.renew_date),
+                lease::duration.eq(data.duration),
             ))
             .get_result(&self.0.get()?)?)
     }
@@ -325,5 +335,32 @@ impl LeaseTenantStore for DatabaseLeaseTenantStore<'_> {
                 leasetenant::tenant_id.eq(data.tenant_id),
             ))
             .get_result(&self.0.get()?)?)
+    }
+
+    fn create_many(&mut self, data: Vec<LeaseTenant>) -> Result<Vec<LeaseTenant>> {
+        data.iter().map(|item| self.create(item.clone())).collect()
+    }
+}
+
+impl RentStore for DatabaseRentStore<'_> {
+    fn create(&mut self, data: Rent) -> Result<Rent> {
+        Ok(insert_into(rent::table)
+            .values((
+                rent::period_end.eq(data.period_end),
+                rent::period_start.eq(data.period_start),
+                rent::amount.eq(data.amount),
+                rent::charges_amount.eq(data.charges_amount),
+                rent::full_amount.eq(data.full_amount),
+                rent::status.eq(data.status),
+                rent::lease_id.eq(data.lease_id),
+                rent::receipt_id.eq(data.receipt_id),
+                rent::transaction_id.eq(data.transaction_id),
+                rent::notice_id.eq(data.notice_id),
+            ))
+            .get_result(&self.0.get()?)?)
+    }
+
+    fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>> {
+        data.iter().map(|item| self.create(item.clone())).collect()
     }
 }

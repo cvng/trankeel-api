@@ -103,6 +103,7 @@ type Lease {
 	accountId: ID!
 	depositAmount: Decimal
 	effectDate: DateTime!
+	duration: LeaseFurnishedDuration!
 	signatureDate: DateTime
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
@@ -115,8 +116,8 @@ type Lease {
 	expiredAt: DateTime
 	renewDate: DateTime
 	status: LeaseStatus!
+	rents: [Rent!]!
 	lease: File
-	rents: [Rent!]
 	tenants: [Tenant!]!
 	account: Account
 	property: Property

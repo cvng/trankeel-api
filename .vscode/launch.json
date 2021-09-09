@@ -7,15 +7,15 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug executable 'piteo'",
+      "name": "Debug executable 'piteo-api'",
       "cargo": {
         "args": [
           "build",
-          "--bin=piteo",
-          "--package=piteo"
+          "--bin=piteo-api",
+          "--package=piteo-api"
         ],
         "filter": {
-          "name": "piteo",
+          "name": "piteo-api",
           "kind": "bin"
         }
       },

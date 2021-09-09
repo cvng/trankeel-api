@@ -70,6 +70,7 @@ table! {
         expired_at -> Nullable<Timestamptz>,
         #[sql_name = "renewDate"]
         renew_date -> Nullable<Timestamptz>,
+        duration -> Text,
     }
 }
 
@@ -150,17 +151,24 @@ table! {
 table! {
     rent (id) {
         id -> Uuid,
-        periodEnd -> Timestamptz,
-        periodStart -> Timestamptz,
+        #[sql_name="periodEnd"]
+        period_end -> Timestamptz,
+        #[sql_name="periodStart"]
+        period_start -> Timestamptz,
         amount -> Numeric,
-        chargesAmount -> Nullable<Numeric>,
-        fullAmount -> Numeric,
+        #[sql_name="chargesAmount"]
+        charges_amount -> Nullable<Numeric>,
+        #[sql_name="fullAmount"]
+        full_amount -> Numeric,
         status -> Text,
-        accountId -> Uuid,
-        leaseId -> Uuid,
-        receiptId -> Nullable<Uuid>,
-        transactionId -> Nullable<Uuid>,
-        noticeId -> Nullable<Uuid>,
+        #[sql_name="leaseId"]
+        lease_id -> Uuid,
+        #[sql_name="receiptId"]
+        receipt_id -> Nullable<Uuid>,
+        #[sql_name="transactionId"]
+        transaction_id -> Nullable<Uuid>,
+        #[sql_name="noticeId"]
+        notice_id -> Nullable<Uuid>,
     }
 }
 
@@ -192,9 +200,11 @@ table! {
 
 table! {
     transaction (id) {
-        accountId -> Nullable<Uuid>,
+        #[sql_name="accountId"]
+        account_id -> Nullable<Uuid>,
         amount -> Numeric,
-        leaseId -> Nullable<Uuid>,
+        #[sql_name="leaseId"]
+        lease_id -> Nullable<Uuid>,
         date -> Timestamptz,
         label -> Nullable<Text>,
         #[sql_name = "type"]
@@ -232,10 +242,10 @@ joinable!(leasetenant -> lease (lease_id));
 joinable!(leasetenant -> tenant (tenant_id));
 joinable!(lender -> account (account_id));
 joinable!(property -> lender (lender_id));
-joinable!(rent -> lease (leaseId));
-joinable!(rent -> transaction (transactionId));
+joinable!(rent -> lease (lease_id));
+joinable!(rent -> transaction (transaction_id));
 joinable!(tenant -> lease (lease_id));
-joinable!(transaction -> lease (leaseId));
+joinable!(transaction -> lease (lease_id));
 
 allow_tables_to_appear_in_same_query!(
     account,

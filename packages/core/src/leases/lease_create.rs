@@ -7,9 +7,11 @@ use piteo_data::AuthId;
 use piteo_data::DateTime;
 use piteo_data::FurnishedLeaseDetails;
 use piteo_data::Lease;
+use piteo_data::LeaseId;
 use piteo_data::LeaseTenant;
 use piteo_data::LeaseType;
 use piteo_data::PropertyId;
+use piteo_data::Rent;
 use piteo_data::TenantId;
 use validator::Validate;
 
@@ -49,16 +51,11 @@ pub fn create_furnished_lease(
         .and_then(|details| details.duration)
         .unwrap_or_default();
 
-    // Compute renew date.
-    let renew_date = input
-        .renew_date
-        .unwrap_or_else(|| input.effect_date.shift_months(duration.in_months()));
-
     let lease = db.leases().create(Lease {
         account_id: account.id,
         deposit_amount: input.deposit_amount,
         effect_date: input.effect_date,
-        renew_date: Some(renew_date),
+        duration,
         signature_date: input.signature_date,
         rent_amount: input.rent_amount,
         rent_charges_amount: input.rent_charges_amount,
@@ -68,15 +65,36 @@ pub fn create_furnished_lease(
         id: Default::default(),
         details: input.details.map(Into::into),
         expired_at: None,
+        renew_date: None,
     })?;
 
+    // Generate lease rents.
+    add_lease_rents(&db, &lease)?;
+
     // Affect created lease to existing tenants.
-    for tenant_id in input.tenant_ids {
-        db.lease_tenants().create(LeaseTenant {
-            lease_id: lease.id,
-            tenant_id,
-        })?;
-    }
+    add_lease_tenants(&db, lease.id, input.tenant_ids)?;
 
     Ok(lease)
+}
+
+// # Utils
+
+fn add_lease_rents(db: &impl Db, lease: &Lease) -> Result<Vec<Rent>, Error> {
+    db.rents().create_many(lease.rents())
+}
+
+fn add_lease_tenants(
+    db: &impl Db,
+    lease_id: LeaseId,
+    tenant_ids: Vec<TenantId>,
+) -> Result<Vec<LeaseTenant>, Error> {
+    db.lease_tenants().create_many(
+        tenant_ids
+            .iter()
+            .map(|&tenant_id| LeaseTenant {
+                lease_id,
+                tenant_id,
+            })
+            .collect(),
+    )
 }

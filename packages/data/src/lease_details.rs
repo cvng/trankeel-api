@@ -3,6 +3,7 @@ use crate::DateTime;
 use async_graphql::Enum;
 use async_graphql::InputObject;
 use diesel_as_jsonb::AsJsonb;
+use diesel_enum_derive::DieselEnum;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -12,7 +13,7 @@ pub enum LeaseDetails {
     FurnishedLeaseDetails(FurnishedLeaseDetails),
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
 pub enum LeaseFurnishedDuration {
     NineMonths,
     OneYear,
