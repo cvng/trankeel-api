@@ -37,7 +37,7 @@ pub struct Account {
     pub id: AccountId,
 }
 
-#[derive(Deserialize, Default, AsChangeset, Identifiable, Insertable)]
+#[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
 #[table_name = "account"]
 pub struct AccountData {
     pub id: AccountId,

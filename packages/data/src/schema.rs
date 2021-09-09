@@ -8,7 +8,7 @@ table! {
         #[sql_name = "stripeSubscriptionId"]
         stripe_subscription_id -> Nullable<Text>,
         #[sql_name = "trialEnd"]
-        trial_end -> Nullable<Timestamp>,
+        trial_end -> Nullable<Timestamptz>,
         #[sql_name = "ownerId"]
         owner_id -> Text,
         id -> Uuid,
@@ -30,7 +30,7 @@ table! {
 
 table! {
     file (id) {
-        createdAt -> Nullable<Timestamp>,
+        createdAt -> Nullable<Timestamptz>,
         downloadUrl -> Nullable<Text>,
         externalId -> Nullable<Text>,
         filename -> Nullable<Text>,
@@ -38,7 +38,7 @@ table! {
         status -> Nullable<Text>,
         #[sql_name = "type"]
         type_ -> Text,
-        updatedAt -> Nullable<Timestamp>,
+        updatedAt -> Nullable<Timestamptz>,
         id -> Uuid,
     }
 }
@@ -50,9 +50,9 @@ table! {
         #[sql_name = "depositAmount"]
         deposit_amount -> Nullable<Numeric>,
         #[sql_name = "effectDate"]
-        effect_date -> Timestamp,
+        effect_date -> Timestamptz,
         #[sql_name = "signatureDate"]
-        signature_date -> Nullable<Timestamp>,
+        signature_date -> Nullable<Timestamptz>,
         #[sql_name = "rentAmount"]
         rent_amount -> Numeric,
         #[sql_name = "rentChargesAmount"]
@@ -67,9 +67,10 @@ table! {
         #[sql_name = "data"]
         details -> Nullable<Jsonb>,
         #[sql_name = "expiredAt"]
-        expired_at -> Nullable<Timestamp>,
+        expired_at -> Nullable<Timestamptz>,
         #[sql_name = "renewDate"]
-        renew_date -> Nullable<Timestamp>,
+        renew_date -> Nullable<Timestamptz>,
+        duration -> Text,
     }
 }
 
@@ -150,17 +151,24 @@ table! {
 table! {
     rent (id) {
         id -> Uuid,
-        periodEnd -> Timestamp,
-        periodStart -> Timestamp,
+        #[sql_name="periodEnd"]
+        period_end -> Timestamptz,
+        #[sql_name="periodStart"]
+        period_start -> Timestamptz,
         amount -> Numeric,
-        chargesAmount -> Nullable<Numeric>,
-        fullAmount -> Numeric,
+        #[sql_name="chargesAmount"]
+        charges_amount -> Nullable<Numeric>,
+        #[sql_name="fullAmount"]
+        full_amount -> Numeric,
         status -> Text,
-        accountId -> Uuid,
-        leaseId -> Uuid,
-        receiptId -> Nullable<Uuid>,
-        transactionId -> Nullable<Uuid>,
-        noticeId -> Nullable<Uuid>,
+        #[sql_name="leaseId"]
+        lease_id -> Uuid,
+        #[sql_name="receiptId"]
+        receipt_id -> Nullable<Uuid>,
+        #[sql_name="transactionId"]
+        transaction_id -> Nullable<Uuid>,
+        #[sql_name="noticeId"]
+        notice_id -> Nullable<Uuid>,
     }
 }
 
@@ -171,7 +179,7 @@ table! {
         apl -> Bool,
         #[sql_name="authId"]
         auth_id -> Nullable<Text>,
-        birthdate -> Timestamp,
+        birthdate -> Timestamptz,
         birthplace -> Nullable<Text>,
         email -> Text,
         #[sql_name="firstName"]
@@ -192,10 +200,12 @@ table! {
 
 table! {
     transaction (id) {
-        accountId -> Nullable<Uuid>,
+        #[sql_name="accountId"]
+        account_id -> Nullable<Uuid>,
         amount -> Numeric,
-        leaseId -> Nullable<Uuid>,
-        date -> Timestamp,
+        #[sql_name="leaseId"]
+        lease_id -> Nullable<Uuid>,
+        date -> Timestamptz,
         label -> Nullable<Text>,
         #[sql_name = "type"]
         type_ -> Text,
@@ -232,10 +242,10 @@ joinable!(leasetenant -> lease (lease_id));
 joinable!(leasetenant -> tenant (tenant_id));
 joinable!(lender -> account (account_id));
 joinable!(property -> lender (lender_id));
-joinable!(rent -> lease (leaseId));
-joinable!(rent -> transaction (transactionId));
+joinable!(rent -> lease (lease_id));
+joinable!(rent -> transaction (transaction_id));
 joinable!(tenant -> lease (lease_id));
-joinable!(transaction -> lease (leaseId));
+joinable!(transaction -> lease (lease_id));
 
 allow_tables_to_appear_in_same_query!(
     account,

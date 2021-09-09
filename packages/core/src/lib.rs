@@ -37,6 +37,7 @@ pub use piteo_data::LeaseId;
 pub use piteo_data::LeaseNakedDuration;
 pub use piteo_data::LeaseRentPeriodicity;
 pub use piteo_data::LeaseRentReferenceIrl;
+pub use piteo_data::LeaseRents;
 pub use piteo_data::LeaseStatus;
 pub use piteo_data::LeaseTenant;
 pub use piteo_data::LeaseType;

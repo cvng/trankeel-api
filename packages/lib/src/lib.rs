@@ -41,6 +41,7 @@ pub use piteo_core::LeaseFurnishedDuration;
 pub use piteo_core::LeaseNakedDuration;
 pub use piteo_core::LeaseRentPeriodicity;
 pub use piteo_core::LeaseRentReferenceIrl;
+pub use piteo_core::LeaseRents;
 pub use piteo_core::LeaseStatus;
 pub use piteo_core::LeaseType;
 pub use piteo_core::LegalEntity;
@@ -79,6 +80,9 @@ pub use piteo_core::TenantStatus;
 pub use piteo_core::TransactionType;
 pub use piteo_core::UserRole;
 
+pub use piteo_core::database::Db;
+
 pub use crate::database::build_connection_pool;
+pub use crate::database::db;
 pub use crate::database::DbPool;
 pub use crate::ops::*;

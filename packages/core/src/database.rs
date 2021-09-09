@@ -5,6 +5,7 @@ use piteo_data::AuthId;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
 use piteo_data::LeaseId;
+use piteo_data::LeaseRents;
 use piteo_data::LeaseTenant;
 use piteo_data::Lender;
 use piteo_data::LenderData;
@@ -14,6 +15,7 @@ use piteo_data::PersonData;
 use piteo_data::Property;
 use piteo_data::PropertyData;
 use piteo_data::PropertyId;
+use piteo_data::Rent;
 use piteo_data::Tenant;
 use piteo_data::TenantData;
 use piteo_data::TenantId;
@@ -32,6 +34,7 @@ pub trait Db {
     fn properties(&self) -> Box<dyn PropertyStore + '_>;
     fn leases(&self) -> Box<dyn LeaseStore + '_>;
     fn lease_tenants(&self) -> Box<dyn LeaseTenantStore + '_>;
+    fn rents(&self) -> Box<dyn RentStore + '_>;
 }
 
 pub trait AccountStore {
@@ -73,4 +76,11 @@ pub trait LeaseStore {
 
 pub trait LeaseTenantStore {
     fn create(&mut self, data: LeaseTenant) -> Result<LeaseTenant>;
+    fn create_many(&mut self, data: Vec<LeaseTenant>) -> Result<Vec<LeaseTenant>>;
+}
+
+pub trait RentStore {
+    fn by_lease_id(&mut self, lease_id: LeaseId) -> Result<LeaseRents>;
+    fn create(&mut self, data: Rent) -> Result<Rent>;
+    fn create_many(&mut self, data: LeaseRents) -> Result<LeaseRents>;
 }
