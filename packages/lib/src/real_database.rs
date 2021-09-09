@@ -61,28 +61,23 @@ pub fn build_connection_pool(database_url: &str) -> Result<DbPool> {
         .context(format!("Error connecting to {}", database_url))
 }
 
-/// Access database instance.
-pub fn db(pool: DbPool) -> Database {
-    Database::new(pool)
-}
-
 pub struct Database(DbPool);
 
-pub struct DatabaseAccountStore<'a>(&'a DbPool);
+struct DatabaseAccountStore<'a>(&'a DbPool);
 
-pub struct DatabaseUserStore<'a>(&'a DbPool);
+struct DatabaseUserStore<'a>(&'a DbPool);
 
-pub struct DatabaseTenantStore<'a>(&'a DbPool);
+struct DatabaseTenantStore<'a>(&'a DbPool);
 
-pub struct DatabaseLenderStore<'a>(&'a DbPool);
+struct DatabaseLenderStore<'a>(&'a DbPool);
 
-pub struct DatabasePropertyStore<'a>(&'a DbPool);
+struct DatabasePropertyStore<'a>(&'a DbPool);
 
-pub struct DatabaseLeaseStore<'a>(&'a DbPool);
+struct DatabaseLeaseStore<'a>(&'a DbPool);
 
-pub struct DatabaseLeaseTenantStore<'a>(&'a DbPool);
+struct DatabaseLeaseTenantStore<'a>(&'a DbPool);
 
-pub struct DatabaseRentStore<'a>(&'a DbPool);
+struct DatabaseRentStore<'a>(&'a DbPool);
 
 impl Database {
     pub fn new(pool: DbPool) -> Self {

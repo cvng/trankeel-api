@@ -1,6 +1,6 @@
-use crate::database::Database;
-use crate::database::DbPool;
-use crate::payment::Stripe;
+use crate::real_database::Database;
+use crate::real_database::DbPool;
+use crate::real_payment::Stripe;
 use piteo_core::auth;
 use piteo_core::auth::CreateUserWithAccountInput;
 use piteo_core::error::Error;
@@ -27,6 +27,12 @@ use piteo_core::Property;
 use piteo_core::PropertyId;
 use piteo_core::Tenant;
 use piteo_core::TenantId;
+
+// # Database
+
+pub fn db(pool: DbPool) -> Database {
+    Database::new(pool)
+}
 
 // # Auth
 
