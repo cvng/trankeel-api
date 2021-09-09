@@ -23,6 +23,8 @@ use serde::Serialize;
 
 pub type LeaseId = Id;
 
+pub type LeaseRents = Vec<Rent>;
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
 pub enum LeaseStatus {
     Active,
@@ -95,7 +97,7 @@ impl Lease {
         LeaseStatus::Active
     }
 
-    pub fn rents(&self) -> Vec<Rent> {
+    pub fn rents(&self) -> LeaseRents {
         let effect_date = self.effect_date;
         let duration_in_months = self.duration.in_months() as usize;
 

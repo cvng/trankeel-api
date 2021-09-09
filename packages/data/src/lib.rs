@@ -51,6 +51,7 @@ pub use crate::import::ImportSource;
 pub use crate::lease::Lease;
 pub use crate::lease::LeaseData;
 pub use crate::lease::LeaseId;
+pub use crate::lease::LeaseRents;
 pub use crate::lease::LeaseStatus;
 pub use crate::lease::LeaseTenant;
 pub use crate::lease::LeaseType;

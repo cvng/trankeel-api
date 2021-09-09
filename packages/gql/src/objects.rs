@@ -11,6 +11,7 @@ use async_graphql::*;
 use piteo::auth;
 use piteo::owners;
 use piteo::AccountStatus;
+use piteo::Db;
 use piteo::DbPool;
 use piteo::FileStatus;
 use piteo::FileType;
@@ -156,58 +157,85 @@ pub struct Invoice {
     plan_code: PlanCode,
 }
 
-#[derive(async_graphql::SimpleObject)]
-pub struct Lease {
-    account_id: ID,
-    deposit_amount: Option<Decimal>,
-    effect_date: DateTime,
-    duration: LeaseFurnishedDuration,
-    signature_date: Option<DateTime>,
-    rent_amount: Decimal,
-    rent_charges_amount: Option<Decimal>,
-    rent_full_amount: Decimal,
-    r#type: LeaseType,
-    lease_id: Option<ID>,
-    property_id: ID,
-    id: ID,
+pub struct Lease(piteo::Lease);
+
+#[async_graphql::Object]
+impl Lease {
+    async fn account_id(&self) -> ID {
+        self.0.account_id.into()
+    }
+    async fn deposit_amount(&self) -> Option<Decimal> {
+        self.0.deposit_amount.map(Into::into)
+    }
+    async fn effect_date(&self) -> DateTime {
+        self.0.effect_date.into()
+    }
+    async fn duration(&self) -> LeaseFurnishedDuration {
+        self.0.duration
+    }
+    async fn signature_date(&self) -> Option<DateTime> {
+        self.0.signature_date.map(Into::into)
+    }
+    async fn rent_amount(&self) -> Decimal {
+        self.0.rent_amount.into()
+    }
+    async fn rent_charges_amount(&self) -> Option<Decimal> {
+        self.0.rent_charges_amount.map(Into::into)
+    }
+    async fn rent_full_amount(&self) -> Decimal {
+        self.0.rent_full_amount().into()
+    }
+    async fn r#type(&self) -> LeaseType {
+        self.0.type_
+    }
+    async fn lease_id(&self) -> Option<ID> {
+        self.0.lease_id.map(Into::into)
+    }
+    async fn property_id(&self) -> ID {
+        self.0.property_id.into()
+    }
+    async fn id(&self) -> ID {
+        self.0.id.into()
+    }
     #[graphql(name = "data")]
-    details: Option<FurnishedLeaseDetails>,
-    expired_at: Option<DateTime>,
-    renew_date: Option<DateTime>,
-    status: LeaseStatus,
-    rents: Vec<Rent>,
-    //
-    lease: Option<File>,
-    tenants: Vec<Tenant>,
-    account: Option<Account>,
-    property: Option<Property>,
+    async fn details(&self) -> Option<FurnishedLeaseDetails> {
+        self.0.details.clone().map(Into::into)
+    }
+    async fn expired_at(&self) -> Option<DateTime> {
+        self.0.expired_at.map(Into::into)
+    }
+    async fn renew_date(&self) -> Option<DateTime> {
+        self.0.renew_date.map(Into::into)
+    }
+    async fn status(&self) -> LeaseStatus {
+        self.0.status()
+    }
+    async fn rents(&self, ctx: &Context<'_>) -> Result<Vec<Rent>> {
+        let pool = ctx.data::<DbPool>()?;
+        Ok(piteo::db(pool.clone())
+            .rents()
+            .by_lease_id(self.0.id)?
+            .into_iter()
+            .map(Into::into)
+            .collect::<Vec<_>>())
+    }
+    async fn lease(&self) -> Option<File> {
+        None
+    }
+    async fn tenants(&self) -> Vec<Tenant> {
+        Vec::new()
+    }
+    async fn account(&self) -> Option<Account> {
+        None
+    }
+    async fn property(&self) -> Option<Property> {
+        None
+    }
 }
 
 impl From<piteo::Lease> for Lease {
     fn from(item: piteo::Lease) -> Self {
-        Self {
-            status: item.status(),
-            account_id: item.account_id.into(),
-            deposit_amount: item.deposit_amount.map(Into::into),
-            effect_date: item.effect_date.into(),
-            duration: item.duration,
-            signature_date: item.signature_date.map(Into::into),
-            rent_amount: item.rent_amount.into(),
-            rent_charges_amount: item.rent_charges_amount.map(Into::into),
-            rent_full_amount: item.rent_full_amount().into(),
-            r#type: item.type_,
-            lease_id: item.lease_id.map(Into::into),
-            property_id: item.property_id.into(),
-            id: item.id.into(),
-            rents: item.rents().into_iter().map(Into::into).collect(),
-            details: item.details.map(Into::into),
-            expired_at: item.expired_at.map(Into::into),
-            renew_date: item.renew_date.map(Into::into),
-            tenants: Vec::new(),
-            lease: None,
-            account: None,
-            property: None,
-        }
+        Self(item)
     }
 }
 

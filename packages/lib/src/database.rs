@@ -30,6 +30,7 @@ use piteo_core::AuthId;
 use piteo_core::Lease;
 use piteo_core::LeaseData;
 use piteo_core::LeaseId;
+use piteo_core::LeaseRents;
 use piteo_core::LeaseTenant;
 use piteo_core::Lender;
 use piteo_core::LenderData;
@@ -58,6 +59,11 @@ pub fn build_connection_pool(database_url: &str) -> Result<DbPool> {
     Pool::builder()
         .build(manager)
         .context(format!("Error connecting to {}", database_url))
+}
+
+/// Access database instance.
+pub fn db(pool: DbPool) -> Database {
+    Database::new(pool)
 }
 
 pub struct Database(DbPool);
@@ -343,6 +349,13 @@ impl LeaseTenantStore for DatabaseLeaseTenantStore<'_> {
 }
 
 impl RentStore for DatabaseRentStore<'_> {
+    fn by_lease_id(&mut self, lease_id: LeaseId) -> Result<LeaseRents> {
+        rent::table
+            .filter(rent::lease_id.eq(&lease_id))
+            .load(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+
     fn create(&mut self, data: Rent) -> Result<Rent> {
         Ok(insert_into(rent::table)
             .values((
@@ -360,7 +373,7 @@ impl RentStore for DatabaseRentStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
-    fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>> {
+    fn create_many(&mut self, data: LeaseRents) -> Result<LeaseRents> {
         data.iter().map(|item| self.create(item.clone())).collect()
     }
 }

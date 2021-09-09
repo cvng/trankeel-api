@@ -5,6 +5,7 @@ use piteo_data::AuthId;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
 use piteo_data::LeaseId;
+use piteo_data::LeaseRents;
 use piteo_data::LeaseTenant;
 use piteo_data::Lender;
 use piteo_data::LenderData;
@@ -79,6 +80,7 @@ pub trait LeaseTenantStore {
 }
 
 pub trait RentStore {
+    fn by_lease_id(&mut self, lease_id: LeaseId) -> Result<LeaseRents>;
     fn create(&mut self, data: Rent) -> Result<Rent>;
-    fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>>;
+    fn create_many(&mut self, data: LeaseRents) -> Result<LeaseRents>;
 }
