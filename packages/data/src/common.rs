@@ -1,8 +1,14 @@
+use crate::FileId;
+
 pub(crate) type Id = uuid::Uuid;
+
+pub type ExternalId = String; // ID of an external service
 
 pub type Email = String;
 
 pub type PhoneNumber = String;
+
+pub type Url = String;
 
 pub trait LegalEntity {}
 
@@ -28,4 +34,8 @@ pub trait Name {
             .trim()
             .to_string()
     }
+}
+
+pub trait Attachable {
+    fn to_filename(&self, file_id: &FileId) -> String;
 }

@@ -11,9 +11,6 @@ use crate::query::Query;
 use async_graphql::extensions::ApolloTracing;
 use async_graphql::EmptySubscription;
 use async_graphql::Schema;
-use piteo::error::Context;
-use piteo::DbPool;
-use std::env;
 use std::fs::File;
 use std::io::Write;
 
@@ -26,7 +23,7 @@ pub type PiteoSchema = Schema<Query, Mutation, EmptySubscription>;
 
 /// Build Piteo GraphQL schema. https://async-graphql.github.io
 pub fn build_schema() -> Result<PiteoSchema> {
-    let db_pool = db_pool_from_env()?;
+    let db_pool = piteo::db_pool_from_env()?;
 
     let schema = Schema::build(Query, Mutation, EmptySubscription)
         .extension(ApolloTracing)
@@ -47,13 +44,6 @@ pub fn write_schema() -> Result<()> {
     println!("💫 GraphQL schema printed at {}", path);
 
     Ok(())
-}
-
-/// Build database pool from env.
-fn db_pool_from_env() -> Result<DbPool> {
-    let database_url = env::var("DATABASE_URL").context("DATABASE_URL must be set.")?;
-
-    piteo::build_connection_pool(&database_url)
 }
 
 fn wip() -> async_graphql::Error {

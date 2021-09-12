@@ -1,4 +1,5 @@
 use crate::objects::Account;
+use crate::objects::Error;
 use crate::objects::File;
 use crate::objects::Lease;
 use crate::objects::Lender;
@@ -7,6 +8,7 @@ use crate::objects::Property;
 use crate::objects::Task;
 use crate::objects::Tenant;
 use crate::objects::Transaction;
+use crate::query::map_res;
 use crate::wip;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -17,7 +19,7 @@ use piteo::auth::CreateUserWithAccountInput;
 use piteo::files::FileInput;
 use piteo::imports::ImportInput;
 use piteo::leases::CreateFurnishedLeaseInput;
-use piteo::leases::RentReceiptInput;
+use piteo::leases::CreateReceiptsInput;
 use piteo::leases::TransactionInput;
 use piteo::leases::UpdateFurnishedLeaseInput;
 use piteo::owners::UpdateIndividualLenderInput;
@@ -148,14 +150,31 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn rent_receipt_create(&self, _input: RentReceiptInput) -> Result<RentReceiptPayload> {
-        Err(wip())
+    async fn create_receipts(
+        &self,
+        ctx: &Context<'_>,
+        input: CreateReceiptsInput,
+    ) -> Result<CreateReceiptsPayload> {
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        match piteo::create_receipts(db_pool.clone(), auth_id.clone(), input) {
+            Ok(receipts) => Ok(CreateReceiptsPayload {
+                receipts: Some(map_res(receipts)?),
+                errors: None,
+            }),
+            Err(err) => Ok(CreateReceiptsPayload {
+                receipts: None,
+                errors: Some(vec![err.into()]),
+            }),
+        }
     }
 }
 
 // # Payloads
 
 #[derive(async_graphql::SimpleObject)]
-struct RentReceiptPayload {
-    receipt: File,
+#[graphql(name = "RentReceiptPayload")]
+struct CreateReceiptsPayload {
+    errors: Option<Vec<Error>>,
+    receipts: Option<Vec<File>>,
 }

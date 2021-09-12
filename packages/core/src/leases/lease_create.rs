@@ -8,10 +8,10 @@ use piteo_data::DateTime;
 use piteo_data::FurnishedLeaseDetails;
 use piteo_data::Lease;
 use piteo_data::LeaseId;
-use piteo_data::LeaseRents;
 use piteo_data::LeaseTenant;
 use piteo_data::LeaseType;
 use piteo_data::PropertyId;
+use piteo_data::Rent;
 use piteo_data::TenantId;
 use validator::Validate;
 
@@ -79,7 +79,7 @@ pub fn create_furnished_lease(
 
 // # Utils
 
-fn add_lease_rents(db: &impl Db, lease: &Lease) -> Result<LeaseRents, Error> {
+fn add_lease_rents(db: &impl Db, lease: &Lease) -> Result<Vec<Rent>, Error> {
     db.rents().create_many(lease.rents())
 }
 

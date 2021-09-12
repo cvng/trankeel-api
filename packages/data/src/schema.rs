@@ -30,15 +30,20 @@ table! {
 
 table! {
     file (id) {
-        createdAt -> Nullable<Timestamptz>,
-        downloadUrl -> Nullable<Text>,
-        externalId -> Nullable<Text>,
+        #[sql_name = "createdAt"]
+        created_at -> Nullable<Timestamptz>,
+        #[sql_name = "downloadUrl"]
+        download_url -> Nullable<Text>,
+        #[sql_name = "externalId"]
+        external_id -> Nullable<Text>,
         filename -> Nullable<Text>,
-        previewUrl -> Nullable<Text>,
+        #[sql_name = "previewUrl"]
+        preview_url -> Nullable<Text>,
         status -> Nullable<Text>,
         #[sql_name = "type"]
         type_ -> Text,
-        updatedAt -> Nullable<Timestamptz>,
+        #[sql_name = "updatedAt"]
+        updated_at -> Nullable<Timestamptz>,
         id -> Uuid,
     }
 }

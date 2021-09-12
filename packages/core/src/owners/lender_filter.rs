@@ -18,15 +18,15 @@ pub fn get_identity(conn: &Conn, id: LenderId) -> Result<LenderIdentity, Error> 
             individual_id: Some(individual_id),
             ..
         } => {
-            let individual = auth::person_by_id(conn, &individual_id)?;
-            Ok(LenderIdentity::Individual(individual))
+            let person = auth::person_by_id(conn, &individual_id)?;
+            Ok(LenderIdentity::Individual(lender, person))
         }
         Lender {
             company_id: Some(company_id),
             ..
         } => {
             let company = companies::find(conn, &company_id)?;
-            Ok(LenderIdentity::Company(company))
+            Ok(LenderIdentity::Company(lender, company))
         }
         _ => Err(Error::msg("Identity not found")),
     }

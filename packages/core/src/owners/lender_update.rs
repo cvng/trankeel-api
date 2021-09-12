@@ -7,6 +7,7 @@ use eyre::Error;
 use piteo_data::AuthId;
 use piteo_data::Lender;
 use piteo_data::LenderId;
+use piteo_data::LenderIdentity;
 use piteo_data::PersonData;
 use validator::Validate;
 
@@ -45,18 +46,18 @@ pub fn update_individual_lender(
 
     let lender = db.lenders().by_id(input.id)?;
 
-    let individual_id = match lender.individual_id {
-        Some(individual_id) => individual_id,
-        None => return Err(err!("Lender is not an individual")),
+    let person = match &lender {
+        LenderIdentity::Individual(_, person) => person,
+        _ => return Err(err!("Lender is not an individual")),
     };
 
     db.users().update(PersonData {
-        id: individual_id,
+        id: person.id,
         address: input.individual.address.map(Into::into),
         first_name: input.individual.first_name,
         last_name: input.individual.last_name,
         ..Default::default()
     })?;
 
-    Ok(lender)
+    Ok(lender.into())
 }

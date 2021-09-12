@@ -42,6 +42,19 @@ use std::convert::TryInto;
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_complex_object.html
 
 #[derive(async_graphql::SimpleObject)]
+pub struct Error {
+    message: String,
+}
+
+impl From<piteo::error::Error> for Error {
+    fn from(item: piteo::error::Error) -> Self {
+        Self {
+            message: item.to_string(),
+        }
+    }
+}
+
+#[derive(async_graphql::SimpleObject)]
 #[graphql(complex)]
 pub struct Account {
     plan_id: Option<ID>,
@@ -135,7 +148,7 @@ pub struct Feature {
 
 #[derive(async_graphql::SimpleObject)]
 pub struct File {
-    created_at: DateTime,
+    created_at: Option<DateTime>,
     download_url: Option<String>,
     external_id: Option<String>,
     filename: Option<String>,
@@ -144,6 +157,22 @@ pub struct File {
     r#type: FileType,
     updated_at: Option<DateTime>,
     id: ID,
+}
+
+impl From<piteo::File> for File {
+    fn from(item: piteo::File) -> Self {
+        Self {
+            created_at: item.created_at.map(Into::into),
+            download_url: item.download_url,
+            external_id: item.external_id,
+            filename: item.filename,
+            preview_url: item.preview_url,
+            status: item.status,
+            r#type: item.type_,
+            updated_at: item.updated_at.map(Into::into),
+            id: item.id.into(),
+        }
+    }
 }
 
 #[derive(async_graphql::SimpleObject)]
