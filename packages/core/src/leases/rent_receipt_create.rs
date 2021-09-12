@@ -2,7 +2,7 @@ use crate::database::Db;
 use crate::documents::ReceiptDocument;
 use crate::mailer::Mailer;
 use crate::messages::ReceiptMail;
-use crate::pdfmaker::PdfMaker;
+use crate::pdfmaker::Pdfmaker;
 use async_graphql::InputObject;
 use chrono::Utc;
 use diesel::result::Error::NotFound;
@@ -35,7 +35,7 @@ pub struct SendReceiptsInput {
 
 pub fn create_receipts(
     db: &impl Db,
-    pdfmaker: &impl PdfMaker,
+    pdfmaker: &impl Pdfmaker,
     input: CreateReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
     input.validate()?;
@@ -95,7 +95,7 @@ fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>, Error>
 
 fn generate_receipts(
     db: &impl Db,
-    pdfmaker: &impl PdfMaker,
+    pdfmaker: &impl Pdfmaker,
     rents: Vec<Rent>,
 ) -> Result<Vec<Receipt>, Error> {
     let receipts = rents

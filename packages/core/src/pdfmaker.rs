@@ -10,7 +10,7 @@ pub type DocumentTemplateId = ExternalId;
 
 pub type DocumentId = ExternalId;
 
-pub trait PdfMaker {
+pub trait Pdfmaker {
     fn generate(&self, document: impl IntoDocument) -> Result<Document, Error>;
 }
 

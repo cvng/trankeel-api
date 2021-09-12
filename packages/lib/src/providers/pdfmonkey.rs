@@ -1,17 +1,17 @@
 use eyre::Error;
 use piteo_core::pdfmaker::Document;
 use piteo_core::pdfmaker::IntoDocument;
-use piteo_core::pdfmaker::PdfMaker;
+use piteo_core::pdfmaker::Pdfmaker;
 
-pub struct DocMaker;
+pub struct Pdfmonkey;
 
-impl DocMaker {
+impl Pdfmonkey {
     pub fn new() -> Self {
         Self
     }
 }
 
-impl PdfMaker for DocMaker {
+impl Pdfmaker for Pdfmonkey {
     fn generate(&self, document: impl IntoDocument) -> Result<Document, Error> {
         println!("PdfMaker.generate: {:?}", document);
 
