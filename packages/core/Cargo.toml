@@ -8,7 +8,9 @@ edition = "2018"
 [dependencies]
 async-graphql = { version = "2.9.10", git = "https://github.com/async-graphql/async-graphql", features = ["uuid"] }
 async-trait = "0.1.51"
+chrono = "0.4.19"
 diesel = { version = "1.4.7", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }
+erased-serde = "0.3"
 eyre = "0.6.5"
 log = "0.4.14"
 piteo-data = { path = "../data" }

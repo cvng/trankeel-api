@@ -13,6 +13,6 @@ color-eyre = "0.5.11"
 jsonwebtoken = "7.2.0"
 piteo = { path = "../lib" }
 piteo-graphql = { path = "../gql" }
-rocket = { version = "0.5.0-rc.1", default-features = false }
+rocket = { version = "0.5.0-rc.1", default-features = false, features = ["json"] }
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master", default-features = false }
 serde = "1.0"

@@ -9,6 +9,7 @@ use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::AccountId;
 use piteo_data::AuthId;
+use piteo_data::LeaseId;
 use piteo_data::Tenant;
 use piteo_data::TenantData;
 use piteo_data::TenantId;
@@ -46,12 +47,12 @@ impl Db for InMemoryDb {
         todo!()
     }
 
-    fn tenants(&self) -> Box<dyn TenantStore> {
-        Box::new(InMemoryTenantStore(BTreeMap::new()))
-    }
-
     fn lenders(&self) -> Box<dyn LenderStore> {
         todo!()
+    }
+
+    fn tenants(&self) -> Box<dyn TenantStore> {
+        Box::new(InMemoryTenantStore(BTreeMap::new()))
     }
 
     fn properties(&self) -> Box<dyn PropertyStore + '_> {
@@ -67,6 +68,10 @@ impl Db for InMemoryDb {
     }
 
     fn rents(&self) -> Box<dyn crate::database::RentStore + '_> {
+        todo!()
+    }
+
+    fn files(&self) -> Box<dyn crate::database::FileStore + '_> {
         todo!()
     }
 }
@@ -98,16 +103,20 @@ impl TenantStore for InMemoryTenantStore {
         Ok(self.0.clone().into_values().collect::<Vec<Tenant>>())
     }
 
+    fn by_lease_id(&mut self, _id: LeaseId) -> Result<Vec<Tenant>, Error> {
+        todo!()
+    }
+
     fn create(&mut self, data: Tenant) -> Result<Tenant, Error> {
         let id = TenantId::new_v4();
         Ok(self.0.entry(id).or_insert(Tenant { id, ..data }).clone())
     }
 
-    fn update(&mut self, _data: TenantData) -> Result<Tenant, Error> {
+    fn delete(&mut self, _data: TenantId) -> Result<usize, Error> {
         todo!()
     }
 
-    fn delete(&mut self, _data: TenantId) -> Result<usize, Error> {
+    fn update(&mut self, _data: TenantData) -> Result<Tenant, Error> {
         todo!()
     }
 }

@@ -3,6 +3,7 @@
 mod guards;
 mod routes;
 mod server;
+mod webhooks;
 
 use color_eyre::Result;
 use rocket::launch;

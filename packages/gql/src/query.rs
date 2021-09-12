@@ -112,7 +112,7 @@ impl Query {
 
 // # Utils
 
-fn map_res<T, U>(vec: Vec<T>) -> std::result::Result<Vec<U>, piteo::error::Error>
+pub(crate) fn map_res<T, U>(vec: Vec<T>) -> std::result::Result<Vec<U>, piteo::error::Error>
 where
     T: Clone,
     U: From<T>,

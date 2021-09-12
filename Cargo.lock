@@ -585,6 +585,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "erased-serde"
+version = "0.3.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3de9ad4541d99dc22b59134e7ff8dc3d6c988c89ecd7324bf10a8362b07a2afa"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "eyre"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1380,7 +1389,9 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "diesel",
+ "eyre",
  "piteo-core",
+ "serde",
  "stripe-rust",
 ]
 
@@ -1413,7 +1424,9 @@ version = "0.1.0"
 dependencies = [
  "async-graphql",
  "async-trait",
+ "chrono",
  "diesel",
+ "erased-serde",
  "eyre",
  "log",
  "piteo-data",
@@ -1433,6 +1446,7 @@ dependencies = [
  "diesel-derive-newtype",
  "diesel_as_jsonb",
  "diesel_enum_derive",
+ "eyre",
  "rust_decimal",
  "serde",
  "serde_json",
@@ -1717,6 +1731,7 @@ dependencies = [
  "rocket_codegen",
  "rocket_http",
  "serde",
+ "serde_json",
  "state",
  "tempfile",
  "time 0.2.27",

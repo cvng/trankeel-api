@@ -1,12 +1,16 @@
 use crate::real_database::Database;
 use crate::real_database::DbPool;
+use crate::real_mailer::SendMailer;
 use crate::real_payment::Stripe;
+use crate::real_pdfmaker::DocMaker;
 use piteo_core::auth;
 use piteo_core::auth::CreateUserWithAccountInput;
 use piteo_core::error::Error;
 use piteo_core::leases;
 use piteo_core::leases::CreateFurnishedLeaseInput;
+use piteo_core::leases::CreateReceiptsInput;
 use piteo_core::leases::DeleteLeaseInput;
+use piteo_core::leases::SendReceiptsInput;
 use piteo_core::leases::UpdateFurnishedLeaseInput;
 use piteo_core::owners;
 use piteo_core::owners::UpdateIndividualLenderInput;
@@ -25,14 +29,9 @@ use piteo_core::Lender;
 use piteo_core::Person;
 use piteo_core::Property;
 use piteo_core::PropertyId;
+use piteo_core::Receipt;
 use piteo_core::Tenant;
 use piteo_core::TenantId;
-
-// # Database
-
-pub fn db(pool: DbPool) -> Database {
-    Database::new(pool)
-}
 
 // # Auth
 
@@ -133,4 +132,18 @@ pub fn update_individual_lender(
     input: UpdateIndividualLenderInput,
 ) -> Result<Lender, Error> {
     owners::update_individual_lender(Database::new(pool), auth_id, input)
+}
+
+// # Receipts
+
+pub fn create_receipts(
+    pool: DbPool,
+    _auth_id: AuthId,
+    input: CreateReceiptsInput,
+) -> Result<Vec<Receipt>, Error> {
+    leases::create_receipts(&Database::new(pool), &DocMaker::new(), input)
+}
+
+pub fn send_receipts(pool: DbPool, input: SendReceiptsInput) -> Result<Vec<Receipt>, Error> {
+    leases::send_receipts(&Database::new(pool), &SendMailer::new(), input)
 }

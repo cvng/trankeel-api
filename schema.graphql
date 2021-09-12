@@ -47,13 +47,16 @@ type Company {
 scalar DateTime
 scalar Decimal
 scalar Email
+type Error {
+	message: String!
+}
 type Feature {
 	available: Boolean!
 	title: String!
 	key: String
 }
 type File {
-	createdAt: DateTime!
+	createdAt: DateTime
 	downloadUrl: String
 	externalId: String
 	filename: String
@@ -280,7 +283,7 @@ type Mutation {
 	transactionDelete(id: ID!): ID!
 	fileUpload(input: FileInput!): File!
 	importUpload(input: ImportInput!): Task!
-	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
+	createReceipts(input: RentReceiptInput!): RentReceiptPayload!
 }
 scalar PhoneNumber
 type Plan {
@@ -460,11 +463,12 @@ enum RentPaymentMethod {
 	BEFORE
 }
 input RentReceiptInput {
-	leaseId: UUID!
-	sendMail: Boolean
+	rentIds: [UUID!]!
+	sendMail: Boolean!
 }
 type RentReceiptPayload {
-	receipt: File!
+	errors: [Error!]
+	receipts: [File!]
 }
 enum RentStatus {
 	PARTIAL

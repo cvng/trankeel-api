@@ -1,8 +1,16 @@
+use crate::AccountId;
+use crate::Amount;
+use crate::DateTime;
+use crate::Id;
+use crate::LeaseId;
 use async_graphql::Enum;
+use diesel_enum_derive::DieselEnum;
 
 // # Types
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+pub type TransactionId = Id;
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
 pub enum TransactionType {
     InsuranceHab,
     InsurancePno,
@@ -13,19 +21,13 @@ pub enum TransactionType {
     Rent,
 }
 
-// # Impls
-
-impl From<String> for TransactionType {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "INSURANCE_HAB" => Self::InsuranceHab,
-            "INSURANCE_PNO" => Self::InsurancePno,
-            "INVOICE" => Self::Invoice,
-            "LOAN_INTEREST" => Self::LoanInterest,
-            "LOAN_PAYMENT" => Self::LoanPayment,
-            "OTHER" => Self::Other,
-            "RENT" => Self::Rent,
-            _ => unimplemented!(),
-        }
-    }
+#[derive(Clone, Queryable)]
+pub struct Transaction {
+    pub account_id: AccountId,
+    pub amount: Amount,
+    pub lease_id: LeaseId,
+    pub date: DateTime,
+    pub label: String,
+    pub type_: TransactionType,
+    pub id: TransactionId,
 }

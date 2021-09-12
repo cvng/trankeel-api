@@ -9,6 +9,7 @@ use crate::LeaseFurnishedDuration;
 use crate::LenderId;
 use crate::PropertyId;
 use crate::Rent;
+use crate::RentId;
 use crate::RentStatus;
 use crate::TenantId;
 use async_graphql::Enum;
@@ -22,8 +23,6 @@ use serde::Serialize;
 // # Types
 
 pub type LeaseId = Id;
-
-pub type LeaseRents = Vec<Rent>;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
 pub enum LeaseStatus {
@@ -97,7 +96,7 @@ impl Lease {
         LeaseStatus::Active
     }
 
-    pub fn rents(&self) -> LeaseRents {
+    pub fn rents(&self) -> Vec<Rent> {
         let effect_date = self.effect_date;
         let duration_in_months = self.duration.in_months() as usize;
 
@@ -140,7 +139,7 @@ impl Lease {
                 };
 
                 Rent {
-                    id: Default::default(),
+                    id: RentId::new_v4(),
                     period_start: start,
                     period_end: end,
                     amount: rent,
