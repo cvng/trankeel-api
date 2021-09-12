@@ -1,8 +1,8 @@
-use crate::real_database::Database;
-use crate::real_database::DbPool;
-use crate::real_mailer::SendMailer;
-use crate::real_payment::Stripe;
-use crate::real_pdfmaker::DocMaker;
+use crate::providers::DbPool;
+use crate::providers::Pdfmonkey;
+use crate::providers::Pg;
+use crate::providers::Sendinblue;
+use crate::providers::Stripe;
 use piteo_core::auth;
 use piteo_core::auth::CreateUserWithAccountInput;
 use piteo_core::error::Error;
@@ -39,7 +39,7 @@ pub async fn create_user_with_account(
     pool: DbPool,
     input: CreateUserWithAccountInput,
 ) -> Result<Person, Error> {
-    auth::create_user_with_account(Database::new(pool), Stripe::from_env()?, input).await
+    auth::create_user_with_account(Pg::new(pool), Stripe::from_env()?, input).await
 }
 
 // # Tenants
@@ -49,7 +49,7 @@ pub fn all_tenants(
     auth_id: AuthId,
     id: Option<TenantId>,
 ) -> Result<Vec<Tenant>, Error> {
-    tenants::all_tenants(Database::new(pool), auth_id, id)
+    tenants::all_tenants(Pg::new(pool), auth_id, id)
 }
 
 pub fn create_tenant(
@@ -57,7 +57,7 @@ pub fn create_tenant(
     auth_id: AuthId,
     input: CreateTenantInput,
 ) -> Result<Tenant, Error> {
-    tenants::create_tenant(Database::new(pool), auth_id, input)
+    tenants::create_tenant(Pg::new(pool), auth_id, input)
 }
 
 pub fn update_tenant(
@@ -65,11 +65,11 @@ pub fn update_tenant(
     auth_id: AuthId,
     input: UpdateTenantInput,
 ) -> Result<Tenant, Error> {
-    tenants::update_tenant(Database::new(pool), auth_id, input)
+    tenants::update_tenant(Pg::new(pool), auth_id, input)
 }
 
 pub fn delete_tenant(pool: DbPool, auth_id: AuthId, id: TenantId) -> Result<TenantId, Error> {
-    tenants::delete_tenant(Database::new(pool), auth_id, DeleteTenantInput { id })
+    tenants::delete_tenant(Pg::new(pool), auth_id, DeleteTenantInput { id })
 }
 
 // # Properties
@@ -79,7 +79,7 @@ pub fn all_properties(
     auth_id: AuthId,
     id: Option<PropertyId>,
 ) -> Result<Vec<Property>, Error> {
-    properties::all_properties(Database::new(pool), auth_id, id)
+    properties::all_properties(Pg::new(pool), auth_id, id)
 }
 
 pub fn create_property(
@@ -87,7 +87,7 @@ pub fn create_property(
     auth_id: AuthId,
     input: CreatePropertyInput,
 ) -> Result<Property, Error> {
-    properties::create_property(Database::new(pool), auth_id, input)
+    properties::create_property(Pg::new(pool), auth_id, input)
 }
 
 pub fn update_property(
@@ -95,11 +95,11 @@ pub fn update_property(
     auth_id: AuthId,
     input: UpdatePropertyInput,
 ) -> Result<Property, Error> {
-    properties::update_property(Database::new(pool), auth_id, input)
+    properties::update_property(Pg::new(pool), auth_id, input)
 }
 
 pub fn delete_property(pool: DbPool, auth_id: AuthId, id: PropertyId) -> Result<TenantId, Error> {
-    properties::delete_property(Database::new(pool), auth_id, DeletePropertyInput { id })
+    properties::delete_property(Pg::new(pool), auth_id, DeletePropertyInput { id })
 }
 
 // # Leases
@@ -109,7 +109,7 @@ pub fn create_furnished_lease(
     auth_id: AuthId,
     input: CreateFurnishedLeaseInput,
 ) -> Result<Lease, Error> {
-    leases::create_furnished_lease(Database::new(pool), auth_id, input)
+    leases::create_furnished_lease(Pg::new(pool), auth_id, input)
 }
 
 pub fn update_furnished_lease(
@@ -117,11 +117,11 @@ pub fn update_furnished_lease(
     auth_id: AuthId,
     input: UpdateFurnishedLeaseInput,
 ) -> Result<Lease, Error> {
-    leases::update_furnished_lease(Database::new(pool), auth_id, input)
+    leases::update_furnished_lease(Pg::new(pool), auth_id, input)
 }
 
 pub fn delete_lease(pool: DbPool, auth_id: AuthId, id: LeaseId) -> Result<LeaseId, Error> {
-    leases::delete_lease(Database::new(pool), auth_id, DeleteLeaseInput { id })
+    leases::delete_lease(Pg::new(pool), auth_id, DeleteLeaseInput { id })
 }
 
 // # Lenders
@@ -131,7 +131,7 @@ pub fn update_individual_lender(
     auth_id: AuthId,
     input: UpdateIndividualLenderInput,
 ) -> Result<Lender, Error> {
-    owners::update_individual_lender(Database::new(pool), auth_id, input)
+    owners::update_individual_lender(Pg::new(pool), auth_id, input)
 }
 
 // # Receipts
@@ -141,9 +141,9 @@ pub fn create_receipts(
     _auth_id: AuthId,
     input: CreateReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
-    leases::create_receipts(&Database::new(pool), &DocMaker::new(), input)
+    leases::create_receipts(&Pg::new(pool), &Pdfmonkey::new(), input)
 }
 
 pub fn send_receipts(pool: DbPool, input: SendReceiptsInput) -> Result<Vec<Receipt>, Error> {
-    leases::send_receipts(&Database::new(pool), &SendMailer::new(), input)
+    leases::send_receipts(&Pg::new(pool), &Sendinblue::new(), input)
 }

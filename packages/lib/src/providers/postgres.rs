@@ -6,16 +6,8 @@ use diesel::r2d2::Pool;
 use diesel::result::Error::NotFound;
 use diesel::update;
 use diesel::PgConnection;
-use piteo_core::database::AccountStore;
+use piteo_core::database;
 use piteo_core::database::Db;
-use piteo_core::database::FileStore;
-use piteo_core::database::LeaseStore;
-use piteo_core::database::LeaseTenantStore;
-use piteo_core::database::LenderStore;
-use piteo_core::database::PropertyStore;
-use piteo_core::database::RentStore;
-use piteo_core::database::TenantStore;
-use piteo_core::database::UserStore;
 use piteo_core::error::Context;
 use piteo_core::error::Error;
 use piteo_core::schema::account;
@@ -81,75 +73,75 @@ pub fn build_connection_pool(database_url: &str) -> Result<DbPool> {
 }
 
 /// Access database.
-pub fn db(pool: DbPool) -> Database {
-    Database::new(pool)
+pub fn db(pool: DbPool) -> Pg {
+    Pg::new(pool)
 }
 
-pub struct Database(DbPool);
+pub struct Pg(DbPool);
 
-struct DatabaseAccountStore<'a>(&'a DbPool);
+struct AccountStore<'a>(&'a DbPool);
 
-struct DatabaseUserStore<'a>(&'a DbPool);
+struct UserStore<'a>(&'a DbPool);
 
-struct DatabaseTenantStore<'a>(&'a DbPool);
+struct TenantStore<'a>(&'a DbPool);
 
-struct DatabaseLenderStore<'a>(&'a DbPool);
+struct LenderStore<'a>(&'a DbPool);
 
-struct DatabasePropertyStore<'a>(&'a DbPool);
+struct PropertyStore<'a>(&'a DbPool);
 
-struct DatabaseLeaseStore<'a>(&'a DbPool);
+struct LeaseStore<'a>(&'a DbPool);
 
-struct DatabaseLeaseTenantStore<'a>(&'a DbPool);
+struct LeaseTenantStore<'a>(&'a DbPool);
 
-struct DatabaseRentStore<'a>(&'a DbPool);
+struct RentStore<'a>(&'a DbPool);
 
-struct DatabaseFileStore<'a>(&'a DbPool);
+struct FileStore<'a>(&'a DbPool);
 
-impl Database {
+impl Pg {
     pub fn new(pool: DbPool) -> Self {
         Self(pool)
     }
 }
 
-impl Db for Database {
-    fn accounts(&self) -> Box<dyn AccountStore + '_> {
-        Box::new(DatabaseAccountStore(&self.0))
+impl Db for Pg {
+    fn accounts(&self) -> Box<dyn database::AccountStore + '_> {
+        Box::new(AccountStore(&self.0))
     }
 
-    fn users(&self) -> Box<dyn UserStore + '_> {
-        Box::new(DatabaseUserStore(&self.0))
+    fn users(&self) -> Box<dyn database::UserStore + '_> {
+        Box::new(UserStore(&self.0))
     }
 
-    fn lenders(&self) -> Box<dyn LenderStore + '_> {
-        Box::new(DatabaseLenderStore(&self.0))
+    fn lenders(&self) -> Box<dyn database::LenderStore + '_> {
+        Box::new(LenderStore(&self.0))
     }
 
-    fn tenants(&self) -> Box<dyn TenantStore + '_> {
-        Box::new(DatabaseTenantStore(&self.0))
+    fn tenants(&self) -> Box<dyn database::TenantStore + '_> {
+        Box::new(TenantStore(&self.0))
     }
 
-    fn properties(&self) -> Box<dyn PropertyStore + '_> {
-        Box::new(DatabasePropertyStore(&self.0))
+    fn properties(&self) -> Box<dyn database::PropertyStore + '_> {
+        Box::new(PropertyStore(&self.0))
     }
 
-    fn leases(&self) -> Box<dyn LeaseStore + '_> {
-        Box::new(DatabaseLeaseStore(&self.0))
+    fn leases(&self) -> Box<dyn database::LeaseStore + '_> {
+        Box::new(LeaseStore(&self.0))
     }
 
-    fn lease_tenants(&self) -> Box<dyn LeaseTenantStore + '_> {
-        Box::new(DatabaseLeaseTenantStore(&self.0))
+    fn lease_tenants(&self) -> Box<dyn database::LeaseTenantStore + '_> {
+        Box::new(LeaseTenantStore(&self.0))
     }
 
-    fn rents(&self) -> Box<dyn RentStore + '_> {
-        Box::new(DatabaseRentStore(&self.0))
+    fn rents(&self) -> Box<dyn database::RentStore + '_> {
+        Box::new(RentStore(&self.0))
     }
 
-    fn files(&self) -> Box<dyn FileStore + '_> {
-        Box::new(DatabaseFileStore(&self.0)) // FileStore.create should respect File.id
+    fn files(&self) -> Box<dyn database::FileStore + '_> {
+        Box::new(FileStore(&self.0))
     }
 }
 
-impl AccountStore for DatabaseAccountStore<'_> {
+impl database::AccountStore for AccountStore<'_> {
     fn by_auth_id(&mut self, auth_id: AuthId) -> Result<Account> {
         account::table
             .select(account::all_columns)
@@ -177,7 +169,7 @@ impl AccountStore for DatabaseAccountStore<'_> {
     }
 }
 
-impl UserStore for DatabaseUserStore<'_> {
+impl database::UserStore for UserStore<'_> {
     fn create(&mut self, data: Person) -> Result<Person> {
         Ok(insert_into(user::table)
             .values((
@@ -199,7 +191,7 @@ impl UserStore for DatabaseUserStore<'_> {
     }
 }
 
-impl TenantStore for DatabaseTenantStore<'_> {
+impl database::TenantStore for TenantStore<'_> {
     fn all(&mut self, auth_id: AuthId, id: Option<TenantId>) -> Result<Vec<Tenant>> {
         let query = tenant::table
             .select(tenant::all_columns)
@@ -255,7 +247,7 @@ impl TenantStore for DatabaseTenantStore<'_> {
     }
 }
 
-impl LenderStore for DatabaseLenderStore<'_> {
+impl database::LenderStore for LenderStore<'_> {
     fn by_id(&mut self, id: LenderId) -> Result<LenderIdentity> {
         let lender_: Lender = lender::table.find(id).first(&self.0.get()?)?;
 
@@ -293,7 +285,7 @@ impl LenderStore for DatabaseLenderStore<'_> {
     }
 }
 
-impl PropertyStore for DatabasePropertyStore<'_> {
+impl database::PropertyStore for PropertyStore<'_> {
     fn all(&mut self, auth_id: AuthId, id: Option<PropertyId>) -> Result<Vec<Property>> {
         let query = property::table
             .select(property::all_columns)
@@ -357,7 +349,7 @@ impl PropertyStore for DatabasePropertyStore<'_> {
     }
 }
 
-impl LeaseStore for DatabaseLeaseStore<'_> {
+impl database::LeaseStore for LeaseStore<'_> {
     fn by_id(&mut self, id: LeaseId) -> Result<Lease> {
         lease::table
             .find(id)
@@ -396,7 +388,7 @@ impl LeaseStore for DatabaseLeaseStore<'_> {
     }
 }
 
-impl LeaseTenantStore for DatabaseLeaseTenantStore<'_> {
+impl database::LeaseTenantStore for LeaseTenantStore<'_> {
     fn create(&mut self, data: LeaseTenant) -> Result<LeaseTenant> {
         Ok(insert_into(leasetenant::table)
             .values((
@@ -411,7 +403,7 @@ impl LeaseTenantStore for DatabaseLeaseTenantStore<'_> {
     }
 }
 
-impl RentStore for DatabaseRentStore<'_> {
+impl database::RentStore for RentStore<'_> {
     fn by_id(&mut self, id: &RentId) -> Result<Rent> {
         rent::table
             .find(id)
@@ -452,7 +444,7 @@ impl RentStore for DatabaseRentStore<'_> {
     }
 }
 
-impl FileStore for DatabaseFileStore<'_> {
+impl database::FileStore for FileStore<'_> {
     fn by_external_id(&mut self, external_id: ExternalId) -> Result<File> {
         file::table
             .filter(file::external_id.eq(external_id))
