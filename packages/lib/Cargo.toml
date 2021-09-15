@@ -10,5 +10,8 @@ async-trait = "0.1.51"
 eyre = "0.6.5"
 diesel = { version = "1.4.7", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }
 piteo-core = { path = "../core" }
+reqwest = { version = "0.11.4", features = ["json"] }
+sendinblue = "0.2.1"
 serde = "1.0"
+serde_json = "1.0"
 stripe-rust = { version = "0.13.0-dev", git = "https://github.com/wyyerd/stripe-rs" }

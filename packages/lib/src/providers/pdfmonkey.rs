@@ -1,33 +1,52 @@
+mod adapter;
+mod configuration;
+mod document;
+mod lib;
+
+use super::pdfmonkey::lib as pdfmonkey;
+use crate::Provider;
+use async_trait::async_trait;
 use eyre::Error;
 use piteo_core::pdfmaker::Document;
 use piteo_core::pdfmaker::IntoDocument;
 use piteo_core::pdfmaker::Pdfmaker;
 
-pub struct Pdfmonkey;
+pub struct Pdfmonkey(pdfmonkey::Pdfmonkey);
 
-impl Pdfmonkey {
-    pub fn new() -> Self {
-        Self
+impl Provider for Pdfmonkey {
+    fn init() -> Self {
+        Self(pdfmonkey::Pdfmonkey::new())
     }
 }
 
+#[async_trait]
 impl Pdfmaker for Pdfmonkey {
-    fn generate(&self, document: impl IntoDocument) -> Result<Document, Error> {
+    async fn generate(
+        &self,
+        document: impl IntoDocument + 'async_trait,
+    ) -> Result<Document, Error> {
         println!("PdfMaker.generate: {:?}", document);
 
+        let document = pdfmonkey::Document::generate(
+            document.template_id(),
+            document.clone(),
+            Some(document.meta()),
+        )
+        .await?;
+
         Ok(Document {
-            id: Default::default(),
-            status: Default::default(),
-            app_id: Default::default(),
-            checksum: Default::default(),
-            document_template_id: Default::default(),
-            download_url: Default::default(),
-            preview_url: Default::default(),
-            meta: Default::default(),
-            payload: Default::default(),
-            errors: Default::default(),
-            created_at: Default::default(),
-            updated_at: Default::default(),
+            id: document.id,
+            status: document.status.into(),
+            app_id: document.app_id,
+            checksum: document.checksum,
+            document_template_id: document.document_template_id,
+            download_url: document.download_url,
+            preview_url: document.preview_url,
+            meta: None,
+            payload: document.payload,
+            errors: document.errors,
+            created_at: document.created_at,
+            updated_at: document.updated_at,
         })
     }
 }

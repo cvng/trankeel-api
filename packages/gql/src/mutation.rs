@@ -157,7 +157,7 @@ impl Mutation {
     ) -> Result<CreateReceiptsPayload> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        match piteo::create_receipts(db_pool.clone(), auth_id.clone(), input) {
+        match piteo::create_receipts(db_pool.clone(), auth_id.clone(), input).await {
             Ok(receipts) => Ok(CreateReceiptsPayload {
                 receipts: Some(map_res(receipts)?),
                 errors: None,

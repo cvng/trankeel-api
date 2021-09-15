@@ -1,3 +1,4 @@
+use crate::Provider;
 use async_trait::async_trait;
 use piteo_core::error::Context;
 use piteo_core::error::Error;
@@ -10,15 +11,10 @@ use std::env;
 
 pub struct Stripe(stripe::Client);
 
-impl Stripe {
-    pub fn from_env() -> Result<Self, Error> {
-        let secret_key = env::var("STRIPE_SECRET_KEY").context("STRIPE_SECRET_KEY must be set")?;
-        let client = stripe::Client::new(secret_key);
-        Ok(Self(client))
-    }
-
-    pub fn client(&self) -> &stripe::Client {
-        &self.0
+impl Provider for Stripe {
+    fn init() -> Self {
+        let secret_key = env::var("STRIPE_SECRET_KEY").expect("STRIPE_SECRET_KEY must be set");
+        Self(stripe::Client::new(secret_key))
     }
 }
 
@@ -50,7 +46,7 @@ impl PaymentProvider for Stripe {
             tax_id_data: Default::default(),
         };
 
-        let customer = stripe::Customer::create(self.client(), customer_params)
+        let customer = stripe::Customer::create(&self.0, customer_params)
             .await
             .unwrap();
 
@@ -93,7 +89,7 @@ impl PaymentProvider for Stripe {
             trial_period_days: Default::default(),
         };
 
-        let subscription = stripe::Subscription::create(self.client(), subscription_params)
+        let subscription = stripe::Subscription::create(&self.0, subscription_params)
             .await
             .unwrap();
 

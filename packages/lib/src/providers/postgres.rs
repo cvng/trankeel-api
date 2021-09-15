@@ -1,3 +1,4 @@
+use crate::Provider;
 use diesel::delete;
 use diesel::insert_into;
 use diesel::prelude::*;
@@ -100,6 +101,12 @@ struct FileStore<'a>(&'a DbPool);
 impl Pg {
     pub fn new(pool: DbPool) -> Self {
         Self(pool)
+    }
+}
+
+impl Provider for Pg {
+    fn init() -> Self {
+        Self::new(db_pool_from_env().unwrap())
     }
 }
 

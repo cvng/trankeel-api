@@ -67,3 +67,16 @@ impl Default for FileStatus {
         Self::Pending
     }
 }
+
+impl From<String> for FileStatus {
+    fn from(item: String) -> Self {
+        match item.as_str() {
+            "draft" => FileStatus::Draft,
+            "failure" => FileStatus::Failure,
+            "generating" => FileStatus::Generating,
+            "pending" => FileStatus::Pending,
+            "success" => FileStatus::Success,
+            _ => unreachable!(),
+        }
+    }
+}
