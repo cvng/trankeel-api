@@ -49,7 +49,7 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
             let input = SendReceiptsInput {
                 rent_ids: vec![rent.id],
             };
-            piteo::send_receipts(db_pool, input).unwrap();
+            piteo::send_receipts(db_pool, input).await.unwrap();
             Status::Ok
         }
         _ => panic!(),

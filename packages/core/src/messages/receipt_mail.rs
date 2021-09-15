@@ -11,6 +11,7 @@ use piteo_data::Receipt;
 use piteo_data::Rent;
 use piteo_data::Tenant;
 use piteo_data::Url;
+use piteo_kit::locale;
 use serde::Serialize;
 
 #[derive(Clone, Debug, Serialize)]
@@ -81,6 +82,14 @@ impl ReceiptMail {
 }
 
 impl IntoMail for ReceiptMail {
+    fn template_id(&self) -> u32 {
+        1 // https://my.sendinblue.com/camp/template/1/message-setup
+    }
+
+    fn subject(&self) -> String {
+        locale::text("receipt_mail_subject")
+    }
+
     fn recipients(&self) -> Vec<Contact> {
         self._recipients.clone()
     }

@@ -1,20 +1,23 @@
+use async_trait::async_trait;
 use eyre::Error;
 use piteo_data::ExternalId;
 use piteo_data::FileStatus;
 use piteo_data::Url;
 use serde::Deserialize;
 use serde::Serialize;
-use std::fmt;
+use std::fmt::Debug;
 
 pub type DocumentTemplateId = ExternalId;
 
 pub type DocumentId = ExternalId;
 
+#[async_trait]
 pub trait Pdfmaker {
-    fn generate(&self, document: impl IntoDocument) -> Result<Document, Error>;
+    async fn generate(&self, document: impl IntoDocument + 'async_trait)
+        -> Result<Document, Error>;
 }
 
-pub trait IntoDocument: Serialize + Clone + fmt::Debug {
+pub trait IntoDocument: Serialize + Clone + Debug + Send + Sync {
     fn template_id(&self) -> String;
     fn filename(&self) -> String;
     fn data(&'static self) -> Box<dyn erased_serde::Serialize> {

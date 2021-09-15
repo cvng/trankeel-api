@@ -33,7 +33,7 @@ pub struct SendReceiptsInput {
 
 // # Operation
 
-pub fn create_receipts(
+pub async fn create_receipts(
     db: &impl Db,
     pdfmaker: &impl Pdfmaker,
     input: CreateReceiptsInput,
@@ -42,38 +42,35 @@ pub fn create_receipts(
 
     let rents = setlle_rents(db, input.rent_ids)?;
 
-    let receipts = generate_receipts(db, pdfmaker, rents)?;
+    let receipts = generate_receipts(db, pdfmaker, rents).await?;
 
     Ok(receipts)
 }
 
-pub fn send_receipts(
+pub async fn send_receipts(
     db: &impl Db,
     mailer: &impl Mailer,
     input: SendReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
     input.validate()?;
 
-    let receipts = input
-        .rent_ids
-        .iter()
-        .map(|rent_id| {
-            let rent = db.rents().by_id(rent_id)?;
-            let lease = db.leases().by_id(rent.lease_id)?;
-            let tenants = db.tenants().by_lease_id(lease.id)?;
+    let mut receipts = vec![];
 
-            let receipt_id = rent.receipt_id.ok_or_else(|| Error::new(NotFound))?;
-            let receipt = match db.files().by_id(receipt_id) {
-                Ok(receipt) => receipt,
-                Err(err) => return Err(err),
-            };
+    for rent_id in input.rent_ids {
+        let rent = db.rents().by_id(&rent_id)?;
+        let lease = db.leases().by_id(rent.lease_id)?;
+        let tenants = db.tenants().by_lease_id(lease.id)?;
 
-            let mail = ReceiptMail::try_new(receipt.clone(), rent, tenants, Utc::now().into())?;
-            mailer.batch(vec![mail])?;
+        let receipt_id = rent.receipt_id.ok_or_else(|| Error::new(NotFound))?;
+        let receipt = match db.files().by_id(receipt_id) {
+            Ok(receipt) => receipt,
+            Err(err) => return Err(err),
+        };
+        receipts.push(receipt.clone());
 
-            Ok(receipt)
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+        let mail = ReceiptMail::try_new(receipt, rent, tenants, Utc::now().into())?;
+        mailer.batch(vec![mail]).await?;
+    }
 
     Ok(receipts)
 }
@@ -93,65 +90,64 @@ fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>, Error>
     db.rents().update_many(rents)
 }
 
-fn generate_receipts(
+async fn generate_receipts(
     db: &impl Db,
     pdfmaker: &impl Pdfmaker,
     rents: Vec<Rent>,
 ) -> Result<Vec<Receipt>, Error> {
-    let receipts = rents
-        .iter()
-        .map(|rent| {
-            // Try to fetch associated entities.
-            let lease = db.leases().by_id(rent.lease_id)?;
-            let tenants = db.tenants().by_lease_id(lease.id)?;
-            let property = db.properties().by_id(lease.property_id)?;
-            let lender = db.lenders().by_id(property.lender_id)?;
+    let mut receipts = vec![];
 
-            // Init new receipt.
-            let receipt_id = ReceiptId::new_v4();
-            let mut receipt = Receipt {
-                id: receipt_id,
-                type_: FileType::RentReceipt,
-                filename: Some(rent.to_filename(&receipt_id)),
-                status: None,
-                external_id: None,
-                download_url: None,
-                preview_url: None,
-                created_at: None,
-                updated_at: None,
-            };
+    for rent in rents {
+        // Try to fetch associated entities.
+        let lease = db.leases().by_id(rent.lease_id)?;
+        let tenants = db.tenants().by_lease_id(lease.id)?;
+        let property = db.properties().by_id(lease.property_id)?;
+        let lender = db.lenders().by_id(property.lender_id)?;
 
-            // Try to generate receipt document (PDF).
-            let document = ReceiptDocument::try_new(
-                receipt.clone(),
-                rent.clone(),
-                lender,
-                tenants,
-                property,
-                Utc::now().into(),
-            )?;
-            let document = pdfmaker.generate(document)?;
+        // Init new receipt.
+        let receipt_id = ReceiptId::new_v4();
+        let mut receipt = Receipt {
+            id: receipt_id,
+            type_: FileType::RentReceipt,
+            filename: Some(rent.to_filename(&receipt_id)),
+            status: None,
+            external_id: None,
+            download_url: None,
+            preview_url: None,
+            created_at: None,
+            updated_at: None,
+        };
 
-            // Assign receipt external ID.
-            receipt.external_id = Some(document.id);
-            receipt.status = Some(document.status);
+        // Try to generate receipt document (PDF).
+        let document = ReceiptDocument::try_new(
+            receipt.clone(),
+            rent.clone(),
+            lender,
+            tenants,
+            property,
+            Utc::now().into(),
+        )?;
+        let document = pdfmaker.generate(document).await?;
 
-            // Create receipt.
-            let receipt = match db.files().create(&receipt) {
-                Ok(receipt) => receipt,
-                Err(err) => return Err(err),
-            };
+        // Assign receipt external ID.
+        receipt.external_id = Some(document.id);
+        receipt.status = Some(document.status);
 
-            // Link receipt with rent.
-            db.rents().update(&RentData {
-                id: rent.id,
-                receipt_id: Some(receipt.id),
-                ..Default::default()
-            })?;
+        // Create receipt.
+        let receipt = match db.files().create(&receipt) {
+            Ok(receipt) => receipt,
+            Err(err) => return Err(err),
+        };
 
-            Ok(receipt)
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+        // Link receipt with rent.
+        db.rents().update(&RentData {
+            id: rent.id,
+            receipt_id: Some(receipt.id),
+            ..Default::default()
+        })?;
+
+        receipts.push(receipt);
+    }
 
     Ok(receipts)
 }

@@ -3,6 +3,7 @@ use crate::providers::Pdfmonkey;
 use crate::providers::Pg;
 use crate::providers::Sendinblue;
 use crate::providers::Stripe;
+use crate::Provider;
 use piteo_core::auth;
 use piteo_core::auth::CreateUserWithAccountInput;
 use piteo_core::error::Error;
@@ -39,7 +40,7 @@ pub async fn create_user_with_account(
     pool: DbPool,
     input: CreateUserWithAccountInput,
 ) -> Result<Person, Error> {
-    auth::create_user_with_account(Pg::new(pool), Stripe::from_env()?, input).await
+    auth::create_user_with_account(Pg::new(pool), Stripe::init(), input).await
 }
 
 // # Tenants
@@ -136,14 +137,14 @@ pub fn update_individual_lender(
 
 // # Receipts
 
-pub fn create_receipts(
+pub async fn create_receipts(
     pool: DbPool,
     _auth_id: AuthId,
     input: CreateReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
-    leases::create_receipts(&Pg::new(pool), &Pdfmonkey::new(), input)
+    leases::create_receipts(&Pg::new(pool), &Pdfmonkey::init(), input).await
 }
 
-pub fn send_receipts(pool: DbPool, input: SendReceiptsInput) -> Result<Vec<Receipt>, Error> {
-    leases::send_receipts(&Pg::new(pool), &Sendinblue::new(), input)
+pub async fn send_receipts(pool: DbPool, input: SendReceiptsInput) -> Result<Vec<Receipt>, Error> {
+    leases::send_receipts(&Pg::new(pool), &Sendinblue::init(), input).await
 }
