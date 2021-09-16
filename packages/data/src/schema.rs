@@ -19,11 +19,16 @@ table! {
     company (id) {
         address -> Nullable<Jsonb>,
         email -> Text,
-        legalEntity -> Text,
-        legalEntityIdentifier -> Nullable<Text>,
-        legalEntityType -> Nullable<Text>,
-        legalEntityTypeOther -> Nullable<Text>,
-        phoneNumber -> Nullable<Text>,
+        #[sql_name = "legalEntity"]
+        legal_entity -> Text,
+        #[sql_name = "legalEntityIdentifier"]
+        legal_entity_identifier -> Nullable<Text>,
+        #[sql_name = "legalEntityType"]
+        legal_entity_type -> Nullable<Text>,
+        #[sql_name = "legalEntityTypeOther"]
+        legal_entity_type_other -> Nullable<Text>,
+        #[sql_name = "phoneNumber"]
+        phone_number -> Nullable<Text>,
         id -> Uuid,
     }
 }

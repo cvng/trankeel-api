@@ -14,12 +14,12 @@ pub enum LeaseDetails {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
-pub enum LeaseFurnishedDuration {
+pub enum FurnishedLeaseDuration {
     NineMonths,
     OneYear,
 }
 
-impl LeaseFurnishedDuration {
+impl FurnishedLeaseDuration {
     pub fn in_months(&self) -> i32 {
         match self {
             Self::NineMonths => 9,
@@ -28,7 +28,7 @@ impl LeaseFurnishedDuration {
     }
 }
 
-impl Default for LeaseFurnishedDuration {
+impl Default for FurnishedLeaseDuration {
     fn default() -> Self {
         Self::OneYear
     }
@@ -65,7 +65,7 @@ pub enum LeaseNakedDuration {
     SixYears,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, AsJsonb, InputObject)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, AsJsonb, InputObject)]
 #[serde(rename_all = "camelCase")]
 #[graphql(name = "LeaseFurnishedDataInput")]
 pub struct FurnishedLeaseDetails {
@@ -74,7 +74,7 @@ pub struct FurnishedLeaseDetails {
     pub colocation_insurance_lender: Option<bool>,
     pub colocation_insurance_monthly_amount: Option<Amount>,
     pub colocation_insurance_total_amount: Option<Amount>,
-    pub duration: Option<LeaseFurnishedDuration>,
+    pub duration: Option<FurnishedLeaseDuration>,
     pub lender_fee_cap: Option<Amount>,
     pub lender_fee_cap_other: Option<String>,
     pub lender_fee_cap_prestations: Option<Amount>,

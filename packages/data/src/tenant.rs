@@ -21,7 +21,7 @@ pub enum TenantStatus {
     Uptodate,
 }
 
-#[derive(Clone, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable)]
 #[table_name = "tenant"]
 pub struct Tenant {
     pub account_id: Id,

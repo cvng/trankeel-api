@@ -21,16 +21,16 @@ use validator::Validate;
 #[graphql(name = "LeaseFurnishedInput")]
 pub struct CreateFurnishedLeaseInput {
     #[graphql(name = "data")]
-    details: Option<FurnishedLeaseDetails>,
-    deposit_amount: Option<Amount>,
-    effect_date: DateTime,
-    renew_date: Option<DateTime>,
-    file: Option<FileInput>,
-    property_id: PropertyId,
-    rent_amount: Amount,
-    rent_charges_amount: Option<Amount>,
-    signature_date: Option<DateTime>,
-    tenant_ids: Vec<TenantId>,
+    pub details: Option<FurnishedLeaseDetails>,
+    pub deposit_amount: Option<Amount>,
+    pub effect_date: DateTime,
+    pub renew_date: Option<DateTime>,
+    pub file: Option<FileInput>,
+    pub property_id: PropertyId,
+    pub rent_amount: Amount,
+    pub rent_charges_amount: Option<Amount>,
+    pub signature_date: Option<DateTime>,
+    pub tenant_ids: Vec<TenantId>,
 }
 
 // # Operation

@@ -25,7 +25,7 @@ pub enum UserRole {
 #[derive(Clone, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct AuthId(String);
 
-#[derive(Clone, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable)]
 #[table_name = "user"]
 pub struct Person {
     pub auth_id: AuthId,
