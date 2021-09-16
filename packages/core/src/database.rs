@@ -9,13 +9,13 @@ use piteo_data::FileId;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
 use piteo_data::LeaseId;
-use piteo_data::LeaseTenant;
 use piteo_data::Lender;
 use piteo_data::LenderData;
 use piteo_data::LenderId;
 use piteo_data::LenderIdentity;
 use piteo_data::Person;
 use piteo_data::PersonData;
+use piteo_data::PersonId;
 use piteo_data::Property;
 use piteo_data::PropertyData;
 use piteo_data::PropertyId;
@@ -40,7 +40,6 @@ pub trait Db {
     fn tenants(&self) -> Box<dyn TenantStore + '_>;
     fn properties(&self) -> Box<dyn PropertyStore + '_>;
     fn leases(&self) -> Box<dyn LeaseStore + '_>;
-    fn lease_tenants(&self) -> Box<dyn LeaseTenantStore + '_>;
     fn rents(&self) -> Box<dyn RentStore + '_>;
     fn files(&self) -> Box<dyn FileStore + '_>;
 }
@@ -58,6 +57,7 @@ pub trait UserStore {
 
 pub trait LenderStore {
     fn by_id(&mut self, id: LenderId) -> Result<LenderIdentity>;
+    fn by_individual_id(&mut self, individual_id: PersonId) -> Result<LenderIdentity>;
     fn create(&mut self, data: Lender) -> Result<Lender>;
     fn update(&mut self, data: LenderData) -> Result<Lender>;
 }
@@ -83,11 +83,6 @@ pub trait LeaseStore {
     fn create(&mut self, data: Lease) -> Result<Lease>;
     fn delete(&mut self, data: LeaseId) -> Result<Deleted>;
     fn update(&mut self, data: LeaseData) -> Result<Lease>;
-}
-
-pub trait LeaseTenantStore {
-    fn create(&mut self, data: LeaseTenant) -> Result<LeaseTenant>;
-    fn create_many(&mut self, data: Vec<LeaseTenant>) -> Result<Vec<LeaseTenant>>;
 }
 
 pub trait RentStore {

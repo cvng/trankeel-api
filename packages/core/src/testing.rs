@@ -63,10 +63,6 @@ impl Db for InMemoryDb {
         todo!()
     }
 
-    fn lease_tenants(&self) -> Box<dyn crate::database::LeaseTenantStore + '_> {
-        todo!()
-    }
-
     fn rents(&self) -> Box<dyn crate::database::RentStore + '_> {
         todo!()
     }
@@ -79,13 +75,14 @@ impl Db for InMemoryDb {
 impl AccountStore for InMemoryAccountStore {
     fn by_auth_id(&mut self, _auth_id: AuthId) -> Result<Account, Error> {
         Ok(Account {
+            id: Default::default(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
             plan_id: Default::default(),
             status: Default::default(),
             stripe_customer_id: Default::default(),
             stripe_subscription_id: Default::default(),
             trial_end: Default::default(),
-            owner_id: Default::default(),
-            id: Default::default(),
         })
     }
 

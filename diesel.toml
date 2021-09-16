@@ -3,4 +3,3 @@
 
 [print_schema]
 file = "packages/data/src/schema.rs"
-filter = { except_tables = ["_prisma_migrations"] }

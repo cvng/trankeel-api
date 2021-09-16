@@ -1,5 +1,5 @@
 use crate::common::Id;
-use crate::schema::file;
+use crate::schema::files;
 use crate::DateTime;
 use crate::ExternalId;
 use crate::Url;
@@ -33,31 +33,30 @@ pub enum FileType {
 }
 
 #[derive(Clone, Insertable, Queryable)]
-#[table_name = "file"]
 pub struct File {
+    pub id: FileId,
     pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
     pub download_url: Option<Url>,
     pub external_id: Option<ExternalId>,
     pub filename: Option<String>,
     pub preview_url: Option<String>,
     pub status: Option<FileStatus>,
     pub type_: FileType,
-    pub updated_at: Option<DateTime>,
-    pub id: Id,
 }
 
 #[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
-#[table_name = "file"]
+#[table_name = "files"]
 pub struct FileData {
+    pub id: FileId,
     pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
     pub download_url: Option<Url>,
     pub external_id: Option<ExternalId>,
     pub filename: Option<String>,
     pub preview_url: Option<String>,
     pub status: Option<FileStatus>,
     pub type_: Option<FileType>,
-    pub updated_at: Option<DateTime>,
-    pub id: Id,
 }
 
 // # Impls

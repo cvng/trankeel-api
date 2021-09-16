@@ -1,9 +1,10 @@
 use crate::common::Id;
-use crate::schema::lender;
+use crate::schema::lenders;
 use crate::AccountId;
 use crate::Address;
 use crate::Company;
 use crate::CompanyId;
+use crate::DateTime;
 use crate::LegalEntity;
 use crate::Name;
 use crate::Person;
@@ -14,22 +15,24 @@ use serde::Deserialize;
 
 pub type LenderId = Id;
 
+#[derive(Debug)]
 pub enum LenderIdentity {
     Individual(Lender, Person),
     Company(Lender, Company),
 }
 
-#[derive(Clone, Insertable, Queryable)]
-#[table_name = "lender"]
+#[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Lender {
     pub id: LenderId,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
     pub individual_id: Option<PersonId>,
     pub company_id: Option<CompanyId>,
 }
 
 #[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
-#[table_name = "lender"]
+#[table_name = "lenders"]
 pub struct LenderData {
     pub id: LenderId,
     pub account_id: AccountId,
@@ -42,6 +45,13 @@ pub struct LenderData {
 impl LegalEntity for Lender {}
 
 impl LenderIdentity {
+    pub fn id(&self) -> LenderId {
+        match self {
+            Self::Individual(lender, _) => lender.id,
+            Self::Company(lender, _) => lender.id,
+        }
+    }
+
     pub fn display_name(&self) -> String {
         match self {
             Self::Individual(_, person) => person.display_name(),

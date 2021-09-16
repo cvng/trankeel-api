@@ -1,6 +1,7 @@
 use chrono::Utc;
 use piteo::auth::AddressInput;
 use piteo::auth::CreateUserWithAccountInput;
+use piteo::database::Db;
 use piteo::leases::CreateFurnishedLeaseInput;
 use piteo::properties::CreatePropertyInput;
 use piteo::tenants::CreateTenantInput;
@@ -52,6 +53,11 @@ async fn seed() {
     .await
     .unwrap();
 
+    let lender = piteo::db(db_pool.clone())
+        .lenders()
+        .by_individual_id(user.id)
+        .unwrap();
+
     let property = piteo::create_property(
         db_pool.clone(),
         auth_id.clone(),
@@ -71,7 +77,7 @@ async fn seed() {
             gas_emission: None,
             heating_method: PropertyUsageType::Collective,
             housing_type: PropertyUsageType::Individual,
-            lender_id: user.id,
+            lender_id: lender.id(),
             name: "Petite mission".into(),
             note: Some("RAS".into()),
             ntic_equipments: None,
@@ -119,8 +125,12 @@ async fn seed() {
             signature_date: None,
             tenant_ids: vec![tenant.id],
         },
-    );
+    )
+    .unwrap();
 
-    println!("{:?} {:?} {:?} {:?}", user, property, tenant, lease);
+    println!(
+        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",
+        user, lender, property, tenant, lease
+    );
     println!("🌱 Database seeded.");
 }

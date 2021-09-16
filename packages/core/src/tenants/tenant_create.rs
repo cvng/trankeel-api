@@ -16,7 +16,7 @@ pub struct CreateTenantInput {
     pub birthdate: DateTime,
     pub birthplace: Option<String>,
     #[validate(email)]
-    pub email: String,
+    pub email: String, // Email,
     pub first_name: String,
     pub last_name: String,
     pub note: Option<String>,
@@ -36,6 +36,9 @@ pub fn create_tenant(
     let account = db.accounts().by_auth_id(auth_id)?;
 
     db.tenants().create(Tenant {
+        id: Default::default(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
         account_id: account.id,
         apl: input.apl.unwrap_or_default(),
         birthdate: input.birthdate,
@@ -46,10 +49,7 @@ pub fn create_tenant(
         note: input.note,
         phone_number: input.phone_number,
         visale_id: input.visale_id,
-        auth_id: Default::default(),
-        role: Default::default(),
-        id: Default::default(),
-        lease_id: Default::default(),
+        lease_id: None,
     })
 }
 

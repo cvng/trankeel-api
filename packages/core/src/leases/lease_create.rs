@@ -8,10 +8,11 @@ use piteo_data::DateTime;
 use piteo_data::FurnishedLeaseDetails;
 use piteo_data::Lease;
 use piteo_data::LeaseId;
-use piteo_data::LeaseTenant;
 use piteo_data::LeaseType;
 use piteo_data::PropertyId;
 use piteo_data::Rent;
+use piteo_data::Tenant;
+use piteo_data::TenantData;
 use piteo_data::TenantId;
 use validator::Validate;
 
@@ -52,6 +53,10 @@ pub fn create_furnished_lease(
         .unwrap_or_default();
 
     let lease = db.leases().create(Lease {
+        id: Default::default(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
+        details: input.details.map(Into::into),
         account_id: account.id,
         deposit_amount: input.deposit_amount,
         effect_date: input.effect_date,
@@ -62,8 +67,6 @@ pub fn create_furnished_lease(
         type_: LeaseType::Furnished,
         lease_id: None,
         property_id: input.property_id,
-        id: Default::default(),
-        details: input.details.map(Into::into),
         expired_at: None,
         renew_date: None,
     })?;
@@ -87,14 +90,24 @@ fn add_lease_tenants(
     db: &impl Db,
     lease_id: LeaseId,
     tenant_ids: Vec<TenantId>,
-) -> Result<Vec<LeaseTenant>, Error> {
-    db.lease_tenants().create_many(
-        tenant_ids
-            .iter()
-            .map(|&tenant_id| LeaseTenant {
-                lease_id,
-                tenant_id,
+) -> Result<Vec<Tenant>, Error> {
+    tenant_ids
+        .iter()
+        .map(|&tenant_id| {
+            db.tenants().update(TenantData {
+                id: tenant_id,
+                lease_id: Some(lease_id),
+                account_id: Default::default(),
+                apl: Default::default(),
+                birthdate: Default::default(),
+                birthplace: Default::default(),
+                email: Default::default(),
+                first_name: Default::default(),
+                last_name: Default::default(),
+                note: Default::default(),
+                phone_number: Default::default(),
+                visale_id: Default::default(),
             })
-            .collect(),
-    )
+        })
+        .collect()
 }

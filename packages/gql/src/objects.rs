@@ -4,7 +4,6 @@ use crate::scalars::Decimal;
 use crate::scalars::Email;
 use crate::scalars::PhoneNumber;
 use crate::unions::Identity;
-use crate::wip;
 use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
@@ -62,7 +61,6 @@ pub struct Account {
     stripe_customer_id: Option<String>,
     stripe_subscription_id: Option<String>,
     trial_end: Option<DateTime>,
-    owner_id: Option<String>,
     id: ID,
 }
 
@@ -81,7 +79,6 @@ impl From<piteo::Account> for Account {
             stripe_customer_id: item.stripe_customer_id,
             stripe_subscription_id: item.stripe_subscription_id,
             trial_end: item.trial_end.map(Into::into),
-            owner_id: Some(item.owner_id),
             id: item.id.into(),
         }
     }
@@ -410,7 +407,7 @@ pub struct Person {
     role: Option<UserRole>,
     id: ID,
     phone_number: Option<PhoneNumber>,
-    account_id: Option<ID>,
+    account_id: ID,
     display_name: String,
     //
     accounts: Option<Vec<Account>>,
@@ -420,7 +417,7 @@ pub struct Person {
 impl Person {
     async fn account(&self, ctx: &Context<'_>) -> Result<Option<Account>> {
         let conn = ctx.data::<DbPool>()?.get()?;
-        let account_id = self.account_id.clone().ok_or_else(wip)?.try_into()?;
+        let account_id = self.account_id.clone().try_into()?;
 
         Ok(Some(auth::find_by_id(&conn, account_id).map(Into::into)?))
     }
@@ -439,7 +436,7 @@ impl From<piteo::Person> for Person {
             role: item.role.map(Into::into),
             id: item.id.into(),
             phone_number: item.phone_number.map(Into::into),
-            account_id: Some(item.account_id.unwrap_or_default().into()),
+            account_id: item.account_id.into(),
             accounts: None,
         }
     }
@@ -462,8 +459,8 @@ impl Property {
     async fn account(&self) -> Option<Account> {
         None
     }
-    async fn account_id(&self) -> Option<ID> {
-        self.0.account_id.map(Into::into)
+    async fn account_id(&self) -> ID {
+        self.0.account_id.into()
     }
     async fn address(&self) -> Address {
         self.0.address.clone().into()
@@ -513,7 +510,7 @@ impl Property {
     async fn status(&self) -> Option<PropertyStatus> {
         self.0.status.map(Into::into)
     }
-    async fn surface(&self) -> f64 {
+    async fn surface(&self) -> f32 {
         self.0.surface
     }
     async fn tenant_private_spaces(&self) -> Option<String> {
@@ -564,7 +561,6 @@ pub struct Rent {
     status: RentStatus,
     lease_id: ID,
     receipt_id: Option<ID>,
-    transaction_id: Option<ID>,
     notice_id: Option<ID>,
     //
     delay: Option<i32>,
@@ -583,7 +579,6 @@ impl From<piteo::Rent> for Rent {
             status: item.status,
             lease_id: item.lease_id.into(),
             receipt_id: item.receipt_id.map(Into::into),
-            transaction_id: item.transaction_id.map(Into::into),
             notice_id: item.notice_id.map(Into::into),
             delay: None,
             transactions: None,
@@ -666,16 +661,14 @@ pub struct Task {
 pub struct Tenant {
     account_id: ID,
     apl: Option<bool>,
-    auth_id: Option<AuthId>,
     birthdate: DateTime,
     birthplace: Option<String>,
-    email: String,
+    email: Email,
     first_name: String,
     last_name: String,
     display_name: String,
     note: Option<String>,
-    phone_number: Option<String>,
-    role: Option<String>,
+    phone_number: Option<PhoneNumber>,
     id: ID,
     lease_id: Option<ID>,
     visale_id: Option<String>,
@@ -700,15 +693,13 @@ impl From<piteo::Tenant> for Tenant {
             full_name: item.full_name(),
             account_id: item.account_id.into(),
             apl: Some(item.apl),
-            auth_id: item.auth_id.map(Into::into),
             birthdate: item.birthdate.into(),
             birthplace: item.birthplace,
-            email: item.email,
+            email: item.email.into(),
             first_name: item.first_name,
             last_name: item.last_name,
             note: item.note,
-            phone_number: item.phone_number,
-            role: item.role,
+            phone_number: item.phone_number.map(Into::into),
             id: item.id.into(),
             lease_id: item.lease_id.map(Into::into),
             visale_id: item.visale_id,

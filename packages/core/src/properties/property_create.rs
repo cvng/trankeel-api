@@ -37,7 +37,7 @@ pub struct CreatePropertyInput {
     pub other_spaces: Option<String>,
     pub room_count: PropertyRoomType,
     pub status: Option<PropertyStatus>,
-    pub surface: f64,
+    pub surface: f32,
     pub tax: Option<Amount>,
     pub tenant_private_spaces: Option<String>,
     pub usage_type: PropertyHabitationUsageType,
@@ -56,7 +56,10 @@ pub fn create_property(
     let account = db.accounts().by_auth_id(auth_id)?;
 
     db.properties().create(Property {
-        account_id: Some(account.id),
+        id: Default::default(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
+        account_id: account.id,
         address: input.address.into(),
         build_period: Some(input.build_period),
         building_legal_status: Some(input.building_legal_status),
@@ -78,6 +81,5 @@ pub fn create_property(
         tenant_private_spaces: input.tenant_private_spaces,
         usage_type: Some(input.usage_type),
         water_heating_method: Some(input.water_heating_method),
-        id: Default::default(),
     })
 }

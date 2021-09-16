@@ -4,7 +4,6 @@ type Account {
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	trialEnd: DateTime
-	ownerId: String
 	id: ID!
 	plan: Plan
 }
@@ -85,6 +84,10 @@ enum FileType {
 	LEASE_DOCUMENT
 	RENT_RECEIPT
 }
+enum FurnishedLeaseDuration {
+	NINE_MONTHS
+	ONE_YEAR
+}
 union Identity = | User | Company
 input ImportInput {
 	files: [FileInput!]!
@@ -106,7 +109,7 @@ type Lease {
 	accountId: ID!
 	depositAmount: Decimal
 	effectDate: DateTime!
-	duration: LeaseFurnishedDuration!
+	duration: FurnishedLeaseDuration!
 	signatureDate: DateTime
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
@@ -131,7 +134,7 @@ type LeaseFurnishedData {
 	colocationInsuranceLender: Boolean
 	colocationInsuranceMonthlyAmount: Decimal
 	colocationInsuranceTotalAmount: Decimal
-	duration: LeaseFurnishedDuration
+	duration: FurnishedLeaseDuration
 	lenderFeeCap: Decimal
 	lenderFeeCapOther: String
 	lenderFeeCapPrestations: Decimal
@@ -170,7 +173,7 @@ input LeaseFurnishedDataInput {
 	colocationInsuranceLender: Boolean
 	colocationInsuranceMonthlyAmount: Decimal
 	colocationInsuranceTotalAmount: Decimal
-	duration: LeaseFurnishedDuration
+	duration: FurnishedLeaseDuration
 	lenderFeeCap: Decimal
 	lenderFeeCapOther: String
 	lenderFeeCapPrestations: Decimal
@@ -202,10 +205,6 @@ input LeaseFurnishedDataInput {
 	worksDecenceSinceLastRental: String
 	worksRentDecreaseTenant: String
 	worksRentIncreaseLender: String
-}
-enum LeaseFurnishedDuration {
-	NINE_MONTHS
-	ONE_YEAR
 }
 input LeaseFurnishedInput {
 	data: LeaseFurnishedDataInput
@@ -299,7 +298,7 @@ enum PlanCode {
 }
 type Property {
 	account: Account
-	accountId: ID
+	accountId: ID!
 	address: Address!
 	buildPeriod: PropertyBuildPeriodType
 	buildingLegalStatus: PropertyBuildingLegalStatus
@@ -448,7 +447,6 @@ type Rent {
 	status: RentStatus!
 	leaseId: ID!
 	receiptId: ID
-	transactionId: ID
 	noticeId: ID
 	delay: Int
 	transactions: [Transaction!]
@@ -521,16 +519,14 @@ type Task {
 type Tenant {
 	accountId: ID!
 	apl: Boolean
-	authId: AuthenticationID
 	birthdate: DateTime!
 	birthplace: String
-	email: String!
+	email: Email!
 	firstName: String!
 	lastName: String!
 	displayName: String!
 	note: String
-	phoneNumber: String
-	role: String
+	phoneNumber: PhoneNumber
 	id: ID!
 	leaseId: ID
 	visaleId: String
@@ -609,7 +605,7 @@ type User {
 	role: UserRole
 	id: ID!
 	phoneNumber: PhoneNumber
-	accountId: ID
+	accountId: ID!
 	displayName: String!
 	accounts: [Account!]
 	account: Account

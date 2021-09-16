@@ -1,4 +1,4 @@
-use crate::schema::user;
+use crate::schema::persons;
 use crate::AuthId;
 use crate::Conn;
 use diesel::dsl::FindBy;
@@ -14,11 +14,14 @@ pub fn find(conn: &Conn, auth_id: &AuthId) -> Result<Person, Error> {
 }
 
 pub fn person_by_id(conn: &Conn, id: &PersonId) -> Result<Person, Error> {
-    user::table.find(id).first(conn).map_err(|err| err.into())
+    persons::table
+        .find(id)
+        .first(conn)
+        .map_err(|err| err.into())
 }
 
 // # Utils
 
-fn by_auth_id(auth_id: &AuthId) -> FindBy<user::table, user::auth_id, &str> {
-    user::table.filter(user::auth_id.eq(auth_id.inner()))
+fn by_auth_id(auth_id: &AuthId) -> FindBy<persons::table, persons::auth_id, &str> {
+    persons::table.filter(persons::auth_id.eq(auth_id.inner()))
 }
