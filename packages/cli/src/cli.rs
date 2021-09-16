@@ -28,9 +28,8 @@ async fn main() {
 }
 
 async fn write_schema() {
-    let path = "schema.graphql";
-    piteo_graphql::write_schema(path).ok();
-    println!("💫 GraphQL schema printed at {}", path);
+    piteo_graphql::write_schema("schema.graphql").ok();
+    println!("💫 GraphQL schema printed.");
 }
 
 async fn seed() {
@@ -123,5 +122,5 @@ async fn seed() {
     );
 
     println!("{:?} {:?} {:?} {:?}", user, property, tenant, lease);
-    println!("🌱 Database seeded at {}", url);
+    println!("🌱 Database seeded.");
 }
