@@ -5,7 +5,7 @@ use crate::Amount;
 use crate::DateTime;
 use crate::FileId;
 use crate::FurnishedLeaseDetails;
-use crate::LeaseFurnishedDuration;
+use crate::FurnishedLeaseDuration;
 use crate::LenderId;
 use crate::PropertyId;
 use crate::Rent;
@@ -36,7 +36,7 @@ pub enum LeaseType {
     Naked,
 }
 
-#[derive(Clone, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable)]
 #[table_name = "lease"]
 pub struct Lease {
     pub account_id: Id,
@@ -52,7 +52,7 @@ pub struct Lease {
     pub details: Option<FurnishedLeaseDetails>,
     pub expired_at: Option<DateTime>,
     pub renew_date: Option<DateTime>,
-    pub duration: LeaseFurnishedDuration,
+    pub duration: FurnishedLeaseDuration,
 }
 
 #[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
@@ -207,7 +207,7 @@ mod tests {
     fn test_rents() {
         let lease = Lease {
             effect_date: Utc.ymd(2020, 1, 20).and_hms(0, 0, 0).into(),
-            duration: LeaseFurnishedDuration::OneYear,
+            duration: FurnishedLeaseDuration::OneYear,
             rent_amount: Amount::new(900, 0),
             rent_charges_amount: Some(Amount::new(100, 0)),
             ..Default::default()

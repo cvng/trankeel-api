@@ -81,7 +81,7 @@ pub enum PropertyUsageType {
     Individual,
 }
 
-#[derive(Clone, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable)]
 #[table_name = "property"]
 pub struct Property {
     pub account_id: Option<AccountId>,

@@ -7,7 +7,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use std::env;
 
-const AUTH_ID_KEY: &str = "FIREBASE_ADMIN_USER_ID";
+const AUTH_ID_KEY: &str = "DEBUG_AUTH_ID";
 
 #[derive(Debug)]
 pub enum Error {

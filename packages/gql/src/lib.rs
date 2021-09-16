@@ -14,8 +14,6 @@ use async_graphql::Schema;
 use std::fs::File;
 use std::io::Write;
 
-const SCHEMA_PATH: &str = "schema.graphql";
-
 type Result<T> = std::result::Result<T, piteo::error::Error>;
 
 /// Piteo GraphQL schema.
@@ -34,16 +32,13 @@ pub fn build_schema() -> Result<PiteoSchema> {
 }
 
 /// Print the schema in SDL format. https://async-graphql.github.io/async-graphql/en/sdl_export.html
-pub fn write_schema() -> Result<()> {
-    let path = SCHEMA_PATH;
+pub fn write_schema(path: &str) -> Result<File> {
     let schema = build_schema()?;
 
     let mut file = File::create(path)?;
     file.write_all(schema.sdl().as_bytes())?;
 
-    println!("💫 GraphQL schema printed at {}", path);
-
-    Ok(())
+    Ok(file)
 }
 
 fn wip() -> async_graphql::Error {

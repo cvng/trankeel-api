@@ -12,6 +12,6 @@ use rocket::launch;
 fn rocket() -> _ {
     color_eyre::install().ok();
     dotenv::dotenv().ok();
-    piteo_graphql::write_schema().ok();
+    piteo_graphql::write_schema("schema.graphql").ok();
     server::server().unwrap()
 }

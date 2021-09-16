@@ -1630,8 +1630,11 @@ dependencies = [
 name = "piteo-cli"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "dotenv",
+ "piteo",
  "piteo-graphql",
+ "tokio 1.10.0",
 ]
 
 [[package]]
@@ -2662,6 +2665,7 @@ dependencies = [
  "mio 0.7.13",
  "num_cpus",
  "once_cell",
+ "parking_lot",
  "pin-project-lite 0.2.7",
  "signal-hook-registry",
  "tokio-macros",

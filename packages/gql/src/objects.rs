@@ -15,7 +15,7 @@ use piteo::AccountStatus;
 use piteo::DbPool;
 use piteo::FileStatus;
 use piteo::FileType;
-use piteo::LeaseFurnishedDuration;
+use piteo::FurnishedLeaseDuration;
 use piteo::LeaseRentPeriodicity;
 use piteo::LeaseRentReferenceIrl;
 use piteo::LeaseStatus;
@@ -199,7 +199,7 @@ impl Lease {
     async fn effect_date(&self) -> DateTime {
         self.0.effect_date.into()
     }
-    async fn duration(&self) -> LeaseFurnishedDuration {
+    async fn duration(&self) -> FurnishedLeaseDuration {
         self.0.duration
     }
     async fn signature_date(&self) -> Option<DateTime> {
@@ -276,7 +276,7 @@ pub struct FurnishedLeaseDetails {
     colocation_insurance_lender: Option<bool>,
     colocation_insurance_monthly_amount: Option<Decimal>,
     colocation_insurance_total_amount: Option<Decimal>,
-    duration: Option<LeaseFurnishedDuration>,
+    duration: Option<FurnishedLeaseDuration>,
     lender_fee_cap: Option<Decimal>,
     lender_fee_cap_other: Option<String>,
     lender_fee_cap_prestations: Option<Decimal>,
