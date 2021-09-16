@@ -1,6 +1,9 @@
 use crate::common::Id;
 use crate::Address;
+use crate::DateTime;
+use crate::Email;
 use crate::LegalEntity;
+use crate::PhoneNumber;
 use async_graphql::Enum;
 
 // # Types
@@ -20,16 +23,18 @@ pub enum LegalEntityType {
     Snc,
 }
 
-#[derive(Queryable)]
+#[derive(Debug, Queryable)]
 pub struct Company {
+    pub id: CompanyId,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
     pub address: Option<Address>,
-    pub email: String,
+    pub email: Email,
     pub legal_entity: String,
     pub legal_entity_identifier: Option<String>,
     pub legal_entity_type: Option<String>,
     pub legal_entity_type_other: Option<String>,
-    pub phone_number: Option<String>,
-    pub id: CompanyId,
+    pub phone_number: Option<PhoneNumber>,
 }
 
 // # Impls

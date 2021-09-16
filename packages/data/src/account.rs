@@ -1,5 +1,5 @@
 use crate::common::Id;
-use crate::schema::account;
+use crate::schema::accounts;
 use crate::CustomerId;
 use crate::DateTime;
 use crate::PlanId;
@@ -26,19 +26,19 @@ pub enum AccountStatus {
 }
 
 #[derive(Clone, Insertable, Queryable)]
-#[table_name = "account"]
 pub struct Account {
+    pub id: AccountId,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
     pub plan_id: Option<PlanId>,
     pub status: Option<AccountStatus>,
     pub stripe_customer_id: Option<CustomerId>,
     pub stripe_subscription_id: Option<SubscriptionId>,
     pub trial_end: Option<DateTime>,
-    pub owner_id: String, // TODO: PersonId,
-    pub id: AccountId,
 }
 
 #[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
-#[table_name = "account"]
+#[table_name = "accounts"]
 pub struct AccountData {
     pub id: AccountId,
     pub plan_id: Option<PlanId>,
@@ -46,7 +46,6 @@ pub struct AccountData {
     pub stripe_customer_id: Option<CustomerId>,
     pub stripe_subscription_id: Option<SubscriptionId>,
     pub trial_end: Option<DateTime>,
-    pub owner_id: Option<String>, // TODO: PersonId,
 }
 
 // # Impls

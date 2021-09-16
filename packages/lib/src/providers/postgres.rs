@@ -11,16 +11,15 @@ use piteo_core::database;
 use piteo_core::database::Db;
 use piteo_core::error::Context;
 use piteo_core::error::Error;
-use piteo_core::schema::account;
-use piteo_core::schema::company;
-use piteo_core::schema::file;
-use piteo_core::schema::lease;
-use piteo_core::schema::leasetenant;
-use piteo_core::schema::lender;
-use piteo_core::schema::property;
-use piteo_core::schema::rent;
-use piteo_core::schema::tenant;
-use piteo_core::schema::user;
+use piteo_core::schema::accounts;
+use piteo_core::schema::companies;
+use piteo_core::schema::files;
+use piteo_core::schema::leases;
+use piteo_core::schema::lenders;
+use piteo_core::schema::persons;
+use piteo_core::schema::properties;
+use piteo_core::schema::rents;
+use piteo_core::schema::tenants;
 use piteo_core::Account;
 use piteo_core::AccountData;
 use piteo_core::AuthId;
@@ -31,13 +30,13 @@ use piteo_core::FileId;
 use piteo_core::Lease;
 use piteo_core::LeaseData;
 use piteo_core::LeaseId;
-use piteo_core::LeaseTenant;
 use piteo_core::Lender;
 use piteo_core::LenderData;
 use piteo_core::LenderId;
 use piteo_core::LenderIdentity;
 use piteo_core::Person;
 use piteo_core::PersonData;
+use piteo_core::PersonId;
 use piteo_core::Property;
 use piteo_core::PropertyData;
 use piteo_core::PropertyId;
@@ -74,8 +73,8 @@ pub fn build_connection_pool(database_url: &str) -> Result<DbPool> {
 }
 
 /// Access database.
-pub fn db(pool: DbPool) -> Pg {
-    Pg::new(pool)
+pub fn db(db_pool: DbPool) -> Pg {
+    Pg::new(db_pool)
 }
 
 pub struct Pg(DbPool);
@@ -99,8 +98,8 @@ struct RentStore<'a>(&'a DbPool);
 struct FileStore<'a>(&'a DbPool);
 
 impl Pg {
-    pub fn new(pool: DbPool) -> Self {
-        Self(pool)
+    pub fn new(db_pool: DbPool) -> Self {
+        Self(db_pool)
     }
 }
 
@@ -135,10 +134,6 @@ impl Db for Pg {
         Box::new(LeaseStore(&self.0))
     }
 
-    fn lease_tenants(&self) -> Box<dyn database::LeaseTenantStore + '_> {
-        Box::new(LeaseTenantStore(&self.0))
-    }
-
     fn rents(&self) -> Box<dyn database::RentStore + '_> {
         Box::new(RentStore(&self.0))
     }
@@ -150,23 +145,22 @@ impl Db for Pg {
 
 impl database::AccountStore for AccountStore<'_> {
     fn by_auth_id(&mut self, auth_id: AuthId) -> Result<Account> {
-        account::table
-            .select(account::all_columns)
-            .left_join(user::table.on(user::account_id.eq(account::id.nullable())))
-            .filter(user::auth_id.eq(&auth_id.inner()))
+        accounts::table
+            .select(accounts::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
+            .filter(persons::auth_id.eq(&auth_id.inner()))
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
     fn create(&mut self, data: Account) -> Result<Account> {
-        Ok(insert_into(account::table)
+        Ok(insert_into(accounts::table)
             .values((
-                account::plan_id.eq(data.plan_id),
-                account::status.eq(data.status),
-                account::stripe_customer_id.eq(data.stripe_customer_id),
-                account::stripe_subscription_id.eq(data.stripe_subscription_id),
-                account::trial_end.eq(data.trial_end),
-                account::owner_id.eq(data.owner_id),
+                accounts::plan_id.eq(data.plan_id),
+                accounts::status.eq(data.status),
+                accounts::stripe_customer_id.eq(data.stripe_customer_id),
+                accounts::stripe_subscription_id.eq(data.stripe_subscription_id),
+                accounts::trial_end.eq(data.trial_end),
             ))
             .get_result(&self.0.get()?)?)
     }
@@ -178,17 +172,17 @@ impl database::AccountStore for AccountStore<'_> {
 
 impl database::UserStore for UserStore<'_> {
     fn create(&mut self, data: Person) -> Result<Person> {
-        Ok(insert_into(user::table)
+        Ok(insert_into(persons::table)
             .values((
-                user::auth_id.eq(data.auth_id),
-                user::email.eq(data.email),
-                user::first_name.eq(data.first_name),
-                user::last_name.eq(data.last_name),
-                user::address.eq(data.address),
-                user::photo_url.eq(data.photo_url),
-                user::role.eq(data.role),
-                user::phone_number.eq(data.phone_number),
-                user::account_id.eq(data.account_id),
+                persons::auth_id.eq(data.auth_id),
+                persons::email.eq(data.email),
+                persons::first_name.eq(data.first_name),
+                persons::last_name.eq(data.last_name),
+                persons::address.eq(data.address),
+                persons::photo_url.eq(data.photo_url),
+                persons::role.eq(data.role),
+                persons::phone_number.eq(data.phone_number),
+                persons::account_id.eq(data.account_id),
             ))
             .get_result(&self.0.get()?)?)
     }
@@ -200,14 +194,14 @@ impl database::UserStore for UserStore<'_> {
 
 impl database::TenantStore for TenantStore<'_> {
     fn all(&mut self, auth_id: AuthId, id: Option<TenantId>) -> Result<Vec<Tenant>> {
-        let query = tenant::table
-            .select(tenant::all_columns)
-            .left_join(user::table.on(user::account_id.eq(tenant::account_id.nullable())))
-            .filter(user::auth_id.eq(auth_id.inner()));
+        let query = tenants::table
+            .select(tenants::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(tenants::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()));
 
         match id {
             Some(id) => query
-                .filter(tenant::id.eq(id))
+                .filter(tenants::id.eq(id))
                 .load(&self.0.get()?)
                 .map_err(|err| err.into()),
             None => query.load(&self.0.get()?).map_err(|err| err.into()),
@@ -215,37 +209,32 @@ impl database::TenantStore for TenantStore<'_> {
     }
 
     fn by_lease_id(&mut self, lease_id: LeaseId) -> Result<Vec<Tenant>> {
-        tenant::table
-            .select(tenant::all_columns)
-            .left_join(leasetenant::table.on(leasetenant::tenant_id.eq(tenant::id)))
-            .filter(leasetenant::lease_id.eq(lease_id))
+        tenants::table
+            .filter(tenants::lease_id.eq(lease_id))
             .load(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
     fn create(&mut self, data: Tenant) -> Result<Tenant> {
-        Ok(insert_into(tenant::table)
+        Ok(insert_into(tenants::table)
             .values((
-                tenant::account_id.eq(data.account_id),
-                tenant::apl.eq(data.apl),
-                tenant::auth_id.eq(data.auth_id),
-                tenant::birthdate.eq(data.birthdate),
-                tenant::birthplace.eq(data.birthplace),
-                tenant::email.eq(data.email),
-                tenant::first_name.eq(data.first_name),
-                tenant::last_name.eq(data.last_name),
-                tenant::note.eq(data.note),
-                tenant::phone_number.eq(data.phone_number),
-                tenant::role.eq(data.role),
-                tenant::lease_id.eq(data.lease_id),
-                tenant::visale_id.eq(data.visale_id),
+                tenants::account_id.eq(data.account_id),
+                tenants::apl.eq(data.apl),
+                tenants::birthdate.eq(data.birthdate),
+                tenants::birthplace.eq(data.birthplace),
+                tenants::email.eq(data.email),
+                tenants::first_name.eq(data.first_name),
+                tenants::last_name.eq(data.last_name),
+                tenants::note.eq(data.note),
+                tenants::phone_number.eq(data.phone_number),
+                tenants::visale_id.eq(data.visale_id),
             ))
             .get_result(&self.0.get()?)?)
     }
 
     fn delete(&mut self, data: TenantId) -> Result<Deleted> {
-        Ok(delete(tenant::table)
-            .filter(tenant::id.eq(data))
+        Ok(delete(tenants::table)
+            .filter(tenants::id.eq(data))
             .execute(&self.0.get()?)?)
     }
 
@@ -256,33 +245,41 @@ impl database::TenantStore for TenantStore<'_> {
 
 impl database::LenderStore for LenderStore<'_> {
     fn by_id(&mut self, id: LenderId) -> Result<LenderIdentity> {
-        let lender_: Lender = lender::table.find(id).first(&self.0.get()?)?;
+        let lender: Lender = lenders::table.find(id).first(&self.0.get()?)?;
 
-        match lender_ {
+        match lender {
             Lender {
                 individual_id: Some(individual_id),
                 ..
             } => {
-                let person = user::table.find(individual_id).first(&self.0.get()?)?;
-                Ok(LenderIdentity::Individual(lender_, person))
+                let person = persons::table.find(individual_id).first(&self.0.get()?)?;
+                Ok(LenderIdentity::Individual(lender, person))
             }
             Lender {
                 company_id: Some(company_id),
                 ..
             } => {
-                let company = company::table.find(company_id).first(&self.0.get()?)?;
-                Ok(LenderIdentity::Company(lender_, company))
+                let company = companies::table.find(company_id).first(&self.0.get()?)?;
+                Ok(LenderIdentity::Company(lender, company))
             }
             _ => Err(Error::new(NotFound)),
         }
     }
 
+    fn by_individual_id(&mut self, individual_id: PersonId) -> Result<LenderIdentity> {
+        let lender: Lender = lenders::table
+            .filter(lenders::individual_id.eq(individual_id))
+            .first(&self.0.get()?)?;
+        let person = persons::table.find(individual_id).first(&self.0.get()?)?;
+        Ok(LenderIdentity::Individual(lender, person))
+    }
+
     fn create(&mut self, data: Lender) -> Result<Lender> {
-        Ok(insert_into(lender::table)
+        Ok(insert_into(lenders::table)
             .values((
-                lender::account_id.eq(data.account_id),
-                lender::individual_id.eq(data.individual_id),
-                lender::company_id.eq(data.company_id),
+                lenders::account_id.eq(data.account_id),
+                lenders::individual_id.eq(data.individual_id),
+                lenders::company_id.eq(data.company_id),
             ))
             .get_result(&self.0.get()?)?)
     }
@@ -294,14 +291,14 @@ impl database::LenderStore for LenderStore<'_> {
 
 impl database::PropertyStore for PropertyStore<'_> {
     fn all(&mut self, auth_id: AuthId, id: Option<PropertyId>) -> Result<Vec<Property>> {
-        let query = property::table
-            .select(property::all_columns)
-            .left_join(user::table.on(user::account_id.eq(property::account_id)))
-            .filter(user::auth_id.eq(auth_id.inner()));
+        let query = properties::table
+            .select(properties::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(properties::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()));
 
         if let Some(id) = id {
             return query
-                .filter(property::id.eq(id))
+                .filter(properties::id.eq(id))
                 .load(&self.0.get()?)
                 .map_err(|err| err.into());
         }
@@ -310,44 +307,44 @@ impl database::PropertyStore for PropertyStore<'_> {
     }
 
     fn by_id(&mut self, id: PropertyId) -> Result<Property> {
-        property::table
+        properties::table
             .find(id)
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
     fn create(&mut self, data: Property) -> Result<Property> {
-        Ok(insert_into(property::table)
+        Ok(insert_into(properties::table)
             .values((
-                property::account_id.eq(data.account_id),
-                property::address.eq(data.address),
-                property::build_period.eq(data.build_period),
-                property::building_legal_status.eq(data.building_legal_status),
-                property::common_spaces.eq(data.common_spaces),
-                property::energy_class.eq(data.energy_class),
-                property::equipments.eq(data.equipments),
-                property::gas_emission.eq(data.gas_emission),
-                property::heating_method.eq(data.heating_method),
-                property::housing_type.eq(data.housing_type),
-                property::name.eq(data.name),
-                property::note.eq(data.note),
-                property::ntic_equipments.eq(data.ntic_equipments),
-                property::other_spaces.eq(data.other_spaces),
-                property::tax.eq(data.tax),
-                property::room_count.eq(data.room_count),
-                property::status.eq(data.status),
-                property::surface.eq(data.surface),
-                property::tenant_private_spaces.eq(data.tenant_private_spaces),
-                property::usage_type.eq(data.usage_type),
-                property::water_heating_method.eq(data.water_heating_method),
-                property::lender_id.eq(data.lender_id),
+                properties::account_id.eq(data.account_id),
+                properties::address.eq(data.address),
+                properties::build_period.eq(data.build_period),
+                properties::building_legal_status.eq(data.building_legal_status),
+                properties::common_spaces.eq(data.common_spaces),
+                properties::energy_class.eq(data.energy_class),
+                properties::equipments.eq(data.equipments),
+                properties::gas_emission.eq(data.gas_emission),
+                properties::heating_method.eq(data.heating_method),
+                properties::housing_type.eq(data.housing_type),
+                properties::name.eq(data.name),
+                properties::note.eq(data.note),
+                properties::ntic_equipments.eq(data.ntic_equipments),
+                properties::other_spaces.eq(data.other_spaces),
+                properties::tax.eq(data.tax),
+                properties::room_count.eq(data.room_count),
+                properties::status.eq(data.status),
+                properties::surface.eq(data.surface),
+                properties::tenant_private_spaces.eq(data.tenant_private_spaces),
+                properties::usage_type.eq(data.usage_type),
+                properties::water_heating_method.eq(data.water_heating_method),
+                properties::lender_id.eq(data.lender_id),
             ))
             .get_result(&self.0.get()?)?)
     }
 
     fn delete(&mut self, data: PropertyId) -> Result<Deleted> {
-        Ok(delete(property::table)
-            .filter(property::id.eq(data))
+        Ok(delete(properties::table)
+            .filter(properties::id.eq(data))
             .execute(&self.0.get()?)?)
     }
 
@@ -358,35 +355,35 @@ impl database::PropertyStore for PropertyStore<'_> {
 
 impl database::LeaseStore for LeaseStore<'_> {
     fn by_id(&mut self, id: LeaseId) -> Result<Lease> {
-        lease::table
+        leases::table
             .find(id)
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
     fn create(&mut self, data: Lease) -> Result<Lease> {
-        Ok(insert_into(lease::table)
+        Ok(insert_into(leases::table)
             .values((
-                lease::account_id.eq(data.account_id),
-                lease::deposit_amount.eq(data.deposit_amount),
-                lease::effect_date.eq(data.effect_date),
-                lease::signature_date.eq(data.signature_date),
-                lease::rent_amount.eq(data.rent_amount),
-                lease::rent_charges_amount.eq(data.rent_charges_amount),
-                lease::type_.eq(data.type_),
-                lease::lease_id.eq(data.lease_id),
-                lease::property_id.eq(data.property_id),
-                lease::details.eq(data.details),
-                lease::expired_at.eq(data.expired_at),
-                lease::renew_date.eq(data.renew_date),
-                lease::duration.eq(data.duration),
+                leases::account_id.eq(data.account_id),
+                leases::deposit_amount.eq(data.deposit_amount),
+                leases::effect_date.eq(data.effect_date),
+                leases::signature_date.eq(data.signature_date),
+                leases::rent_amount.eq(data.rent_amount),
+                leases::rent_charges_amount.eq(data.rent_charges_amount),
+                leases::type_.eq(data.type_),
+                leases::lease_id.eq(data.lease_id),
+                leases::property_id.eq(data.property_id),
+                leases::details.eq(data.details),
+                leases::expired_at.eq(data.expired_at),
+                leases::renew_date.eq(data.renew_date),
+                leases::duration.eq(data.duration),
             ))
             .get_result(&self.0.get()?)?)
     }
 
     fn delete(&mut self, data: LeaseId) -> Result<Deleted> {
-        Ok(delete(lease::table)
-            .filter(lease::id.eq(data))
+        Ok(delete(leases::table)
+            .filter(leases::id.eq(data))
             .execute(&self.0.get()?)?)
     }
 
@@ -395,45 +392,30 @@ impl database::LeaseStore for LeaseStore<'_> {
     }
 }
 
-impl database::LeaseTenantStore for LeaseTenantStore<'_> {
-    fn create(&mut self, data: LeaseTenant) -> Result<LeaseTenant> {
-        Ok(insert_into(leasetenant::table)
-            .values((
-                leasetenant::lease_id.eq(data.lease_id),
-                leasetenant::tenant_id.eq(data.tenant_id),
-            ))
-            .get_result(&self.0.get()?)?)
-    }
-
-    fn create_many(&mut self, data: Vec<LeaseTenant>) -> Result<Vec<LeaseTenant>> {
-        data.iter().map(|item| self.create(item.clone())).collect()
-    }
-}
-
 impl database::RentStore for RentStore<'_> {
     fn by_id(&mut self, id: &RentId) -> Result<Rent> {
-        rent::table
+        rents::table
             .find(id)
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
     fn by_receipt_id(&mut self, receipt_id: ReceiptId) -> Result<Rent> {
-        rent::table
-            .filter(rent::receipt_id.eq(&receipt_id))
+        rents::table
+            .filter(rents::receipt_id.eq(&receipt_id))
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
     fn by_lease_id(&mut self, lease_id: LeaseId) -> Result<Vec<Rent>> {
-        rent::table
-            .filter(rent::lease_id.eq(&lease_id))
+        rents::table
+            .filter(rents::lease_id.eq(&lease_id))
             .load(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
     fn create(&mut self, data: &Rent) -> Result<Rent> {
-        Ok(insert_into(rent::table)
+        Ok(insert_into(rents::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
@@ -453,21 +435,21 @@ impl database::RentStore for RentStore<'_> {
 
 impl database::FileStore for FileStore<'_> {
     fn by_external_id(&mut self, external_id: ExternalId) -> Result<File> {
-        file::table
-            .filter(file::external_id.eq(external_id))
+        files::table
+            .filter(files::external_id.eq(external_id))
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
     fn by_id(&mut self, id: FileId) -> Result<File> {
-        file::table
+        files::table
             .find(id)
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
     fn create(&mut self, data: &File) -> Result<File> {
-        Ok(insert_into(file::table)
+        Ok(insert_into(files::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }

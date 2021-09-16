@@ -13,9 +13,9 @@ pub enum PlanCode {
 
 #[derive(Queryable)]
 pub struct Plan {
+    pub id: PlanId,
     pub code: String,
     pub price: Option<Amount>,
     pub subtitle: Option<String>,
     pub title: Option<String>,
-    pub id: Id,
 }

@@ -1,4 +1,4 @@
-use crate::schema::plan;
+use crate::schema::plans;
 use crate::Conn;
 use diesel::prelude::*;
 use eyre::Error;
@@ -8,5 +8,5 @@ use piteo_data::PlanId;
 // # Queries
 
 pub fn find_by_id(conn: &Conn, id: PlanId) -> Result<Plan, Error> {
-    plan::table.find(id).first(conn).map_err(|err| err.into())
+    plans::table.find(id).first(conn).map_err(|err| err.into())
 }

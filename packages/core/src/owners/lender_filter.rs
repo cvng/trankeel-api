@@ -1,7 +1,7 @@
 use crate::auth;
 use crate::companies;
-use crate::schema::lender;
-use crate::schema::user;
+use crate::schema::lenders;
+use crate::schema::persons;
 use crate::AuthId;
 use crate::Conn;
 use diesel::prelude::*;
@@ -39,14 +39,14 @@ pub fn all_lenders(
 ) -> Result<Vec<Lender>, Error> {
     let auth_id = auth_id.clone();
 
-    let query = lender::table
-        .select(lender::all_columns)
-        .left_join(user::table.on(user::account_id.eq(lender::account_id.nullable())))
-        .filter(user::auth_id.eq(auth_id.inner()));
+    let query = lenders::table
+        .select(lenders::all_columns)
+        .left_join(persons::table.on(persons::account_id.eq(lenders::account_id)))
+        .filter(persons::auth_id.eq(auth_id.inner()));
 
     if let Some(id) = id {
         return query
-            .filter(lender::id.eq(id))
+            .filter(lenders::id.eq(id))
             .load(conn)
             .map_err(|err| err.into());
     }
@@ -55,5 +55,8 @@ pub fn all_lenders(
 }
 
 pub fn lender_by_id(conn: &Conn, id: LenderId) -> Result<Lender, Error> {
-    lender::table.find(id).first(conn).map_err(|err| err.into())
+    lenders::table
+        .find(id)
+        .first(conn)
+        .map_err(|err| err.into())
 }

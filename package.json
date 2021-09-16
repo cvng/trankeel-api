@@ -9,8 +9,7 @@
     "lint": "cargo clippy",
     "test": "cargo test",
     "fmt": "cargo fmt",
-    "seed": "cargo run -p piteo-cli -- seed",
-    "generate": "cargo run -p piteo-cli -- generate",
-    "migrate": "diesel migration run"
+    "setup": "diesel setup && cargo run -p piteo-cli -- seed",
+    "generate": "cargo run -p piteo-cli -- generate"
   }
 }

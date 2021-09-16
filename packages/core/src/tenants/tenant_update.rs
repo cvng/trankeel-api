@@ -18,7 +18,7 @@ pub struct UpdateTenantInput {
     pub birthdate: Option<DateTime>,
     pub birthplace: Option<String>,
     #[validate(email)]
-    pub email: Option<String>,
+    pub email: Option<String>, // Email,
     pub id: TenantId,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
@@ -55,6 +55,7 @@ impl From<UpdateTenantInput> for TenantData {
             note: item.note,
             phone_number: item.phone_number,
             visale_id: item.visale_id,
+            lease_id: None,
         }
     }
 }

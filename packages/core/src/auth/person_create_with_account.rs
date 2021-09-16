@@ -9,7 +9,6 @@ use piteo_data::Address;
 use piteo_data::AuthId;
 use piteo_data::Lender;
 use piteo_data::Person;
-use piteo_data::PersonData;
 use validator::Validate;
 
 // # Input
@@ -44,9 +43,23 @@ pub async fn create_user_with_account(
 ) -> Result<Person, Error> {
     input.validate()?;
 
+    // Create account.
+    let account = db.accounts().create(Account {
+        id: Default::default(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
+        plan_id: None,
+        status: None,
+        stripe_customer_id: None,
+        stripe_subscription_id: None,
+        trial_end: None,
+    })?;
+
     // Create user.
     let user = db.users().create(Person {
         id: Default::default(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
         auth_id: input.auth_id,
         email: input.email.clone(),
         first_name: Some(input.first_name),
@@ -55,32 +68,17 @@ pub async fn create_user_with_account(
         photo_url: None,
         role: None,
         phone_number: None,
-        account_id: None,
-    })?;
-
-    // Create account.
-    let account = db.accounts().create(Account {
-        id: Default::default(),
-        owner_id: user.id.to_string(),
-        plan_id: None,
-        status: None,
-        stripe_customer_id: None,
-        stripe_subscription_id: None,
-        trial_end: None,
-    })?;
-
-    // Update user account.
-    let user = db.users().update(PersonData {
-        account_id: Some(account.id),
-        ..Default::default()
+        account_id: account.id,
     })?;
 
     // Create lender.
     let _lender = db.lenders().create(Lender {
+        id: Default::default(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
         account_id: account.id,
         individual_id: Some(user.id),
         company_id: None,
-        id: Default::default(),
     })?;
 
     if let Some(true) = input.skip_create_customer {
@@ -98,6 +96,7 @@ pub async fn create_user_with_account(
 
     // Update the local customer data.
     db.accounts().update(AccountData {
+        id: account.id,
         stripe_customer_id: Some(subscription.customer_id),
         stripe_subscription_id: Some(subscription.id),
         status: Some(subscription.status),

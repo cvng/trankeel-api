@@ -50,6 +50,7 @@ impl From<UpdateFurnishedLeaseInput> for LeaseData {
             property_id: None,
             expired_at: None,
             renew_date: None,
+            duration: None,
         }
     }
 }

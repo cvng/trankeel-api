@@ -1,14 +1,14 @@
-use crate::AccountId;
+use crate::schema::payments;
 use crate::Amount;
 use crate::DateTime;
 use crate::Id;
-use crate::LeaseId;
+use crate::RentId;
 use async_graphql::Enum;
 use diesel_enum_derive::DieselEnum;
 
 // # Types
 
-pub type TransactionId = Id;
+pub type PaymentId = Id;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
 pub enum TransactionType {
@@ -21,13 +21,14 @@ pub enum TransactionType {
     Rent,
 }
 
-#[derive(Clone, Queryable)]
-pub struct Transaction {
-    pub account_id: AccountId,
+#[derive(Clone, Insertable, Queryable)]
+pub struct Payment {
+    pub id: PaymentId,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
+    pub rent_id: RentId,
     pub amount: Amount,
-    pub lease_id: LeaseId,
     pub date: DateTime,
-    pub label: String,
     pub type_: TransactionType,
-    pub id: TransactionId,
+    pub label: String,
 }

@@ -1,17 +1,15 @@
 use crate::common::Id;
-use crate::schema::lease;
-use crate::schema::leasetenant;
+use crate::schema::leases;
+use crate::AccountId;
 use crate::Amount;
 use crate::DateTime;
 use crate::FileId;
 use crate::FurnishedLeaseDetails;
 use crate::FurnishedLeaseDuration;
-use crate::LenderId;
 use crate::PropertyId;
 use crate::Rent;
 use crate::RentId;
 use crate::RentStatus;
-use crate::TenantId;
 use async_graphql::Enum;
 use chrono::Datelike;
 use chrono::Utc;
@@ -37,18 +35,19 @@ pub enum LeaseType {
 }
 
 #[derive(Clone, Debug, Insertable, Queryable)]
-#[table_name = "lease"]
 pub struct Lease {
-    pub account_id: Id,
+    pub id: LeaseId,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
+    pub account_id: AccountId,
     pub deposit_amount: Option<Amount>,
     pub effect_date: DateTime,
     pub signature_date: Option<DateTime>,
     pub rent_amount: Amount,
     pub rent_charges_amount: Option<Amount>,
     pub type_: LeaseType,
-    pub lease_id: Option<Id>,
-    pub property_id: Id,
-    pub id: Id,
+    pub lease_id: Option<FileId>,
+    pub property_id: PropertyId,
     pub details: Option<FurnishedLeaseDetails>,
     pub expired_at: Option<DateTime>,
     pub renew_date: Option<DateTime>,
@@ -56,10 +55,10 @@ pub struct Lease {
 }
 
 #[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
-#[table_name = "lease"]
+#[table_name = "leases"]
 pub struct LeaseData {
     pub id: LeaseId,
-    pub account_id: Option<Id>,
+    pub account_id: Option<AccountId>,
     pub deposit_amount: Option<Amount>,
     pub effect_date: Option<DateTime>,
     pub signature_date: Option<DateTime>,
@@ -71,13 +70,7 @@ pub struct LeaseData {
     pub details: Option<FurnishedLeaseDetails>,
     pub expired_at: Option<DateTime>,
     pub renew_date: Option<DateTime>,
-}
-
-#[derive(Clone, Insertable, Queryable)]
-#[table_name = "leasetenant"]
-pub struct LeaseTenant {
-    pub lease_id: LenderId,
-    pub tenant_id: TenantId,
+    pub duration: Option<FurnishedLeaseDuration>,
 }
 
 // # Impls
@@ -140,6 +133,8 @@ impl Lease {
 
                 Rent {
                     id: RentId::new_v4(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
                     period_start: start,
                     period_end: end,
                     amount: rent,
@@ -148,7 +143,6 @@ impl Lease {
                     status: RentStatus::Pending,
                     lease_id: self.id,
                     receipt_id: None,
-                    transaction_id: None,
                     notice_id: None,
                 }
             })
@@ -175,6 +169,9 @@ mod tests {
     impl Default for Lease {
         fn default() -> Self {
             Self {
+                id: Default::default(),
+                created_at: Default::default(),
+                updated_at: Default::default(),
                 account_id: Default::default(),
                 deposit_amount: Default::default(),
                 effect_date: DateTime::default(),
@@ -184,7 +181,6 @@ mod tests {
                 type_: LeaseType::Furnished,
                 lease_id: Default::default(),
                 property_id: Default::default(),
-                id: Default::default(),
                 details: Default::default(),
                 expired_at: Default::default(),
                 renew_date: Default::default(),

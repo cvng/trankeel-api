@@ -1,9 +1,12 @@
 use crate::common::Id;
-use crate::schema::user;
+use crate::schema::persons;
+use crate::AccountId;
 use crate::Address;
+use crate::DateTime;
 use crate::Email;
 use crate::LegalEntity;
 use crate::Name;
+use crate::PhoneNumber;
 use async_graphql::scalar;
 use async_graphql::Enum;
 use serde::Deserialize;
@@ -26,30 +29,31 @@ pub enum UserRole {
 pub struct AuthId(String);
 
 #[derive(Clone, Debug, Insertable, Queryable)]
-#[table_name = "user"]
 pub struct Person {
+    pub id: PersonId,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
+    pub account_id: AccountId,
     pub auth_id: AuthId,
-    pub email: String,
+    pub email: Email,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub address: Option<Address>,
     pub photo_url: Option<String>,
     pub role: Option<String>,
-    pub id: PersonId,
-    pub phone_number: Option<String>,
-    pub account_id: Option<Id>,
+    pub phone_number: Option<PhoneNumber>,
 }
 
 #[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
-#[table_name = "user"]
+#[table_name = "persons"]
 pub struct PersonData {
     pub id: PersonId,
-    pub account_id: Option<Id>,
-    pub address: Option<Address>,
+    pub account_id: Option<AccountId>,
     pub auth_id: Option<AuthId>,
     pub email: Option<Email>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
+    pub address: Option<Address>,
 }
 
 // # Impls
@@ -110,6 +114,10 @@ mod tests {
     impl Default for Person {
         fn default() -> Self {
             Self {
+                id: Default::default(),
+                created_at: Default::default(),
+                updated_at: Default::default(),
+                phone_number: Default::default(),
                 auth_id: Default::default(),
                 email: Default::default(),
                 first_name: Default::default(),
@@ -117,8 +125,6 @@ mod tests {
                 address: Default::default(),
                 photo_url: Default::default(),
                 role: Default::default(),
-                id: Default::default(),
-                phone_number: Default::default(),
                 account_id: Default::default(),
             }
         }

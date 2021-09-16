@@ -38,7 +38,7 @@ pub struct UpdatePropertyInput {
     pub other_spaces: Option<String>,
     pub room_count: Option<PropertyRoomType>,
     pub status: Option<PropertyStatus>,
-    pub surface: Option<f64>,
+    pub surface: Option<f32>,
     pub tax: Option<Amount>,
     pub tenant_private_spaces: Option<String>,
     pub usage_type: Option<PropertyHabitationUsageType>,

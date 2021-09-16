@@ -1,5 +1,5 @@
 use crate::common::Id;
-use crate::schema::rent;
+use crate::schema::rents;
 use crate::Amount;
 use crate::Attachable;
 use crate::DateTime;
@@ -7,7 +7,6 @@ use crate::FileId;
 use crate::LeaseId;
 use crate::PaymentNoticeId;
 use crate::ReceiptId;
-use crate::TransactionId;
 use async_graphql::Enum;
 use diesel_enum_derive::DieselEnum;
 use serde::Deserialize;
@@ -25,9 +24,10 @@ pub enum RentStatus {
 }
 
 #[derive(Clone, Insertable, Queryable)]
-#[table_name = "rent"]
 pub struct Rent {
     pub id: Id,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
     pub period_end: DateTime,
     pub period_start: DateTime,
     pub amount: Amount,
@@ -36,12 +36,11 @@ pub struct Rent {
     pub status: RentStatus,
     pub lease_id: LeaseId,
     pub receipt_id: Option<ReceiptId>,
-    pub transaction_id: Option<TransactionId>,
     pub notice_id: Option<PaymentNoticeId>,
 }
 
 #[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
-#[table_name = "rent"]
+#[table_name = "rents"]
 pub struct RentData {
     pub id: Id,
     pub period_end: Option<DateTime>,
@@ -52,7 +51,6 @@ pub struct RentData {
     pub status: Option<RentStatus>,
     pub lease_id: Option<LeaseId>,
     pub receipt_id: Option<ReceiptId>,
-    pub transaction_id: Option<TransactionId>,
     pub notice_id: Option<PaymentNoticeId>,
 }
 
