@@ -1,5 +1,4 @@
 use crate::routes::graphql_playground;
-use crate::routes::graphql_query;
 use crate::routes::graphql_request;
 use crate::webhooks::pdfmonkey_request;
 use crate::Result;
@@ -17,12 +16,7 @@ pub fn server() -> Result<Rocket<Build>> {
         .manage(schema)
         .mount(
             "/",
-            routes![
-                graphql_playground,
-                graphql_query,
-                graphql_request,
-                pdfmonkey_request,
-            ],
+            routes![graphql_playground, graphql_request, pdfmonkey_request],
         )
         .attach(cors);
 
