@@ -14,4 +14,4 @@ reqwest = { version = "0.11.4", features = ["json"] }
 sendinblue = "0.2.1"
 serde = "1.0"
 serde_json = "1.0"
-stripe-rust = { version = "0.13.0-dev", git = "https://github.com/wyyerd/stripe-rs" }
+stripe-rust = { version = "0.13.0-dev", git = "https://github.com/wyyerd/stripe-rs", default-features = false, features = ["default-tls", "billing"] }
