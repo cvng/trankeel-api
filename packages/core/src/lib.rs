@@ -19,6 +19,3 @@ pub mod reports;
 pub mod tenants;
 
 pub use piteo_data::*;
-
-// TODO: Move ops to lib then remove this.
-type Conn = diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>;

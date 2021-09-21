@@ -53,7 +53,7 @@ pub fn create_property(
 ) -> Result<Property, Error> {
     input.validate()?;
 
-    let account = db.accounts().by_auth_id(auth_id)?;
+    let account = db.accounts().by_auth_id(&auth_id)?;
 
     db.properties().create(Property {
         id: Default::default(),

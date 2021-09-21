@@ -44,14 +44,14 @@ pub fn update_individual_lender(
 ) -> Result<Lender, Error> {
     input.validate()?;
 
-    let lender = db.lenders().by_id(input.id)?;
+    let lender = db.lenders().by_id(&input.id)?;
 
     let person = match &lender {
         LenderIdentity::Individual(_, person) => person,
         _ => return Err(err!("Lender is not an individual")),
     };
 
-    db.users().update(PersonData {
+    db.persons().update(PersonData {
         id: person.id,
         address: input.individual.address.map(Into::into),
         first_name: input.individual.first_name,

@@ -55,7 +55,7 @@ async fn seed() {
 
     let lender = piteo::db(db_pool.clone())
         .lenders()
-        .by_individual_id(user.id)
+        .by_individual_id(&user.id)
         .unwrap();
 
     let property = piteo::create_property(

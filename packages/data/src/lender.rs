@@ -15,7 +15,7 @@ use serde::Deserialize;
 
 pub type LenderId = Id;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum LenderIdentity {
     Individual(Lender, Person),
     Company(Lender, Company),
@@ -49,6 +49,13 @@ impl LenderIdentity {
         match self {
             Self::Individual(lender, _) => lender.id,
             Self::Company(lender, _) => lender.id,
+        }
+    }
+
+    pub fn lender(&self) -> Lender {
+        match self {
+            Self::Individual(lender, _) => lender.clone(),
+            Self::Company(lender, _) => lender.clone(),
         }
     }
 

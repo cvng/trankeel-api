@@ -17,13 +17,16 @@ use piteo_core::schema::files;
 use piteo_core::schema::leases;
 use piteo_core::schema::lenders;
 use piteo_core::schema::persons;
+use piteo_core::schema::plans;
 use piteo_core::schema::properties;
 use piteo_core::schema::rents;
 use piteo_core::schema::tenants;
 use piteo_core::Account;
 use piteo_core::AccountData;
+use piteo_core::AccountId;
 use piteo_core::AuthId;
-use piteo_core::ExternalId;
+use piteo_core::Company;
+use piteo_core::CompanyId;
 use piteo_core::File;
 use piteo_core::FileData;
 use piteo_core::FileId;
@@ -37,6 +40,8 @@ use piteo_core::LenderIdentity;
 use piteo_core::Person;
 use piteo_core::PersonData;
 use piteo_core::PersonId;
+use piteo_core::Plan;
+use piteo_core::PlanId;
 use piteo_core::Property;
 use piteo_core::PropertyData;
 use piteo_core::PropertyId;
@@ -81,7 +86,9 @@ pub struct Pg(DbPool);
 
 struct AccountStore<'a>(&'a DbPool);
 
-struct UserStore<'a>(&'a DbPool);
+struct PersonStore<'a>(&'a DbPool);
+
+struct CompanyStore<'a>(&'a DbPool);
 
 struct TenantStore<'a>(&'a DbPool);
 
@@ -96,6 +103,8 @@ struct LeaseTenantStore<'a>(&'a DbPool);
 struct RentStore<'a>(&'a DbPool);
 
 struct FileStore<'a>(&'a DbPool);
+
+struct PlanStore<'a>(&'a DbPool);
 
 impl Pg {
     pub fn new(db_pool: DbPool) -> Self {
@@ -114,8 +123,12 @@ impl Db for Pg {
         Box::new(AccountStore(&self.0))
     }
 
-    fn users(&self) -> Box<dyn database::UserStore + '_> {
-        Box::new(UserStore(&self.0))
+    fn persons(&self) -> Box<dyn database::PersonStore + '_> {
+        Box::new(PersonStore(&self.0))
+    }
+
+    fn companies(&self) -> Box<dyn database::CompanyStore + '_> {
+        Box::new(CompanyStore(&self.0))
     }
 
     fn lenders(&self) -> Box<dyn database::LenderStore + '_> {
@@ -141,10 +154,21 @@ impl Db for Pg {
     fn files(&self) -> Box<dyn database::FileStore + '_> {
         Box::new(FileStore(&self.0))
     }
+
+    fn plans(&self) -> Box<dyn database::PlanStore + '_> {
+        Box::new(PlanStore(&self.0))
+    }
 }
 
 impl database::AccountStore for AccountStore<'_> {
-    fn by_auth_id(&mut self, auth_id: AuthId) -> Result<Account> {
+    fn by_id(&mut self, id: &AccountId) -> Result<Account> {
+        accounts::table
+            .find(id)
+            .first(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Account> {
         accounts::table
             .select(accounts::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
@@ -170,7 +194,21 @@ impl database::AccountStore for AccountStore<'_> {
     }
 }
 
-impl database::UserStore for UserStore<'_> {
+impl database::PersonStore for PersonStore<'_> {
+    fn by_id(&mut self, id: &PersonId) -> Result<Person> {
+        persons::table
+            .find(id)
+            .first(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Person> {
+        persons::table
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .first(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+
     fn create(&mut self, data: Person) -> Result<Person> {
         Ok(insert_into(persons::table)
             .values((
@@ -193,22 +231,23 @@ impl database::UserStore for UserStore<'_> {
 }
 
 impl database::TenantStore for TenantStore<'_> {
-    fn all(&mut self, auth_id: AuthId, id: Option<TenantId>) -> Result<Vec<Tenant>> {
-        let query = tenants::table
-            .select(tenants::all_columns)
-            .left_join(persons::table.on(persons::account_id.eq(tenants::account_id)))
-            .filter(persons::auth_id.eq(auth_id.inner()));
-
-        match id {
-            Some(id) => query
-                .filter(tenants::id.eq(id))
-                .load(&self.0.get()?)
-                .map_err(|err| err.into()),
-            None => query.load(&self.0.get()?).map_err(|err| err.into()),
-        }
+    fn by_id(&mut self, id: &TenantId) -> Result<Tenant> {
+        tenants::table
+            .find(id)
+            .first(&self.0.get()?)
+            .map_err(|err| err.into())
     }
 
-    fn by_lease_id(&mut self, lease_id: LeaseId) -> Result<Vec<Tenant>> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Tenant>> {
+        tenants::table
+            .select(tenants::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(tenants::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .load(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+
+    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Tenant>> {
         tenants::table
             .filter(tenants::lease_id.eq(lease_id))
             .load(&self.0.get()?)
@@ -244,7 +283,7 @@ impl database::TenantStore for TenantStore<'_> {
 }
 
 impl database::LenderStore for LenderStore<'_> {
-    fn by_id(&mut self, id: LenderId) -> Result<LenderIdentity> {
+    fn by_id(&mut self, id: &LenderId) -> Result<LenderIdentity> {
         let lender: Lender = lenders::table.find(id).first(&self.0.get()?)?;
 
         match lender {
@@ -266,7 +305,18 @@ impl database::LenderStore for LenderStore<'_> {
         }
     }
 
-    fn by_individual_id(&mut self, individual_id: PersonId) -> Result<LenderIdentity> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderIdentity>> {
+        lenders::table
+            .select(lenders::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(lenders::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .load(&self.0.get()?)?
+            .iter()
+            .map(|lender: &Lender| self.by_id(&lender.id))
+            .collect::<Result<Vec<_>>>()
+    }
+
+    fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderIdentity> {
         let lender: Lender = lenders::table
             .filter(lenders::individual_id.eq(individual_id))
             .first(&self.0.get()?)?;
@@ -290,26 +340,19 @@ impl database::LenderStore for LenderStore<'_> {
 }
 
 impl database::PropertyStore for PropertyStore<'_> {
-    fn all(&mut self, auth_id: AuthId, id: Option<PropertyId>) -> Result<Vec<Property>> {
-        let query = properties::table
-            .select(properties::all_columns)
-            .left_join(persons::table.on(persons::account_id.eq(properties::account_id)))
-            .filter(persons::auth_id.eq(auth_id.inner()));
-
-        if let Some(id) = id {
-            return query
-                .filter(properties::id.eq(id))
-                .load(&self.0.get()?)
-                .map_err(|err| err.into());
-        }
-
-        query.load(&self.0.get()?).map_err(|err| err.into())
-    }
-
-    fn by_id(&mut self, id: PropertyId) -> Result<Property> {
+    fn by_id(&mut self, id: &PropertyId) -> Result<Property> {
         properties::table
             .find(id)
             .first(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Property>> {
+        properties::table
+            .select(properties::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(properties::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .load(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
@@ -354,10 +397,19 @@ impl database::PropertyStore for PropertyStore<'_> {
 }
 
 impl database::LeaseStore for LeaseStore<'_> {
-    fn by_id(&mut self, id: LeaseId) -> Result<Lease> {
+    fn by_id(&mut self, id: &LeaseId) -> Result<Lease> {
         leases::table
             .find(id)
             .first(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Lease>> {
+        leases::table
+            .select(leases::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(leases::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .load(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
@@ -400,61 +452,79 @@ impl database::RentStore for RentStore<'_> {
             .map_err(|err| err.into())
     }
 
-    fn by_receipt_id(&mut self, receipt_id: ReceiptId) -> Result<Rent> {
+    fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Rent> {
         rents::table
             .filter(rents::receipt_id.eq(&receipt_id))
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
-    fn by_lease_id(&mut self, lease_id: LeaseId) -> Result<Vec<Rent>> {
+    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Rent>> {
         rents::table
             .filter(rents::lease_id.eq(&lease_id))
             .load(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
-    fn create(&mut self, data: &Rent) -> Result<Rent> {
+    fn create(&mut self, data: Rent) -> Result<Rent> {
         Ok(insert_into(rents::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
     fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>> {
-        data.iter().map(|item| self.create(item)).collect()
+        data.into_iter().map(|item| self.create(item)).collect()
     }
 
-    fn update(&mut self, data: &RentData) -> Result<Rent> {
-        Ok(update(data).set(data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: RentData) -> Result<Rent> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
     }
 
     fn update_many(&mut self, data: Vec<RentData>) -> Result<Vec<Rent>> {
-        data.iter().map(|item| self.update(item)).collect()
+        data.into_iter().map(|item| self.update(item)).collect()
     }
 }
 
 impl database::FileStore for FileStore<'_> {
-    fn by_external_id(&mut self, external_id: ExternalId) -> Result<File> {
+    fn by_external_id(&mut self, external_id: &str) -> Result<File> {
         files::table
             .filter(files::external_id.eq(external_id))
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
-    fn by_id(&mut self, id: FileId) -> Result<File> {
+    fn by_id(&mut self, id: &FileId) -> Result<File> {
         files::table
             .find(id)
             .first(&self.0.get()?)
             .map_err(|err| err.into())
     }
 
-    fn create(&mut self, data: &File) -> Result<File> {
+    fn create(&mut self, data: File) -> Result<File> {
         Ok(insert_into(files::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: &FileData) -> Result<File> {
-        Ok(update(data).set(data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: FileData) -> Result<File> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    }
+}
+
+impl database::PlanStore for PlanStore<'_> {
+    fn by_id(&mut self, id: &PlanId) -> Result<Plan> {
+        plans::table
+            .find(id)
+            .first(&self.0.get()?)
+            .map_err(|err| err.into())
+    }
+}
+
+impl database::CompanyStore for CompanyStore<'_> {
+    fn by_id(&mut self, id: &CompanyId) -> Result<Company> {
+        companies::table
+            .find(id)
+            .first(&self.0.get()?)
+            .map_err(|err| err.into())
     }
 }

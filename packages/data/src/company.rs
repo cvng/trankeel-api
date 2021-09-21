@@ -23,7 +23,7 @@ pub enum LegalEntityType {
     Snc,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Clone, Debug, Queryable)]
 pub struct Company {
     pub id: CompanyId,
     pub created_at: Option<DateTime>,
