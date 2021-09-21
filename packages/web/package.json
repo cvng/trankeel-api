@@ -2,10 +2,13 @@
   "name": "piteo-web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "lint": "eslint --ext=.graphql src/ && next lint",
     "fmt": "prettier --loglevel=silent --write .",
     "generate": "graphql-codegen --config=codegen.yml"
