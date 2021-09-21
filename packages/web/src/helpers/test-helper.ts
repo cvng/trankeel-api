@@ -1,4 +1,3 @@
-/*
 import * as faker from "faker";
 
 const testSamples = {
@@ -26,6 +25,3 @@ export function fake(
 ) {
   return { ...testSamples[collectionPath], ...data };
 }
-*/
-
-export {};

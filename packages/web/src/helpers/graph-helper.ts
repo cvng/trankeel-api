@@ -1,55 +1,85 @@
 import { MutationHookOptions } from "@apollo/client";
+import moment from "moment";
+import { RecentActivityListQuery } from ".";
 import {
-  ContractRequirementData as ContractRequirementDataQuery,
-  InvoiceList as InvoiceListQuery,
-  LeaseList as LeaseListQuery,
-  Lender as LenderQuery,
-  PropertyList as PropertyListQuery,
-  RentReceivedStatus as RentReceivedStatusQuery,
-  RentReceivedSummary as RentReceivedSummaryQuery,
+  ContractRequirementDataDocument as ContractRequirementDataQuery,
+  InvoiceListDocument as InvoiceListQuery,
+  LeaseListDocument as LeaseListQuery,
+  LenderDocument as LenderQuery,
+  PropertyListDocument as PropertyListQuery,
+  RentListDocument as RentListQuery,
+  RentReceivedStatusDocument as RentReceivedStatusQuery,
+  RentReceivedSummaryDocument as RentReceivedSummaryQuery,
   TenantInput,
-  TenantList as TenantListQuery,
+  TenantListDocument as TenantListQuery,
   TenantStatus,
 } from "../types";
+import { DATE_ISO_FORMAT } from "../validators";
 
 // # Queries
 
 export {
-  AccountActivatePlan as AccountActivatePlanMutation,
-  AccountUpdatePaymentMethod as AccountUpdatePaymentMethodMutation,
-  ContractDelete as ContractDeleteMutation,
-  ContractRequirementData as ContractRequirementDataQuery,
-  ContractUpdate as ContractUpdateMutation,
-  File as FileListQuery,
-  FileUpload as FileUploadMutation,
-  ImportUpload as ImportUploadMutation,
-  InvoiceList as InvoiceListQuery,
-  LeaseCreate as LeaseCreateMutation,
-  LeaseDelete as LeaseDeleteMutation,
-  Lease as LeaseQuery,
-  LeaseList as LeaseListQuery,
-  Lender as LenderQuery,
-  LenderIndividualUpdate as LenderIndividualUpdateMutation,
-  PricingPlans as PricingPlansQuery,
-  PropertyCreate as PropertyCreateMutation,
-  PropertyDelete as PropertyDeleteMutation,
-  PropertyList as PropertyListQuery,
-  PropertyUpdate as PropertyUpdateMutation,
-  RentalReceiptData as RentalReceiptDataQuery,
-  RentReceiptCreate as RentReceiptCreateMutation,
-  RentReceivedStatus as RentReceivedStatusQuery,
-  RentReceivedSummary as RentReceivedSummaryQuery,
-  TenantCreate as TenantCreateMutation,
-  TenantDelete as TenantDeleteMutation,
-  TenantList as TenantListQuery,
-  TenantUpdate as TenantUpdateMutation,
-  TenantWithRentalReceipts as TenantWithRentalReceiptsQuery,
-  TransactionCreate as TransactionCreateMutation,
-  TransactionDelete as TransactionDeleteMutation,
-  Transaction as TransactionQuery,
-  UserCreateWithAccount as AccountCreateMutation,
-  User as UserQuery,
+  AccountActivatePlanDocument as AccountActivatePlanMutation,
+  AccountUpdatePaymentMethodDocument as AccountUpdatePaymentMethodMutation,
+  ContractDeleteDocument as ContractDeleteMutation,
+  ContractRequirementDataDocument as ContractRequirementDataQuery,
+  ContractUpdateDocument as ContractUpdateMutation,
+  FileDocument as FileListQuery,
+  FileUploadDocument as FileUploadMutation,
+  ImportUploadDocument as ImportUploadMutation,
+  InvoiceListDocument as InvoiceListQuery,
+  LeaseCreateDocument as LeaseCreateMutation,
+  LeaseDeleteDocument as LeaseDeleteMutation,
+  LeaseDocument as LeaseQuery,
+  LeaseListDocument as LeaseListQuery,
+  LenderDocument as LenderQuery,
+  LenderIndividualUpdateDocument as LenderIndividualUpdateMutation,
+  PricingPlansDocument as PricingPlansQuery,
+  PropertyCreateDocument as PropertyCreateMutation,
+  PropertyDeleteDocument as PropertyDeleteMutation,
+  PropertyListDocument as PropertyListQuery,
+  PropertyUpdateDocument as PropertyUpdateMutation,
+  RecentActivityListDocument as RecentActivityListQuery,
+  RentalReceiptDataDocument as RentalReceiptDataQuery,
+  RentListDocument as RentListQuery,
+  RentReceiptCreateDocument as RentReceiptCreateMutation,
+  RentReceivedStatusDocument as RentReceivedStatusQuery,
+  RentReceivedSummaryDocument as RentReceivedSummaryQuery,
+  SendPaymentNoticeDocument as SendPaymentNoticeMutation,
+  TenantCreateDocument as TenantCreateMutation,
+  TenantDeleteDocument as TenantDeleteMutation,
+  TenantListDocument as TenantListQuery,
+  TenantUpdateDocument as TenantUpdateMutation,
+  TenantWithRentalReceiptsDocument as TenantWithRentalReceiptsQuery,
+  TransactionCreateDocument as TransactionCreateMutation,
+  TransactionDeleteDocument as TransactionDeleteMutation,
+  TransactionDocument as TransactionQuery,
+  UserCreateWithAccountDocument as AccountCreateMutation,
+  UserDocument as UserQuery,
 } from "../types";
+
+// Default since date is the first day of the current month
+const SINCE_DEFAULT = moment().startOf("month").format(DATE_ISO_FORMAT);
+// Default until date is the last day of the current month
+const UNTIL_DEFAULT = moment().add(1, "month").startOf("month").format(
+  DATE_ISO_FORMAT,
+);
+
+const RentListDefaultQuery = {
+  query: RentListQuery,
+  variables: {
+    until: UNTIL_DEFAULT,
+    since: SINCE_DEFAULT,
+  },
+};
+
+const RentReceivedSummaryDefaultQuery = {
+  query: RentReceivedSummaryQuery,
+  variables: {
+    until: UNTIL_DEFAULT,
+    since: SINCE_DEFAULT,
+  },
+};
 
 // # Mutations Options
 
@@ -94,6 +124,7 @@ export const LeaseCreateMutationOptions = (): MutationHookOptions => ({
   refetchQueries: [
     { query: PropertyListQuery },
     { query: LeaseListQuery },
+    RentReceivedSummaryDefaultQuery,
   ],
 });
 
@@ -102,6 +133,7 @@ export const LeaseDeleteMutationOptions = (): MutationHookOptions => ({
     { query: PropertyListQuery },
     { query: LeaseListQuery },
     { query: ContractRequirementDataQuery },
+    RentReceivedSummaryDefaultQuery,
   ],
 });
 
@@ -122,15 +154,18 @@ export const ContractUpdateMutationOptions = (): MutationHookOptions => ({
 export const TransactionCreateMutationOptions = (): MutationHookOptions => ({
   refetchQueries: [
     { query: RentReceivedStatusQuery },
-    { query: RentReceivedSummaryQuery },
     { query: TenantListQuery },
+    RentReceivedSummaryDefaultQuery,
+    {
+      query: RecentActivityListQuery,
+    },
   ],
 });
 
 export const TransactionDeleteMutationOptions = (): MutationHookOptions => ({
   refetchQueries: [
     { query: RentReceivedStatusQuery },
-    { query: RentReceivedSummaryQuery },
+    RentReceivedSummaryDefaultQuery,
   ],
 });
 
@@ -155,8 +190,23 @@ export const PropertyDeleteMutationOptions = (): MutationHookOptions => ({
 });
 
 export const RentReceiptCreateMutationOptions = (): MutationHookOptions => ({
-  refetchQueries: [{ query: RentReceivedSummaryQuery }, {
+  refetchQueries: [RentReceivedSummaryDefaultQuery, RentListDefaultQuery, {
     query: TenantListQuery,
+  }, {
+    query: RecentActivityListQuery,
+  }],
+});
+
+export const AllRentReceiptsCreateMutationOptions =
+  (): MutationHookOptions => ({
+    refetchQueries: [RentReceivedSummaryDefaultQuery, {
+      query: TenantListQuery,
+    }],
+  });
+
+export const SendPaymentNoticeMutationOptions = (): MutationHookOptions => ({
+  refetchQueries: [{
+    query: RecentActivityListQuery,
   }],
 });
 
