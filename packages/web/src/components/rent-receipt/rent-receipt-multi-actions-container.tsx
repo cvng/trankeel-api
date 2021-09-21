@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMutation } from "@apollo/client";
 import { toaster } from "evergreen-ui";
 import { translate } from "piteo-kit";

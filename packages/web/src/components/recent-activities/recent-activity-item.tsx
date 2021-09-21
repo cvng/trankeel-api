@@ -11,7 +11,7 @@ import {
 } from "evergreen-ui";
 import React, { ElementType } from "react";
 import { useAppTheme } from "../../hooks/use-app-theme";
-import { EventType, Person } from "../../types";
+import { EventType, User } from "../../types";
 
 export type EventModel = {
   type: EventType;
@@ -21,7 +21,7 @@ export type EventModel = {
     title: string;
     icon?: ElementType;
   };
-  user?: Person;
+  user?: User;
 };
 
 export type RecentActivityItemProps = {

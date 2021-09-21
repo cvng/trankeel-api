@@ -1,3 +1,4 @@
+// @ts-nocheck
 import moment from "moment";
 import { translate } from "piteo-kit";
 import { EventModel } from "../components/recent-activities/recent-activity-item";

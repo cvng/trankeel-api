@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FormikProps } from "formik";
 import React from "react";
 import { ObjectSchema } from "yup";

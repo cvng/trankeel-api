@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMutation, useQuery } from "@apollo/client";
 import { toaster } from "evergreen-ui";
 import moment from "moment";
@@ -72,7 +73,8 @@ export const withContainer = (
         leaseId: rent.leaseId,
       };
       // Prepare the payment notice to be send to the tenant
-      const input: SendPaymentNoticeInput = { rentList: [rentInput] };
+      const input: SendPaymentNoticeInput = {
+      rentList: [rentInput] };
       try {
         // Hide the confirmation modal
         setIsShown(false);
