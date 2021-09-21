@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { InboxSearchIcon } from "evergreen-ui";
 import { PropertyHelper } from "piteo-kit";
 import * as React from "react";

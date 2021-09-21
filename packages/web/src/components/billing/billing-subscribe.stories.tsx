@@ -25,7 +25,7 @@ const PLAN = {
     { id: null, title: _("benefit_3"), available: true },
     { id: null, title: _("benefit_4"), available: true },
   ],
-  price: 990,
+  price: "990",
   available: true,
 };
 

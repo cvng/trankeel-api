@@ -16,7 +16,7 @@ export interface Scalars {
   Float: number;
   AuthenticationID: string;
   DateTime: string;
-  Decimal: number;
+  Decimal: string;
   Email: string;
   PhoneNumber: string;
   UUID: string;
@@ -1150,7 +1150,7 @@ export type TenantWithRentalReceiptsQuery = {
     lastTransaction?: Maybe<{
       __typename?: "Transaction";
       date: string;
-      amount: number;
+      amount: string;
     }>;
   }>;
 };
@@ -1186,7 +1186,7 @@ export type TenantListQuery = {
       __typename?: "Transaction";
       id: string;
       date: string;
-      amount: number;
+      amount: string;
       accountId: string;
       type: TransactionType;
     }>;
@@ -1205,13 +1205,13 @@ export type TenantListQuery = {
       id: string;
       type: LeaseType;
       status: LeaseStatus;
-      rentFullAmount: number;
-      rentAmount: number;
-      rentChargesAmount?: Maybe<number>;
+      rentFullAmount: string;
+      rentAmount: string;
+      rentChargesAmount?: Maybe<string>;
       effectDate: string;
       renewDate?: Maybe<string>;
       signatureDate?: Maybe<string>;
-      depositAmount?: Maybe<number>;
+      depositAmount?: Maybe<string>;
       accountId: string;
       propertyId: string;
       rents: Array<{
@@ -1219,8 +1219,8 @@ export type TenantListQuery = {
         id: string;
         periodStart: string;
         periodEnd: string;
-        fullAmount: number;
-        amount: number;
+        fullAmount: string;
+        amount: string;
         status: RentStatus;
         leaseId: string;
       }>;
@@ -1295,11 +1295,11 @@ export type LeaseListQuery = {
     status: LeaseStatus;
     renewDate?: Maybe<string>;
     type: LeaseType;
-    rentFullAmount: number;
+    rentFullAmount: string;
     effectDate: string;
-    rentAmount: number;
-    depositAmount?: Maybe<number>;
-    rentChargesAmount?: Maybe<number>;
+    rentAmount: string;
+    depositAmount?: Maybe<string>;
+    rentChargesAmount?: Maybe<string>;
     account?: Maybe<{ __typename?: "Account"; id: string }>;
     property?: Maybe<{
       __typename?: "Property";
@@ -1382,11 +1382,11 @@ export type LeaseQuery = {
     id: string;
     accountId: string;
     status: LeaseStatus;
-    rentFullAmount: number;
+    rentFullAmount: string;
     effectDate: string;
-    rentAmount: number;
-    depositAmount?: Maybe<number>;
-    rentChargesAmount?: Maybe<number>;
+    rentAmount: string;
+    depositAmount?: Maybe<string>;
+    rentChargesAmount?: Maybe<string>;
     tenants: Array<{ __typename?: "Tenant"; id: string; fullName: string }>;
     file?: Maybe<{ __typename?: "File"; downloadUrl?: Maybe<string> }>;
     data?: Maybe<{
@@ -1410,15 +1410,15 @@ export type RentListQuery = {
     periodStart: string;
     periodEnd: string;
     status: RentStatus;
-    amount: number;
-    chargesAmount?: Maybe<number>;
-    fullAmount: number;
+    amount: string;
+    chargesAmount?: Maybe<string>;
+    fullAmount: string;
     leaseId: string;
     delay?: Maybe<number>;
     lease?: Maybe<{
       __typename?: "Lease";
       id: string;
-      rentFullAmount: number;
+      rentFullAmount: string;
       tenants: Array<{
         __typename?: "Tenant";
         shortName?: Maybe<string>;
@@ -1461,7 +1461,7 @@ export type PropertyListQuery = {
     name: string;
     roomCount: PropertyRoomType;
     note?: Maybe<string>;
-    collectedRents?: Maybe<number>;
+    collectedRents?: Maybe<string>;
     surface: number;
     status?: Maybe<PropertyStatus>;
     energyClass?: Maybe<PropertyEnergyClass>;
@@ -1473,7 +1473,7 @@ export type PropertyListQuery = {
     commonSpaces?: Maybe<string>;
     waterHeatingMethod?: Maybe<PropertyUsageType>;
     heatingMethod?: Maybe<PropertyUsageType>;
-    tax?: Maybe<number>;
+    tax?: Maybe<string>;
     buildPeriod?: Maybe<PropertyBuildPeriodType>;
     housingType?: Maybe<PropertyUsageType>;
     buildingLegalStatus?: Maybe<PropertyBuildingLegalStatus>;
@@ -1497,10 +1497,10 @@ export type PropertyListQuery = {
         effectDate: string;
         renewDate?: Maybe<string>;
         signatureDate?: Maybe<string>;
-        rentAmount: number;
-        depositAmount?: Maybe<number>;
-        rentChargesAmount?: Maybe<number>;
-        rentFullAmount: number;
+        rentAmount: string;
+        depositAmount?: Maybe<string>;
+        rentChargesAmount?: Maybe<string>;
+        rentFullAmount: string;
         accountId: string;
         propertyId: string;
         account?: Maybe<{ __typename?: "Account"; id: string }>;
@@ -1557,7 +1557,7 @@ export type TransactionQuery = {
     __typename?: "Transaction";
     id: string;
     date: string;
-    amount: number;
+    amount: string;
     type: TransactionType;
     lease?: Maybe<{ __typename?: "Lease"; id: string }>;
   }>;
@@ -1571,7 +1571,7 @@ export type InvoiceListQuery = {
     __typename?: "Invoice";
     id: string;
     number: number;
-    amountPaid: number;
+    amountPaid: string;
     invoicePdf: string;
     periodEnd: string;
     status: string;
@@ -1588,7 +1588,7 @@ export type PricingPlansQuery = {
     title?: Maybe<string>;
     subtitle?: Maybe<string>;
     id: string;
-    price?: Maybe<number>;
+    price?: Maybe<string>;
     code: PlanCode;
     features: Array<{
       __typename?: "Feature";
@@ -1613,9 +1613,9 @@ export type RentalReceiptDataQuery = {
     lease?: Maybe<{
       __typename?: "Lease";
       id: string;
-      rentAmount: number;
-      rentChargesAmount?: Maybe<number>;
-      rentFullAmount: number;
+      rentAmount: string;
+      rentChargesAmount?: Maybe<string>;
+      rentFullAmount: string;
       property?: Maybe<{
         __typename?: "Property";
         id: string;
@@ -1644,11 +1644,11 @@ export type RentReceivedSummaryQuery = {
     __typename?: "Summary";
     since: string;
     until: string;
-    amountExpected: number;
-    amountReceived: number;
-    amountSettled: number;
-    amountPartial: number;
-    amountPending: number;
+    amountExpected: string;
+    amountReceived: string;
+    amountSettled: string;
+    amountPartial: string;
+    amountPending: string;
     nExpected: number;
     nReceived: number;
     nSettled: number;
@@ -1684,8 +1684,8 @@ export type RecentActivityListQuery = {
       | {
           __typename: "Rent";
           id: string;
-          fullAmount: number;
-          amount: number;
+          fullAmount: string;
+          amount: string;
           leaseId: string;
           periodEnd: string;
           periodStart: string;
@@ -1695,7 +1695,7 @@ export type RecentActivityListQuery = {
             renewDate?: Maybe<string>;
             id: string;
             propertyId: string;
-            rentAmount: number;
+            rentAmount: string;
             status: LeaseStatus;
             type: LeaseType;
             property?: Maybe<{
@@ -1734,7 +1734,7 @@ export type RecentActivityListQuery = {
       | {
           __typename: "Transaction";
           id: string;
-          amount: number;
+          amount: string;
           type: TransactionType;
           date: string;
           lease?: Maybe<{
@@ -1743,7 +1743,7 @@ export type RecentActivityListQuery = {
             renewDate?: Maybe<string>;
             id: string;
             propertyId: string;
-            rentAmount: number;
+            rentAmount: string;
             status: LeaseStatus;
             type: LeaseType;
             property?: Maybe<{
@@ -1790,13 +1790,13 @@ export type RentReceivedStatusQuery = {
     __typename?: "Property";
     id: string;
     name: string;
-    collectedRents?: Maybe<number>;
-    expectedRents?: Maybe<number>;
+    collectedRents?: Maybe<string>;
+    expectedRents?: Maybe<string>;
     leases?: Maybe<
       Array<{
         __typename?: "Lease";
         id: string;
-        rentFullAmount: number;
+        rentFullAmount: string;
         property?: Maybe<{
           __typename?: "Property";
           lender?: Maybe<{
@@ -1824,8 +1824,8 @@ export type RentReceivedStatusQuery = {
           id: string;
           periodStart: string;
           periodEnd: string;
-          fullAmount: number;
-          amount: number;
+          fullAmount: string;
+          amount: string;
           status: RentStatus;
           leaseId: string;
           transactions?: Maybe<
@@ -1905,7 +1905,7 @@ export type TenantCreateMutation = {
     lastTransaction?: Maybe<{
       __typename?: "Transaction";
       date: string;
-      amount: number;
+      amount: string;
     }>;
   };
 };

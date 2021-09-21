@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { QueryResult } from "@apollo/client";
 import {
   Alert,
