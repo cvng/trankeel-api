@@ -1,0 +1,21 @@
+name: ci
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - uses: swatinem/rust-cache@v1
+
+      - run: cargo build --release --locked
+
+      - run: cargo test --release --locked
