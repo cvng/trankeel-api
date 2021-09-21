@@ -1,3 +1,4 @@
+use crate::objects::Event;
 use crate::objects::File;
 use crate::objects::Invoice;
 use crate::objects::Lease;
@@ -5,6 +6,7 @@ use crate::objects::Lender;
 use crate::objects::Person;
 use crate::objects::Plan;
 use crate::objects::Property;
+use crate::objects::Rent;
 use crate::objects::Summary;
 use crate::objects::Tenant;
 use crate::objects::Transaction;
@@ -91,6 +93,19 @@ impl Query {
         let id = id.map(|id| LenderId::parse_str(&id).unwrap_or_default());
 
         Ok(owners::all_lenders(&conn, auth_id, id).and_then(map_res)?)
+    }
+
+    async fn rents(
+        &self,
+        _ctx: &Context<'_>,
+        _since: DateTime,
+        _until: DateTime,
+    ) -> Result<Vec<Rent>> {
+        Ok(Vec::new())
+    }
+
+    async fn events(&self, _ctx: &Context<'_>) -> Result<Vec<Event>> {
+        Ok(Vec::new())
     }
 
     async fn transactions(&self, _ctx: &Context<'_>, _id: Option<ID>) -> Result<Vec<Transaction>> {

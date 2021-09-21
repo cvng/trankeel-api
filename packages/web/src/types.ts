@@ -15,11 +15,11 @@ export interface Scalars {
   Int: number;
   Float: number;
   AuthenticationID: string;
-  Date: string;
   DateTime: string;
   Decimal: number;
   Email: string;
   PhoneNumber: string;
+  UUID: string;
 }
 
 export interface Account {
@@ -29,20 +29,19 @@ export interface Account {
   stripeCustomerId?: Maybe<Scalars["String"]>;
   stripeSubscriptionId?: Maybe<Scalars["String"]>;
   trialEnd?: Maybe<Scalars["DateTime"]>;
-  ownerId?: Maybe<Scalars["String"]>;
   id: Scalars["ID"];
   plan?: Maybe<Plan>;
 }
 
 export interface AccountActivatePlanInput {
-  id: Scalars["ID"];
+  id: Scalars["UUID"];
   name: Scalars["String"];
   planCode: PlanCode;
 }
 
 export interface AccountUpdateInput {
-  id: Scalars["ID"];
-  paymentMethodId: Scalars["ID"];
+  id: Scalars["UUID"];
+  paymentMethodId: Scalars["String"];
 }
 
 export interface Address {
@@ -76,6 +75,29 @@ export interface Company {
   phoneNumber?: Maybe<Scalars["PhoneNumber"]>;
 }
 
+export interface Error {
+  __typename?: "Error";
+  message: Scalars["String"];
+}
+
+export interface Event {
+  __typename?: "Event";
+  id: Scalars["ID"];
+  createdAt: Scalars["DateTime"];
+  eventableId: Scalars["ID"];
+  eventableType: Scalars["String"];
+  type: EventType;
+  object: Eventable;
+}
+
+export enum EventType {
+  RentReceiptCreated = "RENT_RECEIPT_CREATED",
+  RentReceiptSent = "RENT_RECEIPT_SENT",
+  TransactionCreated = "TRANSACTION_CREATED",
+}
+
+export type Eventable = Rent | Transaction;
+
 export interface Feature {
   __typename?: "Feature";
   available: Scalars["Boolean"];
@@ -85,7 +107,7 @@ export interface Feature {
 
 export interface File {
   __typename?: "File";
-  createdAt: Scalars["DateTime"];
+  createdAt?: Maybe<Scalars["DateTime"]>;
   downloadUrl?: Maybe<Scalars["String"]>;
   externalId?: Maybe<Scalars["String"]>;
   filename?: Maybe<Scalars["String"]>;
@@ -116,6 +138,11 @@ export enum FileType {
   RentReceipt = "RENT_RECEIPT",
 }
 
+export enum FurnishedLeaseDuration {
+  NineMonths = "NINE_MONTHS",
+  OneYear = "ONE_YEAR",
+}
+
 export type Identity = User | Company;
 
 export interface ImportInput {
@@ -143,6 +170,7 @@ export interface Lease {
   accountId: Scalars["ID"];
   depositAmount?: Maybe<Scalars["Decimal"]>;
   effectDate: Scalars["DateTime"];
+  duration: FurnishedLeaseDuration;
   signatureDate?: Maybe<Scalars["DateTime"]>;
   rentAmount: Scalars["Decimal"];
   rentChargesAmount?: Maybe<Scalars["Decimal"]>;
@@ -155,8 +183,8 @@ export interface Lease {
   expiredAt?: Maybe<Scalars["DateTime"]>;
   renewDate?: Maybe<Scalars["DateTime"]>;
   status: LeaseStatus;
+  rents: Array<Rent>;
   lease?: Maybe<File>;
-  rents?: Maybe<Array<Rent>>;
   tenants: Array<Tenant>;
   account?: Maybe<Account>;
   property?: Maybe<Property>;
@@ -169,7 +197,7 @@ export interface LeaseFurnishedData {
   colocationInsuranceLender?: Maybe<Scalars["Boolean"]>;
   colocationInsuranceMonthlyAmount?: Maybe<Scalars["Decimal"]>;
   colocationInsuranceTotalAmount?: Maybe<Scalars["Decimal"]>;
-  duration?: Maybe<LeaseFurnishedDuration>;
+  duration?: Maybe<FurnishedLeaseDuration>;
   lenderFeeCap?: Maybe<Scalars["Decimal"]>;
   lenderFeeCapOther?: Maybe<Scalars["String"]>;
   lenderFeeCapPrestations?: Maybe<Scalars["Decimal"]>;
@@ -178,7 +206,7 @@ export interface LeaseFurnishedData {
   rentComplementPropertyJustification?: Maybe<Scalars["String"]>;
   rentFirstAmount?: Maybe<Scalars["Decimal"]>;
   rentIrl?: Maybe<LeaseRentReferenceIrl>;
-  rentIrlRevisionDate?: Maybe<Scalars["String"]>;
+  rentIrlRevisionDate?: Maybe<Scalars["DateTime"]>;
   rentMajDecreeIncreasedAmount?: Maybe<Scalars["Decimal"]>;
   rentMajDecreeReferenceAmount?: Maybe<Scalars["Decimal"]>;
   rentMajorationDecree?: Maybe<Scalars["Boolean"]>;
@@ -196,8 +224,8 @@ export interface LeaseFurnishedData {
   tenantFeeCapReportByMeter?: Maybe<Scalars["Decimal"]>;
   tenantFeeCapReportPrestations?: Maybe<Scalars["Decimal"]>;
   tenantLastRentAmount?: Maybe<Scalars["Decimal"]>;
-  tenantLastRentReceivedDate?: Maybe<Scalars["String"]>;
-  tenantLastRentRevisionDate?: Maybe<Scalars["String"]>;
+  tenantLastRentReceivedDate?: Maybe<Scalars["DateTime"]>;
+  tenantLastRentRevisionDate?: Maybe<Scalars["DateTime"]>;
   worksDecenceSinceLastRental?: Maybe<Scalars["String"]>;
   worksRentDecreaseTenant?: Maybe<Scalars["String"]>;
   worksRentIncreaseLender?: Maybe<Scalars["String"]>;
@@ -209,7 +237,7 @@ export interface LeaseFurnishedDataInput {
   colocationInsuranceLender?: Maybe<Scalars["Boolean"]>;
   colocationInsuranceMonthlyAmount?: Maybe<Scalars["Decimal"]>;
   colocationInsuranceTotalAmount?: Maybe<Scalars["Decimal"]>;
-  duration?: Maybe<LeaseFurnishedDuration>;
+  duration?: Maybe<FurnishedLeaseDuration>;
   lenderFeeCap?: Maybe<Scalars["Decimal"]>;
   lenderFeeCapOther?: Maybe<Scalars["String"]>;
   lenderFeeCapPrestations?: Maybe<Scalars["Decimal"]>;
@@ -218,12 +246,12 @@ export interface LeaseFurnishedDataInput {
   rentComplementPropertyJustification?: Maybe<Scalars["String"]>;
   rentFirstAmount?: Maybe<Scalars["Decimal"]>;
   rentIrl?: Maybe<LeaseRentReferenceIrl>;
-  rentIrlRevisionDate?: Maybe<Scalars["Date"]>;
+  rentIrlRevisionDate?: Maybe<Scalars["DateTime"]>;
   rentMajDecreeIncreasedAmount?: Maybe<Scalars["Decimal"]>;
   rentMajDecreeReferenceAmount?: Maybe<Scalars["Decimal"]>;
   rentMajorationDecree?: Maybe<Scalars["Boolean"]>;
   rentMaxEvolutionRelocation?: Maybe<Scalars["Boolean"]>;
-  rentPaymentDate?: Maybe<Scalars["Date"]>;
+  rentPaymentDate?: Maybe<Scalars["DateTime"]>;
   rentPaymentMethod?: Maybe<RentPaymentMethod>;
   rentPaymentPlace?: Maybe<Scalars["String"]>;
   rentPeriodicity?: Maybe<LeaseRentPeriodicity>;
@@ -236,35 +264,30 @@ export interface LeaseFurnishedDataInput {
   tenantFeeCapReportByMeter?: Maybe<Scalars["Decimal"]>;
   tenantFeeCapReportPrestations?: Maybe<Scalars["Decimal"]>;
   tenantLastRentAmount?: Maybe<Scalars["Decimal"]>;
-  tenantLastRentReceivedDate?: Maybe<Scalars["Date"]>;
-  tenantLastRentRevisionDate?: Maybe<Scalars["Date"]>;
+  tenantLastRentReceivedDate?: Maybe<Scalars["DateTime"]>;
+  tenantLastRentRevisionDate?: Maybe<Scalars["DateTime"]>;
   worksDecenceSinceLastRental?: Maybe<Scalars["String"]>;
   worksRentDecreaseTenant?: Maybe<Scalars["String"]>;
   worksRentIncreaseLender?: Maybe<Scalars["String"]>;
 }
 
-export enum LeaseFurnishedDuration {
-  NineMonths = "NINE_MONTHS",
-  OneYear = "ONE_YEAR",
-}
-
 export interface LeaseFurnishedInput {
   data?: Maybe<LeaseFurnishedDataInput>;
   depositAmount?: Maybe<Scalars["Decimal"]>;
-  effectDate: Scalars["Date"];
-  renewDate?: Maybe<Scalars["Date"]>;
+  effectDate: Scalars["DateTime"];
+  renewDate?: Maybe<Scalars["DateTime"]>;
   file?: Maybe<FileInput>;
-  propertyId: Scalars["ID"];
+  propertyId: Scalars["UUID"];
   rentAmount: Scalars["Decimal"];
   rentChargesAmount?: Maybe<Scalars["Decimal"]>;
-  signatureDate?: Maybe<Scalars["Date"]>;
-  tenantIds: Array<Scalars["ID"]>;
+  signatureDate?: Maybe<Scalars["DateTime"]>;
+  tenantIds: Array<Scalars["UUID"]>;
 }
 
 export interface LeaseFurnishedUpdateInput {
   data?: Maybe<LeaseFurnishedDataInput>;
   file?: Maybe<FileInput>;
-  id: Scalars["ID"];
+  id: Scalars["UUID"];
 }
 
 export enum LeaseRentPeriodicity {
@@ -310,13 +333,13 @@ export interface Lender {
 }
 
 export interface LenderIndividualUpdateInput {
-  id: Scalars["ID"];
+  id: Scalars["UUID"];
   individual: UserUpdateInput;
 }
 
 export interface Mutation {
   __typename?: "Mutation";
-  userCreateWithAccount: Account;
+  userCreateWithAccount: User;
   accountUpdatePaymentMethod: Account;
   accountActivatePlan: Account;
   tenantCreate: Tenant;
@@ -326,14 +349,15 @@ export interface Mutation {
   propertyUpdate: Property;
   propertyDelete: Scalars["ID"];
   leaseFurnishedCreate: Lease;
-  leaseDelete: Scalars["ID"];
   leaseFurnishedUpdate: Lease;
+  leaseDelete: Scalars["ID"];
   lenderIndividualUpdate: Lender;
   transactionCreate: Transaction;
   transactionDelete: Scalars["ID"];
   fileUpload: File;
   importUpload: Task;
   rentReceiptCreate: RentReceiptPayload;
+  sendPaymentNotice: SendPaymentNoticePayload;
 }
 
 export interface MutationUserCreateWithAccountArgs {
@@ -376,12 +400,12 @@ export interface MutationLeaseFurnishedCreateArgs {
   input: LeaseFurnishedInput;
 }
 
-export interface MutationLeaseDeleteArgs {
-  id: Scalars["ID"];
-}
-
 export interface MutationLeaseFurnishedUpdateArgs {
   input: LeaseFurnishedUpdateInput;
+}
+
+export interface MutationLeaseDeleteArgs {
+  id: Scalars["ID"];
 }
 
 export interface MutationLenderIndividualUpdateArgs {
@@ -408,6 +432,10 @@ export interface MutationRentReceiptCreateArgs {
   input: RentReceiptInput;
 }
 
+export interface MutationSendPaymentNoticeArgs {
+  input: SendPaymentNoticeInput;
+}
+
 export interface Plan {
   __typename?: "Plan";
   code: PlanCode;
@@ -425,7 +453,7 @@ export enum PlanCode {
 export interface Property {
   __typename?: "Property";
   account?: Maybe<Account>;
-  accountId?: Maybe<Scalars["ID"]>;
+  accountId: Scalars["ID"];
   address: Address;
   buildPeriod?: Maybe<PropertyBuildPeriodType>;
   buildingLegalStatus?: Maybe<PropertyBuildingLegalStatus>;
@@ -439,10 +467,10 @@ export interface Property {
   note?: Maybe<Scalars["String"]>;
   nticEquipments?: Maybe<Scalars["String"]>;
   otherSpaces?: Maybe<Scalars["String"]>;
-  tax?: Maybe<Scalars["Float"]>;
+  tax?: Maybe<Scalars["Decimal"]>;
   roomCount: PropertyRoomType;
   status?: Maybe<PropertyStatus>;
-  surface: Scalars["Int"];
+  surface: Scalars["Float"];
   tenantPrivateSpaces?: Maybe<Scalars["String"]>;
   usageType?: Maybe<PropertyHabitationUsageType>;
   waterHeatingMethod?: Maybe<PropertyUsageType>;
@@ -502,7 +530,7 @@ export interface PropertyInput {
   gasEmission?: Maybe<PropertyGasEmission>;
   heatingMethod: PropertyUsageType;
   housingType: PropertyUsageType;
-  lenderId: Scalars["ID"];
+  lenderId: Scalars["UUID"];
   name: Scalars["String"];
   note?: Maybe<Scalars["String"]>;
   nticEquipments?: Maybe<Scalars["String"]>;
@@ -544,7 +572,7 @@ export interface PropertyUpdateInput {
   gasEmission?: Maybe<PropertyGasEmission>;
   heatingMethod?: Maybe<PropertyUsageType>;
   housingType?: Maybe<PropertyUsageType>;
-  id: Scalars["ID"];
+  id: Scalars["UUID"];
   name?: Maybe<Scalars["String"]>;
   note?: Maybe<Scalars["String"]>;
   nticEquipments?: Maybe<Scalars["String"]>;
@@ -571,6 +599,8 @@ export interface Query {
   tenants: Array<Tenant>;
   leases: Array<Lease>;
   lenders: Array<Lender>;
+  rents: Array<Rent>;
+  events: Array<Event>;
   transactions: Array<Transaction>;
   invoices: Array<Invoice>;
   plans: Array<Plan>;
@@ -603,6 +633,11 @@ export interface QueryLendersArgs {
   query?: Maybe<Scalars["String"]>;
 }
 
+export interface QueryRentsArgs {
+  since: Scalars["DateTime"];
+  until: Scalars["DateTime"];
+}
+
 export interface QueryTransactionsArgs {
   id?: Maybe<Scalars["ID"]>;
 }
@@ -618,8 +653,8 @@ export interface Rent {
   status: RentStatus;
   leaseId: Scalars["ID"];
   receiptId?: Maybe<Scalars["ID"]>;
-  transactionId?: Maybe<Scalars["ID"]>;
   noticeId?: Maybe<Scalars["ID"]>;
+  lease?: Maybe<Lease>;
   delay?: Maybe<Scalars["Int"]>;
   transactions?: Maybe<Array<Transaction>>;
 }
@@ -636,19 +671,31 @@ export enum RentPaymentMethod {
 }
 
 export interface RentReceiptInput {
-  leaseId: Scalars["ID"];
-  sendMail?: Maybe<Scalars["Boolean"]>;
+  rentIds: Array<Scalars["UUID"]>;
+  sendMail: Scalars["Boolean"];
 }
 
 export interface RentReceiptPayload {
   __typename?: "RentReceiptPayload";
-  receipt: File;
+  errors?: Maybe<Array<Error>>;
+  receipts?: Maybe<Array<File>>;
 }
 
 export enum RentStatus {
   Partial = "PARTIAL",
   Pending = "PENDING",
   Settled = "SETTLED",
+}
+
+export interface SendPaymentNoticeInput {
+  rentIds: Array<Scalars["UUID"]>;
+  date?: Maybe<Scalars["DateTime"]>;
+}
+
+export interface SendPaymentNoticePayload {
+  __typename?: "SendPaymentNoticePayload";
+  errors?: Maybe<Array<Error>>;
+  notices?: Maybe<Array<File>>;
 }
 
 /** https://stripe.com/docs/billing/subscriptions/overview#subscription-states */
@@ -701,16 +748,14 @@ export interface Tenant {
   __typename?: "Tenant";
   accountId: Scalars["ID"];
   apl?: Maybe<Scalars["Boolean"]>;
-  authId?: Maybe<Scalars["AuthenticationID"]>;
   birthdate: Scalars["DateTime"];
   birthplace?: Maybe<Scalars["String"]>;
-  email: Scalars["String"];
+  email: Scalars["Email"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   displayName: Scalars["String"];
   note?: Maybe<Scalars["String"]>;
-  phoneNumber?: Maybe<Scalars["String"]>;
-  role?: Maybe<Scalars["String"]>;
+  phoneNumber?: Maybe<Scalars["PhoneNumber"]>;
   id: Scalars["ID"];
   leaseId?: Maybe<Scalars["ID"]>;
   visaleId?: Maybe<Scalars["String"]>;
@@ -729,13 +774,13 @@ export interface Tenant {
 
 export interface TenantInput {
   apl?: Maybe<Scalars["Boolean"]>;
-  birthdate: Scalars["Date"];
+  birthdate: Scalars["DateTime"];
   birthplace?: Maybe<Scalars["String"]>;
-  email: Scalars["Email"];
+  email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   note?: Maybe<Scalars["String"]>;
-  phoneNumber?: Maybe<Scalars["PhoneNumber"]>;
+  phoneNumber?: Maybe<Scalars["String"]>;
   visaleId?: Maybe<Scalars["String"]>;
 }
 
@@ -748,14 +793,14 @@ export enum TenantStatus {
 
 export interface TenantUpdateInput {
   apl?: Maybe<Scalars["Boolean"]>;
-  birthdate?: Maybe<Scalars["Date"]>;
+  birthdate?: Maybe<Scalars["DateTime"]>;
   birthplace?: Maybe<Scalars["String"]>;
-  email?: Maybe<Scalars["Email"]>;
-  id: Scalars["ID"];
+  email?: Maybe<Scalars["String"]>;
+  id: Scalars["UUID"];
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
   note?: Maybe<Scalars["String"]>;
-  phoneNumber?: Maybe<Scalars["PhoneNumber"]>;
+  phoneNumber?: Maybe<Scalars["String"]>;
   visaleId?: Maybe<Scalars["String"]>;
 }
 
@@ -771,8 +816,8 @@ export interface Transaction {
 
 export interface TransactionInput {
   amount: Scalars["Decimal"];
-  leaseId: Scalars["ID"];
-  date: Scalars["Date"];
+  leaseId: Scalars["UUID"];
+  date: Scalars["DateTime"];
   type?: Maybe<TransactionType>;
 }
 
@@ -797,7 +842,7 @@ export interface User {
   role?: Maybe<UserRole>;
   id: Scalars["ID"];
   phoneNumber?: Maybe<Scalars["PhoneNumber"]>;
-  accountId?: Maybe<Scalars["ID"]>;
+  accountId: Scalars["ID"];
   displayName: Scalars["String"];
   accounts?: Maybe<Array<Account>>;
   account?: Maybe<Account>;
@@ -810,15 +855,15 @@ export enum UserRole {
 }
 
 export interface UserUpdateInput {
-  address: AddressInput;
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
+  address?: Maybe<AddressInput>;
+  firstName?: Maybe<Scalars["String"]>;
+  lastName?: Maybe<Scalars["String"]>;
 }
 
 export interface UserWithAccountInput {
   address?: Maybe<AddressInput>;
   authId: Scalars["AuthenticationID"];
-  email: Scalars["Email"];
+  email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   skipCreateCustomer?: Maybe<Scalars["Boolean"]>;
@@ -1150,7 +1195,7 @@ export type TenantListQuery = {
         __typename?: "File";
         id: string;
         filename?: Maybe<string>;
-        createdAt: string;
+        createdAt?: Maybe<string>;
         type: FileType;
         downloadUrl?: Maybe<string>;
       }>
@@ -1169,21 +1214,19 @@ export type TenantListQuery = {
       depositAmount?: Maybe<number>;
       accountId: string;
       propertyId: string;
-      rents?: Maybe<
-        Array<{
-          __typename?: "Rent";
-          id: string;
-          periodStart: string;
-          periodEnd: string;
-          fullAmount: number;
-          amount: number;
-          status: RentStatus;
-          leaseId: string;
-        }>
-      >;
+      rents: Array<{
+        __typename?: "Rent";
+        id: string;
+        periodStart: string;
+        periodEnd: string;
+        fullAmount: number;
+        amount: number;
+        status: RentStatus;
+        leaseId: string;
+      }>;
       data?: Maybe<{
         __typename?: "LeaseFurnishedData";
-        duration?: Maybe<LeaseFurnishedDuration>;
+        duration?: Maybe<FurnishedLeaseDuration>;
       }>;
       account?: Maybe<{ __typename?: "Account"; id: string }>;
       property?: Maybe<{
@@ -1205,6 +1248,20 @@ export type TenantListQuery = {
           line1: string;
           postalCode: string;
         };
+        lender?: Maybe<{
+          __typename?: "Lender";
+          id: string;
+          displayName: string;
+          identity:
+            | {
+                __typename?: "User";
+                address?: Maybe<{ __typename?: "Address"; inline: string }>;
+              }
+            | {
+                __typename?: "Company";
+                address?: Maybe<{ __typename?: "Address"; inline: string }>;
+              };
+        }>;
       }>;
       tenants: Array<{
         __typename?: "Tenant";
@@ -1236,6 +1293,8 @@ export type LeaseListQuery = {
     accountId: string;
     propertyId: string;
     status: LeaseStatus;
+    renewDate?: Maybe<string>;
+    type: LeaseType;
     rentFullAmount: number;
     effectDate: string;
     rentAmount: number;
@@ -1261,6 +1320,30 @@ export type LeaseListQuery = {
         line1: string;
         postalCode: string;
       };
+      lender?: Maybe<{
+        __typename?: "Lender";
+        id: string;
+        displayName: string;
+        identity:
+          | {
+              __typename?: "User";
+              id: string;
+              email: string;
+              firstName?: Maybe<string>;
+              lastName?: Maybe<string>;
+              displayName: string;
+              address?: Maybe<{ __typename?: "Address"; inline: string }>;
+            }
+          | {
+              __typename?: "Company";
+              id: string;
+              displayName: string;
+              email: string;
+              legalEntity: string;
+              legalEntityIdentifier?: Maybe<string>;
+              address?: Maybe<{ __typename?: "Address"; inline: string }>;
+            };
+      }>;
     }>;
     tenants: Array<{
       __typename?: "Tenant";
@@ -1282,7 +1365,7 @@ export type LeaseListQuery = {
     }>;
     data?: Maybe<{
       __typename?: "LeaseFurnishedData";
-      duration?: Maybe<LeaseFurnishedDuration>;
+      duration?: Maybe<FurnishedLeaseDuration>;
       rentPaymentMethod?: Maybe<RentPaymentMethod>;
     }>;
   }>;
@@ -1308,8 +1391,39 @@ export type LeaseQuery = {
     file?: Maybe<{ __typename?: "File"; downloadUrl?: Maybe<string> }>;
     data?: Maybe<{
       __typename?: "LeaseFurnishedData";
-      duration?: Maybe<LeaseFurnishedDuration>;
+      duration?: Maybe<FurnishedLeaseDuration>;
       rentPaymentMethod?: Maybe<RentPaymentMethod>;
+    }>;
+  }>;
+};
+
+export type RentListQueryVariables = Exact<{
+  since: Scalars["DateTime"];
+  until: Scalars["DateTime"];
+}>;
+
+export type RentListQuery = {
+  __typename?: "Query";
+  rents: Array<{
+    __typename?: "Rent";
+    id: string;
+    periodStart: string;
+    periodEnd: string;
+    status: RentStatus;
+    amount: number;
+    chargesAmount?: Maybe<number>;
+    fullAmount: number;
+    leaseId: string;
+    delay?: Maybe<number>;
+    lease?: Maybe<{
+      __typename?: "Lease";
+      id: string;
+      rentFullAmount: number;
+      tenants: Array<{
+        __typename?: "Tenant";
+        shortName?: Maybe<string>;
+        fullName: string;
+      }>;
     }>;
   }>;
 };
@@ -1325,7 +1439,12 @@ export type ContractRequirementDataQuery = {
     id: string;
     fullName: string;
     status?: Maybe<TenantStatus>;
-    lease?: Maybe<{ __typename?: "Lease"; id: string }>;
+    lease?: Maybe<{
+      __typename?: "Lease";
+      id: string;
+      renewDate?: Maybe<string>;
+      type: LeaseType;
+    }>;
   }>;
 };
 
@@ -1550,6 +1669,119 @@ export type RentReceivedSummaryQuery = {
   };
 };
 
+export type RecentActivityListQueryVariables = Exact<{ [key: string]: never }>;
+
+export type RecentActivityListQuery = {
+  __typename?: "Query";
+  events: Array<{
+    __typename?: "Event";
+    id: string;
+    eventableId: string;
+    eventableType: string;
+    createdAt: string;
+    type: EventType;
+    object:
+      | {
+          __typename: "Rent";
+          id: string;
+          fullAmount: number;
+          amount: number;
+          leaseId: string;
+          periodEnd: string;
+          periodStart: string;
+          lease?: Maybe<{
+            __typename?: "Lease";
+            effectDate: string;
+            renewDate?: Maybe<string>;
+            id: string;
+            propertyId: string;
+            rentAmount: number;
+            status: LeaseStatus;
+            type: LeaseType;
+            property?: Maybe<{
+              __typename?: "Property";
+              id: string;
+              buildPeriod?: Maybe<PropertyBuildPeriodType>;
+              buildingLegalStatus?: Maybe<PropertyBuildingLegalStatus>;
+              heatingMethod?: Maybe<PropertyUsageType>;
+              housingType?: Maybe<PropertyUsageType>;
+              name: string;
+              roomCount: PropertyRoomType;
+              surface: number;
+              usageType?: Maybe<PropertyHabitationUsageType>;
+              waterHeatingMethod?: Maybe<PropertyUsageType>;
+              address: {
+                __typename?: "Address";
+                inline: string;
+                line1: string;
+                line2?: Maybe<string>;
+                postalCode: string;
+                city: string;
+              };
+            }>;
+            tenants: Array<{
+              __typename?: "Tenant";
+              id: string;
+              displayName: string;
+              birthdate: string;
+              email: string;
+              firstName: string;
+              fullName: string;
+              lastName: string;
+            }>;
+          }>;
+        }
+      | {
+          __typename: "Transaction";
+          id: string;
+          amount: number;
+          type: TransactionType;
+          date: string;
+          lease?: Maybe<{
+            __typename?: "Lease";
+            effectDate: string;
+            renewDate?: Maybe<string>;
+            id: string;
+            propertyId: string;
+            rentAmount: number;
+            status: LeaseStatus;
+            type: LeaseType;
+            property?: Maybe<{
+              __typename?: "Property";
+              id: string;
+              buildPeriod?: Maybe<PropertyBuildPeriodType>;
+              buildingLegalStatus?: Maybe<PropertyBuildingLegalStatus>;
+              heatingMethod?: Maybe<PropertyUsageType>;
+              housingType?: Maybe<PropertyUsageType>;
+              name: string;
+              roomCount: PropertyRoomType;
+              surface: number;
+              usageType?: Maybe<PropertyHabitationUsageType>;
+              waterHeatingMethod?: Maybe<PropertyUsageType>;
+              address: {
+                __typename?: "Address";
+                inline: string;
+                line1: string;
+                line2?: Maybe<string>;
+                postalCode: string;
+                city: string;
+              };
+            }>;
+            tenants: Array<{
+              __typename?: "Tenant";
+              id: string;
+              displayName: string;
+              birthdate: string;
+              email: string;
+              firstName: string;
+              fullName: string;
+              lastName: string;
+            }>;
+          }>;
+        };
+  }>;
+};
+
 export type RentReceivedStatusQueryVariables = Exact<{ [key: string]: never }>;
 
 export type RentReceivedStatusQuery = {
@@ -1587,21 +1819,19 @@ export type RentReceivedStatusQuery = {
           fullName: string;
           shortName?: Maybe<string>;
         }>;
-        rents?: Maybe<
-          Array<{
-            __typename?: "Rent";
-            id: string;
-            periodStart: string;
-            periodEnd: string;
-            fullAmount: number;
-            amount: number;
-            status: RentStatus;
-            leaseId: string;
-            transactions?: Maybe<
-              Array<{ __typename?: "Transaction"; id: string }>
-            >;
-          }>
-        >;
+        rents: Array<{
+          __typename?: "Rent";
+          id: string;
+          periodStart: string;
+          periodEnd: string;
+          fullAmount: number;
+          amount: number;
+          status: RentStatus;
+          leaseId: string;
+          transactions?: Maybe<
+            Array<{ __typename?: "Transaction"; id: string }>
+          >;
+        }>;
       }>
     >;
   }>;
@@ -1616,7 +1846,7 @@ export type FileQuery = {
     id: string;
     filename?: Maybe<string>;
     type: FileType;
-    createdAt: string;
+    createdAt?: Maybe<string>;
     downloadUrl?: Maybe<string>;
   }>;
 };
@@ -1627,7 +1857,7 @@ export type UserCreateWithAccountMutationVariables = Exact<{
 
 export type UserCreateWithAccountMutation = {
   __typename?: "Mutation";
-  accountCreate: { __typename?: "Account"; id: string };
+  accountCreate: { __typename?: "User"; id: string };
 };
 
 export type AccountUpdatePaymentMethodMutationVariables = Exact<{
@@ -1819,7 +2049,23 @@ export type RentReceiptCreateMutation = {
   __typename?: "Mutation";
   rentReceiptCreate: {
     __typename?: "RentReceiptPayload";
-    receipt: { __typename?: "File"; id: string; downloadUrl?: Maybe<string> };
+    receipts?: Maybe<
+      Array<{ __typename?: "File"; id: string; downloadUrl?: Maybe<string> }>
+    >;
+  };
+};
+
+export type SendPaymentNoticeMutationVariables = Exact<{
+  input: SendPaymentNoticeInput;
+}>;
+
+export type SendPaymentNoticeMutation = {
+  __typename?: "Mutation";
+  sendPaymentNotice: {
+    __typename?: "SendPaymentNoticePayload";
+    notices?: Maybe<
+      Array<{ __typename?: "File"; id: string; downloadUrl?: Maybe<string> }>
+    >;
   };
 };
 
@@ -1969,6 +2215,7 @@ export const TenantList = gql`
         signatureDate
         rentAmount
         depositAmount
+        renewDate
         data {
           ... on LeaseFurnishedData {
             duration
@@ -1996,6 +2243,22 @@ export const TenantList = gql`
           surface
           usageType
           waterHeatingMethod
+          lender {
+            id
+            displayName
+            identity {
+              ... on User {
+                address {
+                  inline
+                }
+              }
+              ... on Company {
+                address {
+                  inline
+                }
+              }
+            }
+          }
         }
         tenants {
           id
@@ -2047,8 +2310,36 @@ export const LeaseList = gql`
         surface
         usageType
         waterHeatingMethod
+        lender {
+          id
+          displayName
+          identity {
+            ... on User {
+              id
+              email
+              firstName
+              lastName
+              displayName
+              address {
+                inline
+              }
+            }
+            ... on Company {
+              id
+              displayName
+              email
+              legalEntity
+              legalEntityIdentifier
+              address {
+                inline
+              }
+            }
+          }
+        }
       }
       status
+      renewDate
+      type
       tenants {
         id
         email
@@ -2108,6 +2399,29 @@ export const Lease = gql`
     }
   }
 `;
+export const RentList = gql`
+  query RentList($since: DateTime!, $until: DateTime!) {
+    rents(since: $since, until: $until) {
+      id
+      periodStart
+      periodEnd
+      status
+      amount
+      chargesAmount
+      fullAmount
+      leaseId
+      delay
+      lease {
+        id
+        rentFullAmount
+        tenants {
+          shortName
+          fullName
+        }
+      }
+    }
+  }
+`;
 export const ContractRequirementData = gql`
   query ContractRequirementData($query: String) {
     tenants(query: $query) {
@@ -2116,6 +2430,8 @@ export const ContractRequirementData = gql`
       status
       lease {
         id
+        renewDate
+        type
       }
     }
   }
@@ -2165,6 +2481,7 @@ export const PropertyList = gql`
         signatureDate
         rentAmount
         depositAmount
+        renewDate
         rentChargesAmount
         rentFullAmount
         accountId
@@ -2309,6 +2626,108 @@ export const RentReceivedSummary = gql`
       variationPending
       paymentRate
       occupationRate
+    }
+  }
+`;
+export const RecentActivityList = gql`
+  query RecentActivityList {
+    events {
+      id
+      eventableId
+      eventableType
+      createdAt
+      type
+      object {
+        __typename
+        ... on Rent {
+          id
+          fullAmount
+          amount
+          leaseId
+          periodEnd
+          periodStart
+          lease {
+            effectDate
+            renewDate
+            id
+            propertyId
+            property {
+              id
+              address {
+                inline
+                line1
+                line2
+                postalCode
+                city
+              }
+              buildPeriod
+              buildingLegalStatus
+              heatingMethod
+              housingType
+              name
+              roomCount
+              surface
+              usageType
+              waterHeatingMethod
+            }
+            rentAmount
+            status
+            type
+            tenants {
+              id
+              displayName
+              birthdate
+              email
+              firstName
+              fullName
+              lastName
+            }
+          }
+        }
+        ... on Transaction {
+          id
+          amount
+          type
+          date
+          lease {
+            effectDate
+            renewDate
+            id
+            propertyId
+            property {
+              id
+              address {
+                inline
+                line1
+                line2
+                postalCode
+                city
+              }
+              buildPeriod
+              buildingLegalStatus
+              heatingMethod
+              housingType
+              name
+              roomCount
+              surface
+              usageType
+              waterHeatingMethod
+            }
+            rentAmount
+            status
+            type
+            tenants {
+              id
+              displayName
+              birthdate
+              email
+              firstName
+              fullName
+              lastName
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -2508,7 +2927,17 @@ export const ImportUpload = gql`
 export const RentReceiptCreate = gql`
   mutation RentReceiptCreate($input: RentReceiptInput!) {
     rentReceiptCreate(input: $input) {
-      receipt {
+      receipts {
+        id
+        downloadUrl
+      }
+    }
+  }
+`;
+export const SendPaymentNotice = gql`
+  mutation SendPaymentNotice($input: SendPaymentNoticeInput!) {
+    sendPaymentNotice(input: $input) {
+      notices {
         id
         downloadUrl
       }
