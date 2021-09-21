@@ -1,5 +1,6 @@
 import React from "react";
 import { FactoryHelper } from "../../helpers/factory-helper";
+import { Themable } from "../common/themable";
 import { RentReceiptPreview } from "./rent-receipt-preview";
 
 export default {
@@ -7,13 +8,7 @@ export default {
   component: RentReceiptPreview,
 };
 
-export const noData = () => <RentReceiptPreview />;
-
-const lender = FactoryHelper.lenderList()[0];
-
-const tenant = FactoryHelper.tenantList()[0];
-
-const property = FactoryHelper.propertyList()[0];
+const lease = FactoryHelper.leaseList()[0];
 
 const periodStart = "01/05/2020";
 const periodEnd = "31/05/2020";
@@ -21,29 +16,48 @@ const rentAmount = 315;
 const rentChargesAmount = 50;
 const rentFullAmount = 365;
 
+export const noData = () =>
+  <Themable>
+    <RentReceiptPreview />
+  </Themable>;
+
+export const loading = () => (
+  <Themable>
+    <RentReceiptPreview
+      loading
+      lease={lease}
+      periodStart={periodStart}
+      periodEnd={periodEnd}
+      rentAmount={rentAmount}
+      rentChargesAmount={rentChargesAmount}
+      rentFullAmount={rentFullAmount}
+    />
+  </Themable>
+);
+
 export const withData = () => (
-  <RentReceiptPreview
-    lender={lender}
-    tenant={tenant}
-    property={property}
-    periodStart={periodStart}
-    periodEnd={periodEnd}
-    rentAmount={rentAmount}
-    rentChargesAmount={rentChargesAmount}
-    rentFullAmount={rentFullAmount}
-  />
+  <Themable>
+    <RentReceiptPreview
+      lease={lease}
+      periodStart={periodStart}
+      periodEnd={periodEnd}
+      rentAmount={rentAmount}
+      rentChargesAmount={rentChargesAmount}
+      rentFullAmount={rentFullAmount}
+    />
+  </Themable>
 );
 
 export const withDataAsNotice = () => (
-  <RentReceiptPreview
-    lender={lender}
-    tenant={tenant}
-    property={property}
-    periodStart={periodStart}
-    periodEnd={periodEnd}
-    rentAmount={rentAmount}
-    rentChargesAmount={rentChargesAmount}
-    rentFullAmount={rentFullAmount}
-    isNotice={true}
-  />
+  <Themable>
+    <RentReceiptPreview
+      lease={lease}
+      periodStart={periodStart}
+      periodEnd={periodEnd}
+      rentAmount={rentAmount}
+      rentChargesAmount={rentChargesAmount}
+      rentFullAmount={rentFullAmount}
+      isNotice={true}
+    />
+  </Themable>
 );

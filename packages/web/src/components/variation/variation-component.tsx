@@ -1,6 +1,6 @@
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
+  ArrowBottomRightIcon,
+  ArrowTopRightIcon,
   defaultTheme,
   Icon,
   Pane,
@@ -23,7 +23,7 @@ export const VariationComponent: React.FunctionComponent<
       {!!value && (
         <Pane>
           <Icon
-            icon={value > 0 ? ArrowUpIcon : ArrowDownIcon}
+            icon={value > 0 ? ArrowTopRightIcon : ArrowBottomRightIcon}
             size={10}
             color={value > 0
               ? defaultTheme.palette.green.dark

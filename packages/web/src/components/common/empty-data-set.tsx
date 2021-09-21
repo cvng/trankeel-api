@@ -39,7 +39,7 @@ export const EmptyDataset: React.FunctionComponent<EmptyDatasetProps> = ({
     <Card
       elevation={removeBorder ? 0 : 2}
       width={350}
-      height={350}
+      height={props.height || 350}
       padding={minorScale(20)}
       display="flex"
       flexDirection="column"

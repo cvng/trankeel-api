@@ -42,20 +42,26 @@ export const ProgressBar: React.FunctionComponent<ProgressBarProps> = ({
         background={defaultTheme.palette.blue.light}
         borderRadius={20}
       >
-        {value > 0 && (
-          <Pane
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            width={`${value}%`}
-            background={tintColor}
-            borderRadius={20}
-          >
-            <Heading size={300} color="white">
+        {value > 25
+          ? (
+            <Pane
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              width={`${value}%`}
+              background={tintColor}
+              borderRadius={20}
+            >
+              <Heading size={300} color="white">
+                {label}
+              </Heading>
+            </Pane>
+          )
+          : (
+            <Heading marginLeft={5} size={300} color={rightTintColor}>
               {label}
             </Heading>
-          </Pane>
-        )}
+          )}
         {rightLabel.length > 0 && (
           <Pane
             flex={1}

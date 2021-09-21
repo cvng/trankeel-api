@@ -129,7 +129,7 @@ export const CardSynthesisItem: React.FunctionComponent<
                       </Badge>;
                     })}
                     {tab.avatars?.map((avatar, index) => {
-                      return <AvatarItem {...avatar} />;
+                      return <AvatarItem {...avatar} key={index} />;
                     })}
                     {/* Text */}
                     {tab.text && <Text>

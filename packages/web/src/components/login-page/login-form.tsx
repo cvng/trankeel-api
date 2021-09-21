@@ -117,6 +117,7 @@ export const LoginForm: React.FunctionComponent<LoginFormProps> = ({
                 )}
                 disabled={form.isSubmitting}
                 placeholder={_("input_email_placeholder")}
+                id="input-email"
               />
 
               <TextInputField
@@ -129,6 +130,7 @@ export const LoginForm: React.FunctionComponent<LoginFormProps> = ({
                 )}
                 disabled={form.isSubmitting}
                 placeholder={_("input_password_placeholder")}
+                id="input-password"
               />
 
               <Pane
@@ -141,6 +143,7 @@ export const LoginForm: React.FunctionComponent<LoginFormProps> = ({
                   appearance="primary"
                   isLoading={form.isSubmitting}
                   type="submit"
+                  id="button-login"
                 >
                   {_("action_login")}
                 </Button>

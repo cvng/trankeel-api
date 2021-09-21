@@ -1,7 +1,5 @@
 import {
   Button,
-  DownloadIcon,
-  EnvelopeIcon,
   EyeOpenIcon,
   InboxSearchIcon,
   PlusIcon,
@@ -20,8 +18,7 @@ import { EmptyDataset } from "../common";
 
 const _ = translate();
 
-const STARTED_DATE_FORMAT = "DD";
-const ENDED_DATE_FORMAT = "DD MMMM YYYY";
+const PERIOD_DATE_FORMAT = "DD MMMM YYYY";
 
 export type TenantSynthesisSummaryProps = {
   loading?: boolean;
@@ -69,8 +66,8 @@ export const TenantSynthesisSummary: React.FunctionComponent<
         {
           title: _("rent_payment"),
           tooltip: _("date_period", {
-            periodStart: moment().startOf("month").format(STARTED_DATE_FORMAT),
-            periodEnd: moment().endOf("month").format(ENDED_DATE_FORMAT),
+            periodStart: moment().startOf("month").format(PERIOD_DATE_FORMAT),
+            periodEnd: moment().endOf("month").format(PERIOD_DATE_FORMAT),
           }),
           badges: [
             {
@@ -122,22 +119,6 @@ export const TenantSynthesisSummary: React.FunctionComponent<
           onClick={() => onSelectLease?.(tenant?.lease?.property?.id)}
         >
           {_("preview_lease")}
-        </Button>,
-        <Button
-          iconBefore={EnvelopeIcon}
-          width={260}
-          marginY={theme.margin.medium}
-          disabled
-        >
-          {_("send_receipt_email")}
-        </Button>,
-        <Button
-          iconBefore={DownloadIcon}
-          width={260}
-          marginY={theme.margin.medium}
-          disabled
-        >
-          {_("download_receipt")}
         </Button>,
         <Button
           iconBefore={ShieldIcon}

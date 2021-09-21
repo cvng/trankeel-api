@@ -2,11 +2,11 @@ import React, { createContext, useReducer } from "react";
 import { Property, Tenant } from "../../types";
 
 export enum LeaseAddContextAction {
-  CreateFromExistingLease = "create-from-existing-lease",
-  SetProperty = "set-property",
-  SetTenants = "set-tenants",
-  SetFlowFinishWithError = "set-flow-finish-with-error",
-  Reset = "reset",
+  CreateFromExistingLease,
+  SetProperty,
+  SetTenants,
+  SetFlowFinishWithError,
+  Reset,
 }
 
 export const LeaseAddContext = createContext(null);

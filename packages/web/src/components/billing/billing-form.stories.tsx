@@ -3,8 +3,9 @@ import { BillingForm } from "./billing-form";
 import { Pane } from "evergreen-ui";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { env } from "../../utils";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(env("REACT_APP_STRIPE_PUBLISHABLE_KEY"));
 
 export default {
   title: "Billing/BillingForm",

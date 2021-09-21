@@ -55,7 +55,7 @@ export const PropertySynthesisList: React.FunctionComponent<
       onSearchFieldChange={onSearchFieldChange}
       onSelectEntity={onPropertySelect}
       onAddNewEntity={onPropertyAdd}
-      entity={_("property")}
+      entity={_("property")?.toLowerCase()}
       emptyDatasetAnimation={animationData}
       cardData={(property: Property) => {
         return {

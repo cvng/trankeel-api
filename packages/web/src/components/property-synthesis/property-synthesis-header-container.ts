@@ -1,4 +1,3 @@
-import { toaster } from "evergreen-ui";
 import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import { RouteById, Routes } from "../../constants";
@@ -8,9 +7,6 @@ import {
   PropertySynthesisContextProps,
 } from "./property-synthesis-context";
 import { PropertySynthesisHeaderProps } from "./property-synthesis-header";
-import { translate } from "piteo-kit";
-
-const _ = translate();
 
 export type WrappedComponentProps = unknown;
 
@@ -28,11 +24,6 @@ export const withContainer = (
     const onPropertyEdit = (propertyId: string): void => {
       history.push(RouteById(Routes.PROPERTY_EDIT, [propertyId]));
     };
-
-    const onPropertyArchive = (propertyId: string): void => {
-      toaster.notify(_("feature_available_soon", { propertyId }));
-    };
-
     const onPropertyDelete = (propertyId: string): void => {
       history.push(RouteById(Routes.PROPERTY_DELETE, [propertyId]));
     };
@@ -47,7 +38,6 @@ export const withContainer = (
       loading,
       property,
       onPropertyEdit,
-      onPropertyArchive,
       onPropertyDelete,
       onLeaseAdd,
     };

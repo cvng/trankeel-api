@@ -1,4 +1,4 @@
-import { AddIcon, ArchiveIcon, EditIcon, TrashIcon } from "evergreen-ui";
+import { AddIcon, EditIcon, TrashIcon } from "evergreen-ui";
 import { translate } from "piteo-kit";
 import * as React from "react";
 import { Property } from "../../types";
@@ -10,7 +10,6 @@ export type PropertySynthesisHeaderProps = {
   loading?: boolean;
   property?: Property;
   onPropertyEdit?: (propertyId: string) => void;
-  onPropertyArchive?: (propertyId: string) => void;
   onPropertyDelete?: (propertyId: string) => void;
   onLeaseAdd?: (propertyId: string) => void;
 };
@@ -21,7 +20,6 @@ export const PropertySynthesisHeader: React.FunctionComponent<
   loading,
   property,
   onPropertyEdit,
-  onPropertyArchive,
   onPropertyDelete,
   onLeaseAdd,
 }) => {
@@ -63,11 +61,6 @@ export const PropertySynthesisHeader: React.FunctionComponent<
               name: `${_("edit")}...`,
               handler: () => onPropertyEdit?.(property?.id),
               icon: EditIcon,
-            },
-            {
-              name: `${_("archive")}...`,
-              handler: () => onPropertyArchive?.(property?.id),
-              icon: ArchiveIcon,
             },
           ],
         },

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useMutation, useQuery } from "@apollo/client";
 import { toaster } from "evergreen-ui";
 import { useFormik } from "formik";

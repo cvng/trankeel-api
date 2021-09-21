@@ -1,24 +1,21 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { toaster } from "evergreen-ui";
-import React from "react";
-import { useHistory } from "react-router-dom";
-import { RouteById, Routes } from "../../constants";
+import { useQuery } from "@apollo/client";
+import moment from "moment";
+import React, { useContext } from "react";
 import {
   LeaseListQuery,
-  RentReceiptCreateMutation,
-  RentReceiptCreateMutationOptions,
-  RentReceivedStatusQuery,
+  RecentActivityListQuery,
   RentReceivedSummaryQuery,
-  TransactionCreateMutation,
-  TransactionCreateMutationOptions,
-  TransactionDeleteMutation,
-  TransactionDeleteMutationOptions,
 } from "../../helpers";
-import { Lease, Transaction } from "../../types";
+import { useRouter } from "../../hooks/use-router";
+import { Rent, RentStatus } from "../../types";
+import { DATE_ISO_FORMAT } from "../../validators";
+import {
+  RentManagerContext,
+  RentManagerContextAction,
+} from "../rent-manager/rent-manager-context";
+import { RentManagerMultiActionsMenuType } from "../rent-manager/rent-manager-multi-actions-menu";
+import { RentManagerSingleActionsMenuType } from "../rent-manager/rent-manager-single-actions-menu";
 import { DashboardProps } from "./dashboard";
-import { translate } from "piteo-kit";
-
-const _ = translate();
 
 export type WrappedComponentProps = unknown;
 
@@ -26,123 +23,132 @@ export const withContainer = (
   WrappedComponent,
 ): React.FunctionComponent<WrappedComponentProps> =>
   () => {
-    const history = useHistory();
+    const {
+      dispatch,
+      loading,
+      rentList,
+      groupedRentList,
+      selectedRentList,
+      selectedRentStatus,
+      allRentsSelected,
+    } = useContext(RentManagerContext);
 
-    const rentReceivedSummaryQueryResult = useQuery(RentReceivedSummaryQuery);
+    const router = useRouter();
 
-    const rentReceivedStatusQueryResult = useQuery(RentReceivedStatusQuery);
-
+    // Lease query
     const leaseListResult = useQuery(LeaseListQuery);
+    const {
+      data: { rentReceivedSummary } = { rentReceivedSummary: null },
+      loading: isLoadingSummary,
+    } = useQuery(
+      RentReceivedSummaryQuery,
+      {
+        variables: {
+          until: moment().add(1, "month").startOf("month").format(
+            DATE_ISO_FORMAT,
+          ),
+          since: moment().startOf("month").format(DATE_ISO_FORMAT),
+        },
+      },
+    );
+
+    // Recent activities query
+    const {
+      data: { events } = { events: [] },
+      loading: isLoadingRecentActivityList,
+    } = useQuery(
+      RecentActivityListQuery,
+    );
+
+    const onSelectAllTenantsClick = (selected: boolean) => {
+      dispatch({
+        type: RentManagerContextAction.AllRentsSelected,
+        payload: selected,
+      });
+    };
+
+    const onSelectRentClick = (rent: Rent, selected: boolean) => {
+      dispatch({
+        type: RentManagerContextAction.SelectRent,
+        payload: rent,
+        selected,
+      });
+    };
+
+    const onSelectRentSingleAction = (
+      type: RentManagerSingleActionsMenuType,
+      rent: Rent,
+    ) => {
+      switch (type) {
+        case RentManagerSingleActionsMenuType.MarkAsPaid:
+          router.showRentReceiptPreview(rent?.id);
+          break;
+        case RentManagerSingleActionsMenuType.Remind:
+          router.showPaymentNoticePreview(rent?.id);
+          break;
+        case RentManagerSingleActionsMenuType.ShowTenant:
+          router.showTenantSynthesisRoute(rent?.lease?.tenants?.[0]?.id);
+          break;
+      }
+    };
+
+    const onSelectRentMultiAction = (
+      type: RentManagerMultiActionsMenuType,
+    ) => {
+      switch (type) {
+        case RentManagerMultiActionsMenuType.MarkAllAsPaid:
+          router.showRentReceiptSendAllConfirmation();
+          break;
+      }
+    };
+
+    const onChangeRentStatus = (status: RentStatus) => {
+      dispatch({
+        type: RentManagerContextAction.SelectedRentStatus,
+        payload: status,
+      });
+    };
 
     const displayOnboarding = leaseListResult?.data?.leases?.length === 0;
-
-    const [
-      transactionCreate,
-      { loading: isLoadingTransactionCreate },
-    ] = useMutation(
-      TransactionCreateMutation,
-      TransactionCreateMutationOptions(),
-    );
-    const [
-      transactionDelete,
-      { loading: isLoadingTransactionDelete },
-    ] = useMutation(
-      TransactionDeleteMutation,
-      TransactionDeleteMutationOptions(),
-    );
-
-    const [
-      rentReceiptCreate,
-      { loading: isLoadingRentReceiptCreate },
-    ] = useMutation(
-      RentReceiptCreateMutation,
-      RentReceiptCreateMutationOptions(),
-    );
-
-    // Le tableau de bord est 100% disponible uniquement lorsque l'on a au moins un contrat
-    const handleShowRentalContractClick = (contract: Lease) => {
-      history.push(
-        Routes.DASHBOARD_SHOW_CONTRACT.replace(":contractId", contract.id),
-      );
-    };
-
-    const handleMarkRentAsPaid = async (paid: boolean, contract: Lease) => {
-      try {
-        if (paid) {
-          // On supprime toutes les transactions
-          // dans la plupart des cas on ne devrait en avoir qu'une
-          const transactions: Transaction[] = contract.rents?.[0]?.transactions;
-          for (let i = 0; i < transactions.length; i++) {
-            await transactionDelete({ variables: { id: transactions[i].id } });
-          }
-          toaster.success(_("mark_rent_as_unpaid_success"), {
-            id: "mark-rent-as-paid-toast",
-          });
-        } else {
-          // Marquer le loyer comme étant payé
-          await transactionCreate({
-            variables: {
-              input: {
-                contractId: contract.id,
-                date: new Date(),
-                amount: contract?.rentFullAmount,
-              },
-            },
-          });
-          toaster.success(_("mark_rent_as_paid_success"), {
-            id: "mark-rent-as-paid-toast",
-          });
-        }
-      } catch {
-        toaster.danger(_("error_smi"));
-      }
-    };
-
-    const handleEditReceipt = async (lease: Lease) => {
-      const hasAddress = !!lease?.property?.lender?.identity?.address;
-      if (hasAddress) {
-        // Generate rent receipt
-        await rentReceiptCreate({
-          variables: {
-            input: {
-              leaseId: lease.id,
-              sendMail: true,
-            },
-          },
-        }).catch(() => {
-          toaster.danger(_("error_smi"));
-        }).then(() => {
-          toaster.success(_("edit_receipt_success"), {
-            id: "edit-receipt-success",
-          });
-          // Redirect to the tenants document screen
-          history.push(
-            RouteById(
-              Routes.TENANT_VIEW,
-              [lease?.tenants?.[0].id, "documents"],
-              [":id", ":route"],
-            ),
-          );
-        });
-      } else {
-        toaster.notify(_("lender_informations_missing_address"), {
-          duration: 10,
-          id: "lender-missing-address-toast",
-        });
-        const lenderId = lease?.property?.lender?.id;
-        history.push(RouteById(Routes.DASHBOARD_LENDER_EDIT, [lenderId]));
-      }
-    };
+    const isLoading = loading || isLoadingSummary ||
+      isLoadingRecentActivityList;
 
     const componentProps: DashboardProps = {
-      rentReceivedSummaryQueryResult,
-      rentReceivedStatusQueryResult,
-      editReceipt: handleEditReceipt,
-      showRentalContract: handleShowRentalContractClick,
-      handleMarkRentAsPaid,
-      loading: isLoadingTransactionCreate || isLoadingTransactionDelete ||
-        isLoadingRentReceiptCreate,
+      loading: isLoading,
       displayOnboarding,
+      rentManagerData: {
+        loading: isLoading,
+        rentList,
+        groupedRentList,
+        selectedRentList,
+        selectedRentStatus,
+        summaryData: {
+          loading: false,
+          amountReceived: rentReceivedSummary?.amountReceived,
+          amountPending: rentReceivedSummary?.amountPending,
+          variationReceived: rentReceivedSummary?.variationReceived,
+          paymentRate: rentReceivedSummary?.paymentRate,
+          occupationRate: rentReceivedSummary?.occupationRate,
+          nPartial: rentReceivedSummary?.nPartial,
+          nReceived: rentReceivedSummary?.nReceived,
+          nExpected: rentReceivedSummary?.nExpected,
+        },
+        collectedBarData: {
+          amountReceived: rentReceivedSummary?.amountReceived,
+          amountPending: rentReceivedSummary?.amountPending,
+          amountPartial: rentReceivedSummary?.amountPartial,
+          ratioReceived: rentReceivedSummary?.ratioReceived,
+          ratioPending: rentReceivedSummary?.ratioPending,
+          ratioPartial: rentReceivedSummary?.ratioPartial,
+        },
+        onSelectAllTenantsClick,
+        onSelectRentClick,
+        onChangeRentStatus,
+        allRentsSelected,
+        onSelectRentSingleAction,
+        onSelectRentMultiAction,
+      },
+      reventActivityList: events,
     };
 
     return WrappedComponent(componentProps);
