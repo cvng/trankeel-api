@@ -9,10 +9,10 @@ import { User } from "../types";
 const _ = translate("common");
 
 enum AuthContextAction {
-  Loading = "loading",
-  ApiUser = "api-user",
-  ApiUserError = "api-user-error",
-  FirebaseUser = "firebase-user",
+  Loading,
+  ApiUser,
+  ApiUserError,
+  FirebaseUser,
 }
 
 export const AuthContext = createContext(null);
