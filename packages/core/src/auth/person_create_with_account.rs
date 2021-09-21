@@ -9,6 +9,7 @@ use piteo_data::Address;
 use piteo_data::AuthId;
 use piteo_data::Lender;
 use piteo_data::Person;
+use piteo_data::PersonRole;
 use validator::Validate;
 
 // # Input
@@ -66,7 +67,7 @@ pub async fn create_user_with_account(
         last_name: Some(input.last_name),
         address: input.address.map(Into::into),
         photo_url: None,
-        role: None,
+        role: Some(PersonRole::User),
         phone_number: None,
         account_id: account.id,
     })?;

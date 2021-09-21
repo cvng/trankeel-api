@@ -9,6 +9,7 @@ use crate::Name;
 use crate::PhoneNumber;
 use async_graphql::scalar;
 use async_graphql::Enum;
+use diesel_enum_derive::DieselEnum;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt;
@@ -18,9 +19,11 @@ use std::fmt::Display;
 
 pub type PersonId = Id;
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
-pub enum UserRole {
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
+#[graphql(name = "UserRole")]
+pub enum PersonRole {
     Admin,
+    Tenant,
     User,
     Viewer,
 }
@@ -40,7 +43,7 @@ pub struct Person {
     pub last_name: Option<String>,
     pub address: Option<Address>,
     pub photo_url: Option<String>,
-    pub role: Option<String>,
+    pub role: Option<PersonRole>,
     pub phone_number: Option<PhoneNumber>,
 }
 
@@ -57,17 +60,6 @@ pub struct PersonData {
 }
 
 // # Impls
-
-impl From<String> for UserRole {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "ADMIN" => UserRole::Admin,
-            "USER" => UserRole::User,
-            "VIEWER" => UserRole::Viewer,
-            _ => unimplemented!(),
-        }
-    }
-}
 
 impl AuthId {
     pub fn new(auth_id: String) -> Self {

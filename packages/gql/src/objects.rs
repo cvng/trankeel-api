@@ -23,6 +23,7 @@ use piteo::LeaseStatus;
 use piteo::LeaseType;
 use piteo::LegalEntityType;
 use piteo::Name;
+use piteo::PersonRole;
 use piteo::PlanCode;
 use piteo::PropertyBuildPeriodType;
 use piteo::PropertyBuildingLegalStatus;
@@ -37,7 +38,6 @@ use piteo::RentPaymentMethod;
 use piteo::RentStatus;
 use piteo::TenantStatus;
 use piteo::TransactionType;
-use piteo::UserRole;
 use std::convert::TryInto;
 
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_complex_object.html
@@ -406,7 +406,7 @@ pub struct Person {
     address: Option<Address>,
     #[graphql(name = "photoURL")]
     photo_url: Option<String>,
-    role: Option<UserRole>,
+    role: Option<PersonRole>,
     id: ID,
     phone_number: Option<PhoneNumber>,
     account_id: ID,
