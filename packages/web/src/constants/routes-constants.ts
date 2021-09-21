@@ -7,19 +7,17 @@ export enum Routes {
   DASHBOARD = "/dashboard",
   DASHBOARD_MARK_ALL_RENT_PAY_CONFIRMATION =
     "/dashboard/mark-all-receipts/confirmation",
-  DASHBOARD_PREVIEW_RENT_RECEIPT = "/dashboard/preview-receipt/:leaseId",
-  DASHBOARD_TRANSACTION_DELETE = "/dashboard/:transactionId/delete",
+  DASHBOARD_PREVIEW_RENT_RECEIPT = "/dashboard/preview-receipt/:rentId",
+  DASHBOARD_PREVIEW_PAYMENT_NOTICE =
+    "/dashboard/preview-payment-notice/:rentId",
   DASHBOARD_SHOW_CONTRACT = "/dashboard/contract/:contractId",
   DASHBOARD_LENDER_EDIT = "/dashboard/lender/:id/edit",
-  TRANSACTION_RENT_ADD = "/transactions/add/rent",
   PROPERTIES = "/properties",
   PROPERTY_VIEW = "/properties/:id/:route",
   PROPERTY_VIEW_LEASE_DELETE = "/properties/:id/leases/:leaseId/delete",
   PROPERTY_EDIT = "/properties/:id/edit",
   PROPERTY_DELETE = "/properties/:id/delete",
   PROPERTY_ADD = "/properties/add",
-  PROPERTY_TRANSACTION_DELETE =
-    "/properties/list/details/:id/:transactionId/delete",
   TENANTS = "/tenants",
   TENANT_VIEW = "/tenants/:id/:route",
   TENANT_ADD = "/tenants/add",
