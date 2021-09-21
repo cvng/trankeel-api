@@ -638,6 +638,7 @@ type User {
 }
 enum UserRole {
 	ADMIN
+	TENANT
 	USER
 	VIEWER
 }
