@@ -14,6 +14,7 @@ export type PopinMenuButtonSubItemProps = {
   name: string;
   icon?: React.ElementType;
   handler: () => void;
+  identifier?: string;
 };
 
 export type PopinMenuButtonProps = {
@@ -39,6 +40,7 @@ export const PopinMenuButton: React.FunctionComponent<
                   icon={subItem.icon}
                   onClick={subItem.handler}
                   key={index}
+                  data-test-id={subItem.identifier}
                 >
                   {subItem.name}
                 </Menu.Item>

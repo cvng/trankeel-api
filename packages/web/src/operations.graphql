@@ -150,6 +150,7 @@ query TenantList($id: ID, $query: String, $status: TenantStatus) {
       signatureDate
       rentAmount
       depositAmount
+      renewDate
       data {
         ... on LeaseFurnishedData {
           duration
@@ -177,6 +178,22 @@ query TenantList($id: ID, $query: String, $status: TenantStatus) {
         surface
         usageType
         waterHeatingMethod
+        lender {
+          id
+          displayName
+          identity {
+            ... on User {
+              address {
+                inline
+              }
+            }
+            ... on Company {
+              address {
+                inline
+              }
+            }
+          }
+        }
       }
       tenants {
         id
@@ -229,8 +246,36 @@ query LeaseList($id: ID, $query: String) {
       surface
       usageType
       waterHeatingMethod
+      lender {
+        id
+        displayName
+        identity {
+          ... on User {
+            id
+            email
+            firstName
+            lastName
+            displayName
+            address {
+              inline
+            }
+          }
+          ... on Company {
+            id
+            displayName
+            email
+            legalEntity
+            legalEntityIdentifier
+            address {
+              inline
+            }
+          }
+        }
+      }
     }
     status
+    renewDate
+    type
     tenants {
       id
       email
@@ -289,6 +334,30 @@ query Lease($id: ID!) {
   }
 }
 
+# Rents
+
+query RentList($since: DateTime!, $until: DateTime!) {
+  rents(since: $since, until: $until) {
+    id
+    periodStart
+    periodEnd
+    status
+    amount
+    chargesAmount
+    fullAmount
+    leaseId
+    delay
+    lease {
+      id
+      rentFullAmount
+      tenants {
+        shortName
+        fullName
+      }
+    }
+  }
+}
+
 query ContractRequirementData($query: String) {
   tenants(query: $query) {
     id
@@ -296,6 +365,8 @@ query ContractRequirementData($query: String) {
     status
     lease {
       id
+      renewDate
+      type
     }
   }
 }
@@ -346,6 +417,7 @@ query PropertyList($id: ID, $query: String) {
       signatureDate
       rentAmount
       depositAmount
+      renewDate
       rentChargesAmount
       rentFullAmount
       accountId
@@ -500,6 +572,107 @@ query RentReceivedSummary($since: DateTime!, $until: DateTime!) {
     #
     paymentRate
     occupationRate
+  }
+}
+
+query RecentActivityList {
+  events {
+    id
+    eventableId
+    eventableType
+    createdAt
+    type
+    object {
+      __typename
+      ... on Rent {
+        id
+        fullAmount
+        amount
+        leaseId
+        periodEnd
+        periodStart
+        lease {
+          effectDate
+          renewDate
+          id
+          propertyId
+          property {
+            id
+            address {
+              inline
+              line1
+              line2
+              postalCode
+              city
+            }
+            buildPeriod
+            buildingLegalStatus
+            heatingMethod
+            housingType
+            name
+            roomCount
+            surface
+            usageType
+            waterHeatingMethod
+          }
+          rentAmount
+          status
+          type
+          tenants {
+            id
+            displayName
+            birthdate
+            email
+            firstName
+            fullName
+            lastName
+          }
+        }
+      }
+      ... on Transaction {
+        id
+        amount
+        type
+        date
+        lease {
+          effectDate
+          renewDate
+          id
+          propertyId
+          property {
+            id
+            address {
+              inline
+              line1
+              line2
+              postalCode
+              city
+            }
+            buildPeriod
+            buildingLegalStatus
+            heatingMethod
+            housingType
+            name
+            roomCount
+            surface
+            usageType
+            waterHeatingMethod
+          }
+          rentAmount
+          status
+          type
+          tenants {
+            id
+            displayName
+            birthdate
+            email
+            firstName
+            fullName
+            lastName
+          }
+        }
+      }
+    }
   }
 }
 
@@ -685,7 +858,17 @@ mutation ImportUpload($input: ImportInput!) {
 # Edition d'une quittance
 mutation RentReceiptCreate($input: RentReceiptInput!) {
   rentReceiptCreate(input: $input) {
-    receipt {
+    receipts {
+      id
+      downloadUrl
+    }
+  }
+}
+
+# Envoi de l'avis d'échéance
+mutation SendPaymentNotice($input: SendPaymentNoticeInput!) {
+  sendPaymentNotice(input: $input) {
+    notices {
       id
       downloadUrl
     }

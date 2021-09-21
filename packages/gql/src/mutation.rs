@@ -20,6 +20,7 @@ use piteo::files::FileInput;
 use piteo::imports::ImportInput;
 use piteo::leases::CreateFurnishedLeaseInput;
 use piteo::leases::CreateReceiptsInput;
+use piteo::leases::SendPaymentNoticeInput;
 use piteo::leases::TransactionInput;
 use piteo::leases::UpdateFurnishedLeaseInput;
 use piteo::owners::UpdateIndividualLenderInput;
@@ -150,7 +151,7 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn create_receipts(
+    async fn rent_receipt_create(
         &self,
         ctx: &Context<'_>,
         input: CreateReceiptsInput,
@@ -168,6 +169,13 @@ impl Mutation {
             }),
         }
     }
+
+    async fn send_payment_notice(
+        &self,
+        _input: SendPaymentNoticeInput,
+    ) -> Result<SendPaymentNoticePayload> {
+        Err(wip())
+    }
 }
 
 // # Payloads
@@ -177,4 +185,10 @@ impl Mutation {
 struct CreateReceiptsPayload {
     errors: Option<Vec<Error>>,
     receipts: Option<Vec<File>>,
+}
+
+#[derive(async_graphql::SimpleObject)]
+struct SendPaymentNoticePayload {
+    errors: Option<Vec<Error>>,
+    notices: Option<Vec<File>>,
 }

@@ -38,7 +38,11 @@ export const AmountLabel: React.FunctionComponent<AmountLabelProps> = ({
   ...props
 }) => {
   return (
-    <Heading {...props} size={getSize(type)} color={getColor(value)}>
+    <Heading
+      {...props}
+      size={getSize(type)}
+      color={props.color || getColor(value)}
+    >
       {NumberHelper.formatToString(value, addSign)}
     </Heading>
   );

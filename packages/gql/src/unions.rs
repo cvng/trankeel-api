@@ -1,6 +1,8 @@
 use crate::objects::Company;
 use crate::objects::FurnishedLeaseDetails;
 use crate::objects::Person;
+use crate::objects::Rent;
+use crate::objects::Transaction;
 
 #[derive(async_graphql::Union)]
 pub enum Identity {
@@ -20,4 +22,10 @@ impl From<piteo::LenderIdentity> for Identity {
 #[derive(async_graphql::Union)]
 pub enum LeaseDetails {
     FurnishedLeaseDetails(FurnishedLeaseDetails),
+}
+
+#[derive(async_graphql::Union)]
+pub enum Eventable {
+    Rent(Rent),
+    Transaction(Transaction),
 }

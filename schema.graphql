@@ -49,6 +49,20 @@ scalar Email
 type Error {
 	message: String!
 }
+type Event {
+	id: ID!
+	createdAt: DateTime!
+	eventableId: ID!
+	eventableType: String!
+	type: EventType!
+	object: Eventable!
+}
+enum EventType {
+	RENT_RECEIPT_CREATED
+	RENT_RECEIPT_SENT
+	TRANSACTION_CREATED
+}
+union Eventable = | Rent | Transaction
 type Feature {
 	available: Boolean!
 	title: String!
@@ -84,10 +98,6 @@ enum FileType {
 	LEASE_DOCUMENT
 	RENT_RECEIPT
 }
-enum FurnishedLeaseDuration {
-	NINE_MONTHS
-	ONE_YEAR
-}
 union Identity = | User | Company
 input ImportInput {
 	files: [FileInput!]!
@@ -109,7 +119,7 @@ type Lease {
 	accountId: ID!
 	depositAmount: Decimal
 	effectDate: DateTime!
-	duration: FurnishedLeaseDuration!
+	duration: LeaseFurnishedDuration!
 	signatureDate: DateTime
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
@@ -134,7 +144,7 @@ type LeaseFurnishedData {
 	colocationInsuranceLender: Boolean
 	colocationInsuranceMonthlyAmount: Decimal
 	colocationInsuranceTotalAmount: Decimal
-	duration: FurnishedLeaseDuration
+	duration: LeaseFurnishedDuration
 	lenderFeeCap: Decimal
 	lenderFeeCapOther: String
 	lenderFeeCapPrestations: Decimal
@@ -173,7 +183,7 @@ input LeaseFurnishedDataInput {
 	colocationInsuranceLender: Boolean
 	colocationInsuranceMonthlyAmount: Decimal
 	colocationInsuranceTotalAmount: Decimal
-	duration: FurnishedLeaseDuration
+	duration: LeaseFurnishedDuration
 	lenderFeeCap: Decimal
 	lenderFeeCapOther: String
 	lenderFeeCapPrestations: Decimal
@@ -205,6 +215,10 @@ input LeaseFurnishedDataInput {
 	worksDecenceSinceLastRental: String
 	worksRentDecreaseTenant: String
 	worksRentIncreaseLender: String
+}
+enum LeaseFurnishedDuration {
+	NINE_MONTHS
+	ONE_YEAR
 }
 input LeaseFurnishedInput {
 	data: LeaseFurnishedDataInput
@@ -282,7 +296,8 @@ type Mutation {
 	transactionDelete(id: ID!): ID!
 	fileUpload(input: FileInput!): File!
 	importUpload(input: ImportInput!): Task!
-	createReceipts(input: RentReceiptInput!): RentReceiptPayload!
+	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
+	sendPaymentNotice(input: SendPaymentNoticeInput!): SendPaymentNoticePayload!
 }
 scalar PhoneNumber
 type Plan {
@@ -432,6 +447,8 @@ type Query {
 	tenants(id: ID, query: String, status: TenantStatus): [Tenant!]!
 	leases(id: ID, query: String): [Lease!]!
 	lenders(id: ID, query: String): [Lender!]!
+	rents(since: DateTime!, until: DateTime!): [Rent!]!
+	events: [Event!]!
 	transactions(id: ID): [Transaction!]!
 	invoices: [Invoice!]!
 	plans: [Plan!]!
@@ -448,6 +465,7 @@ type Rent {
 	leaseId: ID!
 	receiptId: ID
 	noticeId: ID
+	lease: Lease
 	delay: Int
 	transactions: [Transaction!]
 }
@@ -472,6 +490,14 @@ enum RentStatus {
 	PARTIAL
 	PENDING
 	SETTLED
+}
+input SendPaymentNoticeInput {
+	rentIds: [UUID!]!
+	date: DateTime
+}
+type SendPaymentNoticePayload {
+	errors: [Error!]
+	notices: [File!]
 }
 """
 https://stripe.com/docs/billing/subscriptions/overview#subscription-states

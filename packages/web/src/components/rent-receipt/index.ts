@@ -1,2 +1,2 @@
-export { withContainer as RentReceiptAddPageContainer } from "./rent-receipt-add-page-container";
-export { RentReceiptAddPage } from "./rent-receipt-add-page";
+export { withContainer as RentReceiptPreviewContainer } from "./rent-receipt-preview-container";
+export { withContainer as RentReceiptMultiActionsContainer } from "./rent-receipt-multi-actions-container";

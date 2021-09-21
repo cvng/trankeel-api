@@ -14,6 +14,7 @@ pub enum LeaseDetails {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[graphql(name = "LeaseFurnishedDuration")]
 pub enum FurnishedLeaseDuration {
     NineMonths,
     OneYear,

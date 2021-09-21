@@ -13,7 +13,5 @@ export { PropertySynthesisContext } from "./property-synthesis-context";
 export enum PropertySynthesisRoutes {
   Synthesis = "synthesis",
   Leases = "leases",
-  Documents = "documents",
-  Works = "works",
   Sinisters = "sinisters",
 }

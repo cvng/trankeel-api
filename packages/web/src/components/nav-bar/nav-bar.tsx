@@ -2,6 +2,8 @@ import { Pane, PaneProps, Tab, TabNavigation } from "evergreen-ui";
 import * as React from "react";
 import { useAppTheme } from "../../hooks/use-app-theme";
 
+const DEFAULT_NAV_BAR_HEIGHT = 80;
+
 export type NavBarItem = {
   title: string;
   route: string;
@@ -28,11 +30,12 @@ export const NavBar: React.FunctionComponent<
   const theme = useAppTheme();
   return (
     <Pane
+      key={0}
       display="flex"
       flexDirection="column"
       {...props}
       marginBottom={theme.margin.large}
-      height={hidden && 0}
+      height={hidden ? 0 : props.height || DEFAULT_NAV_BAR_HEIGHT}
     >
       <TabNavigation marginTop={theme.margin.large}>
         {!hidden && items.map((tab, index) => (

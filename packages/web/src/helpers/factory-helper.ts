@@ -1,6 +1,9 @@
+// @ts-nocheck
 import {
   Account,
   Address,
+  Event,
+  EventType,
   Feature,
   File,
   FileStatus,
@@ -22,15 +25,17 @@ import {
   PropertyRoomType,
   PropertyStatus,
   PropertyUsageType,
+  Rent,
   RentPaymentMethod,
+  RentStatus,
   SubscriptionStatus,
   Tenant,
   TenantStatus,
 } from "../types";
 
 export class FactoryHelper {
-  // Contracts
-  static contractList(): Lease[] {
+  // Leases
+  static leaseList(): Lease[] {
     return [
       {
         account: this.account(),
@@ -208,7 +213,7 @@ export class FactoryHelper {
       surface: 27,
       status: PropertyStatus.Rented,
       address: this.address(),
-      leases: this.contractList(),
+      leases: this.leaseList(),
       housingType: PropertyUsageType.Collective,
       buildPeriod: PropertyBuildPeriodType.FromY1975Y1989,
       usageType: PropertyHabitationUsageType.Habitation,
@@ -226,7 +231,7 @@ export class FactoryHelper {
       status: PropertyStatus.Rented,
       collectedRents: 930,
       expectedRents: 930,
-      leases: this.contractList(),
+      leases: this.leaseList(),
       accountId: "",
       housingType: PropertyUsageType.Individual,
       buildPeriod: PropertyBuildPeriodType.BeforeY1949,
@@ -243,7 +248,7 @@ export class FactoryHelper {
       status: PropertyStatus.Rented,
       collectedRents: 450,
       expectedRents: 450,
-      leases: this.contractList(),
+      leases: this.leaseList(),
       accountId: "",
       housingType: PropertyUsageType.Individual,
       buildPeriod: PropertyBuildPeriodType.BeforeY1949,
@@ -286,6 +291,7 @@ export class FactoryHelper {
           legalEntityIdentifier: "530 706 738 00040",
           legalEntityType: LegalEntityType.Sci,
           displayName: "SCI PITEO",
+          address: this.address(),
           __typename: "Company",
         },
       },
@@ -363,6 +369,57 @@ export class FactoryHelper {
         status: FileStatus.Success,
         type: FileType.LeaseDocument,
         updatedAt: new Date().toLocaleString("fr-FR"),
+      },
+    ];
+  }
+
+  // Rent
+  static rentList(): Rent[] {
+    return [
+      {
+        status: RentStatus.Pending,
+        amount: 330,
+        chargesAmount: 50,
+        fullAmount: 380,
+        delay: 2,
+        lease: this.leaseList()?.[0],
+        leaseId: null,
+        id: "rentId0",
+        periodEnd: "2021-07-31T00:00:00.000Z",
+        periodStart: "2021-08-31T00:00:00.000Z",
+        receipt: null,
+        receiptId: null,
+        transactions: [],
+      },
+    ];
+  }
+
+  // Event
+  static eventList(): Event[] {
+    return [
+      {
+        eventableId: "",
+        eventableType: "",
+        createdAt: new Date("2021-09-02").toISOString(),
+        id: "",
+        object: this.rentList()[0],
+        type: EventType.RentReceiptSent,
+      },
+      {
+        eventableId: "",
+        eventableType: "",
+        createdAt: new Date("2021-09-08").toISOString(),
+        id: "",
+        object: this.rentList()[0],
+        type: EventType.RentReceiptCreated,
+      },
+      {
+        eventableId: "",
+        eventableType: "",
+        createdAt: new Date().toISOString(),
+        id: "",
+        object: this.rentList()[0],
+        type: EventType.TransactionCreated,
       },
     ];
   }

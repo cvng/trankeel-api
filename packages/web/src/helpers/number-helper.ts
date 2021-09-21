@@ -1,10 +1,12 @@
 export class NumberHelper extends Number {
   static formatToString(
-    rawNumber: unknown,
+    rawNumber: number | string,
     addSign = true,
     currency = "EUR",
   ): string {
-    if (typeof rawNumber !== "number") return;
+    if (typeof rawNumber !== "number") {
+      rawNumber = Number(rawNumber);
+    }
     // deno-lint-ignore no-undef https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Intl/NumberFormat
     const formatter = Intl.NumberFormat("fr-FR", {
       style: "currency",

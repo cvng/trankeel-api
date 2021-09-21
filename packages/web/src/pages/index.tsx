@@ -4,7 +4,7 @@ import React from "react";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import {
   BillingSubscribeContainer,
-  BillingSubscribePage
+  BillingSubscribePage,
 } from "../components/billing";
 import { ComingSoon } from "../components/coming-soon/coming-soon";
 import { Advertisement } from "../components/common";
@@ -13,17 +13,17 @@ import { Dashboard, DashboardContainer } from "../components/dashboard";
 import {
   ImportStatusCornerDialog,
   ImportUploadContainer,
-  ImportUploadDialog
+  ImportUploadDialog,
 } from "../components/import-upload-dialog";
 import {
   LeaseAddFlowContainer,
-  LeaseAddFlowPage
+  LeaseAddFlowPage,
 } from "../components/lease-add";
 import { LeaseAddProvider } from "../components/lease-add/lease-add-context";
 import { LeaseDeleteContainer } from "../components/lease-dialog";
 import {
   LenderDialog,
-  LenderUpdateContainer
+  LenderUpdateContainer,
 } from "../components/lender-dialog";
 import {
   LoginForgotPasswordContainer,
@@ -31,32 +31,35 @@ import {
   LoginForm,
   LoginFormContainer,
   LoginRegister,
-  RegisterContainer
+  RegisterContainer,
 } from "../components/login-page";
 import { MainPage } from "../components/main-menu/main-page";
 import { MaintenancePage } from "../components/maintenance-page/maintenance-page";
 import { Onboarding, OnboardingContainer } from "../components/onboarding";
+import { PaymentNoticePreviewContainer } from "../components/payment-notice";
 import {
   PropertyAddContainer,
   PropertyDeleteContainer,
   PropertyDialog,
-  PropertyEditContainer
+  PropertyEditContainer,
 } from "../components/property-dialog";
 import {
-  PropertySynthesisPageContainer
+  PropertySynthesisPageContainer,
 } from "../components/property-synthesis";
 import {
-  PropertySynthesisProvider
+  PropertySynthesisProvider,
 } from "../components/property-synthesis/property-synthesis-context";
+import { RentManagerProvider } from "../components/rent-manager/rent-manager-context";
 import {
-  RentReceiptAddPage,
-  RentReceiptAddPageContainer
+  RentReceiptMultiActionsContainer,
+  RentReceiptPreviewContainer,
 } from "../components/rent-receipt";
+import { RentReceiptPreview } from "../components/rent-receipt/rent-receipt-preview";
 import {
   SettingsAccount,
   SettingsLendersListContainer,
   SettingsMenu,
-  SettingsMenuContainer
+  SettingsMenuContainer,
 } from "../components/settings";
 import { SettingsLenders } from "../components/settings/settings-lenders";
 import { SynthesisPage } from "../components/synthesis/synthesis-page";
@@ -64,12 +67,12 @@ import {
   TenantAddContainer,
   TenantDeleteContainer,
   TenantDialog,
-  TenantEditContainer
+  TenantEditContainer,
 } from "../components/tenant-dialog";
 import { TenantSynthesisPageContainer } from "../components/tenant-synthesis";
 import { TenantSynthesisProvider } from "../components/tenant-synthesis/tenant-synthesis-context";
-import { TransactionDeleteContainer } from "../components/transaction-delete-dialog";
 import { Routes } from "../constants/routes-constants";
+import { AsyncProvider } from "../context/async-context";
 import { AuthProvider } from "../context/auth-context";
 import { AuthenticatedRoute } from "../routes/authenticated-route";
 import { AppTheme } from "../theme/app-theme";
@@ -108,165 +111,167 @@ const Home: React.FC = () => {
             component={MaintenancePage}
           />
           <AuthProvider>
-            <MainPage>
-              {/* Subscribe */}
-              <AuthenticatedRoute
-                path={Routes.SUBSCRIBE}
-                component={BillingSubscribeContainer(BillingSubscribePage)}
-              />
-              {/* Dashboard */}
-              <AuthenticatedRoute
-                exact
-                path={Routes.DASHBOARD}
-                component={DashboardContainer(Dashboard)}
-              />
-              <AuthenticatedRoute
-                path={Routes.DASHBOARD_ONBOARDING}
-                component={OnboardingContainer(Onboarding)}
-              />
-              <AuthenticatedRoute
-                exact
-                path={Routes.DASHBOARD_TENANT_ADD}
-                component={TenantAddContainer(TenantDialog)}
-              />
-              <AuthenticatedRoute
-                path={Routes.DASHBOARD_IMPORT}
-                component={ImportUploadContainer(ImportStatusCornerDialog)}
-              />
-
-              <AuthenticatedRoute
-                path={Routes.DASHBOARD_TRANSACTION_DELETE}
-                component={TransactionDeleteContainer(ConfirmDialog)}
-              />
-
-              {/* Transactions */}
-              <AuthenticatedRoute
-                exact
-                path={Routes.TRANSACTION_RENT_ADD}
-                component={RentReceiptAddPageContainer(RentReceiptAddPage)}
-              />
-              <AuthenticatedRoute
-                exact
-                path={Routes.PROPERTY_TRANSACTION_DELETE}
-                component={TransactionDeleteContainer(ConfirmDialog)}
-              />
-
-              {/* Properties */}
-              <PropertySynthesisProvider>
+            <AsyncProvider>
+              <MainPage>
+                {/* Subscribe */}
                 <AuthenticatedRoute
-                  path={[Routes.PROPERTY_VIEW, Routes.PROPERTIES]}
-                  component={PropertySynthesisPageContainer(
-                    SynthesisPage,
-                  )}
+                  path={Routes.SUBSCRIBE}
+                  component={BillingSubscribeContainer(BillingSubscribePage)}
                 />
-                <AuthenticatedRoute
-                  path={[Routes.PROPERTY_VIEW_LEASE_DELETE]}
-                  component={LeaseDeleteContainer(
-                    ConfirmDialog,
-                  )}
-                />
-              </PropertySynthesisProvider>
+                <RentManagerProvider>
+                  {/* Dashboard */}
+                  <AuthenticatedRoute
+                    path={Routes.DASHBOARD}
+                    component={DashboardContainer(Dashboard)}
+                  />
+                  <AuthenticatedRoute
+                    path={Routes.DASHBOARD_ONBOARDING}
+                    component={OnboardingContainer(Onboarding)}
+                  />
+                  <AuthenticatedRoute
+                    exact
+                    path={Routes.DASHBOARD_TENANT_ADD}
+                    component={TenantAddContainer(TenantDialog)}
+                  />
+                  <AuthenticatedRoute
+                    path={Routes.DASHBOARD_IMPORT}
+                    component={ImportUploadContainer(ImportStatusCornerDialog)}
+                  />
+                  <AuthenticatedRoute
+                    path={Routes.DASHBOARD_PREVIEW_RENT_RECEIPT}
+                    component={RentReceiptPreviewContainer(RentReceiptPreview)}
+                  />
+                  <AuthenticatedRoute
+                    path={Routes.DASHBOARD_PREVIEW_PAYMENT_NOTICE}
+                    component={PaymentNoticePreviewContainer(
+                      RentReceiptPreview,
+                    )}
+                  />
+                  <AuthenticatedRoute
+                    path={Routes.DASHBOARD_MARK_ALL_RENT_PAY_CONFIRMATION}
+                    component={RentReceiptMultiActionsContainer(
+                      ConfirmDialog,
+                    )}
+                  />
+                </RentManagerProvider>
 
-              <AuthenticatedRoute
-                exact
-                path={[
-                  Routes.PROPERTY_ADD,
-                  Routes.LEASE_ADD_NEW_PROPERTY,
-                  Routes.DASHBOARD_PROPERTY_ADD,
-                ]}
-                component={PropertyAddContainer(PropertyDialog)}
-              />
-              <AuthenticatedRoute
-                path={Routes.PROPERTY_DELETE}
-                component={PropertyDeleteContainer(ConfirmDialog)}
-              />
-              <AuthenticatedRoute
-                path={Routes.PROPERTY_EDIT}
-                component={PropertyEditContainer(PropertyDialog)}
-              />
+                {/* Properties */}
+                <PropertySynthesisProvider>
+                  <AuthenticatedRoute
+                    path={[Routes.PROPERTY_VIEW, Routes.PROPERTIES]}
+                    component={PropertySynthesisPageContainer(
+                      SynthesisPage,
+                    )}
+                  />
+                  <AuthenticatedRoute
+                    path={[Routes.PROPERTY_VIEW_LEASE_DELETE]}
+                    component={LeaseDeleteContainer(
+                      ConfirmDialog,
+                    )}
+                  />
+                </PropertySynthesisProvider>
 
-              {/* Tenants */}
-              <TenantSynthesisProvider>
-                <AuthenticatedRoute
-                  path={[Routes.TENANT_VIEW, Routes.TENANTS]}
-                  component={TenantSynthesisPageContainer(SynthesisPage)}
-                />
-              </TenantSynthesisProvider>
-
-              <AuthenticatedRoute
-                exact
-                path={Routes.TENANT_ADD}
-                component={TenantAddContainer(TenantDialog)}
-              />
-
-              <AuthenticatedRoute
-                path={Routes.TENANT_DELETE}
-                component={TenantDeleteContainer(ConfirmDialog)}
-              />
-              <AuthenticatedRoute
-                path={Routes.TENANT_EDIT}
-                component={TenantEditContainer(TenantDialog)}
-              />
-
-              {/* Leases */}
-              <LeaseAddProvider>
                 <AuthenticatedRoute
                   exact
                   path={[
-                    Routes.LEASE_ADD,
-                    Routes.LEASE_ADD_FROM_PROPERTY,
-                    Routes.LEASE_ADD_FROM_TENANT,
+                    Routes.PROPERTY_ADD,
+                    Routes.LEASE_ADD_NEW_PROPERTY,
+                    Routes.DASHBOARD_PROPERTY_ADD,
                   ]}
-                  component={LeaseAddFlowContainer(LeaseAddFlowPage)}
+                  component={PropertyAddContainer(PropertyDialog)}
                 />
-              </LeaseAddProvider>
-              <AuthenticatedRoute
-                exact
-                path={[Routes.LEASE_ADD_NEW_TENANT, Routes.TENANT_ADD]}
-                component={TenantAddContainer(TenantDialog)}
-              />
+                <AuthenticatedRoute
+                  path={Routes.PROPERTY_DELETE}
+                  component={PropertyDeleteContainer(ConfirmDialog)}
+                />
+                <AuthenticatedRoute
+                  path={Routes.PROPERTY_EDIT}
+                  component={PropertyEditContainer(PropertyDialog)}
+                />
 
-              {/* Settings */}
-              <AuthenticatedRoute
-                path={Routes.SETTINGS}
-                component={SettingsMenuContainer(SettingsMenu)}
-              />
-              <AuthenticatedRoute
-                exact
-                path={Routes.SETTINGS_ACCOUNT}
-                component={SettingsAccount} // Toute la logique est récupérée du contexte du coup pas d'injection
-              />
-              <AuthenticatedRoute
-                exact
-                path={Routes.SETTINGS_IMPORT}
-                component={ImportUploadContainer(ImportUploadDialog)}
-              />
-              <AuthenticatedRoute
-                path={[Routes.SETTINGS_LENDERS, Routes.SETTINGS_LENDER_VIEW]}
-                component={SettingsLendersListContainer(SettingsLenders)}
-              />
-              <AuthenticatedRoute
-                exact
-                path={[
-                  Routes.SETTINGS_LENDER_EDIT,
-                  Routes.DASHBOARD_LENDER_EDIT,
-                ]}
-                component={LenderUpdateContainer(LenderDialog)}
-              />
-              <AuthenticatedRoute
-                exact
-                path={[
-                  Routes.SETTINGS_SUBSCRIPTION,
-                ]}
-                component={ComingSoon}
-              />
+                {/* Tenants */}
+                <TenantSynthesisProvider>
+                  <AuthenticatedRoute
+                    path={[Routes.TENANT_VIEW, Routes.TENANTS]}
+                    component={TenantSynthesisPageContainer(SynthesisPage)}
+                  />
+                </TenantSynthesisProvider>
 
-              <AuthenticatedRoute
-                exact
-                path={Routes.COMING_SOON}
-                component={ComingSoon}
-              />
-            </MainPage>
+                <AuthenticatedRoute
+                  exact
+                  path={Routes.TENANT_ADD}
+                  component={TenantAddContainer(TenantDialog)}
+                />
+
+                <AuthenticatedRoute
+                  path={Routes.TENANT_DELETE}
+                  component={TenantDeleteContainer(ConfirmDialog)}
+                />
+                <AuthenticatedRoute
+                  path={Routes.TENANT_EDIT}
+                  component={TenantEditContainer(TenantDialog)}
+                />
+
+                {/* Leases */}
+                <LeaseAddProvider>
+                  <AuthenticatedRoute
+                    exact
+                    path={[
+                      Routes.LEASE_ADD,
+                      Routes.LEASE_ADD_FROM_PROPERTY,
+                      Routes.LEASE_ADD_FROM_TENANT,
+                    ]}
+                    component={LeaseAddFlowContainer(LeaseAddFlowPage)}
+                  />
+                </LeaseAddProvider>
+                <AuthenticatedRoute
+                  exact
+                  path={[Routes.LEASE_ADD_NEW_TENANT, Routes.TENANT_ADD]}
+                  component={TenantAddContainer(TenantDialog)}
+                />
+
+                {/* Settings */}
+                <AuthenticatedRoute
+                  path={Routes.SETTINGS}
+                  component={SettingsMenuContainer(SettingsMenu)}
+                />
+                <AuthenticatedRoute
+                  exact
+                  path={Routes.SETTINGS_ACCOUNT}
+                  component={SettingsAccount} // Toute la logique est récupérée du contexte du coup pas d'injection
+                />
+                <AuthenticatedRoute
+                  exact
+                  path={Routes.SETTINGS_IMPORT}
+                  component={ImportUploadContainer(ImportUploadDialog)}
+                />
+                <AuthenticatedRoute
+                  path={[Routes.SETTINGS_LENDERS, Routes.SETTINGS_LENDER_VIEW]}
+                  component={SettingsLendersListContainer(SettingsLenders)}
+                />
+                <AuthenticatedRoute
+                  exact
+                  path={[
+                    Routes.SETTINGS_LENDER_EDIT,
+                    Routes.DASHBOARD_LENDER_EDIT,
+                  ]}
+                  component={LenderUpdateContainer(LenderDialog)}
+                />
+                <AuthenticatedRoute
+                  exact
+                  path={[
+                    Routes.SETTINGS_SUBSCRIPTION,
+                  ]}
+                  component={ComingSoon}
+                />
+
+                <AuthenticatedRoute
+                  exact
+                  path={Routes.COMING_SOON}
+                  component={ComingSoon}
+                />
+              </MainPage>
+            </AsyncProvider>
           </AuthProvider>
         </Switch>
       </BrowserRouter>

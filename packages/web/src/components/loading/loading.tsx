@@ -15,7 +15,7 @@ export const Loading: React.FunctionComponent<LoadingProps> = ({
   height,
 }) => {
   return (
-    <Pane display="flex" flexDirection="column" alignItems="center">
+    <Pane display="flex" flex={1} flexDirection="column" alignItems="center">
       <LottieAnimation
         data={animationData}
         maxHeight={200}

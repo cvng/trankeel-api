@@ -50,18 +50,6 @@ export const withContainer = (
           available: true,
         },
         {
-          title: _("documents"),
-          route: PropertySynthesisRoutes.Documents,
-          selected: route === PropertySynthesisRoutes.Documents,
-          available: false,
-        },
-        {
-          title: _("works"),
-          route: PropertySynthesisRoutes.Works,
-          selected: route === PropertySynthesisRoutes.Works,
-          available: false,
-        },
-        {
           title: _("sinisters"),
           route: PropertySynthesisRoutes.Sinisters,
           selected: route === PropertySynthesisRoutes.Sinisters,

@@ -9,7 +9,7 @@ export default {
 
 const tenant = FactoryHelper.tenantList()[0];
 
-const contract = FactoryHelper.contractList()[0];
+const contract = FactoryHelper.leaseList()[0];
 
 const tenantB = { ...tenant, contract: { ...contract } };
 

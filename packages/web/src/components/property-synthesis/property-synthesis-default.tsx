@@ -25,7 +25,7 @@ export const PropertySynthesisDefault: React.FunctionComponent<
   onLenderSelect,
 }) => {
   return (
-    <Pane>
+    <Pane key={property?.id}>
       {/* Informations */}
       <PropertySynthesisInformations
         loading={loading}

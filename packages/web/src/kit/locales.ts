@@ -16,6 +16,7 @@ import {
   PropertyUsageType,
   RentChargesRecuperationMode,
   RentPaymentMethod,
+  RentStatus,
   TenantStatus,
 } from "../types";
 import { unreachable } from "./deps";
@@ -331,13 +332,6 @@ export class ContractHelper {
       [RentPaymentMethod.After, _("rent_payment_method_after")],
     ]);
   }
-  static furnishedDuration(): Map<LeaseFurnishedDuration, string> {
-    return new Map<LeaseFurnishedDuration, string>([
-      [LeaseFurnishedDuration.NineMonths, _("nine_months")],
-      [LeaseFurnishedDuration.OneYear,  _("one_year")],
-    ]);
-  }
-
 }
 
 export function fileTypeMap(): Map<FileType, string> {
@@ -382,6 +376,37 @@ export function chargesRecuperationMode(
     case RentChargesRecuperationMode.Reel: return _("rent_charges_reel");
     case RentChargesRecuperationMode.Package: return _("rent_charges_package");
     case RentChargesRecuperationMode.Periodic: return _("rent_charges_periodic");
+    default: unreachable();
+  }
+}
+
+export function rentStatusMapColor(status: RentStatus): string | undefined {
+  const map = new Map<RentStatus, string>([
+    [RentStatus.Settled, "#2B64FC"],
+    [RentStatus.Partial, "#8BB1F9"],
+    [RentStatus.Pending, "#FFB020"],
+  ]);
+  return map.get(status);
+}
+
+export function rentStatusBadgeMapColor(
+  status: RentStatus,
+): string | undefined {
+  const map = new Map<RentStatus, string>([
+    [RentStatus.Settled, "blue"],
+    [RentStatus.Partial, "lightblue"],
+    [RentStatus.Pending, "orange"],
+  ]);
+  return map.get(status);
+}
+
+export function rentStatus(status: RentStatus): string | undefined {
+  const _ = translate("Rental");
+  // deno-fmt-ignore
+  switch (status) {
+    case RentStatus.Settled: return _("rent_status_completed");
+    case RentStatus.Partial: return _("rent_status_partial");
+    case RentStatus.Pending: return _("rent_status_pending");
     default: unreachable();
   }
 }

@@ -3,6 +3,7 @@ use crate::scalars::DateTime;
 use crate::scalars::Decimal;
 use crate::scalars::Email;
 use crate::scalars::PhoneNumber;
+use crate::unions::Eventable;
 use crate::unions::Identity;
 use async_graphql::Result;
 use async_graphql::ID;
@@ -12,6 +13,7 @@ use piteo::database::Db;
 use piteo::owners;
 use piteo::AccountStatus;
 use piteo::DbPool;
+use piteo::EventType;
 use piteo::FileStatus;
 use piteo::FileType;
 use piteo::FurnishedLeaseDuration;
@@ -563,6 +565,7 @@ pub struct Rent {
     receipt_id: Option<ID>,
     notice_id: Option<ID>,
     //
+    lease: Option<Lease>,
     delay: Option<i32>,
     transactions: Option<Vec<Transaction>>,
 }
@@ -580,6 +583,7 @@ impl From<piteo::Rent> for Rent {
             lease_id: item.lease_id.into(),
             receipt_id: item.receipt_id.map(Into::into),
             notice_id: item.notice_id.map(Into::into),
+            lease: None,
             delay: None,
             transactions: None,
         }
@@ -726,4 +730,14 @@ pub struct Transaction {
     r#type: TransactionType,
     //
     lease: Option<Lease>,
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Event {
+    id: ID,
+    created_at: DateTime,
+    eventable_id: ID,
+    eventable_type: String,
+    r#type: EventType,
+    object: Eventable,
 }

@@ -15,8 +15,6 @@ generates:
     config:
       declarationKind: "interface"
       defaultScalarType: "string"
-      scalars:
-        Decimal: number
 
 hooks:
   afterAllFileWrite:

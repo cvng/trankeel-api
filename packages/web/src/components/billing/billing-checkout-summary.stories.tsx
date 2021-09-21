@@ -14,7 +14,7 @@ const plan: Plan = {
   id: null,
   title: "Plan SOLO",
   subtitle: "Parfait pour débuter",
-  price: 990,
+  price: "990",
   code: PlanCode.Solo,
   features: [
     { title: _("benefit_1"), available: true },

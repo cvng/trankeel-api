@@ -75,10 +75,15 @@ export const PropertySynthesisLease: React.FunctionComponent<
             </Button>}
           />}
         />}
-      {property?.leases?.map((lease) => {
+      {property?.leases?.map((lease, index) => {
         return (<CardSynthesisItem
-          title={_("informations")}
+          key={index}
+          title={_("lease_synthesis")}
           items={[
+            {
+              title: lease?.tenants?.length > 1 ? _("tenants") : _("tenant"),
+              avatars: getAvatarItems(lease),
+            },
             {
               title: _("status"),
               text: ContractHelper.statusMap().get(lease?.status),
@@ -130,13 +135,10 @@ export const PropertySynthesisLease: React.FunctionComponent<
               title: _("ongoing_proceedings"),
               text: _("no"),
             },
-            {
-              title: lease?.tenants?.length > 1 ? _("tenants") : _("tenant"),
-              avatars: getAvatarItems(lease),
-            },
           ]}
           buttons={[
             <Button
+              key={0}
               iconBefore={DocumentOpenIcon}
               maxWidth={MAX_WIDTH}
               marginY={theme.margin.medium}
@@ -146,6 +148,7 @@ export const PropertySynthesisLease: React.FunctionComponent<
               {_("show_lease_pdf")}
             </Button>,
             <Button
+              key={1}
               intent="danger"
               iconBefore={EraserIcon}
               maxWidth={MAX_WIDTH}

@@ -12,8 +12,7 @@ import { translate } from "piteo-kit";
 
 const _ = translate();
 
-const STARTED_DATE_FORMAT = "DD";
-const ENDED_DATE_FORMAT = "DD MMMM YYYY";
+const PERIOD_DATE_FORMAT = "DD/MM/YYYY";
 
 export type PeriodSelectorProps = {
   startedDate: Date;
@@ -43,8 +42,8 @@ export const PeriodSelector: React.FunctionComponent<PeriodSelectorProps> = ({
       <Pane flex={1} justifyContent="center">
         <Heading size={200} marginX={minorScale(2)}>
           {_("date_period", {
-            periodStart: moment(startedDate).format(STARTED_DATE_FORMAT),
-            periodEnd: moment(endedDate).format(ENDED_DATE_FORMAT),
+            periodStart: moment(startedDate).format(PERIOD_DATE_FORMAT),
+            periodEnd: moment(endedDate).format(PERIOD_DATE_FORMAT),
           })}
         </Heading>
       </Pane>

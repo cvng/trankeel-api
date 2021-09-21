@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { InboxSearchIcon } from "evergreen-ui";
 import { PropertyHelper } from "piteo-kit";
 import * as React from "react";
@@ -81,6 +82,11 @@ export const PropertySynthesisInformations: React.FunctionComponent<
             property?.tax,
             false,
           ) || "-",
+          tooltip: property?.tax > 0
+            ? _("price_by_month", {
+              price: NumberHelper.formatToString(property?.tax / 12, false),
+            })
+            : null,
         },
         {
           title: _("lender"),

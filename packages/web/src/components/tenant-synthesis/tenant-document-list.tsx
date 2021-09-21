@@ -105,7 +105,7 @@ export const TenantDocumentList: React.FunctionComponent<
                           isSelectable
                         >
                           <Table.TextCell>
-                            {_("rent_receipt_filename", { name: item.id })}
+                            {_("rent_receipt_filename", item)}
                           </Table.TextCell>
                           <Table.TextCell>
                             <Pill color={ColorHelper.fileMapColor(item.type)}>

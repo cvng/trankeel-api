@@ -321,14 +321,14 @@ export const RentValidator = object({
 });
 
 export const PaymentNoticeValidator = object({
-  leaseId: id().required(),
+  leaseIds: array().of(id().required()),
   date: date(),
 });
 
 // # Rent Receipt validators
 
 export const RentReceiptValidator = object({
-  leaseId: id().required(),
+  leaseIds: array().of(id().required()),
   sendMail: boolean(),
 });
 

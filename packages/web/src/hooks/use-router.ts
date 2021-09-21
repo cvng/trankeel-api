@@ -35,7 +35,8 @@ export type Destinations = {
   showLenderEdit: UniquableClosure;
   showComingSoon: Closure;
   showRentReceiptPreview: UniquableClosure;
-  showRentReceiptSendAllConfirmation: UniquableClosure;
+  showRentReceiptSendAllConfirmation: Closure;
+  showPaymentNoticePreview: UniquableClosure;
 };
 
 export const useRouter = (): Destinations => {
@@ -135,17 +136,26 @@ export const useRouter = (): Destinations => {
         id: "soon",
       });
     },
-    showRentReceiptPreview: (leaseId: string) => {
+    showRentReceiptPreview: (rentId: string) => {
       history.push(
         RouteById(Routes.DASHBOARD_PREVIEW_RENT_RECEIPT, [
-          leaseId,
+          rentId,
         ], [
-          ":leaseId",
+          ":rentId",
         ]),
       );
     },
     showRentReceiptSendAllConfirmation: () => {
       history.push(Routes.DASHBOARD_MARK_ALL_RENT_PAY_CONFIRMATION);
+    },
+    showPaymentNoticePreview: (rentId: string) => {
+      history.push(
+        RouteById(Routes.DASHBOARD_PREVIEW_PAYMENT_NOTICE, [
+          rentId,
+        ], [
+          ":rentId",
+        ]),
+      );
     },
   };
 };
