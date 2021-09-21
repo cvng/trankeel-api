@@ -138,11 +138,6 @@ export enum FileType {
   RentReceipt = "RENT_RECEIPT",
 }
 
-export enum FurnishedLeaseDuration {
-  NineMonths = "NINE_MONTHS",
-  OneYear = "ONE_YEAR",
-}
-
 export type Identity = User | Company;
 
 export interface ImportInput {
@@ -170,7 +165,7 @@ export interface Lease {
   accountId: Scalars["ID"];
   depositAmount?: Maybe<Scalars["Decimal"]>;
   effectDate: Scalars["DateTime"];
-  duration: FurnishedLeaseDuration;
+  duration: LeaseFurnishedDuration;
   signatureDate?: Maybe<Scalars["DateTime"]>;
   rentAmount: Scalars["Decimal"];
   rentChargesAmount?: Maybe<Scalars["Decimal"]>;
@@ -197,7 +192,7 @@ export interface LeaseFurnishedData {
   colocationInsuranceLender?: Maybe<Scalars["Boolean"]>;
   colocationInsuranceMonthlyAmount?: Maybe<Scalars["Decimal"]>;
   colocationInsuranceTotalAmount?: Maybe<Scalars["Decimal"]>;
-  duration?: Maybe<FurnishedLeaseDuration>;
+  duration?: Maybe<LeaseFurnishedDuration>;
   lenderFeeCap?: Maybe<Scalars["Decimal"]>;
   lenderFeeCapOther?: Maybe<Scalars["String"]>;
   lenderFeeCapPrestations?: Maybe<Scalars["Decimal"]>;
@@ -237,7 +232,7 @@ export interface LeaseFurnishedDataInput {
   colocationInsuranceLender?: Maybe<Scalars["Boolean"]>;
   colocationInsuranceMonthlyAmount?: Maybe<Scalars["Decimal"]>;
   colocationInsuranceTotalAmount?: Maybe<Scalars["Decimal"]>;
-  duration?: Maybe<FurnishedLeaseDuration>;
+  duration?: Maybe<LeaseFurnishedDuration>;
   lenderFeeCap?: Maybe<Scalars["Decimal"]>;
   lenderFeeCapOther?: Maybe<Scalars["String"]>;
   lenderFeeCapPrestations?: Maybe<Scalars["Decimal"]>;
@@ -269,6 +264,11 @@ export interface LeaseFurnishedDataInput {
   worksDecenceSinceLastRental?: Maybe<Scalars["String"]>;
   worksRentDecreaseTenant?: Maybe<Scalars["String"]>;
   worksRentIncreaseLender?: Maybe<Scalars["String"]>;
+}
+
+export enum LeaseFurnishedDuration {
+  NineMonths = "NINE_MONTHS",
+  OneYear = "ONE_YEAR",
 }
 
 export interface LeaseFurnishedInput {
@@ -1226,7 +1226,7 @@ export type TenantListQuery = {
       }>;
       data?: Maybe<{
         __typename?: "LeaseFurnishedData";
-        duration?: Maybe<FurnishedLeaseDuration>;
+        duration?: Maybe<LeaseFurnishedDuration>;
       }>;
       account?: Maybe<{ __typename?: "Account"; id: string }>;
       property?: Maybe<{
@@ -1365,7 +1365,7 @@ export type LeaseListQuery = {
     }>;
     data?: Maybe<{
       __typename?: "LeaseFurnishedData";
-      duration?: Maybe<FurnishedLeaseDuration>;
+      duration?: Maybe<LeaseFurnishedDuration>;
       rentPaymentMethod?: Maybe<RentPaymentMethod>;
     }>;
   }>;
@@ -1391,7 +1391,7 @@ export type LeaseQuery = {
     file?: Maybe<{ __typename?: "File"; downloadUrl?: Maybe<string> }>;
     data?: Maybe<{
       __typename?: "LeaseFurnishedData";
-      duration?: Maybe<FurnishedLeaseDuration>;
+      duration?: Maybe<LeaseFurnishedDuration>;
       rentPaymentMethod?: Maybe<RentPaymentMethod>;
     }>;
   }>;

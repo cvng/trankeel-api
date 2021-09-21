@@ -98,10 +98,6 @@ enum FileType {
 	LEASE_DOCUMENT
 	RENT_RECEIPT
 }
-enum FurnishedLeaseDuration {
-	NINE_MONTHS
-	ONE_YEAR
-}
 union Identity = | User | Company
 input ImportInput {
 	files: [FileInput!]!
@@ -123,7 +119,7 @@ type Lease {
 	accountId: ID!
 	depositAmount: Decimal
 	effectDate: DateTime!
-	duration: FurnishedLeaseDuration!
+	duration: LeaseFurnishedDuration!
 	signatureDate: DateTime
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
@@ -148,7 +144,7 @@ type LeaseFurnishedData {
 	colocationInsuranceLender: Boolean
 	colocationInsuranceMonthlyAmount: Decimal
 	colocationInsuranceTotalAmount: Decimal
-	duration: FurnishedLeaseDuration
+	duration: LeaseFurnishedDuration
 	lenderFeeCap: Decimal
 	lenderFeeCapOther: String
 	lenderFeeCapPrestations: Decimal
@@ -187,7 +183,7 @@ input LeaseFurnishedDataInput {
 	colocationInsuranceLender: Boolean
 	colocationInsuranceMonthlyAmount: Decimal
 	colocationInsuranceTotalAmount: Decimal
-	duration: FurnishedLeaseDuration
+	duration: LeaseFurnishedDuration
 	lenderFeeCap: Decimal
 	lenderFeeCapOther: String
 	lenderFeeCapPrestations: Decimal
@@ -219,6 +215,10 @@ input LeaseFurnishedDataInput {
 	worksDecenceSinceLastRental: String
 	worksRentDecreaseTenant: String
 	worksRentIncreaseLender: String
+}
+enum LeaseFurnishedDuration {
+	NINE_MONTHS
+	ONE_YEAR
 }
 input LeaseFurnishedInput {
 	data: LeaseFurnishedDataInput
