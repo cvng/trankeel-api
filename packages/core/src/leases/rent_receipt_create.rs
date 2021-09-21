@@ -58,11 +58,11 @@ pub async fn send_receipts(
 
     for rent_id in input.rent_ids {
         let rent = db.rents().by_id(&rent_id)?;
-        let lease = db.leases().by_id(rent.lease_id)?;
-        let tenants = db.tenants().by_lease_id(lease.id)?;
+        let lease = db.leases().by_id(&rent.lease_id)?;
+        let tenants = db.tenants().by_lease_id(&lease.id)?;
 
         let receipt_id = rent.receipt_id.ok_or_else(|| Error::new(NotFound))?;
-        let receipt = match db.files().by_id(receipt_id) {
+        let receipt = match db.files().by_id(&receipt_id) {
             Ok(receipt) => receipt,
             Err(err) => return Err(err),
         };
@@ -99,10 +99,10 @@ async fn generate_receipts(
 
     for rent in rents {
         // Try to fetch associated entities.
-        let lease = db.leases().by_id(rent.lease_id)?;
-        let tenants = db.tenants().by_lease_id(lease.id)?;
-        let property = db.properties().by_id(lease.property_id)?;
-        let lender = db.lenders().by_id(property.lender_id)?;
+        let lease = db.leases().by_id(&rent.lease_id)?;
+        let tenants = db.tenants().by_lease_id(&lease.id)?;
+        let property = db.properties().by_id(&lease.property_id)?;
+        let lender = db.lenders().by_id(&property.lender_id)?;
 
         // Init new receipt.
         let receipt_id = ReceiptId::new_v4();
@@ -134,13 +134,13 @@ async fn generate_receipts(
         receipt.status = Some(document.status);
 
         // Create receipt.
-        let receipt = match db.files().create(&receipt) {
+        let receipt = match db.files().create(receipt) {
             Ok(receipt) => receipt,
             Err(err) => return Err(err),
         };
 
         // Link receipt with rent.
-        db.rents().update(&RentData {
+        db.rents().update(RentData {
             id: rent.id,
             receipt_id: Some(receipt.id),
             ..Default::default()

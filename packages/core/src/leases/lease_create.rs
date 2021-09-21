@@ -43,7 +43,7 @@ pub fn create_furnished_lease(
 ) -> Result<Lease, Error> {
     input.validate()?;
 
-    let account = db.accounts().by_auth_id(auth_id)?;
+    let account = db.accounts().by_auth_id(&auth_id)?;
 
     // Compute duration.
     let duration = input

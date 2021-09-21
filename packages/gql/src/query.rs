@@ -14,9 +14,8 @@ use crate::scalars::DateTime;
 use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
-use piteo::auth;
-use piteo::leases;
-use piteo::owners;
+use piteo::database::Db;
+use piteo::db;
 use piteo::reports;
 use piteo::AuthId;
 use piteo::DbPool;
@@ -30,9 +29,12 @@ pub struct Query;
 #[async_graphql::Object]
 impl Query {
     async fn viewer(&self, ctx: &Context<'_>) -> Result<Person> {
-        let conn = ctx.data::<DbPool>()?.get()?;
+        let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(auth::find(&conn, auth_id).map(Person::from)?)
+        Ok(db(db_pool.clone())
+            .persons()
+            .by_auth_id(auth_id)
+            .map(Person::from)?)
     }
 
     async fn properties(
@@ -44,7 +46,15 @@ impl Query {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| PropertyId::parse_str(&id).unwrap_or_default());
-        Ok(piteo::all_properties(db_pool.clone(), auth_id.clone(), id).and_then(map_res)?)
+
+        if let Some(id) = id {
+            Ok(vec![db(db_pool.clone()).properties().by_id(&id)?.into()])
+        } else {
+            Ok(db(db_pool.clone())
+                .properties()
+                .by_auth_id(auth_id)
+                .and_then(map_res)?)
+        }
     }
 
     async fn summary(
@@ -63,11 +73,18 @@ impl Query {
         _query: Option<String>,
         _status: Option<TenantStatus>,
     ) -> Result<Vec<Tenant>> {
-        let pool = ctx.data::<DbPool>()?;
+        let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| TenantId::parse_str(&id).unwrap_or_default());
 
-        Ok(piteo::all_tenants(pool.clone(), auth_id.clone(), id).and_then(map_res)?)
+        if let Some(id) = id {
+            Ok(vec![db(db_pool.clone()).tenants().by_id(&id)?.into()])
+        } else {
+            Ok(db(db_pool.clone())
+                .tenants()
+                .by_auth_id(auth_id)
+                .and_then(map_res)?)
+        }
     }
 
     async fn leases(
@@ -76,10 +93,13 @@ impl Query {
         _id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Lease>> {
-        let conn = ctx.data::<DbPool>()?.get()?;
+        let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
 
-        Ok(leases::all_leases(&conn, auth_id).and_then(map_res)?)
+        Ok(db(db_pool.clone())
+            .leases()
+            .by_auth_id(auth_id)
+            .and_then(map_res)?)
     }
 
     async fn lenders(
@@ -88,11 +108,24 @@ impl Query {
         id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Lender>> {
-        let conn = ctx.data::<DbPool>()?.get()?;
+        let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
         let id = id.map(|id| LenderId::parse_str(&id).unwrap_or_default());
 
-        Ok(owners::all_lenders(&conn, auth_id, id).and_then(map_res)?)
+        if let Some(id) = id {
+            Ok(vec![db(db_pool.clone())
+                .lenders()
+                .by_id(&id)?
+                .lender()
+                .into()])
+        } else {
+            Ok(db(db_pool.clone())
+                .lenders()
+                .by_auth_id(auth_id)?
+                .iter()
+                .map(|lender_identity| lender_identity.lender().into())
+                .collect::<Vec<_>>())
+        }
     }
 
     async fn rents(

@@ -45,14 +45,6 @@ pub async fn create_user_with_account(
 
 // # Tenants
 
-pub fn all_tenants(
-    db_pool: DbPool,
-    auth_id: AuthId,
-    id: Option<TenantId>,
-) -> Result<Vec<Tenant>, Error> {
-    tenants::all_tenants(Pg::new(db_pool), auth_id, id)
-}
-
 pub fn create_tenant(
     db_pool: DbPool,
     auth_id: AuthId,
@@ -74,14 +66,6 @@ pub fn delete_tenant(db_pool: DbPool, auth_id: AuthId, id: TenantId) -> Result<T
 }
 
 // # Properties
-
-pub fn all_properties(
-    db_pool: DbPool,
-    auth_id: AuthId,
-    id: Option<PropertyId>,
-) -> Result<Vec<Property>, Error> {
-    properties::all_properties(Pg::new(db_pool), auth_id, id)
-}
 
 pub fn create_property(
     db_pool: DbPool,

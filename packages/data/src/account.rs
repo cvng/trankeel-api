@@ -50,21 +50,6 @@ pub struct AccountData {
 
 // # Impls
 
-impl From<String> for AccountStatus {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "ACTIVE" => Self::Active,
-            "CANCELED" => Self::Canceled,
-            "INCOMPLETE" => Self::Incomplete,
-            "INCOMPLETE_EXPIRED" => Self::IncompleteExpired,
-            "PAST_DUE" => Self::PastDue,
-            "TRIALING" => Self::Trialing,
-            "UNPAID" => Self::Unpaid,
-            _ => unimplemented!(),
-        }
-    }
-}
-
 impl From<stripe::SubscriptionStatus> for AccountStatus {
     fn from(item: stripe::SubscriptionStatus) -> Self {
         match item {

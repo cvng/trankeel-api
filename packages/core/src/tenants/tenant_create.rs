@@ -33,7 +33,7 @@ pub fn create_tenant(
 ) -> Result<Tenant, Error> {
     input.validate()?;
 
-    let account = db.accounts().by_auth_id(auth_id)?;
+    let account = db.accounts().by_auth_id(&auth_id)?;
 
     db.tenants().create(Tenant {
         id: Default::default(),
@@ -51,32 +51,4 @@ pub fn create_tenant(
         visale_id: input.visale_id,
         lease_id: None,
     })
-}
-
-// # Tests
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_create_tenant() {
-        let tenant = create_tenant(
-            crate::testing::db(),
-            AuthId::default(),
-            CreateTenantInput {
-                apl: Default::default(),
-                birthdate: DateTime::default(),
-                birthplace: Default::default(),
-                email: "tenant@piteo.dev".into(),
-                first_name: Default::default(),
-                last_name: Default::default(),
-                note: Default::default(),
-                phone_number: Default::default(),
-                visale_id: Default::default(),
-            },
-        )
-        .unwrap();
-        assert_eq!(tenant.email, "tenant@piteo.dev");
-    }
 }

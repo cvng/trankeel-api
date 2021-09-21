@@ -26,10 +26,10 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
     let document = request.document.clone();
 
-    let file = db.files().by_external_id(document.id.clone()).unwrap();
+    let file = db.files().by_external_id(&document.id).unwrap();
     let file = db
         .files()
-        .update(&FileData {
+        .update(FileData {
             id: file.id,
             status: Some(document.status),
             download_url: document.download_url.clone(),
@@ -45,7 +45,7 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
     match file.type_ {
         FileType::RentReceipt => {
-            let rent = db.rents().by_receipt_id(file.id).unwrap();
+            let rent = db.rents().by_receipt_id(&file.id).unwrap();
             let input = SendReceiptsInput {
                 rent_ids: vec![rent.id],
             };

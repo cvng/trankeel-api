@@ -57,7 +57,7 @@ pub async fn create_user_with_account(
     })?;
 
     // Create user.
-    let user = db.users().create(Person {
+    let user = db.persons().create(Person {
         id: Default::default(),
         created_at: Default::default(),
         updated_at: Default::default(),

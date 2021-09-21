@@ -8,9 +8,8 @@ use crate::unions::Identity;
 use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
-use piteo::auth;
 use piteo::database::Db;
-use piteo::owners;
+use piteo::db;
 use piteo::AccountStatus;
 use piteo::DbPool;
 use piteo::EventType;
@@ -242,7 +241,7 @@ impl Lease {
         let pool = ctx.data::<DbPool>()?;
         Ok(piteo::db(pool.clone())
             .rents()
-            .by_lease_id(self.0.id)?
+            .by_lease_id(&self.0.id)?
             .into_iter()
             .map(Into::into)
             .collect::<Vec<_>>())
@@ -380,12 +379,15 @@ impl Lender {
         self.0.company_id.map(Into::into)
     }
     async fn display_name(&self, ctx: &Context<'_>) -> Result<String> {
-        let conn = ctx.data::<DbPool>()?.get()?;
-        Ok(owners::get_identity(&conn, self.0.id)?.display_name())
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(db(db_pool.clone())
+            .lenders()
+            .by_id(&self.0.id)?
+            .display_name())
     }
     async fn identity(&self, ctx: &Context<'_>) -> Result<Identity> {
-        let conn = ctx.data::<DbPool>()?.get()?;
-        Ok(owners::get_identity(&conn, self.0.id)?.into())
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(db(db_pool.clone()).lenders().by_id(&self.0.id)?.into())
     }
 }
 
@@ -418,10 +420,15 @@ pub struct Person {
 #[async_graphql::ComplexObject]
 impl Person {
     async fn account(&self, ctx: &Context<'_>) -> Result<Option<Account>> {
-        let conn = ctx.data::<DbPool>()?.get()?;
+        let db_pool = ctx.data::<DbPool>()?;
         let account_id = self.account_id.clone().try_into()?;
 
-        Ok(Some(auth::find_by_id(&conn, account_id).map(Into::into)?))
+        Ok(Some(
+            db(db_pool.clone())
+                .accounts()
+                .by_id(&account_id)
+                .map(Into::into)?,
+        ))
     }
 }
 
@@ -538,8 +545,14 @@ impl Property {
         None
     }
     async fn lender(&self, ctx: &Context<'_>) -> Result<Option<Lender>> {
-        let conn = ctx.data::<DbPool>()?.get()?;
-        Ok(Some(owners::lender_by_id(&conn, self.0.lender_id)?.into()))
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(Some(
+            db(db_pool.clone())
+                .lenders()
+                .by_id(&self.0.lender_id)?
+                .lender()
+                .into(),
+        ))
     }
     async fn leases(&self) -> Option<Vec<Lease>> {
         Some(Vec::new())
