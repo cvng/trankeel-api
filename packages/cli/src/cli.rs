@@ -39,6 +39,8 @@ async fn seed() {
     let db_pool = &Pg::init().inner();
     let auth_id = &AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
 
+    let db = piteo::db(db_pool);
+
     let user = piteo::create_user_with_account(
         db_pool,
         CreateUserWithAccountInput {
@@ -46,17 +48,20 @@ async fn seed() {
             email: "dev@piteo.fr".into(),
             first_name: "Dev".into(),
             last_name: "PITEO".into(),
-            address: None,
+            address: Some(AddressInput {
+                city: "PTP".into(),
+                line1: "542".into(),
+                postal_code: "97110".into(),
+                country: None,
+                line2: None,
+            }),
             skip_create_customer: Some(true),
         },
     )
     .await
     .unwrap();
 
-    let lender = piteo::db(db_pool)
-        .lenders()
-        .by_individual_id(&user.id)
-        .unwrap();
+    let lender = db.lenders().by_individual_id(&user.id).unwrap();
 
     let property = piteo::create_property(
         db_pool,
