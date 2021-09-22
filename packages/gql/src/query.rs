@@ -31,7 +31,7 @@ impl Query {
     async fn viewer(&self, ctx: &Context<'_>) -> Result<Person> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(db(db_pool.clone())
+        Ok(db(db_pool)
             .persons()
             .by_auth_id(auth_id)
             .map(Person::from)?)
@@ -48,9 +48,9 @@ impl Query {
         let id = id.map(|id| PropertyId::parse_str(&id).unwrap_or_default());
 
         if let Some(id) = id {
-            Ok(vec![db(db_pool.clone()).properties().by_id(&id)?.into()])
+            Ok(vec![db(db_pool).properties().by_id(&id)?.into()])
         } else {
-            Ok(db(db_pool.clone())
+            Ok(db(db_pool)
                 .properties()
                 .by_auth_id(auth_id)
                 .and_then(map_res)?)
@@ -78,9 +78,9 @@ impl Query {
         let id = id.map(|id| TenantId::parse_str(&id).unwrap_or_default());
 
         if let Some(id) = id {
-            Ok(vec![db(db_pool.clone()).tenants().by_id(&id)?.into()])
+            Ok(vec![db(db_pool).tenants().by_id(&id)?.into()])
         } else {
-            Ok(db(db_pool.clone())
+            Ok(db(db_pool)
                 .tenants()
                 .by_auth_id(auth_id)
                 .and_then(map_res)?)
@@ -96,10 +96,7 @@ impl Query {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
 
-        Ok(db(db_pool.clone())
-            .leases()
-            .by_auth_id(auth_id)
-            .and_then(map_res)?)
+        Ok(db(db_pool).leases().by_auth_id(auth_id).and_then(map_res)?)
     }
 
     async fn lenders(
@@ -113,13 +110,9 @@ impl Query {
         let id = id.map(|id| LenderId::parse_str(&id).unwrap_or_default());
 
         if let Some(id) = id {
-            Ok(vec![db(db_pool.clone())
-                .lenders()
-                .by_id(&id)?
-                .lender()
-                .into()])
+            Ok(vec![db(db_pool).lenders().by_id(&id)?.lender().into()])
         } else {
-            Ok(db(db_pool.clone())
+            Ok(db(db_pool)
                 .lenders()
                 .by_auth_id(auth_id)?
                 .iter()

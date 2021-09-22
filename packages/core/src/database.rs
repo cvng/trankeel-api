@@ -87,7 +87,7 @@ pub trait PropertyStore {
 pub trait TenantStore {
     fn by_id(&mut self, id: &TenantId) -> Result<Tenant>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Tenant>>;
-    fn by_lease_id(&mut self, id: &LeaseId) -> Result<Vec<Tenant>>;
+    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Tenant>>;
     fn create(&mut self, data: Tenant) -> Result<Tenant>;
     fn delete(&mut self, data: TenantId) -> Result<Deleted>;
     fn update(&mut self, data: TenantData) -> Result<Tenant>;

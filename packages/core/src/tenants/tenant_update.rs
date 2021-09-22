@@ -30,8 +30,8 @@ pub struct UpdateTenantInput {
 // # Operation
 
 pub fn update_tenant(
-    db: impl Db,
-    _auth_id: AuthId,
+    db: &impl Db,
+    _auth_id: &AuthId,
     input: UpdateTenantInput,
 ) -> Result<Tenant, Error> {
     input.validate()?;

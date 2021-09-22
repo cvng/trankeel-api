@@ -37,13 +37,13 @@ pub struct CreateFurnishedLeaseInput {
 // # Operation
 
 pub fn create_furnished_lease(
-    db: impl Db,
-    auth_id: AuthId,
+    db: &impl Db,
+    auth_id: &AuthId,
     input: CreateFurnishedLeaseInput,
 ) -> Result<Lease, Error> {
     input.validate()?;
 
-    let account = db.accounts().by_auth_id(&auth_id)?;
+    let account = db.accounts().by_auth_id(auth_id)?;
 
     // Compute duration.
     let duration = input
@@ -53,7 +53,7 @@ pub fn create_furnished_lease(
         .unwrap_or_default();
 
     let lease = db.leases().create(Lease {
-        id: Default::default(),
+        id: LeaseId::new_v4(),
         created_at: Default::default(),
         updated_at: Default::default(),
         details: input.details.map(Into::into),
@@ -72,10 +72,10 @@ pub fn create_furnished_lease(
     })?;
 
     // Generate lease rents.
-    add_lease_rents(&db, &lease)?;
+    add_lease_rents(db, &lease)?;
 
     // Affect created lease to existing tenants.
-    add_lease_tenants(&db, lease.id, input.tenant_ids)?;
+    add_lease_tenants(db, lease.id, input.tenant_ids)?;
 
     Ok(lease)
 }

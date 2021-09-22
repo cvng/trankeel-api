@@ -7,11 +7,13 @@ use piteo::properties::CreatePropertyInput;
 use piteo::tenants::CreateTenantInput;
 use piteo::Amount;
 use piteo::AuthId;
+use piteo::Pg;
 use piteo::PropertyBuildPeriodType;
 use piteo::PropertyBuildingLegalStatus;
 use piteo::PropertyHabitationUsageType;
 use piteo::PropertyRoomType;
 use piteo::PropertyUsageType;
+use piteo::Provider;
 use std::env;
 
 #[tokio::main]
@@ -34,13 +36,11 @@ async fn write_schema() {
 }
 
 async fn seed() {
-    let url = env::var("DATABASE_URL").unwrap();
-
-    let db_pool = piteo::build_connection_pool(&url).unwrap();
-    let auth_id = AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
+    let db_pool = &Pg::init().inner();
+    let auth_id = &AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
 
     let user = piteo::create_user_with_account(
-        db_pool.clone(),
+        db_pool,
         CreateUserWithAccountInput {
             auth_id: auth_id.clone(),
             email: "dev@piteo.fr".into(),
@@ -53,14 +53,14 @@ async fn seed() {
     .await
     .unwrap();
 
-    let lender = piteo::db(db_pool.clone())
+    let lender = piteo::db(db_pool)
         .lenders()
         .by_individual_id(&user.id)
         .unwrap();
 
     let property = piteo::create_property(
-        db_pool.clone(),
-        auth_id.clone(),
+        db_pool,
+        auth_id,
         CreatePropertyInput {
             address: AddressInput {
                 city: "Talence".into(),
@@ -94,8 +94,8 @@ async fn seed() {
     .unwrap();
 
     let tenant = piteo::create_tenant(
-        db_pool.clone(),
-        auth_id.clone(),
+        db_pool,
+        auth_id,
         CreateTenantInput {
             apl: None,
             birthdate: Utc::now().into(),

@@ -5,10 +5,13 @@ use eyre::Error;
 use log::info;
 use piteo_data::Account;
 use piteo_data::AccountData;
+use piteo_data::AccountId;
 use piteo_data::Address;
 use piteo_data::AuthId;
 use piteo_data::Lender;
+use piteo_data::LenderId;
 use piteo_data::Person;
+use piteo_data::PersonId;
 use piteo_data::PersonRole;
 use validator::Validate;
 
@@ -38,15 +41,15 @@ pub struct CreateUserWithAccountInput {
 // # Operation
 
 pub async fn create_user_with_account(
-    db: impl Db,
-    payment_provider: impl PaymentProvider,
+    db: &impl Db,
+    payment_provider: &impl PaymentProvider,
     input: CreateUserWithAccountInput,
 ) -> Result<Person, Error> {
     input.validate()?;
 
     // Create account.
     let account = db.accounts().create(Account {
-        id: Default::default(),
+        id: AccountId::new_v4(),
         created_at: Default::default(),
         updated_at: Default::default(),
         plan_id: None,
@@ -58,7 +61,7 @@ pub async fn create_user_with_account(
 
     // Create user.
     let user = db.persons().create(Person {
-        id: Default::default(),
+        id: PersonId::new_v4(),
         created_at: Default::default(),
         updated_at: Default::default(),
         auth_id: input.auth_id,
@@ -74,7 +77,7 @@ pub async fn create_user_with_account(
 
     // Create lender.
     let _lender = db.lenders().create(Lender {
-        id: Default::default(),
+        id: LenderId::new_v4(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id: account.id,

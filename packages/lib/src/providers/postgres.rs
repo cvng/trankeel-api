@@ -58,31 +58,7 @@ type Result<T, E = Error> = std::result::Result<T, E>;
 
 type Deleted = usize;
 
-/// Database pool.
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
-
-/// Build database pool from env.
-pub fn db_pool_from_env() -> Result<DbPool> {
-    let database_url = env::var("DATABASE_URL").context("DATABASE_URL must be set.")?;
-
-    build_connection_pool(&database_url)
-}
-
-/// Build connection pool.
-pub fn build_connection_pool(database_url: &str) -> Result<DbPool> {
-    let manager = ConnectionManager::<PgConnection>::new(database_url);
-
-    Pool::builder()
-        .build(manager)
-        .context(format!("Error connecting to {}", database_url))
-}
-
-/// Access database.
-pub fn db(db_pool: DbPool) -> Pg {
-    Pg::new(db_pool)
-}
-
-pub struct Pg(DbPool);
 
 struct AccountStore<'a>(&'a DbPool);
 
@@ -106,15 +82,22 @@ struct FileStore<'a>(&'a DbPool);
 
 struct PlanStore<'a>(&'a DbPool);
 
+pub struct Pg(DbPool);
+
 impl Pg {
     pub fn new(db_pool: DbPool) -> Self {
         Self(db_pool)
+    }
+
+    pub fn inner(&self) -> DbPool {
+        self.0.clone()
     }
 }
 
 impl Provider for Pg {
     fn init() -> Self {
-        Self::new(db_pool_from_env().unwrap())
+        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL");
+        Self::new(build_connection_pool(&database_url).unwrap())
     }
 }
 
@@ -162,30 +145,20 @@ impl Db for Pg {
 
 impl database::AccountStore for AccountStore<'_> {
     fn by_id(&mut self, id: &AccountId) -> Result<Account> {
-        accounts::table
-            .find(id)
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+        Ok(accounts::table.find(id).first(&self.0.get()?)?)
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Account> {
-        accounts::table
+        Ok(accounts::table
             .select(accounts::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
             .filter(persons::auth_id.eq(&auth_id.inner()))
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+            .first(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Account) -> Result<Account> {
         Ok(insert_into(accounts::table)
-            .values((
-                accounts::plan_id.eq(data.plan_id),
-                accounts::status.eq(data.status),
-                accounts::stripe_customer_id.eq(data.stripe_customer_id),
-                accounts::stripe_subscription_id.eq(data.stripe_subscription_id),
-                accounts::trial_end.eq(data.trial_end),
-            ))
+            .values(data)
             .get_result(&self.0.get()?)?)
     }
 
@@ -196,32 +169,18 @@ impl database::AccountStore for AccountStore<'_> {
 
 impl database::PersonStore for PersonStore<'_> {
     fn by_id(&mut self, id: &PersonId) -> Result<Person> {
-        persons::table
-            .find(id)
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+        Ok(persons::table.find(id).first(&self.0.get()?)?)
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Person> {
-        persons::table
+        Ok(persons::table
             .filter(persons::auth_id.eq(auth_id.inner()))
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+            .first(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Person) -> Result<Person> {
         Ok(insert_into(persons::table)
-            .values((
-                persons::auth_id.eq(data.auth_id),
-                persons::email.eq(data.email),
-                persons::first_name.eq(data.first_name),
-                persons::last_name.eq(data.last_name),
-                persons::address.eq(data.address),
-                persons::photo_url.eq(data.photo_url),
-                persons::role.eq(data.role),
-                persons::phone_number.eq(data.phone_number),
-                persons::account_id.eq(data.account_id),
-            ))
+            .values(data)
             .get_result(&self.0.get()?)?)
     }
 
@@ -232,42 +191,26 @@ impl database::PersonStore for PersonStore<'_> {
 
 impl database::TenantStore for TenantStore<'_> {
     fn by_id(&mut self, id: &TenantId) -> Result<Tenant> {
-        tenants::table
-            .find(id)
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+        Ok(tenants::table.find(id).first(&self.0.get()?)?)
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Tenant>> {
-        tenants::table
+        Ok(tenants::table
             .select(tenants::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(tenants::account_id)))
             .filter(persons::auth_id.eq(auth_id.inner()))
-            .load(&self.0.get()?)
-            .map_err(|err| err.into())
+            .load(&self.0.get()?)?)
     }
 
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Tenant>> {
-        tenants::table
+        Ok(tenants::table
             .filter(tenants::lease_id.eq(lease_id))
-            .load(&self.0.get()?)
-            .map_err(|err| err.into())
+            .load(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Tenant) -> Result<Tenant> {
         Ok(insert_into(tenants::table)
-            .values((
-                tenants::account_id.eq(data.account_id),
-                tenants::apl.eq(data.apl),
-                tenants::birthdate.eq(data.birthdate),
-                tenants::birthplace.eq(data.birthplace),
-                tenants::email.eq(data.email),
-                tenants::first_name.eq(data.first_name),
-                tenants::last_name.eq(data.last_name),
-                tenants::note.eq(data.note),
-                tenants::phone_number.eq(data.phone_number),
-                tenants::visale_id.eq(data.visale_id),
-            ))
+            .values(data)
             .get_result(&self.0.get()?)?)
     }
 
@@ -285,24 +228,24 @@ impl database::TenantStore for TenantStore<'_> {
 impl database::LenderStore for LenderStore<'_> {
     fn by_id(&mut self, id: &LenderId) -> Result<LenderIdentity> {
         let lender: Lender = lenders::table.find(id).first(&self.0.get()?)?;
-
-        match lender {
+        let lender_identity = match lender {
             Lender {
                 individual_id: Some(individual_id),
                 ..
             } => {
                 let person = persons::table.find(individual_id).first(&self.0.get()?)?;
-                Ok(LenderIdentity::Individual(lender, person))
+                LenderIdentity::Individual(lender, person)
             }
             Lender {
                 company_id: Some(company_id),
                 ..
             } => {
                 let company = companies::table.find(company_id).first(&self.0.get()?)?;
-                Ok(LenderIdentity::Company(lender, company))
+                LenderIdentity::Company(lender, company)
             }
-            _ => Err(Error::new(NotFound)),
-        }
+            _ => return Err(Error::new(NotFound)),
+        };
+        Ok(lender_identity)
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderIdentity>> {
@@ -326,11 +269,7 @@ impl database::LenderStore for LenderStore<'_> {
 
     fn create(&mut self, data: Lender) -> Result<Lender> {
         Ok(insert_into(lenders::table)
-            .values((
-                lenders::account_id.eq(data.account_id),
-                lenders::individual_id.eq(data.individual_id),
-                lenders::company_id.eq(data.company_id),
-            ))
+            .values(data)
             .get_result(&self.0.get()?)?)
     }
 
@@ -341,47 +280,20 @@ impl database::LenderStore for LenderStore<'_> {
 
 impl database::PropertyStore for PropertyStore<'_> {
     fn by_id(&mut self, id: &PropertyId) -> Result<Property> {
-        properties::table
-            .find(id)
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+        Ok(properties::table.find(id).first(&self.0.get()?)?)
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Property>> {
-        properties::table
+        Ok(properties::table
             .select(properties::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(properties::account_id)))
             .filter(persons::auth_id.eq(auth_id.inner()))
-            .load(&self.0.get()?)
-            .map_err(|err| err.into())
+            .load(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Property) -> Result<Property> {
         Ok(insert_into(properties::table)
-            .values((
-                properties::account_id.eq(data.account_id),
-                properties::address.eq(data.address),
-                properties::build_period.eq(data.build_period),
-                properties::building_legal_status.eq(data.building_legal_status),
-                properties::common_spaces.eq(data.common_spaces),
-                properties::energy_class.eq(data.energy_class),
-                properties::equipments.eq(data.equipments),
-                properties::gas_emission.eq(data.gas_emission),
-                properties::heating_method.eq(data.heating_method),
-                properties::housing_type.eq(data.housing_type),
-                properties::name.eq(data.name),
-                properties::note.eq(data.note),
-                properties::ntic_equipments.eq(data.ntic_equipments),
-                properties::other_spaces.eq(data.other_spaces),
-                properties::tax.eq(data.tax),
-                properties::room_count.eq(data.room_count),
-                properties::status.eq(data.status),
-                properties::surface.eq(data.surface),
-                properties::tenant_private_spaces.eq(data.tenant_private_spaces),
-                properties::usage_type.eq(data.usage_type),
-                properties::water_heating_method.eq(data.water_heating_method),
-                properties::lender_id.eq(data.lender_id),
-            ))
+            .values(data)
             .get_result(&self.0.get()?)?)
     }
 
@@ -398,38 +310,20 @@ impl database::PropertyStore for PropertyStore<'_> {
 
 impl database::LeaseStore for LeaseStore<'_> {
     fn by_id(&mut self, id: &LeaseId) -> Result<Lease> {
-        leases::table
-            .find(id)
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+        Ok(leases::table.find(id).first(&self.0.get()?)?)
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Lease>> {
-        leases::table
+        Ok(leases::table
             .select(leases::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(leases::account_id)))
             .filter(persons::auth_id.eq(auth_id.inner()))
-            .load(&self.0.get()?)
-            .map_err(|err| err.into())
+            .load(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Lease) -> Result<Lease> {
         Ok(insert_into(leases::table)
-            .values((
-                leases::account_id.eq(data.account_id),
-                leases::deposit_amount.eq(data.deposit_amount),
-                leases::effect_date.eq(data.effect_date),
-                leases::signature_date.eq(data.signature_date),
-                leases::rent_amount.eq(data.rent_amount),
-                leases::rent_charges_amount.eq(data.rent_charges_amount),
-                leases::type_.eq(data.type_),
-                leases::lease_id.eq(data.lease_id),
-                leases::property_id.eq(data.property_id),
-                leases::details.eq(data.details),
-                leases::expired_at.eq(data.expired_at),
-                leases::renew_date.eq(data.renew_date),
-                leases::duration.eq(data.duration),
-            ))
+            .values(data)
             .get_result(&self.0.get()?)?)
     }
 
@@ -446,24 +340,19 @@ impl database::LeaseStore for LeaseStore<'_> {
 
 impl database::RentStore for RentStore<'_> {
     fn by_id(&mut self, id: &RentId) -> Result<Rent> {
-        rents::table
-            .find(id)
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+        Ok(rents::table.find(id).first(&self.0.get()?)?)
     }
 
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Rent> {
-        rents::table
+        Ok(rents::table
             .filter(rents::receipt_id.eq(&receipt_id))
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+            .first(&self.0.get()?)?)
     }
 
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Rent>> {
-        rents::table
+        Ok(rents::table
             .filter(rents::lease_id.eq(&lease_id))
-            .load(&self.0.get()?)
-            .map_err(|err| err.into())
+            .load(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Rent) -> Result<Rent> {
@@ -473,7 +362,9 @@ impl database::RentStore for RentStore<'_> {
     }
 
     fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>> {
-        data.into_iter().map(|item| self.create(item)).collect()
+        data.into_iter()
+            .map(|item| self.create(item))
+            .collect::<Result<Vec<_>>>()
     }
 
     fn update(&mut self, data: RentData) -> Result<Rent> {
@@ -481,23 +372,21 @@ impl database::RentStore for RentStore<'_> {
     }
 
     fn update_many(&mut self, data: Vec<RentData>) -> Result<Vec<Rent>> {
-        data.into_iter().map(|item| self.update(item)).collect()
+        data.into_iter()
+            .map(|item| self.update(item))
+            .collect::<Result<Vec<_>>>()
     }
 }
 
 impl database::FileStore for FileStore<'_> {
     fn by_external_id(&mut self, external_id: &str) -> Result<File> {
-        files::table
+        Ok(files::table
             .filter(files::external_id.eq(external_id))
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+            .first(&self.0.get()?)?)
     }
 
     fn by_id(&mut self, id: &FileId) -> Result<File> {
-        files::table
-            .find(id)
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+        Ok(files::table.find(id).first(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: File) -> Result<File> {
@@ -513,18 +402,22 @@ impl database::FileStore for FileStore<'_> {
 
 impl database::PlanStore for PlanStore<'_> {
     fn by_id(&mut self, id: &PlanId) -> Result<Plan> {
-        plans::table
-            .find(id)
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+        Ok(plans::table.find(id).first(&self.0.get()?)?)
     }
 }
 
 impl database::CompanyStore for CompanyStore<'_> {
     fn by_id(&mut self, id: &CompanyId) -> Result<Company> {
-        companies::table
-            .find(id)
-            .first(&self.0.get()?)
-            .map_err(|err| err.into())
+        Ok(companies::table.find(id).first(&self.0.get()?)?)
     }
+}
+
+// # Utils
+
+fn build_connection_pool(database_url: &str) -> Result<DbPool> {
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
+
+    Pool::builder()
+        .build(manager)
+        .context(format!("Error connecting to {}", database_url))
 }

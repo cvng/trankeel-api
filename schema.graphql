@@ -580,6 +580,7 @@ input TenantInput {
 	visaleId: String
 }
 enum TenantStatus {
+	CANDIDATE
 	GONE
 	LATE
 	NEW

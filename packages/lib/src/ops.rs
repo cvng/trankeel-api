@@ -34,108 +34,118 @@ use piteo_core::Receipt;
 use piteo_core::Tenant;
 use piteo_core::TenantId;
 
+// # Datasources
+
+pub fn db(db_pool: &DbPool) -> Pg {
+    Pg::new(db_pool.clone())
+}
+
 // # Auth
 
 pub async fn create_user_with_account(
-    db_pool: DbPool,
+    db_pool: &DbPool,
     input: CreateUserWithAccountInput,
 ) -> Result<Person, Error> {
-    auth::create_user_with_account(Pg::new(db_pool), Stripe::init(), input).await
+    auth::create_user_with_account(&Pg::new(db_pool.clone()), &Stripe::init(), input).await
 }
 
 // # Tenants
 
 pub fn create_tenant(
-    db_pool: DbPool,
-    auth_id: AuthId,
+    db_pool: &DbPool,
+    auth_id: &AuthId,
     input: CreateTenantInput,
 ) -> Result<Tenant, Error> {
-    tenants::create_tenant(Pg::new(db_pool), auth_id, input)
+    tenants::create_tenant(&Pg::new(db_pool.clone()), auth_id, input)
 }
 
 pub fn update_tenant(
-    db_pool: DbPool,
-    auth_id: AuthId,
+    db_pool: &DbPool,
+    auth_id: &AuthId,
     input: UpdateTenantInput,
 ) -> Result<Tenant, Error> {
-    tenants::update_tenant(Pg::new(db_pool), auth_id, input)
+    tenants::update_tenant(&Pg::new(db_pool.clone()), auth_id, input)
 }
 
-pub fn delete_tenant(db_pool: DbPool, auth_id: AuthId, id: TenantId) -> Result<TenantId, Error> {
-    tenants::delete_tenant(Pg::new(db_pool), auth_id, DeleteTenantInput { id })
+pub fn delete_tenant(db_pool: &DbPool, auth_id: &AuthId, id: TenantId) -> Result<TenantId, Error> {
+    tenants::delete_tenant(&Pg::new(db_pool.clone()), auth_id, DeleteTenantInput { id })
 }
 
 // # Properties
 
 pub fn create_property(
-    db_pool: DbPool,
-    auth_id: AuthId,
+    db_pool: &DbPool,
+    auth_id: &AuthId,
     input: CreatePropertyInput,
 ) -> Result<Property, Error> {
-    properties::create_property(Pg::new(db_pool), auth_id, input)
+    properties::create_property(&Pg::new(db_pool.clone()), auth_id, input)
 }
 
 pub fn update_property(
-    db_pool: DbPool,
-    auth_id: AuthId,
+    db_pool: &DbPool,
+    auth_id: &AuthId,
     input: UpdatePropertyInput,
 ) -> Result<Property, Error> {
-    properties::update_property(Pg::new(db_pool), auth_id, input)
+    properties::update_property(&Pg::new(db_pool.clone()), auth_id, input)
 }
 
 pub fn delete_property(
-    db_pool: DbPool,
-    auth_id: AuthId,
+    db_pool: &DbPool,
+    auth_id: &AuthId,
     id: PropertyId,
 ) -> Result<TenantId, Error> {
-    properties::delete_property(Pg::new(db_pool), auth_id, DeletePropertyInput { id })
+    properties::delete_property(
+        &Pg::new(db_pool.clone()),
+        auth_id,
+        DeletePropertyInput { id },
+    )
 }
 
 // # Leases
 
 pub fn create_furnished_lease(
-    db_pool: DbPool,
-    auth_id: AuthId,
+    db_pool: &DbPool,
+    auth_id: &AuthId,
     input: CreateFurnishedLeaseInput,
 ) -> Result<Lease, Error> {
-    leases::create_furnished_lease(Pg::new(db_pool), auth_id, input)
+    leases::create_furnished_lease(&Pg::new(db_pool.clone()), auth_id, input)
 }
 
 pub fn update_furnished_lease(
-    db_pool: DbPool,
-    auth_id: AuthId,
+    db_pool: &DbPool,
+    auth_id: &AuthId,
     input: UpdateFurnishedLeaseInput,
 ) -> Result<Lease, Error> {
-    leases::update_furnished_lease(Pg::new(db_pool), auth_id, input)
+    leases::update_furnished_lease(&Pg::new(db_pool.clone()), auth_id, input)
 }
 
-pub fn delete_lease(db_pool: DbPool, auth_id: AuthId, id: LeaseId) -> Result<LeaseId, Error> {
-    leases::delete_lease(Pg::new(db_pool), auth_id, DeleteLeaseInput { id })
+pub fn delete_lease(db_pool: &DbPool, auth_id: &AuthId, id: LeaseId) -> Result<LeaseId, Error> {
+    leases::delete_lease(&Pg::new(db_pool.clone()), auth_id, DeleteLeaseInput { id })
 }
 
 // # Lenders
 
 pub fn update_individual_lender(
-    db_pool: DbPool,
-    auth_id: AuthId,
+    db_pool: &DbPool,
+    auth_id: &AuthId,
     input: UpdateIndividualLenderInput,
 ) -> Result<Lender, Error> {
-    owners::update_individual_lender(Pg::new(db_pool), auth_id, input)
+    owners::update_individual_lender(&Pg::new(db_pool.clone()), auth_id, input)
 }
 
 // # Receipts
 
 pub async fn create_receipts(
-    db_pool: DbPool,
-    _auth_id: AuthId,
+    db_pool: &DbPool,
+    _auth_id: &AuthId,
     input: CreateReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
-    leases::create_receipts(&Pg::new(db_pool), &Pdfmonkey::init(), input).await
+    leases::create_receipts(&Pg::new(db_pool.clone()), &Pdfmonkey::init(), input).await
 }
 
 pub async fn send_receipts(
-    db_pool: DbPool,
+    db_pool: &DbPool,
     input: SendReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
-    leases::send_receipts(&Pg::new(db_pool), &Sendinblue::init(), input).await
+    leases::send_receipts(&Pg::new(db_pool.clone()), &Sendinblue::init(), input).await
 }

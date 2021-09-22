@@ -42,7 +42,7 @@ impl Mutation {
         input: CreateUserWithAccountInput,
     ) -> Result<Person> {
         let db_pool = ctx.data::<DbPool>()?;
-        Ok(piteo::create_user_with_account(db_pool.clone(), input)
+        Ok(piteo::create_user_with_account(db_pool, input)
             .await?
             .into())
     }
@@ -58,19 +58,19 @@ impl Mutation {
     async fn tenant_create(&self, ctx: &Context<'_>, input: CreateTenantInput) -> Result<Tenant> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::create_tenant(db_pool.clone(), auth_id.clone(), input)?.into())
+        Ok(piteo::create_tenant(db_pool, auth_id, input)?.into())
     }
 
     async fn tenant_update(&self, ctx: &Context<'_>, input: UpdateTenantInput) -> Result<Tenant> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::update_tenant(db_pool.clone(), auth_id.clone(), input)?.into())
+        Ok(piteo::update_tenant(db_pool, auth_id, input)?.into())
     }
 
     async fn tenant_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::delete_tenant(db_pool.clone(), auth_id.clone(), id.try_into()?)?.into())
+        Ok(piteo::delete_tenant(db_pool, auth_id, id.try_into()?)?.into())
     }
 
     async fn property_create(
@@ -80,7 +80,7 @@ impl Mutation {
     ) -> Result<Property> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::create_property(db_pool.clone(), auth_id.clone(), input)?.into())
+        Ok(piteo::create_property(db_pool, auth_id, input)?.into())
     }
 
     async fn property_update(
@@ -90,13 +90,13 @@ impl Mutation {
     ) -> Result<Property> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::update_property(db_pool.clone(), auth_id.clone(), input)?.into())
+        Ok(piteo::update_property(db_pool, auth_id, input)?.into())
     }
 
     async fn property_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::delete_property(db_pool.clone(), auth_id.clone(), id.try_into()?)?.into())
+        Ok(piteo::delete_property(db_pool, auth_id, id.try_into()?)?.into())
     }
 
     async fn lease_furnished_create(
@@ -106,7 +106,7 @@ impl Mutation {
     ) -> Result<Lease> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::create_furnished_lease(db_pool.clone(), auth_id.clone(), input)?.into())
+        Ok(piteo::create_furnished_lease(db_pool, auth_id, input)?.into())
     }
 
     async fn lease_furnished_update(
@@ -116,13 +116,13 @@ impl Mutation {
     ) -> Result<Lease> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::update_furnished_lease(db_pool.clone(), auth_id.clone(), input)?.into())
+        Ok(piteo::update_furnished_lease(db_pool, auth_id, input)?.into())
     }
 
     async fn lease_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::delete_lease(db_pool.clone(), auth_id.clone(), id.try_into()?)?.into())
+        Ok(piteo::delete_lease(db_pool, auth_id, id.try_into()?)?.into())
     }
 
     async fn lender_individual_update(
@@ -132,7 +132,7 @@ impl Mutation {
     ) -> Result<Lender> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::update_individual_lender(db_pool.clone(), auth_id.clone(), input)?.into())
+        Ok(piteo::update_individual_lender(db_pool, auth_id, input)?.into())
     }
 
     async fn transaction_create(&self, _input: TransactionInput) -> Result<Transaction> {
@@ -158,7 +158,7 @@ impl Mutation {
     ) -> Result<CreateReceiptsPayload> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        match piteo::create_receipts(db_pool.clone(), auth_id.clone(), input).await {
+        match piteo::create_receipts(db_pool, auth_id, input).await {
             Ok(receipts) => Ok(CreateReceiptsPayload {
                 receipts: Some(map_res(receipts)?),
                 errors: None,

@@ -48,8 +48,8 @@ pub struct UpdatePropertyInput {
 // # Operation
 
 pub fn update_property(
-    db: impl Db,
-    _auth_id: AuthId,
+    db: &impl Db,
+    _auth_id: &AuthId,
     input: UpdatePropertyInput,
 ) -> Result<Property, Error> {
     input.validate()?;

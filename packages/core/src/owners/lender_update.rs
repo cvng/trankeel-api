@@ -38,8 +38,8 @@ pub struct UpdateCompanyLenderUpdateInput {
 // # Operation
 
 pub fn update_individual_lender(
-    db: impl Db,
-    _auth_id: AuthId,
+    db: &impl Db,
+    _auth_id: &AuthId,
     input: UpdateIndividualLenderInput,
 ) -> Result<Lender, Error> {
     input.validate()?;

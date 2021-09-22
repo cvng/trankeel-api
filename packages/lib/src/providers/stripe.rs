@@ -13,7 +13,7 @@ pub struct Stripe(stripe::Client);
 
 impl Provider for Stripe {
     fn init() -> Self {
-        let secret_key = env::var("STRIPE_SECRET_KEY").expect("STRIPE_SECRET_KEY must be set");
+        let secret_key = env::var("STRIPE_SECRET_KEY").expect("STRIPE_SECRET_KEY");
         Self(stripe::Client::new(secret_key))
     }
 }
@@ -21,8 +21,7 @@ impl Provider for Stripe {
 #[async_trait]
 impl PaymentProvider for Stripe {
     async fn create_subscription_with_customer(&self, email: Email) -> Result<Subscription, Error> {
-        let plan_id =
-            env::var("STRIPE_DEFAULT_PLAN_ID").context("STRIPE_DEFAULT_PLAN_ID must be set")?;
+        let plan_id = env::var("STRIPE_DEFAULT_PLAN_ID").context("STRIPE_DEFAULT_PLAN_ID")?;
 
         // https://stripe.com/docs/api/customers/create
         let customer_params = stripe::CreateCustomer {

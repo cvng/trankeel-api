@@ -14,8 +14,8 @@ pub struct DeleteTenantInput {
 // # Operation
 
 pub fn delete_tenant(
-    db: impl Db,
-    _auth_id: AuthId,
+    db: &impl Db,
+    _auth_id: &AuthId,
     input: DeleteTenantInput,
 ) -> Result<TenantId, Error> {
     input.validate()?;
