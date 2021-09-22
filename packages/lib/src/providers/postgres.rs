@@ -414,7 +414,7 @@ impl database::CompanyStore for CompanyStore<'_> {
 
 // # Utils
 
-pub fn build_connection_pool(database_url: &str) -> Result<DbPool> {
+fn build_connection_pool(database_url: &str) -> Result<DbPool> {
     let manager = ConnectionManager::<PgConnection>::new(database_url);
 
     Pool::builder()
