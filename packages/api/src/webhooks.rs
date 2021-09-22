@@ -61,12 +61,12 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 // # Handlers
 
 async fn on_receipt_created(db_pool: &DbPool, receipt: &Receipt) {
-    let db = piteo::db(&db_pool);
+    let db = piteo::db(db_pool);
 
     let rent = db.rents().by_receipt_id(&receipt.id).unwrap();
     let input = SendReceiptsInput {
         rent_ids: vec![rent.id],
     };
 
-    piteo::send_receipts(&db_pool, input).await.ok();
+    piteo::send_receipts(db_pool, input).await.ok();
 }
