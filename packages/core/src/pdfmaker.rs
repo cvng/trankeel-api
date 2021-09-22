@@ -39,7 +39,7 @@ pub struct Document {
     pub checksum: String,
     pub download_url: Option<Url>,
     pub preview_url: Url,
-    pub meta: Option<Meta>,
+    pub meta: Option<String>,
     pub errors: Option<Vec<String>>,
     pub created_at: String,
     pub updated_at: String,
