@@ -15,4 +15,4 @@ sendinblue = "0.2.1"
 serde = "1.0"
 serde_json = "1.0"
 stripe-rust = { version = "0.13.0-dev", git = "https://github.com/wyyerd/stripe-rs", default-features = false, features = ["default-tls", "billing"] }
-tokio = { version = "0.2", features = ["full"] }
+tokio = { version = "0.2", features = ["rt-core"] }
