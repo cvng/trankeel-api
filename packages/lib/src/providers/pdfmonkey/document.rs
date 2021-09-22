@@ -19,11 +19,11 @@ pub struct Document {
     pub document_template_id: String,
     pub download_url: Option<String>,
     pub errors: Option<Vec<String>>,
-    pub filename: String,
+    pub filename: Option<String>,
     pub id: String,
     pub meta: Option<String>,
     pub payload: String,
-    pub preview_url: Option<String>,
+    pub preview_url: String,
     pub status: String,
     pub updated_at: String,
     #[serde(skip)]

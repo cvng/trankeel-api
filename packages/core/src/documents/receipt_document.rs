@@ -113,7 +113,7 @@ impl ReceiptDocument {
 
 impl IntoDocument for ReceiptDocument {
     fn template_id(&self) -> String {
-        "1".into()
+        "756B77DA-7498-4D5C-ADBE-EF4AC4DBE151".into()
     }
 
     fn filename(&self) -> String {

@@ -1,7 +1,7 @@
 use super::lib::Pdfmonkey;
 use std::env;
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct Configuration {
     pub host: String,
     pub namespace: String,
@@ -15,6 +15,12 @@ impl Configuration {
             namespace: "api/v1".into(),
             private_key: env::var("PDFMONKEY_PRIVATE_KEY").expect("PDFMONKEY_PRIVATE_KEY"),
         }
+    }
+}
+
+impl Default for Configuration {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

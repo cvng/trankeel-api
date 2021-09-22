@@ -35,7 +35,7 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
             id: file.id,
             status: Some(document.status),
             download_url: document.download_url.clone(),
-            preview_url: document.preview_url.clone(),
+            preview_url: Some(document.preview_url.clone()),
             ..Default::default()
         })
         .unwrap();
