@@ -299,6 +299,9 @@ type Mutation {
 	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
 	sendPaymentNotice(input: SendPaymentNoticeInput!): SendPaymentNoticePayload!
 }
+interface Person {
+	displayName: String!
+}
 scalar PhoneNumber
 type Plan {
 	code: PlanCode!
@@ -468,6 +471,7 @@ type Rent {
 	lease: Lease
 	delay: Int
 	transactions: [Transaction!]
+	receipt: File
 }
 enum RentChargesRecuperationMode {
 	PACKAGE
@@ -622,7 +626,7 @@ enum TransactionType {
 	RENT
 }
 scalar UUID
-type User {
+type User implements Person {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String

@@ -409,7 +409,7 @@ pub struct Person {
     id: ID,
     phone_number: Option<PhoneNumber>,
     account_id: ID,
-    display_name: String,
+    pub display_name: String,
     //
     accounts: Option<Vec<Account>>,
 }
@@ -575,6 +575,7 @@ pub struct Rent {
     lease: Option<Lease>,
     delay: Option<i32>,
     transactions: Option<Vec<Transaction>>,
+    receipt: Option<File>,
 }
 
 impl From<piteo::Rent> for Rent {
@@ -593,6 +594,7 @@ impl From<piteo::Rent> for Rent {
             lease: None,
             delay: None,
             transactions: None,
+            receipt: None,
         }
     }
 }
