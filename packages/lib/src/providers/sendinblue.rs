@@ -16,7 +16,7 @@ pub struct Sendinblue(sendinblue::Sendinblue);
 
 impl Provider for Sendinblue {
     fn init() -> Self {
-        let api_key = env::var("SENDINBLUE_API_KEY").expect("STRIPE_SECRET_KEY");
+        let api_key = env::var("SENDINBLUE_API_KEY").expect("SENDINBLUE_API_KEY");
         Self(sendinblue::Sendinblue::production(api_key))
     }
 }
