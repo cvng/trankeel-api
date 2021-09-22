@@ -436,6 +436,10 @@ export interface MutationSendPaymentNoticeArgs {
   input: SendPaymentNoticeInput;
 }
 
+export interface Person {
+  displayName: Scalars["String"];
+}
+
 export interface Plan {
   __typename?: "Plan";
   code: PlanCode;
@@ -657,6 +661,7 @@ export interface Rent {
   lease?: Maybe<Lease>;
   delay?: Maybe<Scalars["Int"]>;
   transactions?: Maybe<Array<Transaction>>;
+  receipt?: Maybe<File>;
 }
 
 export enum RentChargesRecuperationMode {
@@ -785,6 +790,7 @@ export interface TenantInput {
 }
 
 export enum TenantStatus {
+  Candidate = "CANDIDATE",
   Gone = "GONE",
   Late = "LATE",
   New = "NEW",
@@ -831,7 +837,7 @@ export enum TransactionType {
   Rent = "RENT",
 }
 
-export interface User {
+export interface User extends Person {
   __typename?: "User";
   authId?: Maybe<Scalars["AuthenticationID"]>;
   email: Scalars["Email"];
@@ -850,6 +856,7 @@ export interface User {
 
 export enum UserRole {
   Admin = "ADMIN",
+  Tenant = "TENANT",
   User = "USER",
   Viewer = "VIEWER",
 }

@@ -1,3 +1,4 @@
+mod interfaces;
 mod mutation;
 mod objects;
 mod query;
@@ -6,6 +7,7 @@ mod unions;
 
 pub use async_graphql::http;
 
+use crate::interfaces::PersonInterface;
 use crate::mutation::Mutation;
 use crate::query::Query;
 use async_graphql::extensions::ApolloTracing;
@@ -26,6 +28,7 @@ pub fn build_schema() -> Result<PiteoSchema> {
     let db_pool = Pg::init().inner();
 
     let schema = Schema::build(Query, Mutation, EmptySubscription)
+        .register_type::<PersonInterface>()
         .extension(ApolloTracing)
         .data(db_pool)
         .finish();
