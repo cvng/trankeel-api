@@ -7,6 +7,8 @@ use piteo_core::mailer::Mailer;
 use sendinblue::Mailer as Line;
 use sendinblue::TransactionalBody;
 use std::env;
+use tokio::runtime::Runtime;
+use tokio::spawn;
 
 const DEFAULT_SENDER_NAME: &str = "Piteo";
 
@@ -16,7 +18,7 @@ pub struct Sendinblue(sendinblue::Sendinblue);
 
 impl Provider for Sendinblue {
     fn init() -> Self {
-        let api_key = env::var("SENDINBLUE_API_KEY").expect("STRIPE_SECRET_KEY");
+        let api_key = env::var("SENDINBLUE_API_KEY").expect("SENDINBLUE_API_KEY");
         Self(sendinblue::Sendinblue::production(api_key))
     }
 }
@@ -26,16 +28,31 @@ impl Mailer for Sendinblue {
     async fn batch(&self, mails: Vec<impl IntoMail + 'async_trait>) -> Result<Vec<Mail>, Error> {
         println!("Mailer.batch: {:?}", mails);
 
+        let mut rt = Runtime::new()?;
         let transactionals = mails.iter().map(to_transactional_body).collect::<Vec<_>>();
         let mut mails = vec![];
 
-        for body in transactionals {
-            let response = self.0.send_transactional_email(body).await?;
+        rt.block_on(async {
+            for body in transactionals {
+                let client = self.0.clone();
 
-            mails.push(Mail {
-                message_id: response.message_id,
-            });
-        }
+                let result = spawn(async move { client.send_transactional_email(body).await })
+                    .await
+                    .unwrap();
+
+                let response = match result {
+                    Ok(response) => response,
+                    Err(err) => {
+                        eprintln!("{:#?}", err);
+                        continue;
+                    }
+                };
+
+                mails.push(Mail {
+                    message_id: response.message_id,
+                });
+            }
+        });
 
         Ok(mails)
     }

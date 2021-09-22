@@ -25,7 +25,7 @@ impl Pdfmaker for Pdfmonkey {
         &self,
         document: impl IntoDocument + 'async_trait,
     ) -> Result<Document, Error> {
-        println!("PdfMaker.generate: {:?}", document);
+        println!("Pdfmaker.generate: {:?}", document);
 
         let document = pdfmonkey::Document::generate(
             document.template_id(),
@@ -37,7 +37,6 @@ impl Pdfmaker for Pdfmonkey {
         Ok(Document {
             id: document.id,
             status: document.status.into(),
-            app_id: document.app_id,
             checksum: document.checksum,
             document_template_id: document.document_template_id,
             download_url: document.download_url,

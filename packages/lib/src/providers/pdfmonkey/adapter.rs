@@ -37,7 +37,7 @@ impl Adapter {
 
         match response.status() {
             StatusCode::NO_CONTENT => Ok(None),
-            StatusCode::OK => Ok(Some(self.extract_attributes(response, resource).await?)),
+            StatusCode::CREATED => Ok(Some(self.extract_attributes(response, resource).await?)),
             _ => Err(self.extract_errors(response).await?),
         }
     }
