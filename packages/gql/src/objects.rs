@@ -238,8 +238,8 @@ impl Lease {
         self.0.status()
     }
     async fn rents(&self, ctx: &Context<'_>) -> Result<Vec<Rent>> {
-        let pool = ctx.data::<DbPool>()?;
-        Ok(piteo::db(pool.clone())
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(piteo::db(db_pool)
             .rents()
             .by_lease_id(&self.0.id)?
             .into_iter()
@@ -380,14 +380,11 @@ impl Lender {
     }
     async fn display_name(&self, ctx: &Context<'_>) -> Result<String> {
         let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool.clone())
-            .lenders()
-            .by_id(&self.0.id)?
-            .display_name())
+        Ok(db(db_pool).lenders().by_id(&self.0.id)?.display_name())
     }
     async fn identity(&self, ctx: &Context<'_>) -> Result<Identity> {
         let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool.clone()).lenders().by_id(&self.0.id)?.into())
+        Ok(db(db_pool).lenders().by_id(&self.0.id)?.into())
     }
 }
 
@@ -424,10 +421,7 @@ impl Person {
         let account_id = self.account_id.clone().try_into()?;
 
         Ok(Some(
-            db(db_pool.clone())
-                .accounts()
-                .by_id(&account_id)
-                .map(Into::into)?,
+            db(db_pool).accounts().by_id(&account_id).map(Into::into)?,
         ))
     }
 }
@@ -547,7 +541,7 @@ impl Property {
     async fn lender(&self, ctx: &Context<'_>) -> Result<Option<Lender>> {
         let db_pool = ctx.data::<DbPool>()?;
         Ok(Some(
-            db(db_pool.clone())
+            db(db_pool)
                 .lenders()
                 .by_id(&self.0.lender_id)?
                 .lender()

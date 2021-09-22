@@ -11,6 +11,7 @@ use piteo_data::PropertyBuildingLegalStatus;
 use piteo_data::PropertyEnergyClass;
 use piteo_data::PropertyGasEmission;
 use piteo_data::PropertyHabitationUsageType;
+use piteo_data::PropertyId;
 use piteo_data::PropertyRoomType;
 use piteo_data::PropertyStatus;
 use piteo_data::PropertyUsageType;
@@ -47,16 +48,16 @@ pub struct CreatePropertyInput {
 // # Operation
 
 pub fn create_property(
-    db: impl Db,
-    auth_id: AuthId,
+    db: &impl Db,
+    auth_id: &AuthId,
     input: CreatePropertyInput,
 ) -> Result<Property, Error> {
     input.validate()?;
 
-    let account = db.accounts().by_auth_id(&auth_id)?;
+    let account = db.accounts().by_auth_id(auth_id)?;
 
     db.properties().create(Property {
-        id: Default::default(),
+        id: PropertyId::new_v4(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id: account.id,

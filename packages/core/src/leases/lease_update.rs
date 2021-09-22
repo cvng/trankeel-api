@@ -23,8 +23,8 @@ pub struct UpdateFurnishedLeaseInput {
 // # Operation
 
 pub fn update_furnished_lease(
-    db: impl Db,
-    _auth_id: AuthId,
+    db: &impl Db,
+    _auth_id: &AuthId,
     input: UpdateFurnishedLeaseInput,
 ) -> Result<Lease, Error> {
     input.validate()?;

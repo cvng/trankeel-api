@@ -4,6 +4,8 @@ use piteo::pdfmaker::Document;
 use piteo::FileData;
 use piteo::FileStatus;
 use piteo::FileType;
+use piteo::Pg;
+use piteo::Provider;
 use rocket::http::Status;
 use rocket::info;
 use rocket::post;
@@ -21,8 +23,8 @@ pub struct PdfmonkeyPayload {
 pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
     info!("Received pdfmonkey request: {:?}", request);
 
-    let db_pool = piteo::db_pool_from_env().unwrap();
-    let db = piteo::db(db_pool.clone());
+    let db_pool = &Pg::init().inner();
+    let db = piteo::db(db_pool);
 
     let document = request.document.clone();
 

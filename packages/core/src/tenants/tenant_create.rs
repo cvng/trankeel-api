@@ -5,6 +5,7 @@ use crate::Tenant;
 use async_graphql::InputObject;
 use eyre::Error;
 use piteo_data::PhoneNumber;
+use piteo_data::TenantId;
 use validator::Validate;
 
 // # Input
@@ -27,16 +28,16 @@ pub struct CreateTenantInput {
 // # Operation
 
 pub fn create_tenant(
-    db: impl Db,
-    auth_id: AuthId,
+    db: &impl Db,
+    auth_id: &AuthId,
     input: CreateTenantInput,
 ) -> Result<Tenant, Error> {
     input.validate()?;
 
-    let account = db.accounts().by_auth_id(&auth_id)?;
+    let account = db.accounts().by_auth_id(auth_id)?;
 
     db.tenants().create(Tenant {
-        id: Default::default(),
+        id: TenantId::new_v4(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id: account.id,

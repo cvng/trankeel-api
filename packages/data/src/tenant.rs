@@ -15,6 +15,7 @@ pub type TenantId = Id;
 
 #[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum TenantStatus {
+    Candidate,
     Gone,
     Late,
     New,

@@ -14,8 +14,8 @@ pub struct DeletePropertyInput {
 // # Operation
 
 pub fn delete_property(
-    db: impl Db,
-    _auth_id: AuthId,
+    db: &impl Db,
+    _auth_id: &AuthId,
     input: DeletePropertyInput,
 ) -> Result<PropertyId, Error> {
     input.validate()?;

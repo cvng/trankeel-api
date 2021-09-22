@@ -14,8 +14,8 @@ pub struct DeleteLeaseInput {
 // # Operation
 
 pub fn delete_lease(
-    db: impl Db,
-    _auth_id: AuthId,
+    db: &impl Db,
+    _auth_id: &AuthId,
     input: DeleteLeaseInput,
 ) -> Result<LeaseId, Error> {
     input.validate()?;
