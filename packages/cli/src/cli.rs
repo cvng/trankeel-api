@@ -7,11 +7,13 @@ use piteo::properties::CreatePropertyInput;
 use piteo::tenants::CreateTenantInput;
 use piteo::Amount;
 use piteo::AuthId;
+use piteo::Pg;
 use piteo::PropertyBuildPeriodType;
 use piteo::PropertyBuildingLegalStatus;
 use piteo::PropertyHabitationUsageType;
 use piteo::PropertyRoomType;
 use piteo::PropertyUsageType;
+use piteo::Provider;
 use std::env;
 
 #[tokio::main]
@@ -34,9 +36,7 @@ async fn write_schema() {
 }
 
 async fn seed() {
-    let url = env::var("DATABASE_URL").unwrap();
-
-    let db_pool = &piteo::build_connection_pool(&url).unwrap();
+    let db_pool = &Pg::init().inner();
     let auth_id = &AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
 
     let user = piteo::create_user_with_account(
