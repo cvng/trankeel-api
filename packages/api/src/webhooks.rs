@@ -51,9 +51,7 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
     // Specific processing by document type.
     match file.type_ {
-        FileType::RentReceipt => {
-            on_receipt_created(&db_pool, &file).await.ok();
-        }
+        FileType::RentReceipt => on_receipt_created(&db_pool, &file).await,
         _ => panic!(),
     }
 
