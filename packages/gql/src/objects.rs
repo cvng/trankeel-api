@@ -395,35 +395,17 @@ impl Lender {
     }
     async fn display_name(&self, ctx: &Context<'_>) -> Result<String> {
         let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool).lenders().by_id(&self.0.id)?.display_name())
+        Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.display_name())
     }
     async fn identity(&self, ctx: &Context<'_>) -> Result<LegalIdentity> {
         let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool).lenders().by_id(&self.0.id)?.into())
+        Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.into())
     }
 }
 
 impl From<piteo::Lender> for Lender {
     fn from(item: piteo::Lender) -> Self {
         Self(item)
-    }
-}
-
-impl From<piteo::LenderWithIdentity> for Lender {
-    fn from(item: piteo::LenderWithIdentity) -> Self {
-        match item {
-            piteo::LenderWithIdentity::Individual(lender, _) => lender.into(),
-            piteo::LenderWithIdentity::Company(lender, _) => lender.into(),
-        }
-    }
-}
-
-impl From<piteo::LenderWithIdentity> for LegalIdentity {
-    fn from(item: piteo::LenderWithIdentity) -> Self {
-        match item {
-            piteo::LenderWithIdentity::Individual(_, person) => Self::Individual(person.into()),
-            piteo::LenderWithIdentity::Company(_, company) => Self::Company(company.into()),
-        }
     }
 }
 
@@ -574,11 +556,7 @@ impl Property {
     async fn lender(&self, ctx: &Context<'_>) -> Result<Option<Lender>> {
         let db_pool = ctx.data::<DbPool>()?;
         Ok(Some(
-            db(db_pool)
-                .lenders()
-                .by_id(&self.0.lender_id)?
-                .lender()
-                .into(),
+            db(db_pool).lenders().by_id(&self.0.lender_id)?.0.into(),
         ))
     }
     async fn leases(&self, ctx: &Context<'_>) -> Result<Option<Vec<Lease>>> {

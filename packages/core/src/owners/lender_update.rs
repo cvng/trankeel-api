@@ -5,9 +5,9 @@ use async_graphql::InputObject;
 use eyre::eyre as err;
 use eyre::Error;
 use piteo_data::AuthId;
+use piteo_data::LegalIdentity;
 use piteo_data::Lender;
 use piteo_data::LenderId;
-use piteo_data::LenderWithIdentity;
 use piteo_data::PersonData;
 use validator::Validate;
 
@@ -44,10 +44,10 @@ pub fn update_individual_lender(
 ) -> Result<Lender, Error> {
     input.validate()?;
 
-    let lender = db.lenders().by_id(&input.id)?;
+    let (lender, identity) = db.lenders().by_id(&input.id)?;
 
-    let person = match &lender {
-        LenderWithIdentity::Individual(_, person) => person,
+    let person = match &identity {
+        LegalIdentity::Individual(person) => person,
         _ => return Err(err!("Lender is not an individual")),
     };
 
@@ -59,5 +59,5 @@ pub fn update_individual_lender(
         ..Default::default()
     })?;
 
-    Ok(lender.into())
+    Ok(lender)
 }

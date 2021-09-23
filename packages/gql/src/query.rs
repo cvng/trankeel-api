@@ -110,12 +110,14 @@ impl Query {
         let id = id.map(|id| LenderId::parse_str(&id).unwrap_or_default());
 
         if let Some(id) = id {
-            Ok(vec![db(db_pool).lenders().by_id(&id)?.lender().into()])
+            Ok(vec![db(db_pool).lenders().by_id(&id)?.0.into()])
         } else {
             Ok(db(db_pool)
                 .lenders()
-                .by_auth_id(auth_id)
-                .and_then(map_res)?)
+                .by_auth_id(auth_id)?
+                .into_iter()
+                .map(|(lender, _)| lender.into())
+                .collect::<Vec<_>>())
         }
     }
 

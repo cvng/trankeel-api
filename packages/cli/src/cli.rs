@@ -61,7 +61,7 @@ async fn seed() {
     .await
     .unwrap();
 
-    let lender = db.lenders().by_individual_id(&user.id).unwrap();
+    let (lender, _) = db.lenders().by_individual_id(&user.id).unwrap();
 
     let property = piteo::create_property(
         db_pool,
@@ -82,7 +82,7 @@ async fn seed() {
             gas_emission: None,
             heating_method: PropertyUsageType::Collective,
             housing_type: PropertyUsageType::Individual,
-            lender_id: lender.id(),
+            lender_id: lender.id,
             name: "Petite mission".into(),
             note: Some("RAS".into()),
             ntic_equipments: None,

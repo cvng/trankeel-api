@@ -10,6 +10,15 @@ pub enum LegalIdentity {
     Company(Company),
 }
 
+impl From<piteo::LegalIdentity> for LegalIdentity {
+    fn from(item: piteo::LegalIdentity) -> Self {
+        match item {
+            piteo::LegalIdentity::Individual(person) => Self::Individual(person.into()),
+            piteo::LegalIdentity::Company(company) => Self::Company(company.into()),
+        }
+    }
+}
+
 #[derive(async_graphql::Union)]
 pub enum Eventable {
     Rent(Rent),
