@@ -1,3 +1,4 @@
+use crate::Url;
 use crate::common::Id;
 use crate::schema::persons;
 use crate::AccountId;
@@ -42,7 +43,7 @@ pub struct Person {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub address: Option<Address>,
-    pub photo_url: Option<String>,
+    pub photo_url: Option<Url>,
     pub role: Option<PersonRole>,
     pub phone_number: Option<PhoneNumber>,
 }

@@ -3,11 +3,11 @@ use crate::objects::Error;
 use crate::objects::File;
 use crate::objects::Lease;
 use crate::objects::Lender;
+use crate::objects::Payment;
 use crate::objects::Person;
 use crate::objects::Property;
 use crate::objects::Task;
 use crate::objects::Tenant;
-use crate::objects::Transaction;
 use crate::query::map_res;
 use crate::wip;
 use async_graphql::Context;
@@ -135,7 +135,7 @@ impl Mutation {
         Ok(piteo::update_individual_lender(db_pool, auth_id, input)?.into())
     }
 
-    async fn transaction_create(&self, _input: TransactionInput) -> Result<Transaction> {
+    async fn transaction_create(&self, _input: TransactionInput) -> Result<Payment> {
         Err(wip())
     }
 

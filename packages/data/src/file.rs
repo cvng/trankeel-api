@@ -40,7 +40,7 @@ pub struct File {
     pub download_url: Option<Url>,
     pub external_id: Option<ExternalId>,
     pub filename: Option<String>,
-    pub preview_url: Option<String>,
+    pub preview_url: Option<Url>,
     pub status: Option<FileStatus>,
     pub type_: FileType,
 }
@@ -54,7 +54,7 @@ pub struct FileData {
     pub download_url: Option<Url>,
     pub external_id: Option<ExternalId>,
     pub filename: Option<String>,
-    pub preview_url: Option<String>,
+    pub preview_url: Option<Url>,
     pub status: Option<FileStatus>,
     pub type_: Option<FileType>,
 }

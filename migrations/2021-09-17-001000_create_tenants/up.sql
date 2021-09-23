@@ -4,14 +4,14 @@ CREATE TABLE tenants (
     updated_at TIMESTAMPTZ,
     account_id UUID NOT NULL REFERENCES accounts(id),
     apl BOOLEAN NOT NULL DEFAULT false,
-    birthdate TIMESTAMPTZ NOT NULL,
+    birthdate DATE NOT NULL,
     birthplace TEXT,
     email TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     note TEXT,
     phone_number TEXT,
-    lease_id UUID REFERENCES leases(id),
+    lease_id UUID REFERENCES leases(id) ON DELETE SET NULL,
     visale_id TEXT
 );
 

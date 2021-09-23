@@ -69,7 +69,10 @@ fn to_transactional_body(mail: &impl IntoMail) -> TransactionalBody {
         .add_values(serde_json::to_value(mail).unwrap());
 
     for contact in mail.recipients() {
-        body = body.add_to_mailer(Line::new(contact.name.clone(), contact.email.clone()));
+        body = body.add_to_mailer(Line::new(
+            contact.name.clone(),
+            contact.email.inner().to_string(),
+        ));
     }
 
     body.create()

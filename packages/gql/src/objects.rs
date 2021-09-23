@@ -1,8 +1,3 @@
-use crate::scalars::AuthId;
-use crate::scalars::DateTime;
-use crate::scalars::Decimal;
-use crate::scalars::Email;
-use crate::scalars::PhoneNumber;
 use crate::unions::Eventable;
 use crate::unions::Identity;
 use async_graphql::Result;
@@ -11,11 +6,18 @@ use async_graphql::*;
 use piteo::database::Db;
 use piteo::db;
 use piteo::AccountStatus;
+use piteo::Amount;
+use piteo::AuthId;
+use piteo::Date;
+use piteo::DateTime;
 use piteo::DbPool;
+use piteo::Email;
 use piteo::EventType;
+use piteo::EventableModel;
 use piteo::FileStatus;
 use piteo::FileType;
 use piteo::FurnishedLeaseDuration;
+use piteo::LeaseId;
 use piteo::LeaseRentPeriodicity;
 use piteo::LeaseRentReferenceIrl;
 use piteo::LeaseStatus;
@@ -23,6 +25,7 @@ use piteo::LeaseType;
 use piteo::LegalEntityType;
 use piteo::Name;
 use piteo::PersonRole;
+use piteo::PhoneNumber;
 use piteo::PlanCode;
 use piteo::PropertyBuildPeriodType;
 use piteo::PropertyBuildingLegalStatus;
@@ -33,10 +36,12 @@ use piteo::PropertyRoomType;
 use piteo::PropertyStatus;
 use piteo::PropertyUsageType;
 use piteo::RentChargesRecuperationMode;
+use piteo::RentId;
 use piteo::RentPaymentMethod;
 use piteo::RentStatus;
 use piteo::TenantStatus;
 use piteo::TransactionType;
+use piteo::Url;
 use std::convert::TryInto;
 
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_complex_object.html
@@ -126,7 +131,7 @@ impl From<piteo::Company> for Company {
         Self {
             display_name: item.display_name(),
             address: item.address.map(Into::into),
-            email: item.email.into(),
+            email: item.email,
             id: item.id.into(),
             legal_entity: item.legal_entity,
             legal_entity_identifier: item.legal_entity_identifier,
@@ -147,10 +152,10 @@ pub struct Feature {
 #[derive(async_graphql::SimpleObject)]
 pub struct File {
     created_at: Option<DateTime>,
-    download_url: Option<String>,
+    download_url: Option<Url>,
     external_id: Option<String>,
     filename: Option<String>,
-    preview_url: Option<String>,
+    preview_url: Option<Url>,
     status: Option<FileStatus>,
     r#type: FileType,
     updated_at: Option<DateTime>,
@@ -161,7 +166,7 @@ impl From<piteo::File> for File {
     fn from(item: piteo::File) -> Self {
         Self {
             created_at: item.created_at.map(Into::into),
-            download_url: item.download_url,
+            download_url: item.download_url.map(Into::into),
             external_id: item.external_id,
             filename: item.filename,
             preview_url: item.preview_url,
@@ -177,7 +182,7 @@ impl From<piteo::File> for File {
 pub struct Invoice {
     id: ID,
     number: u32,
-    amount_paid: Decimal,
+    amount_paid: Amount,
     invoice_pdf: String,
     period_end: DateTime,
     status: String,
@@ -191,11 +196,11 @@ impl Lease {
     async fn account_id(&self) -> ID {
         self.0.account_id.into()
     }
-    async fn deposit_amount(&self) -> Option<Decimal> {
+    async fn deposit_amount(&self) -> Option<Amount> {
         self.0.deposit_amount.map(Into::into)
     }
     async fn effect_date(&self) -> DateTime {
-        self.0.effect_date.into()
+        self.0.effect_date
     }
     async fn duration(&self) -> FurnishedLeaseDuration {
         self.0.duration
@@ -203,14 +208,14 @@ impl Lease {
     async fn signature_date(&self) -> Option<DateTime> {
         self.0.signature_date.map(Into::into)
     }
-    async fn rent_amount(&self) -> Decimal {
-        self.0.rent_amount.into()
+    async fn rent_amount(&self) -> Amount {
+        self.0.rent_amount
     }
-    async fn rent_charges_amount(&self) -> Option<Decimal> {
+    async fn rent_charges_amount(&self) -> Option<Amount> {
         self.0.rent_charges_amount.map(Into::into)
     }
-    async fn rent_full_amount(&self) -> Decimal {
-        self.0.rent_full_amount().into()
+    async fn rent_full_amount(&self) -> Amount {
+        self.0.rent_full_amount()
     }
     async fn r#type(&self) -> LeaseType {
         self.0.type_
@@ -249,14 +254,24 @@ impl Lease {
     async fn lease(&self) -> Option<File> {
         None
     }
-    async fn tenants(&self) -> Vec<Tenant> {
-        Vec::new()
+    async fn tenants(&self, ctx: &Context<'_>) -> Result<Vec<Tenant>> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(piteo::db(db_pool)
+            .tenants()
+            .by_lease_id(&self.0.id)?
+            .into_iter()
+            .map(Into::into)
+            .collect::<Vec<_>>())
     }
     async fn account(&self) -> Option<Account> {
         None
     }
-    async fn property(&self) -> Option<Property> {
-        None
+    async fn property(&self, ctx: &Context<'_>) -> Result<Property> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(piteo::db(db_pool)
+            .properties()
+            .by_id(&self.0.property_id)?
+            .into())
     }
 }
 
@@ -272,20 +287,20 @@ pub struct FurnishedLeaseDetails {
     charges_recuperation_mode: Option<RentChargesRecuperationMode>,
     charges_revision_method: Option<String>,
     colocation_insurance_lender: Option<bool>,
-    colocation_insurance_monthly_amount: Option<Decimal>,
-    colocation_insurance_total_amount: Option<Decimal>,
+    colocation_insurance_monthly_amount: Option<Amount>,
+    colocation_insurance_total_amount: Option<Amount>,
     duration: Option<FurnishedLeaseDuration>,
-    lender_fee_cap: Option<Decimal>,
+    lender_fee_cap: Option<Amount>,
     lender_fee_cap_other: Option<String>,
-    lender_fee_cap_prestations: Option<Decimal>,
+    lender_fee_cap_prestations: Option<Amount>,
     other_conditions: Option<String>,
-    rent_complement: Option<Decimal>,
+    rent_complement: Option<Amount>,
     rent_complement_property_justification: Option<String>,
-    rent_first_amount: Option<Decimal>,
+    rent_first_amount: Option<Amount>,
     rent_irl: Option<LeaseRentReferenceIrl>,
     rent_irl_revision_date: Option<DateTime>,
-    rent_maj_decree_increased_amount: Option<Decimal>,
-    rent_maj_decree_reference_amount: Option<Decimal>,
+    rent_maj_decree_increased_amount: Option<Amount>,
+    rent_maj_decree_reference_amount: Option<Amount>,
     rent_majoration_decree: Option<bool>,
     rent_max_evolution_relocation: Option<bool>,
     rent_payment_date: Option<DateTime>,
@@ -293,14 +308,14 @@ pub struct FurnishedLeaseDetails {
     rent_payment_place: Option<String>,
     rent_periodicity: Option<LeaseRentPeriodicity>,
     rent_underestimated_method: Option<String>,
-    rent_underestimated_monthly_variation: Option<Decimal>,
+    rent_underestimated_monthly_variation: Option<Amount>,
     resolutary_clause: Option<String>,
     solidarity_clause: Option<String>,
-    tenant_fee_cap_new_rental: Option<Decimal>,
-    tenant_fee_cap_prestations: Option<Decimal>,
-    tenant_fee_cap_report_by_meter: Option<Decimal>,
-    tenant_fee_cap_report_prestations: Option<Decimal>,
-    tenant_last_rent_amount: Option<Decimal>,
+    tenant_fee_cap_new_rental: Option<Amount>,
+    tenant_fee_cap_prestations: Option<Amount>,
+    tenant_fee_cap_report_by_meter: Option<Amount>,
+    tenant_fee_cap_report_prestations: Option<Amount>,
+    tenant_last_rent_amount: Option<Amount>,
     tenant_last_rent_received_date: Option<DateTime>,
     tenant_last_rent_revision_date: Option<DateTime>,
     works_decence_since_last_rental: Option<String>,
@@ -394,6 +409,24 @@ impl From<piteo::Lender> for Lender {
     }
 }
 
+impl From<piteo::LenderIdentity> for Lender {
+    fn from(item: piteo::LenderIdentity) -> Self {
+        match item {
+            piteo::LenderIdentity::Individual(lender, _) => lender.into(),
+            piteo::LenderIdentity::Company(lender, _) => lender.into(),
+        }
+    }
+}
+
+impl From<piteo::LenderIdentity> for Identity {
+    fn from(item: piteo::LenderIdentity) -> Self {
+        match item {
+            piteo::LenderIdentity::Individual(_, person) => Self::Individual(person.into()),
+            piteo::LenderIdentity::Company(_, company) => Self::Company(company.into()),
+        }
+    }
+}
+
 #[derive(async_graphql::SimpleObject)]
 #[graphql(complex)]
 #[graphql(name = "User")]
@@ -404,7 +437,7 @@ pub struct Person {
     last_name: Option<String>,
     address: Option<Address>,
     #[graphql(name = "photoURL")]
-    photo_url: Option<String>,
+    photo_url: Option<Url>,
     role: Option<PersonRole>,
     id: ID,
     phone_number: Option<PhoneNumber>,
@@ -430,8 +463,8 @@ impl From<piteo::Person> for Person {
     fn from(item: piteo::Person) -> Self {
         Self {
             display_name: item.display_name(),
-            auth_id: Some(item.auth_id.into()),
-            email: item.email.into(),
+            auth_id: Some(item.auth_id),
+            email: item.email,
             first_name: item.first_name,
             last_name: item.last_name,
             address: item.address.map(Into::into),
@@ -448,7 +481,7 @@ impl From<piteo::Person> for Person {
 #[derive(async_graphql::SimpleObject)]
 pub struct Plan {
     code: PlanCode,
-    price: Option<Decimal>,
+    price: Option<Amount>,
     subtitle: Option<String>,
     title: Option<String>,
     id: ID,
@@ -504,7 +537,7 @@ impl Property {
     async fn other_spaces(&self) -> Option<String> {
         self.0.other_spaces.clone()
     }
-    async fn tax(&self) -> Option<Decimal> {
+    async fn tax(&self) -> Option<Amount> {
         self.0.tax.map(Into::into)
     }
     async fn room_count(&self) -> PropertyRoomType {
@@ -532,10 +565,10 @@ impl Property {
         Some(self.0.lender_id.into())
     }
     //
-    async fn expected_rents(&self) -> Option<Decimal> {
+    async fn expected_rents(&self) -> Option<Amount> {
         None
     }
-    async fn collected_rents(&self) -> Option<Decimal> {
+    async fn collected_rents(&self) -> Option<Amount> {
         None
     }
     async fn lender(&self, ctx: &Context<'_>) -> Result<Option<Lender>> {
@@ -548,8 +581,16 @@ impl Property {
                 .into(),
         ))
     }
-    async fn leases(&self) -> Option<Vec<Lease>> {
-        Some(Vec::new())
+    async fn leases(&self, ctx: &Context<'_>) -> Result<Option<Vec<Lease>>> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(Some(
+            db(db_pool)
+                .leases()
+                .by_property_id(&self.0.id)?
+                .into_iter()
+                .map(Into::into)
+                .collect::<Vec<_>>(),
+        ))
     }
 }
 
@@ -560,38 +601,48 @@ impl From<piteo::Property> for Property {
 }
 
 #[derive(async_graphql::SimpleObject)]
+#[graphql(complex)]
 pub struct Rent {
     id: ID,
     period_end: DateTime,
     period_start: DateTime,
-    amount: Decimal,
-    charges_amount: Option<Decimal>,
-    full_amount: Decimal,
+    amount: Amount,
+    charges_amount: Option<Amount>,
+    full_amount: Amount,
     status: RentStatus,
     lease_id: ID,
     receipt_id: Option<ID>,
     notice_id: Option<ID>,
     //
-    lease: Option<Lease>,
     delay: Option<i32>,
-    transactions: Option<Vec<Transaction>>,
+    transactions: Option<Vec<Payment>>,
     receipt: Option<File>,
+}
+
+#[async_graphql::ComplexObject]
+impl Rent {
+    async fn lease(&self, ctx: &Context<'_>) -> Result<Lease> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(db(db_pool)
+            .leases()
+            .by_id(&self.lease_id.to_string().parse::<LeaseId>()?)?
+            .into())
+    }
 }
 
 impl From<piteo::Rent> for Rent {
     fn from(item: piteo::Rent) -> Self {
         Self {
             id: item.id.into(),
-            period_end: item.period_end.into(),
-            period_start: item.period_start.into(),
-            amount: item.amount.into(),
+            period_end: item.period_end,
+            period_start: item.period_start,
+            amount: item.amount,
             charges_amount: item.charges_amount.map(Into::into),
-            full_amount: item.full_amount.into(),
+            full_amount: item.full_amount,
             status: item.status,
             lease_id: item.lease_id.into(),
             receipt_id: item.receipt_id.map(Into::into),
             notice_id: item.notice_id.map(Into::into),
-            lease: None,
             delay: None,
             transactions: None,
             receipt: None,
@@ -604,11 +655,11 @@ pub struct Summary {
     since: DateTime,
     until: DateTime,
     //
-    amount_expected: Decimal,
-    amount_received: Decimal,
-    amount_settled: Decimal,
-    amount_partial: Decimal,
-    amount_pending: Decimal,
+    amount_expected: Amount,
+    amount_received: Amount,
+    amount_settled: Amount,
+    amount_partial: Amount,
+    amount_pending: Amount,
     //
     n_expected: u32,
     n_received: u32,
@@ -635,13 +686,13 @@ pub struct Summary {
 impl From<piteo::Summary> for Summary {
     fn from(item: piteo::Summary) -> Self {
         Summary {
-            since: item.since.into(),
-            until: item.until.into(),
-            amount_expected: item.amount_expected.into(),
-            amount_received: item.amount_received.into(),
-            amount_settled: item.amount_settled.into(),
-            amount_partial: item.amount_partial.into(),
-            amount_pending: item.amount_pending.into(),
+            since: item.since,
+            until: item.until,
+            amount_expected: item.amount_expected,
+            amount_received: item.amount_received,
+            amount_settled: item.amount_settled,
+            amount_partial: item.amount_partial,
+            amount_pending: item.amount_pending,
             n_expected: item.n_expected,
             n_received: item.n_received,
             n_settled: item.n_settled,
@@ -674,7 +725,7 @@ pub struct Task {
 pub struct Tenant {
     account_id: ID,
     apl: Option<bool>,
-    birthdate: DateTime,
+    birthdate: Date,
     birthplace: Option<String>,
     email: Email,
     first_name: String,
@@ -691,7 +742,7 @@ pub struct Tenant {
     status: Option<TenantStatus>,
     full_name: String,
     short_name: Option<String>,
-    last_transaction: Option<Transaction>,
+    last_transaction: Option<Payment>,
     property_name: Option<String>,
     rent_payed_this_year: Option<String>,
     unpaid_rent_amount: Option<u32>,
@@ -706,9 +757,9 @@ impl From<piteo::Tenant> for Tenant {
             full_name: item.full_name(),
             account_id: item.account_id.into(),
             apl: Some(item.apl),
-            birthdate: item.birthdate.into(),
+            birthdate: item.birthdate,
             birthplace: item.birthplace,
-            email: item.email.into(),
+            email: item.email,
             first_name: item.first_name,
             last_name: item.last_name,
             note: item.note,
@@ -731,22 +782,73 @@ impl From<piteo::Tenant> for Tenant {
 }
 
 #[derive(async_graphql::SimpleObject)]
-pub struct Transaction {
+#[graphql(complex)]
+#[graphql(name = "Transaction")]
+pub struct Payment {
     id: ID,
     date: DateTime,
-    amount: Decimal,
-    account_id: ID,
+    amount: Amount,
     r#type: TransactionType,
+    rent_id: ID,
     //
-    lease: Option<Lease>,
+    account_id: Option<ID>,
+}
+
+#[async_graphql::ComplexObject]
+impl Payment {
+    async fn lease(&self, ctx: &Context<'_>) -> Result<Lease> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(db(db_pool)
+            .leases()
+            .by_rent_id(&self.rent_id.to_string().parse::<RentId>()?)?
+            .into())
+    }
+}
+
+impl From<piteo::Payment> for Payment {
+    fn from(item: piteo::Payment) -> Self {
+        Self {
+            id: item.id.into(),
+            date: item.date,
+            amount: item.amount,
+            r#type: item.type_,
+            rent_id: item.rent_id.into(),
+            account_id: None,
+        }
+    }
 }
 
 #[derive(async_graphql::SimpleObject)]
 pub struct Event {
     id: ID,
-    created_at: DateTime,
+    created_at: Option<DateTime>,
+    updated_at: Option<DateTime>,
     eventable_id: ID,
-    eventable_type: String,
+    #[graphql(name = "eventableType")]
+    eventable_model: EventableModel,
     r#type: EventType,
-    object: Eventable,
+    #[graphql(name = "object")]
+    eventable: Eventable,
+}
+
+impl From<piteo::DetailedEvent> for Event {
+    fn from(item: piteo::DetailedEvent) -> Self {
+        let (item, eventable) = match item {
+            piteo::DetailedEvent::Rent(event, rent) => {
+                (event, Eventable::Rent(rent.into())) //
+            }
+            piteo::DetailedEvent::Payment(event, payment) => {
+                (event, Eventable::Transaction(payment.into()))
+            }
+        };
+        Self {
+            id: item.id.into(),
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            eventable_id: item.eventable_id.into(),
+            eventable_model: item.eventable_model,
+            r#type: item.type_,
+            eventable,
+        }
+    }
 }

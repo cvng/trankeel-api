@@ -33,7 +33,7 @@ table! {
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
         eventable_id -> Uuid,
-        eventable_type -> Text,
+        eventable_model -> Text,
         #[sql_name = "type"]
         type_ -> Text,
     }
@@ -182,7 +182,7 @@ table! {
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
         apl -> Bool,
-        birthdate -> Timestamptz,
+        birthdate -> Date,
         birthplace -> Nullable<Text>,
         email -> Text,
         first_name -> Text,

@@ -30,5 +30,5 @@ pub struct Payment {
     pub amount: Amount,
     pub date: DateTime,
     pub type_: TransactionType,
-    pub label: String,
+    pub label: Option<String>,
 }

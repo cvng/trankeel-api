@@ -4,7 +4,7 @@ CREATE TABLE events (
     updated_at TIMESTAMPTZ,
     account_id UUID NOT NULL REFERENCES accounts(id),
     eventable_id UUID NOT NULL,
-    eventable_type TEXT NOT NULL,
+    eventable_model TEXT NOT NULL,
     type TEXT NOT NULL
 );
 

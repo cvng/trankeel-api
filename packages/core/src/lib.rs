@@ -1,3 +1,4 @@
+mod audit;
 mod testing;
 
 pub mod auth;

@@ -8,6 +8,15 @@ use serde::Deserialize;
 use serde::Serialize;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
+pub struct Date(chrono::NaiveDate);
+
+impl From<chrono::NaiveDate> for Date {
+    fn from(item: chrono::NaiveDate) -> Self {
+        Self(item)
+    }
+}
+
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct DateTime(chrono::DateTime<Utc>);
 
 impl DateTime {
@@ -64,5 +73,7 @@ impl From<chrono::DateTime<Utc>> for DateTime {
         Self(item)
     }
 }
+
+scalar!(Date);
 
 scalar!(DateTime);
