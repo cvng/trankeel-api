@@ -1,6 +1,6 @@
 use crate::database::Db;
 use crate::AuthId;
-use crate::DateTime;
+use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
 use eyre::Error;
@@ -15,7 +15,7 @@ use validator::Validate;
 #[graphql(name = "TenantUpdateInput")]
 pub struct UpdateTenantInput {
     pub apl: Option<bool>,
-    pub birthdate: Option<DateTime>,
+    pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
     #[validate(email)]
     pub email: Option<String>, // Email,
@@ -49,7 +49,7 @@ impl From<UpdateTenantInput> for TenantData {
             apl: item.apl,
             birthdate: item.birthdate,
             birthplace: item.birthplace,
-            email: item.email,
+            email: item.email.map(Into::into),
             first_name: item.first_name,
             last_name: item.last_name,
             note: item.note,

@@ -8,7 +8,7 @@ CREATE TABLE rents (
     charges_amount NUMERIC,
     full_amount NUMERIC NOT NULL,
     status TEXT NOT NULL,
-    lease_id UUID NOT NULL REFERENCES leases(id),
+    lease_id UUID NOT NULL REFERENCES leases(id) ON DELETE CASCADE,
     receipt_id UUID REFERENCES files(id),
     notice_id UUID REFERENCES files(id)
 );

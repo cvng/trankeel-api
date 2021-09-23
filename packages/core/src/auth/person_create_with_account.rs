@@ -65,7 +65,7 @@ pub async fn create_user_with_account(
         created_at: Default::default(),
         updated_at: Default::default(),
         auth_id: input.auth_id,
-        email: input.email.clone(),
+        email: input.email.clone().into(),
         first_name: Some(input.first_name),
         last_name: Some(input.last_name),
         address: input.address.map(Into::into),
@@ -91,7 +91,7 @@ pub async fn create_user_with_account(
 
     // Create subscription.
     let subscription = payment_provider
-        .create_subscription_with_customer(input.email)
+        .create_subscription_with_customer(input.email.into())
         .await?;
     info!(
         "Created subscription {} for account {}",

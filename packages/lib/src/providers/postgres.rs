@@ -13,9 +13,11 @@ use piteo_core::error::Context;
 use piteo_core::error::Error;
 use piteo_core::schema::accounts;
 use piteo_core::schema::companies;
+use piteo_core::schema::events;
 use piteo_core::schema::files;
 use piteo_core::schema::leases;
 use piteo_core::schema::lenders;
+use piteo_core::schema::payments;
 use piteo_core::schema::persons;
 use piteo_core::schema::plans;
 use piteo_core::schema::properties;
@@ -27,6 +29,10 @@ use piteo_core::AccountId;
 use piteo_core::AuthId;
 use piteo_core::Company;
 use piteo_core::CompanyId;
+use piteo_core::DetailedEvent;
+use piteo_core::Event;
+use piteo_core::EventId;
+use piteo_core::EventableType;
 use piteo_core::File;
 use piteo_core::FileData;
 use piteo_core::FileId;
@@ -37,6 +43,7 @@ use piteo_core::Lender;
 use piteo_core::LenderData;
 use piteo_core::LenderId;
 use piteo_core::LenderIdentity;
+use piteo_core::Payment;
 use piteo_core::Person;
 use piteo_core::PersonData;
 use piteo_core::PersonId;
@@ -62,6 +69,8 @@ pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 
 struct AccountStore<'a>(&'a DbPool);
 
+struct EventStore<'a>(&'a DbPool);
+
 struct PersonStore<'a>(&'a DbPool);
 
 struct CompanyStore<'a>(&'a DbPool);
@@ -79,6 +88,8 @@ struct LeaseTenantStore<'a>(&'a DbPool);
 struct RentStore<'a>(&'a DbPool);
 
 struct FileStore<'a>(&'a DbPool);
+
+struct PaymentStore<'a>(&'a DbPool);
 
 struct PlanStore<'a>(&'a DbPool);
 
@@ -138,8 +149,16 @@ impl Db for Pg {
         Box::new(FileStore(&self.0))
     }
 
+    fn payments(&self) -> Box<dyn database::PaymentStore + '_> {
+        Box::new(PaymentStore(&self.0))
+    }
+
     fn plans(&self) -> Box<dyn database::PlanStore + '_> {
         Box::new(PlanStore(&self.0))
+    }
+
+    fn events(&self) -> Box<dyn database::EventStore + '_> {
+        Box::new(EventStore(&self.0))
     }
 }
 
@@ -170,6 +189,12 @@ impl database::AccountStore for AccountStore<'_> {
 impl database::PersonStore for PersonStore<'_> {
     fn by_id(&mut self, id: &PersonId) -> Result<Person> {
         Ok(persons::table.find(id).first(&self.0.get()?)?)
+    }
+
+    fn by_account_id(&mut self, account_id: &AccountId) -> Result<Vec<Person>> {
+        Ok(persons::table
+            .filter(persons::account_id.eq(account_id))
+            .load(&self.0.get()?)?)
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Person> {
@@ -313,6 +338,28 @@ impl database::LeaseStore for LeaseStore<'_> {
         Ok(leases::table.find(id).first(&self.0.get()?)?)
     }
 
+    fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Lease>> {
+        Ok(leases::table
+            .filter(leases::property_id.eq(property_id))
+            .load(&self.0.get()?)?)
+    }
+
+    fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Lease> {
+        Ok(leases::table
+            .select(leases::all_columns)
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .filter(rents::receipt_id.eq(receipt_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Lease> {
+        Ok(leases::table
+            .select(leases::all_columns)
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .filter(rents::id.eq(rent_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Lease>> {
         Ok(leases::table
             .select(leases::all_columns)
@@ -343,6 +390,15 @@ impl database::RentStore for RentStore<'_> {
         Ok(rents::table.find(id).first(&self.0.get()?)?)
     }
 
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Rent>> {
+        Ok(rents::table
+            .select(rents::all_columns)
+            .left_join(leases::table.on(leases::id.eq(rents::lease_id)))
+            .left_join(persons::table.on(persons::account_id.eq(leases::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .load(&self.0.get()?)?)
+    }
+
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Rent> {
         Ok(rents::table
             .filter(rents::receipt_id.eq(&receipt_id))
@@ -370,12 +426,6 @@ impl database::RentStore for RentStore<'_> {
     fn update(&mut self, data: RentData) -> Result<Rent> {
         Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
     }
-
-    fn update_many(&mut self, data: Vec<RentData>) -> Result<Vec<Rent>> {
-        data.into_iter()
-            .map(|item| self.update(item))
-            .collect::<Result<Vec<_>>>()
-    }
 }
 
 impl database::FileStore for FileStore<'_> {
@@ -400,6 +450,14 @@ impl database::FileStore for FileStore<'_> {
     }
 }
 
+impl database::PaymentStore for PaymentStore<'_> {
+    fn create(&mut self, data: Payment) -> Result<Payment> {
+        Ok(insert_into(payments::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
+    }
+}
+
 impl database::PlanStore for PlanStore<'_> {
     fn by_id(&mut self, id: &PlanId) -> Result<Plan> {
         Ok(plans::table.find(id).first(&self.0.get()?)?)
@@ -409,6 +467,44 @@ impl database::PlanStore for PlanStore<'_> {
 impl database::CompanyStore for CompanyStore<'_> {
     fn by_id(&mut self, id: &CompanyId) -> Result<Company> {
         Ok(companies::table.find(id).first(&self.0.get()?)?)
+    }
+}
+
+impl database::EventStore for EventStore<'_> {
+    fn by_id(&mut self, id: &EventId) -> Result<DetailedEvent> {
+        let event: Event = events::table.find(id).first(&self.0.get()?)?;
+        let detailed_event = match event.eventable_type {
+            EventableType::Rent => {
+                let rent = rents::table
+                    .find(event.eventable_id)
+                    .first(&self.0.get()?)?;
+                DetailedEvent::Rent(event, rent)
+            }
+            EventableType::Payment => {
+                let payment = payments::table
+                    .find(event.eventable_id)
+                    .first(&self.0.get()?)?;
+                DetailedEvent::Payment(event, payment)
+            }
+        };
+        Ok(detailed_event)
+    }
+
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<DetailedEvent>> {
+        events::table
+            .select(events::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(events::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .load(&self.0.get()?)?
+            .iter()
+            .map(|event: &Event| self.by_id(&event.id))
+            .collect::<Result<Vec<_>>>()
+    }
+
+    fn create(&mut self, data: Event) -> Result<Event> {
+        Ok(insert_into(events::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
     }
 }
 

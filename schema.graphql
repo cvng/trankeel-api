@@ -43,6 +43,7 @@ type Company {
 	legalEntityTypeOther: String
 	phoneNumber: PhoneNumber
 }
+scalar Date
 scalar DateTime
 scalar Decimal
 scalar Email
@@ -51,9 +52,10 @@ type Error {
 }
 type Event {
 	id: ID!
-	createdAt: DateTime!
+	createdAt: DateTime
+	updatedAt: DateTime
 	eventableId: ID!
-	eventableType: String!
+	eventableType: EventableType!
 	type: EventType!
 	object: Eventable!
 }
@@ -63,6 +65,10 @@ enum EventType {
 	TRANSACTION_CREATED
 }
 union Eventable = | Rent | Transaction
+enum EventableType {
+	RENT
+	PAYMENT
+}
 type Feature {
 	available: Boolean!
 	title: String!
@@ -70,17 +76,17 @@ type Feature {
 }
 type File {
 	createdAt: DateTime
-	downloadUrl: String
+	downloadUrl: URL
 	externalId: String
 	filename: String
-	previewUrl: String
+	previewUrl: URL
 	status: FileStatus
 	type: FileType!
 	updatedAt: DateTime
 	id: ID!
 }
 input FileInput {
-	downloadUrl: String!
+	downloadUrl: URL!
 	type: FileType!
 }
 """
@@ -136,7 +142,7 @@ type Lease {
 	lease: File
 	tenants: [Tenant!]!
 	account: Account
-	property: Property
+	property: Property!
 }
 type LeaseFurnishedData {
 	chargesRecuperationMode: RentChargesRecuperationMode
@@ -346,9 +352,9 @@ type Property {
 }
 enum PropertyBuildPeriodType {
 	BEFORE_Y1949
-	FROM_Y1949Y1974
-	FROM_Y1975Y1989
-	FROM_Y1990Y2005
+	FROM_Y1949_Y1974
+	FROM_Y1975_Y1989
+	FROM_Y1990_Y2005
 	FROM_Y2005
 }
 enum PropertyBuildingLegalStatus {
@@ -468,10 +474,10 @@ type Rent {
 	leaseId: ID!
 	receiptId: ID
 	noticeId: ID
-	lease: Lease
 	delay: Int
 	transactions: [Transaction!]
 	receipt: File
+	lease: Lease!
 }
 enum RentChargesRecuperationMode {
 	PACKAGE
@@ -549,7 +555,7 @@ type Task {
 type Tenant {
 	accountId: ID!
 	apl: Boolean
-	birthdate: DateTime!
+	birthdate: Date!
 	birthplace: String
 	email: Email!
 	firstName: String!
@@ -574,13 +580,13 @@ type Tenant {
 }
 input TenantInput {
 	apl: Boolean
-	birthdate: DateTime!
+	birthdate: Date!
 	birthplace: String
 	email: String!
 	firstName: String!
 	lastName: String!
 	note: String
-	phoneNumber: String
+	phoneNumber: PhoneNumber
 	visaleId: String
 }
 enum TenantStatus {
@@ -592,23 +598,24 @@ enum TenantStatus {
 }
 input TenantUpdateInput {
 	apl: Boolean
-	birthdate: DateTime
+	birthdate: Date
 	birthplace: String
 	email: String
 	id: UUID!
 	firstName: String
 	lastName: String
 	note: String
-	phoneNumber: String
+	phoneNumber: PhoneNumber
 	visaleId: String
 }
 type Transaction {
 	id: ID!
 	date: DateTime!
 	amount: Decimal!
-	accountId: ID!
 	type: TransactionType!
-	lease: Lease
+	rentId: ID!
+	accountId: ID
+	lease: Lease!
 }
 input TransactionInput {
 	amount: Decimal!
@@ -625,6 +632,7 @@ enum TransactionType {
 	OTHER
 	RENT
 }
+scalar URL
 scalar UUID
 type User implements Person {
 	authId: AuthenticationID
@@ -632,7 +640,7 @@ type User implements Person {
 	firstName: String
 	lastName: String
 	address: Address
-	photoURL: String
+	photoURL: URL
 	role: UserRole
 	id: ID!
 	phoneNumber: PhoneNumber

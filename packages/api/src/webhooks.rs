@@ -68,5 +68,14 @@ async fn on_receipt_created(db_pool: &DbPool, receipt: &Receipt) {
         rent_ids: vec![rent.id],
     };
 
-    piteo::send_receipts(db_pool, input).await.ok();
+    // Guess auth_id from given receipt (first user of the account).
+    let lease = db.leases().by_receipt_id(&receipt.id).unwrap();
+    let user = db
+        .persons()
+        .by_account_id(&lease.account_id)
+        .map(|mut users| users.remove(0))
+        .unwrap();
+    let auth_id = &user.auth_id;
+
+    piteo::send_receipts(db_pool, auth_id, input).await.ok();
 }

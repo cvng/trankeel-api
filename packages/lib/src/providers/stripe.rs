@@ -29,7 +29,7 @@ impl PaymentProvider for Stripe {
             balance: Default::default(),
             coupon: Default::default(),
             description: Default::default(),
-            email: Some(email.as_str()), // <-
+            email: Some(email.inner()), // <-
             expand: Default::default(),
             invoice_prefix: Default::default(),
             invoice_settings: Default::default(),

@@ -33,12 +33,13 @@ pub enum PropertyStatus {
     Unrented,
 }
 
+#[allow(non_camel_case_types)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
 pub enum PropertyBuildPeriodType {
     BeforeY1949,
-    FromY1949Y1974,
-    FromY1975Y1989,
-    FromY1990Y2005,
+    FromY1949_Y1974,
+    FromY1975_Y1989,
+    FromY1990_Y2005,
     FromY2005,
 }
 
@@ -138,105 +139,4 @@ pub struct PropertyData {
     pub usage_type: Option<PropertyHabitationUsageType>,
     pub water_heating_method: Option<PropertyUsageType>,
     pub lender_id: Option<LenderId>,
-}
-
-// # Impls
-
-impl From<String> for PropertyRoomType {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "OTHER" => Self::Other,
-            "T1" => Self::T1,
-            "T2" => Self::T2,
-            "T3" => Self::T3,
-            "T4" => Self::T4,
-            "T5" => Self::T5,
-            "T6" => Self::T6,
-            _ => unimplemented!(),
-        }
-    }
-}
-
-impl From<String> for PropertyStatus {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "FOR_SALE" => Self::ForSale,
-            "INACTIVE" => Self::Inactive,
-            "RENTED" => Self::Rented,
-            "UNDER_CONSTRUCTION" => Self::UnderConstruction,
-            "UNRENTED" => Self::Unrented,
-            _ => unimplemented!(),
-        }
-    }
-}
-
-impl From<String> for PropertyBuildPeriodType {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "BEFORE_Y1949" => Self::BeforeY1949,
-            "FROM_Y1949_Y1974" => Self::FromY1949Y1974,
-            "FROM_Y1975_Y1989" => Self::FromY1975Y1989,
-            "FROM_Y1990_Y2005" => Self::FromY1990Y2005,
-            "FROM_Y2005" => Self::FromY2005,
-            _ => unimplemented!(),
-        }
-    }
-}
-
-impl From<String> for PropertyEnergyClass {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "A" => Self::A,
-            "B" => Self::B,
-            "C" => Self::C,
-            "D" => Self::D,
-            "E" => Self::E,
-            "F" => Self::F,
-            _ => unimplemented!(),
-        }
-    }
-}
-
-impl From<String> for PropertyGasEmission {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "A" => Self::A,
-            "B" => Self::B,
-            "C" => Self::C,
-            "D" => Self::D,
-            "E" => Self::E,
-            "F" => Self::F,
-            _ => unimplemented!(),
-        }
-    }
-}
-
-impl From<String> for PropertyBuildingLegalStatus {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "MONO" => Self::Mono,
-            "COPRO" => Self::Copro,
-            _ => unimplemented!(),
-        }
-    }
-}
-
-impl From<String> for PropertyHabitationUsageType {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "HABITATION" => Self::Habitation,
-            "MIXTE" => Self::Mixte,
-            _ => unimplemented!(),
-        }
-    }
-}
-
-impl From<String> for PropertyUsageType {
-    fn from(item: String) -> Self {
-        match item.as_str() {
-            "COLLECTIVE" => Self::Collective,
-            "INDIVIDUAL" => Self::Individual,
-            _ => unimplemented!(),
-        }
-    }
 }

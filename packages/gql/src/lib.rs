@@ -2,7 +2,6 @@ mod interfaces;
 mod mutation;
 mod objects;
 mod query;
-mod scalars;
 mod unions;
 
 pub use async_graphql::http;

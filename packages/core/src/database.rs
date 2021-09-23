@@ -5,6 +5,9 @@ use piteo_data::AccountId;
 use piteo_data::AuthId;
 use piteo_data::Company;
 use piteo_data::CompanyId;
+use piteo_data::DetailedEvent;
+use piteo_data::Event;
+use piteo_data::EventId;
 use piteo_data::File;
 use piteo_data::FileData;
 use piteo_data::FileId;
@@ -15,6 +18,7 @@ use piteo_data::Lender;
 use piteo_data::LenderData;
 use piteo_data::LenderId;
 use piteo_data::LenderIdentity;
+use piteo_data::Payment;
 use piteo_data::Person;
 use piteo_data::PersonData;
 use piteo_data::PersonId;
@@ -47,7 +51,9 @@ pub trait Db {
     fn leases(&self) -> Box<dyn LeaseStore + '_>;
     fn rents(&self) -> Box<dyn RentStore + '_>;
     fn files(&self) -> Box<dyn FileStore + '_>;
+    fn payments(&self) -> Box<dyn PaymentStore + '_>;
     fn plans(&self) -> Box<dyn PlanStore + '_>;
+    fn events(&self) -> Box<dyn EventStore + '_>;
 }
 
 pub trait AccountStore {
@@ -59,6 +65,7 @@ pub trait AccountStore {
 
 pub trait PersonStore {
     fn by_id(&mut self, id: &PersonId) -> Result<Person>;
+    fn by_account_id(&mut self, account_id: &AccountId) -> Result<Vec<Person>>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Person>;
     fn create(&mut self, data: Person) -> Result<Person>;
     fn update(&mut self, data: PersonData) -> Result<Person>;
@@ -95,6 +102,9 @@ pub trait TenantStore {
 
 pub trait LeaseStore {
     fn by_id(&mut self, id: &LeaseId) -> Result<Lease>;
+    fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Lease>>;
+    fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Lease>;
+    fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Lease>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Lease>>;
     fn create(&mut self, data: Lease) -> Result<Lease>;
     fn delete(&mut self, data: LeaseId) -> Result<Deleted>;
@@ -103,12 +113,12 @@ pub trait LeaseStore {
 
 pub trait RentStore {
     fn by_id(&mut self, id: &RentId) -> Result<Rent>;
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Rent>>;
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Rent>;
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Rent>>;
     fn create(&mut self, data: Rent) -> Result<Rent>;
     fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>>;
     fn update(&mut self, data: RentData) -> Result<Rent>;
-    fn update_many(&mut self, data: Vec<RentData>) -> Result<Vec<Rent>>;
 }
 
 pub trait FileStore {
@@ -118,6 +128,16 @@ pub trait FileStore {
     fn update(&mut self, data: FileData) -> Result<File>;
 }
 
+pub trait PaymentStore {
+    fn create(&mut self, data: Payment) -> Result<Payment>;
+}
+
 pub trait PlanStore {
     fn by_id(&mut self, id: &PlanId) -> Result<Plan>;
+}
+
+pub trait EventStore {
+    fn by_id(&mut self, id: &EventId) -> Result<DetailedEvent>;
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<DetailedEvent>>;
+    fn create(&mut self, data: Event) -> Result<Event>;
 }

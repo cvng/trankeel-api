@@ -1,3 +1,4 @@
+use crate::activity::trace;
 use crate::database::Db;
 use crate::documents::ReceiptDocument;
 use crate::mailer::Mailer;
@@ -8,13 +9,18 @@ use chrono::Utc;
 use diesel::result::Error::NotFound;
 use eyre::Error;
 use piteo_data::Attachable;
+use piteo_data::AuthId;
+use piteo_data::EventType;
 use piteo_data::FileType;
+use piteo_data::Payment;
+use piteo_data::PaymentId;
 use piteo_data::Receipt;
 use piteo_data::ReceiptId;
 use piteo_data::Rent;
 use piteo_data::RentData;
 use piteo_data::RentId;
 use piteo_data::RentStatus;
+use piteo_data::TransactionType;
 use validator::Validate;
 
 // # Input
@@ -35,20 +41,22 @@ pub struct SendReceiptsInput {
 
 pub async fn create_receipts(
     db: &impl Db,
+    auth_id: &AuthId,
     pdfmaker: &impl Pdfmaker,
     input: CreateReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
     input.validate()?;
 
-    let rents = setlle_rents(db, input.rent_ids)?;
+    let rents = setlle_rents(db, auth_id, input.rent_ids)?;
 
-    let receipts = generate_receipts(db, pdfmaker, rents).await?;
+    let receipts = generate_receipts(db, auth_id, pdfmaker, rents).await?;
 
     Ok(receipts)
 }
 
 pub async fn send_receipts(
     db: &impl Db,
+    auth_id: &AuthId,
     mailer: &impl Mailer,
     input: SendReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
@@ -68,8 +76,10 @@ pub async fn send_receipts(
         };
         receipts.push(receipt.clone());
 
-        let mail = ReceiptMail::try_new(receipt, rent, tenants, Utc::now().into())?;
+        let mail = ReceiptMail::try_new(&receipt, &rent, tenants, Utc::now().into())?;
         mailer.batch(vec![mail]).await?;
+
+        trace(db, auth_id, EventType::RentReceiptSent, rent.id).ok();
     }
 
     Ok(receipts)
@@ -77,21 +87,38 @@ pub async fn send_receipts(
 
 // # Utils
 
-fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>, Error> {
-    let rents = rent_ids
-        .iter()
-        .map(|&rent_id| RentData {
+fn setlle_rents(db: &impl Db, auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<Vec<Rent>, Error> {
+    let mut rents = vec![];
+
+    for rent_id in rent_ids {
+        let rent = db.rents().update(RentData {
             id: rent_id,
             status: Some(RentStatus::Settled),
             ..Default::default()
-        })
-        .collect();
+        })?;
 
-    db.rents().update_many(rents)
+        let payment = db.payments().create(Payment {
+            id: PaymentId::new_v4(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            rent_id,
+            amount: rent.full_amount,
+            date: Utc::now().into(),
+            type_: TransactionType::Rent,
+            label: None,
+        })?;
+
+        rents.push(rent);
+
+        trace(db, auth_id, EventType::PaymentCreated, payment.id).ok();
+    }
+
+    Ok(rents)
 }
 
 async fn generate_receipts(
     db: &impl Db,
+    auth_id: &AuthId,
     pdfmaker: &impl Pdfmaker,
     rents: Vec<Rent>,
 ) -> Result<Vec<Receipt>, Error> {
@@ -147,6 +174,8 @@ async fn generate_receipts(
         })?;
 
         receipts.push(receipt);
+
+        trace(db, auth_id, EventType::RentReceiptCreated, rent.id).ok();
     }
 
     Ok(receipts)

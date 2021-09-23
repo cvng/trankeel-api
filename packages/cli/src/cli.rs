@@ -103,7 +103,7 @@ async fn seed() {
         auth_id,
         CreateTenantInput {
             apl: None,
-            birthdate: Utc::now().into(),
+            birthdate: Utc::now().date().naive_utc().into(),
             birthplace: None,
             email: "tenant@piteo.dev".into(),
             first_name: "Tenant".into(),

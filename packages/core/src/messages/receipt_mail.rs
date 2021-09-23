@@ -37,8 +37,8 @@ pub struct ReceiptMail {
 
 impl ReceiptMail {
     pub fn try_new(
-        receipt: Receipt,
-        rent: Rent,
+        receipt: &Receipt,
+        rent: &Rent,
         tenants: Vec<Tenant>,
         date: DateTime,
     ) -> Result<Self, Error> {
@@ -65,6 +65,7 @@ impl ReceiptMail {
             period_end: rent.period_end,
 
             download_url: receipt
+                .clone()
                 .download_url
                 .ok_or_else(|| no("receipt.download_url"))?,
             file_id: receipt.id,

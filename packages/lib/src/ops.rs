@@ -137,15 +137,28 @@ pub fn update_individual_lender(
 
 pub async fn create_receipts(
     db_pool: &DbPool,
-    _auth_id: &AuthId,
+    auth_id: &AuthId,
     input: CreateReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
-    leases::create_receipts(&Pg::new(db_pool.clone()), &Pdfmonkey::init(), input).await
+    leases::create_receipts(
+        &Pg::new(db_pool.clone()),
+        auth_id,
+        &Pdfmonkey::init(),
+        input,
+    )
+    .await
 }
 
 pub async fn send_receipts(
     db_pool: &DbPool,
+    auth_id: &AuthId,
     input: SendReceiptsInput,
 ) -> Result<Vec<Receipt>, Error> {
-    leases::send_receipts(&Pg::new(db_pool.clone()), &Sendinblue::init(), input).await
+    leases::send_receipts(
+        &Pg::new(db_pool.clone()),
+        auth_id,
+        &Sendinblue::init(),
+        input,
+    )
+    .await
 }

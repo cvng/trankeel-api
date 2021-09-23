@@ -7,6 +7,7 @@ use crate::Email;
 use crate::LegalEntity;
 use crate::Name;
 use crate::PhoneNumber;
+use crate::Url;
 use async_graphql::scalar;
 use async_graphql::Enum;
 use diesel_enum_derive::DieselEnum;
@@ -42,7 +43,7 @@ pub struct Person {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub address: Option<Address>,
-    pub photo_url: Option<String>,
+    pub photo_url: Option<Url>,
     pub role: Option<PersonRole>,
     pub phone_number: Option<PhoneNumber>,
 }
