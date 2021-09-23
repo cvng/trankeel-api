@@ -814,15 +814,15 @@ impl From<piteo::Payment> for Payment {
 
 #[derive(async_graphql::SimpleObject)]
 pub struct Event {
-    pub id: ID,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
-    pub eventable_id: ID,
+    id: ID,
+    created_at: Option<DateTime>,
+    updated_at: Option<DateTime>,
+    eventable_id: ID,
     #[graphql(name = "eventableType")]
-    pub eventable_type: EventableType,
-    pub r#type: EventType,
+    eventable_type: EventableType,
+    r#type: EventType,
     #[graphql(name = "object")]
-    pub eventable: Eventable,
+    eventable: Eventable,
 }
 
 impl From<piteo::EventWithEventable> for Event {
