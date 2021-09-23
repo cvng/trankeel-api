@@ -23,6 +23,7 @@ pub enum EventType {
     PaymentCreated,
 }
 
+#[derive(Clone)]
 pub enum Eventable {
     Rent(Rent),
     Payment(Payment),

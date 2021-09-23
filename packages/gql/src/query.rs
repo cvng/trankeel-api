@@ -114,10 +114,8 @@ impl Query {
         } else {
             Ok(db(db_pool)
                 .lenders()
-                .by_auth_id(auth_id)?
-                .into_iter()
-                .map(|lender_with_legal_identity| lender_with_legal_identity.into())
-                .collect::<Vec<_>>())
+                .by_auth_id(auth_id)
+                .and_then(map_res)?)
         }
     }
 
@@ -137,12 +135,7 @@ impl Query {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
 
-        Ok(db(db_pool)
-            .events()
-            .by_auth_id(auth_id)?
-            .into_iter()
-            .map(|event_with_eventable| event_with_eventable.into())
-            .collect::<Vec<_>>())
+        Ok(db(db_pool).events().by_auth_id(auth_id).and_then(map_res)?)
     }
 
     async fn transactions(&self, _ctx: &Context<'_>, _id: Option<ID>) -> Result<Vec<Payment>> {
