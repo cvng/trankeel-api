@@ -27,13 +27,18 @@ pub enum EventType {
     PaymentCreated,
 }
 
+pub enum Eventable {
+    Rent(Rent),
+    Transaction(Payment),
+}
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
-pub enum EventableModel {
+pub enum EventableType {
     Rent,
     Payment,
 }
 
-impl From<EventType> for EventableModel {
+impl From<EventType> for EventableType {
     fn from(item: EventType) -> Self {
         match item {
             EventType::RentReceiptCreated => Self::Rent,
@@ -50,6 +55,6 @@ pub struct Event {
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
     pub eventable_id: EventableId,
-    pub eventable_model: EventableModel,
+    pub eventable_type: EventableType,
     pub type_: EventType,
 }

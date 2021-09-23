@@ -33,7 +33,7 @@ table! {
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
         eventable_id -> Uuid,
-        eventable_model -> Text,
+        eventable_type -> Text,
         #[sql_name = "type"]
         type_ -> Text,
     }

@@ -13,7 +13,7 @@ use piteo::DateTime;
 use piteo::DbPool;
 use piteo::Email;
 use piteo::EventType;
-use piteo::EventableModel;
+use piteo::EventableType;
 use piteo::FileStatus;
 use piteo::FileType;
 use piteo::FurnishedLeaseDuration;
@@ -825,7 +825,7 @@ pub struct Event {
     updated_at: Option<DateTime>,
     eventable_id: ID,
     #[graphql(name = "eventableType")]
-    eventable_model: EventableModel,
+    eventable_type: EventableType,
     r#type: EventType,
     #[graphql(name = "object")]
     eventable: Eventable,
@@ -846,7 +846,7 @@ impl From<piteo::DetailedEvent> for Event {
             created_at: item.created_at,
             updated_at: item.updated_at,
             eventable_id: item.eventable_id.into(),
-            eventable_model: item.eventable_model,
+            eventable_type: item.eventable_type,
             r#type: item.type_,
             eventable,
         }

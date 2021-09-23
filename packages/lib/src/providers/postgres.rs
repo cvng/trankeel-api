@@ -32,7 +32,7 @@ use piteo_core::CompanyId;
 use piteo_core::DetailedEvent;
 use piteo_core::Event;
 use piteo_core::EventId;
-use piteo_core::EventableModel;
+use piteo_core::EventableType;
 use piteo_core::File;
 use piteo_core::FileData;
 use piteo_core::FileId;
@@ -473,14 +473,14 @@ impl database::CompanyStore for CompanyStore<'_> {
 impl database::EventStore for EventStore<'_> {
     fn by_id(&mut self, id: &EventId) -> Result<DetailedEvent> {
         let event: Event = events::table.find(id).first(&self.0.get()?)?;
-        let detailed_event = match event.eventable_model {
-            EventableModel::Rent => {
+        let detailed_event = match event.eventable_type {
+            EventableType::Rent => {
                 let rent = rents::table
                     .find(event.eventable_id)
                     .first(&self.0.get()?)?;
                 DetailedEvent::Rent(event, rent)
             }
-            EventableModel::Payment => {
+            EventableType::Payment => {
                 let payment = payments::table
                     .find(event.eventable_id)
                     .first(&self.0.get()?)?;

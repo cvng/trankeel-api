@@ -55,7 +55,7 @@ type Event {
 	createdAt: DateTime
 	updatedAt: DateTime
 	eventableId: ID!
-	eventableType: EventableModel!
+	eventableType: EventableType!
 	type: EventType!
 	object: Eventable!
 }
@@ -65,7 +65,7 @@ enum EventType {
 	TRANSACTION_CREATED
 }
 union Eventable = | Rent | Transaction
-enum EventableModel {
+enum EventableType {
 	RENT
 	PAYMENT
 }

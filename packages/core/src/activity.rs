@@ -20,7 +20,7 @@ pub fn trace(
         updated_at: Default::default(),
         account_id: account.id,
         eventable_id,
-        eventable_model: event_type.into(),
+        eventable_type: event_type.into(),
         type_: event_type,
     })
 }
