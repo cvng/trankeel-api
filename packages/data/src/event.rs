@@ -13,11 +13,7 @@ pub type EventId = Id;
 
 pub type EventableId = Id;
 
-#[derive(Clone)]
-pub enum DetailedEvent {
-    Rent(Event, Rent),
-    Payment(Event, Payment),
-}
+pub type EventWithEventable = (Event, Eventable);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
 pub enum EventType {
@@ -27,9 +23,10 @@ pub enum EventType {
     PaymentCreated,
 }
 
+#[derive(Clone)]
 pub enum Eventable {
     Rent(Rent),
-    Transaction(Payment),
+    Payment(Payment),
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]

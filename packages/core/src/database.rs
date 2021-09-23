@@ -5,9 +5,9 @@ use piteo_data::AccountId;
 use piteo_data::AuthId;
 use piteo_data::Company;
 use piteo_data::CompanyId;
-use piteo_data::DetailedEvent;
 use piteo_data::Event;
 use piteo_data::EventId;
+use piteo_data::EventWithEventable;
 use piteo_data::File;
 use piteo_data::FileData;
 use piteo_data::FileId;
@@ -17,7 +17,7 @@ use piteo_data::LeaseId;
 use piteo_data::Lender;
 use piteo_data::LenderData;
 use piteo_data::LenderId;
-use piteo_data::LenderIdentity;
+use piteo_data::LenderWithLegalIdentity;
 use piteo_data::Payment;
 use piteo_data::Person;
 use piteo_data::PersonData;
@@ -76,9 +76,9 @@ pub trait CompanyStore {
 }
 
 pub trait LenderStore {
-    fn by_id(&mut self, id: &LenderId) -> Result<LenderIdentity>;
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderIdentity>>;
-    fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderIdentity>;
+    fn by_id(&mut self, id: &LenderId) -> Result<LenderWithLegalIdentity>;
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderWithLegalIdentity>>;
+    fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithLegalIdentity>;
     fn create(&mut self, data: Lender) -> Result<Lender>;
     fn update(&mut self, data: LenderData) -> Result<Lender>;
 }
@@ -137,7 +137,7 @@ pub trait PlanStore {
 }
 
 pub trait EventStore {
-    fn by_id(&mut self, id: &EventId) -> Result<DetailedEvent>;
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<DetailedEvent>>;
+    fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable>;
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>>;
     fn create(&mut self, data: Event) -> Result<Event>;
 }

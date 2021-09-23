@@ -104,7 +104,6 @@ enum FileType {
 	LEASE_DOCUMENT
 	RENT_RECEIPT
 }
-union Identity = | User | Company
 input ImportInput {
 	files: [FileInput!]!
 	source: ImportSource!
@@ -272,13 +271,14 @@ enum LegalEntityType {
 	SCP
 	SNC
 }
+union LegalIdentity = | User | Company
 type Lender {
 	id: ID!
 	accountId: ID!
 	individualId: ID
 	companyId: ID
 	displayName: String!
-	identity: Identity!
+	identity: LegalIdentity!
 }
 input LenderIndividualUpdateInput {
 	id: UUID!

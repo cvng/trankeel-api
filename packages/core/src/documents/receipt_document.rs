@@ -3,7 +3,7 @@ use crate::pdfmaker::IntoDocument;
 use crate::Amount;
 use crate::DateTime;
 use crate::FileType;
-use crate::LenderIdentity;
+use crate::LenderWithLegalIdentity;
 use crate::Name;
 use crate::Property;
 use crate::Rent;
@@ -47,7 +47,7 @@ impl ReceiptDocument {
     pub fn try_new(
         receipt: Receipt,
         rent: Rent,
-        lender: LenderIdentity,
+        lender: LenderWithLegalIdentity,
         tenants: Vec<Tenant>,
         property: Property,
         date: DateTime,
@@ -60,19 +60,26 @@ impl ReceiptDocument {
             })
             .ok_or_else(|| no("receipt.type"))?,
 
-            lender_name: lender.display_name(),
+            lender_name: lender.1.display_name(),
             lender_address_city: lender
+                .1
                 .address()
                 .ok_or_else(|| no("lender.address"))?
                 .city
                 .ok_or_else(|| no("lender.address.city"))?,
             lender_address_line1: lender
+                .1
                 .address()
                 .ok_or_else(|| no("lender.address"))?
                 .line1
                 .ok_or_else(|| no("lender.address.line1"))?,
-            lender_address_line2: lender.address().ok_or_else(|| no("lender.address"))?.line2,
+            lender_address_line2: lender
+                .1
+                .address()
+                .ok_or_else(|| no("lender.address"))?
+                .line2,
             lender_address_postal_code: lender
+                .1
                 .address()
                 .ok_or_else(|| no("lender.address"))?
                 .postal_code

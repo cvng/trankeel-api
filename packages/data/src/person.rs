@@ -4,7 +4,6 @@ use crate::AccountId;
 use crate::Address;
 use crate::DateTime;
 use crate::Email;
-use crate::LegalEntity;
 use crate::Name;
 use crate::PhoneNumber;
 use crate::Url;
@@ -87,8 +86,6 @@ impl Name for Person {
         self.last_name.clone().unwrap_or_default()
     }
 }
-
-impl LegalEntity for Person {}
 
 impl Display for Person {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

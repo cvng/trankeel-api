@@ -110,7 +110,7 @@ impl Query {
         let id = id.map(|id| LenderId::parse_str(&id).unwrap_or_default());
 
         if let Some(id) = id {
-            Ok(vec![db(db_pool).lenders().by_id(&id)?.lender().into()])
+            Ok(vec![db(db_pool).lenders().by_id(&id)?.0.into()])
         } else {
             Ok(db(db_pool)
                 .lenders()

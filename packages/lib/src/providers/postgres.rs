@@ -29,9 +29,10 @@ use piteo_core::AccountId;
 use piteo_core::AuthId;
 use piteo_core::Company;
 use piteo_core::CompanyId;
-use piteo_core::DetailedEvent;
 use piteo_core::Event;
 use piteo_core::EventId;
+use piteo_core::EventWithEventable;
+use piteo_core::Eventable;
 use piteo_core::EventableType;
 use piteo_core::File;
 use piteo_core::FileData;
@@ -39,10 +40,11 @@ use piteo_core::FileId;
 use piteo_core::Lease;
 use piteo_core::LeaseData;
 use piteo_core::LeaseId;
+use piteo_core::LegalIdentity;
 use piteo_core::Lender;
 use piteo_core::LenderData;
 use piteo_core::LenderId;
-use piteo_core::LenderIdentity;
+use piteo_core::LenderWithLegalIdentity;
 use piteo_core::Payment;
 use piteo_core::Person;
 use piteo_core::PersonData;
@@ -251,7 +253,7 @@ impl database::TenantStore for TenantStore<'_> {
 }
 
 impl database::LenderStore for LenderStore<'_> {
-    fn by_id(&mut self, id: &LenderId) -> Result<LenderIdentity> {
+    fn by_id(&mut self, id: &LenderId) -> Result<LenderWithLegalIdentity> {
         let lender: Lender = lenders::table.find(id).first(&self.0.get()?)?;
         let lender_identity = match lender {
             Lender {
@@ -259,21 +261,21 @@ impl database::LenderStore for LenderStore<'_> {
                 ..
             } => {
                 let person = persons::table.find(individual_id).first(&self.0.get()?)?;
-                LenderIdentity::Individual(lender, person)
+                (lender, LegalIdentity::Individual(person))
             }
             Lender {
                 company_id: Some(company_id),
                 ..
             } => {
                 let company = companies::table.find(company_id).first(&self.0.get()?)?;
-                LenderIdentity::Company(lender, company)
+                (lender, LegalIdentity::Company(company))
             }
             _ => return Err(Error::new(NotFound)),
         };
         Ok(lender_identity)
     }
 
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderIdentity>> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderWithLegalIdentity>> {
         lenders::table
             .select(lenders::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(lenders::account_id)))
@@ -284,12 +286,12 @@ impl database::LenderStore for LenderStore<'_> {
             .collect::<Result<Vec<_>>>()
     }
 
-    fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderIdentity> {
+    fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithLegalIdentity> {
         let lender: Lender = lenders::table
             .filter(lenders::individual_id.eq(individual_id))
             .first(&self.0.get()?)?;
         let person = persons::table.find(individual_id).first(&self.0.get()?)?;
-        Ok(LenderIdentity::Individual(lender, person))
+        Ok((lender, LegalIdentity::Individual(person)))
     }
 
     fn create(&mut self, data: Lender) -> Result<Lender> {
@@ -471,26 +473,26 @@ impl database::CompanyStore for CompanyStore<'_> {
 }
 
 impl database::EventStore for EventStore<'_> {
-    fn by_id(&mut self, id: &EventId) -> Result<DetailedEvent> {
+    fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable> {
         let event: Event = events::table.find(id).first(&self.0.get()?)?;
         let detailed_event = match event.eventable_type {
             EventableType::Rent => {
                 let rent = rents::table
                     .find(event.eventable_id)
                     .first(&self.0.get()?)?;
-                DetailedEvent::Rent(event, rent)
+                (event, Eventable::Rent(rent))
             }
             EventableType::Payment => {
                 let payment = payments::table
                     .find(event.eventable_id)
                     .first(&self.0.get()?)?;
-                DetailedEvent::Payment(event, payment)
+                (event, Eventable::Payment(payment))
             }
         };
         Ok(detailed_event)
     }
 
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<DetailedEvent>> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>> {
         events::table
             .select(events::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(events::account_id)))

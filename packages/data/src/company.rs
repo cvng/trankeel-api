@@ -2,7 +2,6 @@ use crate::common::Id;
 use crate::Address;
 use crate::DateTime;
 use crate::Email;
-use crate::LegalEntity;
 use crate::PhoneNumber;
 use async_graphql::Enum;
 
@@ -44,8 +43,6 @@ impl Company {
         self.legal_entity.clone()
     }
 }
-
-impl LegalEntity for Company {}
 
 impl From<String> for LegalEntityType {
     fn from(item: String) -> Self {

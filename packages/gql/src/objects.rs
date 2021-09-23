@@ -1,5 +1,5 @@
 use crate::unions::Eventable;
-use crate::unions::Identity;
+use crate::unions::LegalIdentity;
 use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
@@ -377,7 +377,7 @@ impl From<piteo::FurnishedLeaseDetails> for FurnishedLeaseDetails {
     }
 }
 
-pub struct Lender(piteo::Lender);
+pub struct Lender(piteo::Lender, Option<piteo::LegalIdentity>);
 
 #[async_graphql::Object]
 impl Lender {
@@ -394,36 +394,34 @@ impl Lender {
         self.0.company_id.map(Into::into)
     }
     async fn display_name(&self, ctx: &Context<'_>) -> Result<String> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool).lenders().by_id(&self.0.id)?.display_name())
+        match &self.1 {
+            Some(legal_identity) => Ok(legal_identity.display_name()),
+            None => {
+                let db_pool = ctx.data::<DbPool>()?;
+                Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.display_name())
+            }
+        }
     }
-    async fn identity(&self, ctx: &Context<'_>) -> Result<Identity> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool).lenders().by_id(&self.0.id)?.into())
+    async fn identity(&self, ctx: &Context<'_>) -> Result<LegalIdentity> {
+        match &self.1 {
+            Some(legal_identity) => Ok(legal_identity.clone().into()),
+            None => {
+                let db_pool = ctx.data::<DbPool>()?;
+                Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.into())
+            }
+        }
     }
 }
 
 impl From<piteo::Lender> for Lender {
     fn from(item: piteo::Lender) -> Self {
-        Self(item)
+        Self(item, None)
     }
 }
 
-impl From<piteo::LenderIdentity> for Lender {
-    fn from(item: piteo::LenderIdentity) -> Self {
-        match item {
-            piteo::LenderIdentity::Individual(lender, _) => lender.into(),
-            piteo::LenderIdentity::Company(lender, _) => lender.into(),
-        }
-    }
-}
-
-impl From<piteo::LenderIdentity> for Identity {
-    fn from(item: piteo::LenderIdentity) -> Self {
-        match item {
-            piteo::LenderIdentity::Individual(_, person) => Self::Individual(person.into()),
-            piteo::LenderIdentity::Company(_, company) => Self::Company(company.into()),
-        }
+impl From<piteo::LenderWithLegalIdentity> for Lender {
+    fn from(item: piteo::LenderWithLegalIdentity) -> Self {
+        Self(item.0, Some(item.1))
     }
 }
 
@@ -574,11 +572,7 @@ impl Property {
     async fn lender(&self, ctx: &Context<'_>) -> Result<Option<Lender>> {
         let db_pool = ctx.data::<DbPool>()?;
         Ok(Some(
-            db(db_pool)
-                .lenders()
-                .by_id(&self.0.lender_id)?
-                .lender()
-                .into(),
+            db(db_pool).lenders().by_id(&self.0.lender_id)?.0.into(),
         ))
     }
     async fn leases(&self, ctx: &Context<'_>) -> Result<Option<Vec<Lease>>> {
@@ -831,24 +825,16 @@ pub struct Event {
     eventable: Eventable,
 }
 
-impl From<piteo::DetailedEvent> for Event {
-    fn from(item: piteo::DetailedEvent) -> Self {
-        let (item, eventable) = match item {
-            piteo::DetailedEvent::Rent(event, rent) => {
-                (event, Eventable::Rent(rent.into())) //
-            }
-            piteo::DetailedEvent::Payment(event, payment) => {
-                (event, Eventable::Transaction(payment.into()))
-            }
-        };
+impl From<piteo::EventWithEventable> for Event {
+    fn from(item: piteo::EventWithEventable) -> Self {
         Self {
-            id: item.id.into(),
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-            eventable_id: item.eventable_id.into(),
-            eventable_type: item.eventable_type,
-            r#type: item.type_,
-            eventable,
+            id: item.0.id.into(),
+            created_at: item.0.created_at,
+            updated_at: item.0.updated_at,
+            eventable_id: item.0.eventable_id.into(),
+            eventable_type: item.0.eventable_type,
+            r#type: item.0.type_,
+            eventable: item.1.into(),
         }
     }
 }
