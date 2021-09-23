@@ -11,12 +11,21 @@ pub enum Identity {
 }
 
 #[derive(async_graphql::Union)]
-pub enum LeaseDetails {
-    FurnishedLeaseDetails(FurnishedLeaseDetails),
-}
-
-#[derive(async_graphql::Union)]
 pub enum Eventable {
     Rent(Rent),
     Transaction(Payment),
+}
+
+impl From<piteo::Eventable> for Eventable {
+    fn from(item: piteo::Eventable) -> Self {
+        match item {
+            piteo::Eventable::Rent(rent) => Self::Rent(rent.into()),
+            piteo::Eventable::Payment(payment) => Self::Transaction(payment.into()),
+        }
+    }
+}
+
+#[derive(async_graphql::Union)]
+pub enum LeaseDetails {
+    FurnishedLeaseDetails(FurnishedLeaseDetails),
 }

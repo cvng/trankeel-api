@@ -29,9 +29,10 @@ use piteo_core::AccountId;
 use piteo_core::AuthId;
 use piteo_core::Company;
 use piteo_core::CompanyId;
-use piteo_core::EventWithEventable;
 use piteo_core::Event;
 use piteo_core::EventId;
+use piteo_core::EventWithEventable;
+use piteo_core::Eventable;
 use piteo_core::EventableType;
 use piteo_core::File;
 use piteo_core::FileData;
@@ -478,13 +479,13 @@ impl database::EventStore for EventStore<'_> {
                 let rent = rents::table
                     .find(event.eventable_id)
                     .first(&self.0.get()?)?;
-                EventWithEventable::Rent(event, rent)
+                (event, Eventable::Rent(rent))
             }
             EventableType::Payment => {
                 let payment = payments::table
                     .find(event.eventable_id)
                     .first(&self.0.get()?)?;
-                EventWithEventable::Payment(event, payment)
+                (event, Eventable::Payment(payment))
             }
         };
         Ok(detailed_event)

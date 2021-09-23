@@ -820,35 +820,27 @@ impl From<piteo::Payment> for Payment {
 
 #[derive(async_graphql::SimpleObject)]
 pub struct Event {
-    id: ID,
-    created_at: Option<DateTime>,
-    updated_at: Option<DateTime>,
-    eventable_id: ID,
+    pub id: ID,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
+    pub eventable_id: ID,
     #[graphql(name = "eventableType")]
-    eventable_type: EventableType,
-    r#type: EventType,
+    pub eventable_type: EventableType,
+    pub r#type: EventType,
     #[graphql(name = "object")]
-    eventable: Eventable,
+    pub eventable: Eventable,
 }
 
 impl From<piteo::EventWithEventable> for Event {
     fn from(item: piteo::EventWithEventable) -> Self {
-        let (item, eventable) = match item {
-            piteo::EventWithEventable::Rent(event, rent) => {
-                (event, Eventable::Rent(rent.into())) //
-            }
-            piteo::EventWithEventable::Payment(event, payment) => {
-                (event, Eventable::Transaction(payment.into()))
-            }
-        };
         Self {
-            id: item.id.into(),
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-            eventable_id: item.eventable_id.into(),
-            eventable_type: item.eventable_type,
-            r#type: item.type_,
-            eventable,
+            id: item.0.id.into(),
+            created_at: item.0.created_at,
+            updated_at: item.0.updated_at,
+            eventable_id: item.0.eventable_id.into(),
+            eventable_type: item.0.eventable_type,
+            r#type: item.0.type_,
+            eventable: item.1.into(),
         }
     }
 }

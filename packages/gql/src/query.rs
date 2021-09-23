@@ -135,7 +135,20 @@ impl Query {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
 
-        Ok(db(db_pool).events().by_auth_id(auth_id).and_then(map_res)?)
+        Ok(db(db_pool)
+            .events()
+            .by_auth_id(auth_id)?
+            .into_iter()
+            .map(|(event, eventable)| Event {
+                id: event.id.into(),
+                created_at: event.created_at,
+                updated_at: event.updated_at,
+                eventable_id: event.eventable_id.into(),
+                eventable_type: event.eventable_type,
+                r#type: event.type_,
+                eventable: eventable.into(),
+            })
+            .collect::<Vec<_>>())
     }
 
     async fn transactions(&self, _ctx: &Context<'_>, _id: Option<ID>) -> Result<Vec<Payment>> {
