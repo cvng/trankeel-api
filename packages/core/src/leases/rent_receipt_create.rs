@@ -1,4 +1,4 @@
-use crate::audit::trace;
+use crate::activity::trace;
 use crate::database::Db;
 use crate::documents::ReceiptDocument;
 use crate::mailer::Mailer;

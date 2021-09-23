@@ -1,4 +1,4 @@
-mod audit;
+mod activity;
 mod testing;
 
 pub mod auth;
