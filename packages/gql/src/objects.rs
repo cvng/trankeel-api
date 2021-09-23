@@ -377,7 +377,7 @@ impl From<piteo::FurnishedLeaseDetails> for FurnishedLeaseDetails {
     }
 }
 
-pub struct Lender(piteo::Lender);
+pub struct Lender(piteo::Lender, Option<piteo::LegalIdentity>);
 
 #[async_graphql::Object]
 impl Lender {
@@ -394,18 +394,34 @@ impl Lender {
         self.0.company_id.map(Into::into)
     }
     async fn display_name(&self, ctx: &Context<'_>) -> Result<String> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.display_name())
+        match &self.1 {
+            Some(legal_identity) => Ok(legal_identity.display_name()),
+            None => {
+                let db_pool = ctx.data::<DbPool>()?;
+                Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.display_name())
+            }
+        }
     }
     async fn identity(&self, ctx: &Context<'_>) -> Result<LegalIdentity> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.into())
+        match &self.1 {
+            Some(legal_identity) => Ok(legal_identity.clone().into()),
+            None => {
+                let db_pool = ctx.data::<DbPool>()?;
+                Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.into())
+            }
+        }
     }
 }
 
 impl From<piteo::Lender> for Lender {
     fn from(item: piteo::Lender) -> Self {
-        Self(item)
+        Self(item, None)
+    }
+}
+
+impl From<piteo::LenderWithLegalIdentity> for Lender {
+    fn from(item: piteo::LenderWithLegalIdentity) -> Self {
+        Self(item.0, Some(item.1))
     }
 }
 

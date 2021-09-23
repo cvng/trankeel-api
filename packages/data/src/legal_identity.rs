@@ -4,6 +4,7 @@ use crate::Id;
 use crate::Name;
 use crate::Person;
 
+#[derive(Clone)]
 pub enum LegalIdentity {
     Individual(Person),
     Company(Company),

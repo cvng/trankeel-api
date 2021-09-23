@@ -116,7 +116,7 @@ impl Query {
                 .lenders()
                 .by_auth_id(auth_id)?
                 .into_iter()
-                .map(|(lender, _)| lender.into())
+                .map(|lender_with_legal_identity| lender_with_legal_identity.into())
                 .collect::<Vec<_>>())
         }
     }
@@ -141,15 +141,7 @@ impl Query {
             .events()
             .by_auth_id(auth_id)?
             .into_iter()
-            .map(|(event, eventable)| Event {
-                id: event.id.into(),
-                created_at: event.created_at,
-                updated_at: event.updated_at,
-                eventable_id: event.eventable_id.into(),
-                eventable_type: event.eventable_type,
-                r#type: event.type_,
-                eventable: eventable.into(),
-            })
+            .map(|event_with_eventable| event_with_eventable.into())
             .collect::<Vec<_>>())
     }
 
