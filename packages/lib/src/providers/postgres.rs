@@ -29,7 +29,7 @@ use piteo_core::AccountId;
 use piteo_core::AuthId;
 use piteo_core::Company;
 use piteo_core::CompanyId;
-use piteo_core::DetailedEvent;
+use piteo_core::EventWithEventable;
 use piteo_core::Event;
 use piteo_core::EventId;
 use piteo_core::EventableType;
@@ -471,26 +471,26 @@ impl database::CompanyStore for CompanyStore<'_> {
 }
 
 impl database::EventStore for EventStore<'_> {
-    fn by_id(&mut self, id: &EventId) -> Result<DetailedEvent> {
+    fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable> {
         let event: Event = events::table.find(id).first(&self.0.get()?)?;
         let detailed_event = match event.eventable_type {
             EventableType::Rent => {
                 let rent = rents::table
                     .find(event.eventable_id)
                     .first(&self.0.get()?)?;
-                DetailedEvent::Rent(event, rent)
+                EventWithEventable::Rent(event, rent)
             }
             EventableType::Payment => {
                 let payment = payments::table
                     .find(event.eventable_id)
                     .first(&self.0.get()?)?;
-                DetailedEvent::Payment(event, payment)
+                EventWithEventable::Payment(event, payment)
             }
         };
         Ok(detailed_event)
     }
 
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<DetailedEvent>> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>> {
         events::table
             .select(events::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(events::account_id)))

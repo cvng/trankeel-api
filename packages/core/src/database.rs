@@ -5,7 +5,7 @@ use piteo_data::AccountId;
 use piteo_data::AuthId;
 use piteo_data::Company;
 use piteo_data::CompanyId;
-use piteo_data::DetailedEvent;
+use piteo_data::EventWithEventable;
 use piteo_data::Event;
 use piteo_data::EventId;
 use piteo_data::File;
@@ -137,7 +137,7 @@ pub trait PlanStore {
 }
 
 pub trait EventStore {
-    fn by_id(&mut self, id: &EventId) -> Result<DetailedEvent>;
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<DetailedEvent>>;
+    fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable>;
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>>;
     fn create(&mut self, data: Event) -> Result<Event>;
 }

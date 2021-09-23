@@ -831,13 +831,13 @@ pub struct Event {
     eventable: Eventable,
 }
 
-impl From<piteo::DetailedEvent> for Event {
-    fn from(item: piteo::DetailedEvent) -> Self {
+impl From<piteo::EventWithEventable> for Event {
+    fn from(item: piteo::EventWithEventable) -> Self {
         let (item, eventable) = match item {
-            piteo::DetailedEvent::Rent(event, rent) => {
+            piteo::EventWithEventable::Rent(event, rent) => {
                 (event, Eventable::Rent(rent.into())) //
             }
-            piteo::DetailedEvent::Payment(event, payment) => {
+            piteo::EventWithEventable::Payment(event, payment) => {
                 (event, Eventable::Transaction(payment.into()))
             }
         };

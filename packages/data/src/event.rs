@@ -14,7 +14,7 @@ pub type EventId = Id;
 pub type EventableId = Id;
 
 #[derive(Clone)]
-pub enum DetailedEvent {
+pub enum EventWithEventable {
     Rent(Event, Rent),
     Payment(Event, Payment),
 }
