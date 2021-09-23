@@ -1,5 +1,5 @@
 use crate::unions::Eventable;
-use crate::unions::Identity;
+use crate::unions::LegalIdentity;
 use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
@@ -397,7 +397,7 @@ impl Lender {
         let db_pool = ctx.data::<DbPool>()?;
         Ok(db(db_pool).lenders().by_id(&self.0.id)?.display_name())
     }
-    async fn identity(&self, ctx: &Context<'_>) -> Result<Identity> {
+    async fn identity(&self, ctx: &Context<'_>) -> Result<LegalIdentity> {
         let db_pool = ctx.data::<DbPool>()?;
         Ok(db(db_pool).lenders().by_id(&self.0.id)?.into())
     }
@@ -409,20 +409,20 @@ impl From<piteo::Lender> for Lender {
     }
 }
 
-impl From<piteo::LenderIdentity> for Lender {
-    fn from(item: piteo::LenderIdentity) -> Self {
+impl From<piteo::LenderWithIdentity> for Lender {
+    fn from(item: piteo::LenderWithIdentity) -> Self {
         match item {
-            piteo::LenderIdentity::Individual(lender, _) => lender.into(),
-            piteo::LenderIdentity::Company(lender, _) => lender.into(),
+            piteo::LenderWithIdentity::Individual(lender, _) => lender.into(),
+            piteo::LenderWithIdentity::Company(lender, _) => lender.into(),
         }
     }
 }
 
-impl From<piteo::LenderIdentity> for Identity {
-    fn from(item: piteo::LenderIdentity) -> Self {
+impl From<piteo::LenderWithIdentity> for LegalIdentity {
+    fn from(item: piteo::LenderWithIdentity) -> Self {
         match item {
-            piteo::LenderIdentity::Individual(_, person) => Self::Individual(person.into()),
-            piteo::LenderIdentity::Company(_, company) => Self::Company(company.into()),
+            piteo::LenderWithIdentity::Individual(_, person) => Self::Individual(person.into()),
+            piteo::LenderWithIdentity::Company(_, company) => Self::Company(company.into()),
         }
     }
 }

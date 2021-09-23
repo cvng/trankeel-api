@@ -5,7 +5,7 @@ use crate::objects::Person;
 use crate::objects::Rent;
 
 #[derive(async_graphql::Union)]
-pub enum Identity {
+pub enum LegalIdentity {
     Individual(Person),
     Company(Company),
 }

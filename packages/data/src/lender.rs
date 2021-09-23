@@ -5,7 +5,7 @@ use crate::Address;
 use crate::Company;
 use crate::CompanyId;
 use crate::DateTime;
-use crate::LegalEntity;
+use crate::LegalIdentity;
 use crate::Name;
 use crate::Person;
 use crate::PersonId;
@@ -16,7 +16,7 @@ use serde::Deserialize;
 pub type LenderId = Id;
 
 #[derive(Clone, Debug)]
-pub enum LenderIdentity {
+pub enum LenderWithIdentity {
     Individual(Lender, Person),
     Company(Lender, Company),
 }
@@ -42,9 +42,9 @@ pub struct LenderData {
 
 // # Impls
 
-impl LegalEntity for Lender {}
+impl LegalIdentity for Lender {}
 
-impl LenderIdentity {
+impl LenderWithIdentity {
     pub fn id(&self) -> LenderId {
         match self {
             Self::Individual(lender, _) => lender.id,
@@ -74,11 +74,11 @@ impl LenderIdentity {
     }
 }
 
-impl From<LenderIdentity> for Lender {
-    fn from(item: LenderIdentity) -> Self {
+impl From<LenderWithIdentity> for Lender {
+    fn from(item: LenderWithIdentity) -> Self {
         match item {
-            LenderIdentity::Individual(lender, _) => lender,
-            LenderIdentity::Company(lender, _) => lender,
+            LenderWithIdentity::Individual(lender, _) => lender,
+            LenderWithIdentity::Company(lender, _) => lender,
         }
     }
 }

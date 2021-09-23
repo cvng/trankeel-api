@@ -43,7 +43,7 @@ use piteo_core::LeaseId;
 use piteo_core::Lender;
 use piteo_core::LenderData;
 use piteo_core::LenderId;
-use piteo_core::LenderIdentity;
+use piteo_core::LenderWithIdentity;
 use piteo_core::Payment;
 use piteo_core::Person;
 use piteo_core::PersonData;
@@ -252,7 +252,7 @@ impl database::TenantStore for TenantStore<'_> {
 }
 
 impl database::LenderStore for LenderStore<'_> {
-    fn by_id(&mut self, id: &LenderId) -> Result<LenderIdentity> {
+    fn by_id(&mut self, id: &LenderId) -> Result<LenderWithIdentity> {
         let lender: Lender = lenders::table.find(id).first(&self.0.get()?)?;
         let lender_identity = match lender {
             Lender {
@@ -260,21 +260,21 @@ impl database::LenderStore for LenderStore<'_> {
                 ..
             } => {
                 let person = persons::table.find(individual_id).first(&self.0.get()?)?;
-                LenderIdentity::Individual(lender, person)
+                LenderWithIdentity::Individual(lender, person)
             }
             Lender {
                 company_id: Some(company_id),
                 ..
             } => {
                 let company = companies::table.find(company_id).first(&self.0.get()?)?;
-                LenderIdentity::Company(lender, company)
+                LenderWithIdentity::Company(lender, company)
             }
             _ => return Err(Error::new(NotFound)),
         };
         Ok(lender_identity)
     }
 
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderIdentity>> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderWithIdentity>> {
         lenders::table
             .select(lenders::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(lenders::account_id)))
@@ -285,12 +285,12 @@ impl database::LenderStore for LenderStore<'_> {
             .collect::<Result<Vec<_>>>()
     }
 
-    fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderIdentity> {
+    fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithIdentity> {
         let lender: Lender = lenders::table
             .filter(lenders::individual_id.eq(individual_id))
             .first(&self.0.get()?)?;
         let person = persons::table.find(individual_id).first(&self.0.get()?)?;
-        Ok(LenderIdentity::Individual(lender, person))
+        Ok(LenderWithIdentity::Individual(lender, person))
     }
 
     fn create(&mut self, data: Lender) -> Result<Lender> {

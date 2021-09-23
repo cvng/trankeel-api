@@ -52,7 +52,7 @@ impl From<Url> for String {
     }
 }
 
-pub trait LegalEntity {}
+pub trait LegalIdentity {}
 
 pub trait Name {
     fn first_name(&self) -> String;
