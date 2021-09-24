@@ -1,6 +1,7 @@
 use crate::DateTime;
 use crate::Id;
 use crate::Person;
+use crate::PersonId;
 use crate::TenantId;
 use async_graphql::Enum;
 use diesel_enum_derive::DieselEnum;
@@ -11,17 +12,20 @@ pub type WarrantId = Id;
 
 pub type WarrantWithIdentity = (Warrant, WarrantIdentity);
 
+pub type Visale = String;
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
 pub enum WarrantType {
-    Visale,
     Person,
-    Private,
+    Visale,
+    Company,
 }
 
 #[derive(Clone)]
 pub enum WarrantIdentity {
     Person(Person),
-    WarrantCompany(WarrantCompany),
+    Visale(Visale),
+    Company(WarrantCompany),
 }
 
 pub struct Warrant {
@@ -30,7 +34,8 @@ pub struct Warrant {
     pub updated_at: Option<DateTime>,
     pub tenant_id: TenantId,
     pub type_: WarrantType,
-    pub identifier: String,
+    pub identifier: Option<String>,
+    pub person_id: Option<PersonId>,
 }
 
 #[derive(Clone)]

@@ -670,7 +670,7 @@ enum TransactionType {
 }
 scalar URL
 scalar UUID
-type User implements PersonInterface & LegalIdentityInterface {
+type User implements LegalIdentityInterface & PersonInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!
@@ -714,9 +714,9 @@ type Warrant {
 	id: ID!
 }
 enum WarrantType {
-	VISALE
 	PERSON
-	PRIVATE
+	VISALE
+	COMPANY
 }
 schema {
 	query: Query

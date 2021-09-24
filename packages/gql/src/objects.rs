@@ -806,6 +806,17 @@ impl From<piteo::WarrantCompany> for WarrantCompany {
 }
 
 #[derive(async_graphql::SimpleObject)]
+pub struct Visale {
+    identifier: String,
+}
+
+impl From<piteo::Visale> for Visale {
+    fn from(item: piteo::Visale) -> Self {
+        Self { identifier: item }
+    }
+}
+
+#[derive(async_graphql::SimpleObject)]
 #[graphql(complex)]
 #[graphql(name = "Transaction")]
 pub struct Payment {
