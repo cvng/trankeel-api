@@ -710,9 +710,18 @@ input UserWithAccountInput {
 	lastName: String!
 	skipCreateCustomer: Boolean
 }
+type Visale {
+	identifier: String!
+}
 type Warrant {
 	id: ID!
+	type: WarrantType!
+	identity: WarrantIdentity!
 }
+type WarrantCompany {
+	identifier: String!
+}
+union WarrantIdentity = | User | Visale | WarrantCompany
 enum WarrantType {
 	PERSON
 	VISALE

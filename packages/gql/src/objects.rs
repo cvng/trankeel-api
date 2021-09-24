@@ -1,5 +1,6 @@
 use crate::unions::Eventable;
 use crate::unions::LegalIdentity;
+use crate::unions::WarrantIdentity;
 use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
@@ -42,6 +43,7 @@ use piteo::RentStatus;
 use piteo::TenantStatus;
 use piteo::TransactionType;
 use piteo::Url;
+use piteo::WarrantType;
 use std::convert::TryInto;
 
 // # Objects. https://async-graphql.github.io/async-graphql/en/define_complex_object.html
@@ -790,6 +792,8 @@ impl From<piteo::Tenant> for Tenant {
 #[derive(async_graphql::SimpleObject)]
 pub struct Warrant {
     id: ID,
+    r#type: WarrantType,
+    identity: WarrantIdentity,
 }
 
 #[derive(async_graphql::SimpleObject)]
