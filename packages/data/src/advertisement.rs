@@ -1,3 +1,4 @@
+use crate::schema::advertisements;
 use crate::Amount;
 use crate::DateTime;
 use crate::Id;
@@ -10,6 +11,7 @@ use crate::PropertyId;
 
 pub type AdvertisementId = Id;
 
+#[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Advertisement {
     pub id: AdvertisementId,
     pub created_at: Option<DateTime>,
@@ -21,6 +23,6 @@ pub struct Advertisement {
     pub deposit_amount: Amount,
     pub effect_date: DateTime,
     pub flexibility: LenderFlexibility,
-    pub referral_lease_id: LeaseId,
+    pub referral_lease_id: Option<LeaseId>,
     pub property_id: PropertyId,
 }

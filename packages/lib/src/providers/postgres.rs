@@ -12,6 +12,8 @@ use piteo_core::database::Db;
 use piteo_core::error::Context;
 use piteo_core::error::Error;
 use piteo_core::schema::accounts;
+use piteo_core::schema::advertisements;
+use piteo_core::schema::candidacies;
 use piteo_core::schema::companies;
 use piteo_core::schema::events;
 use piteo_core::schema::files;
@@ -23,10 +25,14 @@ use piteo_core::schema::plans;
 use piteo_core::schema::properties;
 use piteo_core::schema::rents;
 use piteo_core::schema::tenants;
+use piteo_core::schema::warrants;
 use piteo_core::Account;
 use piteo_core::AccountData;
 use piteo_core::AccountId;
+use piteo_core::Advertisement;
+use piteo_core::AdvertisementId;
 use piteo_core::AuthId;
+use piteo_core::Candidacy;
 use piteo_core::Company;
 use piteo_core::CompanyId;
 use piteo_core::Event;
@@ -61,6 +67,10 @@ use piteo_core::RentId;
 use piteo_core::Tenant;
 use piteo_core::TenantData;
 use piteo_core::TenantId;
+use piteo_core::Warrant;
+use piteo_core::WarrantIdentity;
+use piteo_core::WarrantType;
+use piteo_core::WarrantWithIdentity;
 use std::env;
 
 type Result<T, E = Error> = std::result::Result<T, E>;
@@ -79,7 +89,13 @@ struct CompanyStore<'a>(&'a DbPool);
 
 struct TenantStore<'a>(&'a DbPool);
 
+struct WarrantStore<'a>(&'a DbPool);
+
 struct LenderStore<'a>(&'a DbPool);
+
+struct AdvertisementStore<'a>(&'a DbPool);
+
+struct CandidacyStore<'a>(&'a DbPool);
 
 struct PropertyStore<'a>(&'a DbPool);
 
@@ -133,6 +149,18 @@ impl Db for Pg {
 
     fn tenants(&self) -> Box<dyn database::TenantStore + '_> {
         Box::new(TenantStore(&self.0))
+    }
+
+    fn warrants(&self) -> Box<dyn database::WarrantStore + '_> {
+        Box::new(WarrantStore(&self.0))
+    }
+
+    fn advertisements(&self) -> Box<dyn database::AdvertisementStore + '_> {
+        Box::new(AdvertisementStore(&self.0))
+    }
+
+    fn candidacies(&self) -> Box<dyn database::CandidacyStore + '_> {
+        Box::new(CandidacyStore(&self.0))
     }
 
     fn properties(&self) -> Box<dyn database::PropertyStore + '_> {
@@ -252,27 +280,53 @@ impl database::TenantStore for TenantStore<'_> {
     }
 }
 
+impl database::WarrantStore for WarrantStore<'_> {
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Vec<WarrantWithIdentity>> {
+        warrants::table
+            .filter(warrants::tenant_id.eq(tenant_id))
+            .load::<Warrant>(&self.0.get()?)?
+            .into_iter()
+            .map(
+                |warrant| match (warrant.type_, warrant.person_id, warrant.identifier.clone()) {
+                    (WarrantType::Person, Some(person_id), _) => {
+                        let person = persons::table.find(person_id).first(&self.0.get()?)?;
+                        Ok((warrant, WarrantIdentity::Person(person)))
+                    }
+                    (WarrantType::Visale, _, Some(identifier)) => {
+                        let visale = identifier;
+                        Ok((warrant, WarrantIdentity::Visale(visale)))
+                    }
+                    (WarrantType::Company, _, Some(identifier)) => {
+                        let company = identifier;
+                        Ok((warrant, WarrantIdentity::Company(company)))
+                    }
+                    _ => Err(Error::new(NotFound)),
+                },
+            )
+            .collect()
+    }
+}
+
 impl database::LenderStore for LenderStore<'_> {
     fn by_id(&mut self, id: &LenderId) -> Result<LenderWithIdentity> {
         let lender: Lender = lenders::table.find(id).first(&self.0.get()?)?;
-        let lender_identity = match lender {
+        match lender {
             Lender {
                 individual_id: Some(individual_id),
                 ..
             } => {
                 let person = persons::table.find(individual_id).first(&self.0.get()?)?;
-                (lender, LegalIdentity::Individual(person))
+                Ok((lender, LegalIdentity::Individual(person)))
             }
             Lender {
                 company_id: Some(company_id),
                 ..
             } => {
                 let company = companies::table.find(company_id).first(&self.0.get()?)?;
-                (lender, LegalIdentity::Company(company))
+                Ok((lender, LegalIdentity::Company(company)))
             }
-            _ => return Err(Error::new(NotFound)),
-        };
-        Ok(lender_identity)
+            _ => Err(Error::new(NotFound)),
+        }
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderWithIdentity>> {
@@ -302,6 +356,34 @@ impl database::LenderStore for LenderStore<'_> {
 
     fn update(&mut self, data: LenderData) -> Result<Lender> {
         Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    }
+}
+
+impl database::AdvertisementStore for AdvertisementStore<'_> {
+    fn by_id(&mut self, id: &AdvertisementId) -> Result<Advertisement> {
+        Ok(advertisements::table.find(id).first(&self.0.get()?)?)
+    }
+}
+
+impl database::CandidacyStore for CandidacyStore<'_> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>> {
+        Ok(candidacies::table
+            .select(candidacies::all_columns)
+            .left_join(tenants::table.on(tenants::id.eq(candidacies::tenant_id)))
+            .left_join(persons::table.on(persons::account_id.eq(tenants::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .load(&self.0.get()?)?)
+    }
+
+    fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Candidacy>> {
+        Ok(candidacies::table
+            .select(candidacies::all_columns)
+            .left_join(
+                advertisements::table.on(advertisements::id.eq(candidacies::advertisement_id)),
+            )
+            .left_join(properties::table.on(properties::id.eq(advertisements::property_id)))
+            .filter(properties::id.eq(property_id))
+            .load(&self.0.get()?)?)
     }
 }
 

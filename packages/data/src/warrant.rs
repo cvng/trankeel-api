@@ -1,3 +1,4 @@
+use crate::schema::warrants;
 use crate::DateTime;
 use crate::Id;
 use crate::Person;
@@ -14,6 +15,8 @@ pub type WarrantWithIdentity = (Warrant, WarrantIdentity);
 
 pub type Visale = String;
 
+pub type WarrantCompany = String;
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
 pub enum WarrantType {
     Person,
@@ -28,17 +31,13 @@ pub enum WarrantIdentity {
     Company(WarrantCompany),
 }
 
+#[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Warrant {
     pub id: WarrantId,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
-    pub tenant_id: TenantId,
     pub type_: WarrantType,
     pub identifier: Option<String>,
     pub person_id: Option<PersonId>,
-}
-
-#[derive(Clone)]
-pub struct WarrantCompany {
-    pub identifier: String,
+    pub tenant_id: TenantId,
 }

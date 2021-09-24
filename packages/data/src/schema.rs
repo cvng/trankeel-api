@@ -12,6 +12,36 @@ table! {
 }
 
 table! {
+    advertisements (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        published -> Bool,
+        lease_type -> Text,
+        rent_amount -> Numeric,
+        rent_charges_amount -> Numeric,
+        deposit_amount -> Numeric,
+        effect_date -> Timestamptz,
+        flexibility -> Text,
+        referral_lease_id -> Nullable<Uuid>,
+        property_id -> Uuid,
+    }
+}
+
+table! {
+    candidacies (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        status -> Text,
+        advertisement_id -> Uuid,
+        tenant_id -> Uuid,
+        move_in_date -> Timestamptz,
+        description -> Text,
+    }
+}
+
+table! {
     companies (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -195,7 +225,24 @@ table! {
     }
 }
 
+table! {
+    warrants (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        #[sql_name = "type"]
+        type_ -> Text,
+        identifier -> Nullable<Text>,
+        person_id -> Nullable<Uuid>,
+        tenant_id -> Uuid,
+    }
+}
+
 joinable!(accounts -> plans (plan_id));
+joinable!(advertisements -> leases (referral_lease_id));
+joinable!(advertisements -> properties (property_id));
+joinable!(candidacies -> advertisements (advertisement_id));
+joinable!(candidacies -> tenants (tenant_id));
 joinable!(events -> accounts (account_id));
 joinable!(leases -> accounts (account_id));
 joinable!(leases -> files (lease_id));
@@ -210,8 +257,23 @@ joinable!(properties -> lenders (lender_id));
 joinable!(rents -> leases (lease_id));
 joinable!(tenants -> accounts (account_id));
 joinable!(tenants -> leases (lease_id));
+joinable!(warrants -> persons (person_id));
+joinable!(warrants -> tenants (tenant_id));
 
 allow_tables_to_appear_in_same_query!(
-    accounts, companies, events, files, leases, lenders, payments, persons, plans, properties,
-    rents, tenants,
+    accounts,
+    advertisements,
+    candidacies,
+    companies,
+    events,
+    files,
+    leases,
+    lenders,
+    payments,
+    persons,
+    plans,
+    properties,
+    rents,
+    tenants,
+    warrants,
 );

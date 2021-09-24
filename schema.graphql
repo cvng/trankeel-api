@@ -33,10 +33,33 @@ input AddressInput {
 }
 type Advertisement {
 	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
+	published: Boolean!
+	leaseType: LeaseType!
+	rentAmount: Decimal!
+	rentChargesAmount: Decimal!
+	depositAmount: Decimal!
+	effectDate: DateTime!
+	flexibility: LenderFlexibility!
+	referralLeaseId: ID
+	propertyId: ID!
 }
 scalar AuthenticationID
 type Candidacy {
 	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
+	status: CandidacyStatus!
+	advertisementId: ID!
+	tenantId: ID!
+	moveInDate: DateTime!
+	description: String!
+}
+enum CandidacyStatus {
+	PENDING
+	REJECTED
+	ACCEPTED
 }
 type Company implements LegalIdentityInterface {
 	address: Address
@@ -312,6 +335,11 @@ type Lender {
 	displayName: String!
 	identity: LegalIdentity!
 }
+enum LenderFlexibility {
+	ONE_DAY
+	THREE_DAYS
+	SEVEN_DAYS
+}
 input LenderIndividualUpdateInput {
 	id: UUID!
 	individual: UserUpdateInput!
@@ -504,7 +532,7 @@ enum PropertyUsageType {
 type Query {
 	viewer: Person!
 	advertisement(id: ID!): Advertisement!
-	candidacies(propertyId: ID!): [Candidacy!]!
+	candidacies(propertyId: ID): [Candidacy!]!
 	properties(id: ID, query: String): [Property!]!
 	summary(since: DateTime, until: DateTime): Summary!
 	tenants(id: ID, query: String, status: TenantStatus): [Tenant!]!
@@ -620,7 +648,6 @@ type Tenant implements PersonInterface {
 	id: ID!
 	leaseId: ID
 	isStudent: Boolean
-	warrants: [Warrant!]
 	account: Account
 	property: Property
 	status: TenantStatus
@@ -632,6 +659,7 @@ type Tenant implements PersonInterface {
 	unpaidRentAmount: Int
 	files: [File!]
 	lease: Lease
+	warrants: [Warrant!]
 }
 input TenantInput {
 	apl: Boolean
