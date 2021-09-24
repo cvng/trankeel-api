@@ -65,9 +65,15 @@ input CreateFileInput {
 	downloadUrl: URL!
 	type: FileType!
 }
+input CreatePersonInput {
+	address: AddressInput!
+	email: Email!
+	firstName: String!
+	lastName: String!
+}
 input CreateWarrantInput {
 	type: WarrantType!
-	person: [UserInput!]!
+	person: CreatePersonInput
 	identifier: String
 }
 scalar Date
@@ -670,7 +676,7 @@ enum TransactionType {
 }
 scalar URL
 scalar UUID
-type User implements PersonInterface & LegalIdentityInterface {
+type User implements LegalIdentityInterface & PersonInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!
@@ -684,12 +690,6 @@ type User implements PersonInterface & LegalIdentityInterface {
 	displayName: String!
 	accounts: [Account!]
 	account: Account
-}
-input UserInput {
-	address: AddressInput!
-	email: Email!
-	firstName: String!
-	lastName: String!
 }
 enum UserRole {
 	ADMIN

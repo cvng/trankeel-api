@@ -1,4 +1,4 @@
-use crate::auth::UserInput;
+use crate::auth::CreatePersonInput;
 use crate::database::Db;
 use crate::files::CreateFileInput;
 use async_graphql::InputObject;
@@ -15,7 +15,7 @@ use validator::Validate;
 #[derive(InputObject, Validate)]
 pub struct CreateWarrantInput {
     r#type: WarrantType,
-    person: Vec<UserInput>,
+    person: Option<CreatePersonInput>,
     identifier: Option<String>,
 }
 
