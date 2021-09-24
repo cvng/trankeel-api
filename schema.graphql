@@ -605,7 +605,7 @@ type Tenant implements PersonInterface {
 	id: ID!
 	leaseId: ID
 	isStudent: Boolean
-	warrants: [Warrant!]!
+	warrants: [Warrant!]
 	account: Account
 	property: Property
 	status: TenantStatus
@@ -676,7 +676,7 @@ enum TransactionType {
 }
 scalar URL
 scalar UUID
-type User implements LegalIdentityInterface & PersonInterface {
+type User implements PersonInterface & LegalIdentityInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!

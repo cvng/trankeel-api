@@ -740,7 +740,7 @@ pub struct Tenant {
     pub id: ID,
     lease_id: Option<ID>,
     is_student: Option<bool>,
-    warrants: Vec<Warrant>,
+    warrants: Option<Vec<Warrant>>,
     //
     account: Option<Account>,
     property: Option<Property>,
@@ -772,7 +772,7 @@ impl From<piteo::Tenant> for Tenant {
             id: item.id.into(),
             lease_id: item.lease_id.map(Into::into),
             is_student: item.is_student,
-            warrants: Vec::new(),
+            warrants: None,
             account: None,
             property: None,
             status: Some(TenantStatus::New),
