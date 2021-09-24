@@ -3,7 +3,7 @@ use piteo_data::FileType;
 use piteo_data::Url;
 
 #[derive(InputObject)]
-pub struct FileInput {
+pub struct CreateFileInput {
     download_url: Url,
     r#type: FileType,
 }

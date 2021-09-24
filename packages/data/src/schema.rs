@@ -109,8 +109,8 @@ table! {
         account_id -> Uuid,
         auth_id -> Text,
         email -> Text,
-        first_name -> Nullable<Text>,
-        last_name -> Nullable<Text>,
+        first_name -> Text,
+        last_name -> Text,
         address -> Nullable<Jsonb>,
         photo_url -> Nullable<Text>,
         role -> Nullable<Text>,
@@ -145,6 +145,7 @@ table! {
         housing_type -> Nullable<Text>,
         name -> Text,
         note -> Nullable<Text>,
+        description -> Nullable<Text>,
         ntic_equipments -> Nullable<Text>,
         other_spaces -> Nullable<Text>,
         tax -> Nullable<Numeric>,
@@ -181,7 +182,7 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
-        apl -> Bool,
+        apl -> Nullable<Bool>,
         birthdate -> Date,
         birthplace -> Nullable<Text>,
         email -> Text,
@@ -190,7 +191,7 @@ table! {
         note -> Nullable<Text>,
         phone_number -> Nullable<Text>,
         lease_id -> Nullable<Uuid>,
-        visale_id -> Nullable<Text>,
+        is_student -> Nullable<Bool>,
     }
 }
 

@@ -31,8 +31,14 @@ input AddressInput {
 	line2: String
 	postalCode: String!
 }
+type Advertisement {
+	id: ID!
+}
 scalar AuthenticationID
-type Company {
+type Candidacy {
+	id: ID!
+}
+type Company implements LegalIdentityInterface {
 	address: Address
 	displayName: String!
 	email: Email!
@@ -42,6 +48,33 @@ type Company {
 	legalEntityType: LegalEntityType
 	legalEntityTypeOther: String
 	phoneNumber: PhoneNumber
+}
+input CreateCandidacyInput {
+	isStudent: Boolean!
+	firstName: String!
+	lastName: String!
+	birthdate: Date!
+	email: Email!
+	phoneNumber: PhoneNumber!
+	moveInDate: Date!
+	description: String!
+	files: [CreateFileInput!]
+	warrants: [CreateWarrantInput!]
+}
+input CreateFileInput {
+	downloadUrl: URL!
+	type: FileType!
+}
+input CreatePersonInput {
+	address: AddressInput!
+	email: Email!
+	firstName: String!
+	lastName: String!
+}
+input CreateWarrantInput {
+	type: WarrantType!
+	person: CreatePersonInput
+	identifier: String
 }
 scalar Date
 scalar DateTime
@@ -85,10 +118,6 @@ type File {
 	updatedAt: DateTime
 	id: ID!
 }
-input FileInput {
-	downloadUrl: URL!
-	type: FileType!
-}
 """
 https://www.pdfmonkey.io/fr/doc/api/generer-un-document
 """
@@ -105,7 +134,7 @@ enum FileType {
 	RENT_RECEIPT
 }
 input ImportInput {
-	files: [FileInput!]!
+	files: [CreateFileInput!]!
 	source: ImportSource!
 }
 enum ImportSource {
@@ -230,7 +259,7 @@ input LeaseFurnishedInput {
 	depositAmount: Decimal
 	effectDate: DateTime!
 	renewDate: DateTime
-	file: FileInput
+	file: CreateFileInput
 	propertyId: UUID!
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
@@ -239,7 +268,7 @@ input LeaseFurnishedInput {
 }
 input LeaseFurnishedUpdateInput {
 	data: LeaseFurnishedDataInput
-	file: FileInput
+	file: CreateFileInput
 	id: UUID!
 }
 enum LeaseRentPeriodicity {
@@ -271,7 +300,10 @@ enum LegalEntityType {
 	SCP
 	SNC
 }
-union LegalIdentity = | User | Company
+union LegalIdentity = | Person | Company
+interface LegalIdentityInterface {
+	displayName: String!
+}
 type Lender {
 	id: ID!
 	accountId: ID!
@@ -285,7 +317,7 @@ input LenderIndividualUpdateInput {
 	individual: UserUpdateInput!
 }
 type Mutation {
-	userCreateWithAccount(input: UserWithAccountInput!): User!
+	userCreateWithAccount(input: UserWithAccountInput!): Person!
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
 	tenantCreate(input: TenantInput!): Tenant!
@@ -298,14 +330,32 @@ type Mutation {
 	leaseFurnishedUpdate(input: LeaseFurnishedUpdateInput!): Lease!
 	leaseDelete(id: ID!): ID!
 	lenderIndividualUpdate(input: LenderIndividualUpdateInput!): Lender!
+	candidacyCreate(input: CreateCandidacyInput!): Candidacy!
 	transactionCreate(input: TransactionInput!): Transaction!
 	transactionDelete(id: ID!): ID!
-	fileUpload(input: FileInput!): File!
+	fileUpload(input: CreateFileInput!): File!
 	importUpload(input: ImportInput!): Task!
 	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
 	sendPaymentNotice(input: SendPaymentNoticeInput!): SendPaymentNoticePayload!
 }
-interface Person {
+type Person implements LegalIdentityInterface & PersonInterface {
+	authId: AuthenticationID
+	email: Email!
+	firstName: String!
+	lastName: String!
+	address: Address
+	photoURL: URL
+	role: UserRole
+	id: ID!
+	phoneNumber: PhoneNumber
+	accountId: ID!
+	displayName: String!
+	accounts: [Account!]
+	account: Account
+}
+interface PersonInterface {
+	firstName: String!
+	lastName: String!
 	displayName: String!
 }
 scalar PhoneNumber
@@ -396,6 +446,7 @@ input PropertyInput {
 	lenderId: UUID!
 	name: String!
 	note: String
+	description: String
 	nticEquipments: String
 	otherSpaces: String
 	roomCount: PropertyRoomType!
@@ -435,6 +486,7 @@ input PropertyUpdateInput {
 	id: UUID!
 	name: String
 	note: String
+	description: String
 	nticEquipments: String
 	otherSpaces: String
 	roomCount: PropertyRoomType
@@ -450,7 +502,9 @@ enum PropertyUsageType {
 	INDIVIDUAL
 }
 type Query {
-	viewer: User!
+	viewer: Person!
+	advertisement(id: ID!): Advertisement!
+	candidacies(propertyId: ID!): [Candidacy!]!
 	properties(id: ID, query: String): [Property!]!
 	summary(since: DateTime, until: DateTime): Summary!
 	tenants(id: ID, query: String, status: TenantStatus): [Tenant!]!
@@ -552,7 +606,7 @@ type Task {
 	status: String!
 	progress: Int!
 }
-type Tenant {
+type Tenant implements PersonInterface {
 	accountId: ID!
 	apl: Boolean
 	birthdate: Date!
@@ -565,7 +619,8 @@ type Tenant {
 	phoneNumber: PhoneNumber
 	id: ID!
 	leaseId: ID
-	visaleId: String
+	isStudent: Boolean
+	warrants: [Warrant!]
 	account: Account
 	property: Property
 	status: TenantStatus
@@ -587,7 +642,8 @@ input TenantInput {
 	lastName: String!
 	note: String
 	phoneNumber: PhoneNumber
-	visaleId: String
+	isStudent: Boolean
+	warrants: [CreateWarrantInput!]
 }
 enum TenantStatus {
 	CANDIDATE
@@ -606,7 +662,8 @@ input TenantUpdateInput {
 	lastName: String
 	note: String
 	phoneNumber: PhoneNumber
-	visaleId: String
+	isStudent: Boolean
+	warrants: [CreateWarrantInput!]
 }
 type Transaction {
 	id: ID!
@@ -634,21 +691,6 @@ enum TransactionType {
 }
 scalar URL
 scalar UUID
-type User implements Person {
-	authId: AuthenticationID
-	email: Email!
-	firstName: String
-	lastName: String
-	address: Address
-	photoURL: URL
-	role: UserRole
-	id: ID!
-	phoneNumber: PhoneNumber
-	accountId: ID!
-	displayName: String!
-	accounts: [Account!]
-	account: Account
-}
 enum UserRole {
 	ADMIN
 	TENANT
@@ -667,6 +709,23 @@ input UserWithAccountInput {
 	firstName: String!
 	lastName: String!
 	skipCreateCustomer: Boolean
+}
+type Visale {
+	identifier: String!
+}
+type Warrant {
+	id: ID!
+	type: WarrantType!
+	identity: WarrantIdentity!
+}
+type WarrantCompany {
+	identifier: String!
+}
+union WarrantIdentity = | Person | Visale | WarrantCompany
+enum WarrantType {
+	PERSON
+	VISALE
+	COMPANY
 }
 schema {
 	query: Query

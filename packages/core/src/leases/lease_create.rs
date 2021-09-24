@@ -1,5 +1,5 @@
 use crate::database::Db;
-use crate::files::FileInput;
+use crate::files::CreateFileInput;
 use async_graphql::InputObject;
 use eyre::Error;
 use piteo_data::Amount;
@@ -26,7 +26,7 @@ pub struct CreateFurnishedLeaseInput {
     pub deposit_amount: Option<Amount>,
     pub effect_date: DateTime,
     pub renew_date: Option<DateTime>,
-    pub file: Option<FileInput>,
+    pub file: Option<CreateFileInput>,
     pub property_id: PropertyId,
     pub rent_amount: Amount,
     pub rent_charges_amount: Option<Amount>,
@@ -106,7 +106,7 @@ fn add_lease_tenants(
                 last_name: Default::default(),
                 note: Default::default(),
                 phone_number: Default::default(),
-                visale_id: Default::default(),
+                is_student: Default::default(),
             })
         })
         .collect()

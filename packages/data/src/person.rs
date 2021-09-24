@@ -39,8 +39,8 @@ pub struct Person {
     pub account_id: AccountId,
     pub auth_id: AuthId,
     pub email: Email,
-    pub first_name: Option<String>,
-    pub last_name: Option<String>,
+    pub first_name: String,
+    pub last_name: String,
     pub address: Option<Address>,
     pub photo_url: Option<Url>,
     pub role: Option<PersonRole>,
@@ -79,11 +79,11 @@ impl Default for AuthId {
 
 impl Name for Person {
     fn first_name(&self) -> String {
-        self.first_name.clone().unwrap_or_default()
+        self.first_name.clone()
     }
 
     fn last_name(&self) -> String {
-        self.last_name.clone().unwrap_or_default()
+        self.last_name.clone()
     }
 }
 
@@ -123,8 +123,8 @@ mod tests {
     #[test]
     fn test_display_name() {
         let person = Person {
-            first_name: Some("John".to_string()),
-            last_name: Some("DOE".to_string()),
+            first_name: "John".to_string(),
+            last_name: "DOE".to_string(),
             ..Default::default()
         };
         assert_eq!(person.display_name(), "John DOE");

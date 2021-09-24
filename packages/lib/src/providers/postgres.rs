@@ -44,7 +44,7 @@ use piteo_core::LegalIdentity;
 use piteo_core::Lender;
 use piteo_core::LenderData;
 use piteo_core::LenderId;
-use piteo_core::LenderWithLegalIdentity;
+use piteo_core::LenderWithIdentity;
 use piteo_core::Payment;
 use piteo_core::Person;
 use piteo_core::PersonData;
@@ -253,7 +253,7 @@ impl database::TenantStore for TenantStore<'_> {
 }
 
 impl database::LenderStore for LenderStore<'_> {
-    fn by_id(&mut self, id: &LenderId) -> Result<LenderWithLegalIdentity> {
+    fn by_id(&mut self, id: &LenderId) -> Result<LenderWithIdentity> {
         let lender: Lender = lenders::table.find(id).first(&self.0.get()?)?;
         let lender_identity = match lender {
             Lender {
@@ -275,7 +275,7 @@ impl database::LenderStore for LenderStore<'_> {
         Ok(lender_identity)
     }
 
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderWithLegalIdentity>> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderWithIdentity>> {
         lenders::table
             .select(lenders::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(lenders::account_id)))
@@ -286,7 +286,7 @@ impl database::LenderStore for LenderStore<'_> {
             .collect::<Result<Vec<_>>>()
     }
 
-    fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithLegalIdentity> {
+    fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithIdentity> {
         let lender: Lender = lenders::table
             .filter(lenders::individual_id.eq(individual_id))
             .first(&self.0.get()?)?;

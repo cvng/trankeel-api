@@ -1,10 +1,10 @@
-use crate::auth::UserInput;
+use crate::auth::CreatePersonInput;
 use crate::companies::CompanyInput;
 use async_graphql::InputObject;
 
 #[derive(InputObject)]
 pub struct LenderIndividualInput {
-    individual: UserInput,
+    individual: CreatePersonInput,
 }
 
 #[derive(InputObject)]

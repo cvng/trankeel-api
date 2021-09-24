@@ -3,7 +3,7 @@ use async_graphql::InputObject;
 use piteo_data::Email;
 
 #[derive(InputObject)]
-pub struct UserInput {
+pub struct CreatePersonInput {
     address: AddressInput,
     email: Email,
     first_name: String,

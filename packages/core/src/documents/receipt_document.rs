@@ -3,7 +3,7 @@ use crate::pdfmaker::IntoDocument;
 use crate::Amount;
 use crate::DateTime;
 use crate::FileType;
-use crate::LenderWithLegalIdentity;
+use crate::LenderWithIdentity;
 use crate::Name;
 use crate::Property;
 use crate::Rent;
@@ -47,7 +47,7 @@ impl ReceiptDocument {
     pub fn try_new(
         receipt: Receipt,
         rent: Rent,
-        lender: LenderWithLegalIdentity,
+        lender: LenderWithIdentity,
         tenants: Vec<Tenant>,
         property: Property,
         date: DateTime,

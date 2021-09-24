@@ -1,4 +1,5 @@
 use crate::objects::Account;
+use crate::objects::Candidacy;
 use crate::objects::Error;
 use crate::objects::File;
 use crate::objects::Lease;
@@ -16,7 +17,7 @@ use async_graphql::ID;
 use piteo::auth::AccountActivatePlanInput;
 use piteo::auth::AccountUpdateInput;
 use piteo::auth::CreateUserWithAccountInput;
-use piteo::files::FileInput;
+use piteo::files::CreateFileInput;
 use piteo::imports::ImportInput;
 use piteo::leases::CreateFurnishedLeaseInput;
 use piteo::leases::CreateReceiptsInput;
@@ -26,6 +27,7 @@ use piteo::leases::UpdateFurnishedLeaseInput;
 use piteo::owners::UpdateIndividualLenderInput;
 use piteo::properties::CreatePropertyInput;
 use piteo::properties::UpdatePropertyInput;
+use piteo::tenants::CreateCandidacyInput;
 use piteo::tenants::CreateTenantInput;
 use piteo::tenants::UpdateTenantInput;
 use piteo::AuthId;
@@ -135,6 +137,10 @@ impl Mutation {
         Ok(piteo::update_individual_lender(db_pool, auth_id, input)?.into())
     }
 
+    async fn candidacy_create(&self, _input: CreateCandidacyInput) -> Result<Candidacy> {
+        Err(wip())
+    }
+
     async fn transaction_create(&self, _input: TransactionInput) -> Result<Payment> {
         Err(wip())
     }
@@ -143,7 +149,7 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn file_upload(&self, _input: FileInput) -> Result<File> {
+    async fn file_upload(&self, _input: CreateFileInput) -> Result<File> {
         Err(wip())
     }
 

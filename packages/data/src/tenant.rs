@@ -29,7 +29,7 @@ pub struct Tenant {
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
-    pub apl: bool,
+    pub apl: Option<bool>,
     pub birthdate: Date,
     pub birthplace: Option<String>,
     pub email: Email,
@@ -38,7 +38,7 @@ pub struct Tenant {
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
     pub lease_id: Option<LeaseId>,
-    pub visale_id: Option<String>,
+    pub is_student: Option<bool>,
 }
 
 #[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
@@ -55,7 +55,7 @@ pub struct TenantData {
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
     pub lease_id: Option<LeaseId>,
-    pub visale_id: Option<String>,
+    pub is_student: Option<bool>,
 }
 
 // # Impls

@@ -6,6 +6,7 @@ mod unions;
 
 pub use async_graphql::http;
 
+use crate::interfaces::LegalIdentityInterface;
 use crate::interfaces::PersonInterface;
 use crate::mutation::Mutation;
 use crate::query::Query;
@@ -28,6 +29,7 @@ pub fn build_schema() -> Result<PiteoSchema> {
 
     let schema = Schema::build(Query, Mutation, EmptySubscription)
         .register_type::<PersonInterface>()
+        .register_type::<LegalIdentityInterface>()
         .extension(ApolloTracing)
         .data(db_pool)
         .finish();

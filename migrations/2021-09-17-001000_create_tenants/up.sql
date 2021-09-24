@@ -3,7 +3,7 @@ CREATE TABLE tenants (
     created_at TIMESTAMPTZ DEFAULT current_timestamp,
     updated_at TIMESTAMPTZ,
     account_id UUID NOT NULL REFERENCES accounts(id),
-    apl BOOLEAN NOT NULL DEFAULT false,
+    apl BOOLEAN,
     birthdate DATE NOT NULL,
     birthplace TEXT,
     email TEXT NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE tenants (
     note TEXT,
     phone_number TEXT,
     lease_id UUID REFERENCES leases(id) ON DELETE SET NULL,
-    visale_id TEXT
+    is_student BOOLEAN
 );
 
 SELECT diesel_manage_updated_at('tenants');
