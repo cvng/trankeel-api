@@ -300,7 +300,7 @@ enum LegalEntityType {
 	SCP
 	SNC
 }
-union LegalIdentity = | User | Company
+union LegalIdentity = | Person | Company
 interface LegalIdentityInterface {
 	displayName: String!
 }
@@ -317,7 +317,7 @@ input LenderIndividualUpdateInput {
 	individual: UserUpdateInput!
 }
 type Mutation {
-	userCreateWithAccount(input: UserWithAccountInput!): User!
+	userCreateWithAccount(input: UserWithAccountInput!): Person!
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
 	tenantCreate(input: TenantInput!): Tenant!
@@ -337,6 +337,21 @@ type Mutation {
 	importUpload(input: ImportInput!): Task!
 	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
 	sendPaymentNotice(input: SendPaymentNoticeInput!): SendPaymentNoticePayload!
+}
+type Person implements LegalIdentityInterface & PersonInterface {
+	authId: AuthenticationID
+	email: Email!
+	firstName: String!
+	lastName: String!
+	address: Address
+	photoURL: URL
+	role: UserRole
+	id: ID!
+	phoneNumber: PhoneNumber
+	accountId: ID!
+	displayName: String!
+	accounts: [Account!]
+	account: Account
 }
 interface PersonInterface {
 	firstName: String!
@@ -487,7 +502,7 @@ enum PropertyUsageType {
 	INDIVIDUAL
 }
 type Query {
-	viewer: User!
+	viewer: Person!
 	advertisement(id: ID!): Advertisement!
 	candidacies(propertyId: ID!): [Candidacy!]!
 	properties(id: ID, query: String): [Property!]!
@@ -676,21 +691,6 @@ enum TransactionType {
 }
 scalar URL
 scalar UUID
-type User implements PersonInterface & LegalIdentityInterface {
-	authId: AuthenticationID
-	email: Email!
-	firstName: String!
-	lastName: String!
-	address: Address
-	photoURL: URL
-	role: UserRole
-	id: ID!
-	phoneNumber: PhoneNumber
-	accountId: ID!
-	displayName: String!
-	accounts: [Account!]
-	account: Account
-}
 enum UserRole {
 	ADMIN
 	TENANT
@@ -721,7 +721,7 @@ type Warrant {
 type WarrantCompany {
 	identifier: String!
 }
-union WarrantIdentity = | User | Visale | WarrantCompany
+union WarrantIdentity = | Person | Visale | WarrantCompany
 enum WarrantType {
 	PERSON
 	VISALE
