@@ -182,7 +182,7 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
-        apl -> Bool,
+        apl -> Nullable<Bool>,
         birthdate -> Date,
         birthplace -> Nullable<Text>,
         email -> Text,
@@ -191,7 +191,7 @@ table! {
         note -> Nullable<Text>,
         phone_number -> Nullable<Text>,
         lease_id -> Nullable<Uuid>,
-        is_student -> Bool,
+        is_student -> Nullable<Bool>,
     }
 }
 

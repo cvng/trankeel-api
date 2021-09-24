@@ -670,7 +670,7 @@ enum TransactionType {
 }
 scalar URL
 scalar UUID
-type User implements LegalIdentityInterface & PersonInterface {
+type User implements PersonInterface & LegalIdentityInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!

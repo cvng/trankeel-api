@@ -43,7 +43,7 @@ pub fn create_tenant(
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id: account.id,
-        apl: input.apl.unwrap_or_default(),
+        apl: input.apl,
         birthdate: input.birthdate,
         birthplace: input.birthplace,
         email: input.email.into(),
@@ -51,7 +51,7 @@ pub fn create_tenant(
         last_name: input.last_name,
         note: input.note,
         phone_number: input.phone_number,
-        is_student: input.is_student.unwrap_or_default(),
+        is_student: input.is_student,
         lease_id: None,
     })
 }
