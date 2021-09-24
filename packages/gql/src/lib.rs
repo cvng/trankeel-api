@@ -6,13 +6,13 @@ mod unions;
 
 pub use async_graphql::http;
 
+use crate::interfaces::LegalIdentityInterface;
 use crate::interfaces::PersonInterface;
 use crate::mutation::Mutation;
 use crate::query::Query;
 use async_graphql::extensions::ApolloTracing;
 use async_graphql::EmptySubscription;
 use async_graphql::Schema;
-use interfaces::LegalIdentityInterface;
 use piteo::Pg;
 use piteo::Provider;
 use std::fs::File;
