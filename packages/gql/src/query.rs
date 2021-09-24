@@ -1,3 +1,5 @@
+use crate::objects::Advertisement;
+use crate::objects::Candidacy;
 use crate::objects::Event;
 use crate::objects::File;
 use crate::objects::Invoice;
@@ -35,6 +37,14 @@ impl Query {
             .persons()
             .by_auth_id(auth_id)
             .map(Person::from)?)
+    }
+
+    async fn advertisement(&self, _ctx: &Context<'_>, _id: ID) -> Result<Advertisement> {
+        todo!()
+    }
+
+    async fn candidacies(&self, _ctx: &Context<'_>, _property_id: ID) -> Result<Vec<Candidacy>> {
+        todo!()
     }
 
     async fn properties(

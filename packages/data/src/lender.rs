@@ -11,7 +11,13 @@ use serde::Deserialize;
 
 pub type LenderId = Id;
 
-pub type LenderWithLegalIdentity = (Lender, LegalIdentity);
+pub type LenderWithIdentity = (Lender, LegalIdentity);
+
+pub enum LenderFlexibility {
+    OneDay,
+    ThreeDays,
+    SevenDays,
+}
 
 #[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Lender {

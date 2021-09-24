@@ -4,9 +4,13 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_derive_newtype;
 
+pub mod schema; // Export database schema.
+
 mod account;
 mod address;
+mod advertisement;
 mod amount;
+mod candidacy;
 mod common;
 mod company;
 mod datetime;
@@ -28,12 +32,13 @@ mod subscription;
 mod summary;
 mod task;
 mod tenant;
-
-pub mod schema; // Export database schema.
+mod warrant;
 
 pub use crate::account::*;
 pub use crate::address::*;
+pub use crate::advertisement::*;
 pub use crate::amount::*;
+pub use crate::candidacy::*;
 pub use crate::common::*;
 pub use crate::company::*;
 pub use crate::datetime::*;
@@ -54,3 +59,4 @@ pub use crate::rent_receipt::*;
 pub use crate::subscription::*;
 pub use crate::summary::*;
 pub use crate::tenant::*;
+pub use crate::warrant::*;

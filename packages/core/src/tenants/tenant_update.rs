@@ -1,3 +1,4 @@
+use super::CreateWarrantInput;
 use crate::database::Db;
 use crate::AuthId;
 use crate::Date;
@@ -24,7 +25,8 @@ pub struct UpdateTenantInput {
     pub last_name: Option<String>,
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
-    pub visale_id: Option<String>,
+    pub is_student: Option<bool>,
+    pub warrants: Option<Vec<CreateWarrantInput>>,
 }
 
 // # Operation
@@ -54,7 +56,7 @@ impl From<UpdateTenantInput> for TenantData {
             last_name: item.last_name,
             note: item.note,
             phone_number: item.phone_number,
-            visale_id: item.visale_id,
+            is_student: item.is_student,
             lease_id: None,
         }
     }

@@ -85,6 +85,7 @@ async fn seed() {
             lender_id: lender.id,
             name: "Petite mission".into(),
             note: Some("RAS".into()),
+            description: Some("Description".into()),
             ntic_equipments: None,
             other_spaces: None,
             room_count: PropertyRoomType::T1,
@@ -110,7 +111,8 @@ async fn seed() {
             last_name: "PITEO".into(),
             note: None,
             phone_number: None,
-            visale_id: None,
+            is_student: Some(false),
+            warrants: None,
         },
     )
     .unwrap();

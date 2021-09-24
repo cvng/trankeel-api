@@ -3,6 +3,7 @@ use crate::objects::FurnishedLeaseDetails;
 use crate::objects::Payment;
 use crate::objects::Person;
 use crate::objects::Rent;
+use crate::objects::WarrantCompany;
 
 #[derive(async_graphql::Union)]
 pub enum LegalIdentity {
@@ -15,6 +16,21 @@ impl From<piteo::LegalIdentity> for LegalIdentity {
         match item {
             piteo::LegalIdentity::Individual(person) => Self::Individual(person.into()),
             piteo::LegalIdentity::Company(company) => Self::Company(company.into()),
+        }
+    }
+}
+
+#[derive(async_graphql::Union)]
+pub enum WarrantIdentity {
+    Person(Person),
+    WarrantCompany(WarrantCompany),
+}
+
+impl From<piteo::WarrantIdentity> for WarrantIdentity {
+    fn from(item: piteo::WarrantIdentity) -> Self {
+        match item {
+            piteo::WarrantIdentity::Person(person) => Self::Person(person.into()),
+            piteo::WarrantIdentity::WarrantCompany(company) => Self::WarrantCompany(company.into()),
         }
     }
 }

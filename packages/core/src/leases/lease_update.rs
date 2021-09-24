@@ -1,5 +1,5 @@
 use crate::database::Db;
-use crate::files::FileInput;
+use crate::files::CreateFileInput;
 use crate::AuthId;
 use async_graphql::InputObject;
 use eyre::Error;
@@ -16,7 +16,7 @@ use validator::Validate;
 pub struct UpdateFurnishedLeaseInput {
     #[graphql(name = "data")]
     details: Option<FurnishedLeaseDetails>,
-    file: Option<FileInput>,
+    file: Option<CreateFileInput>,
     id: LeaseId,
 }
 

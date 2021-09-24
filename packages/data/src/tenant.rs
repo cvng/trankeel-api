@@ -38,7 +38,7 @@ pub struct Tenant {
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
     pub lease_id: Option<LeaseId>,
-    pub visale_id: Option<String>,
+    pub is_student: bool,
 }
 
 #[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
@@ -55,7 +55,7 @@ pub struct TenantData {
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
     pub lease_id: Option<LeaseId>,
-    pub visale_id: Option<String>,
+    pub is_student: Option<bool>,
 }
 
 // # Impls

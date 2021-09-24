@@ -12,6 +12,7 @@ use crate::query::Query;
 use async_graphql::extensions::ApolloTracing;
 use async_graphql::EmptySubscription;
 use async_graphql::Schema;
+use interfaces::LegalIdentityInterface;
 use piteo::Pg;
 use piteo::Provider;
 use std::fs::File;
@@ -28,6 +29,7 @@ pub fn build_schema() -> Result<PiteoSchema> {
 
     let schema = Schema::build(Query, Mutation, EmptySubscription)
         .register_type::<PersonInterface>()
+        .register_type::<LegalIdentityInterface>()
         .extension(ApolloTracing)
         .data(db_pool)
         .finish();

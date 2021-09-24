@@ -20,10 +20,12 @@ use piteo_core::properties::CreatePropertyInput;
 use piteo_core::properties::DeletePropertyInput;
 use piteo_core::properties::UpdatePropertyInput;
 use piteo_core::tenants;
+use piteo_core::tenants::CreateCandidacyInput;
 use piteo_core::tenants::CreateTenantInput;
 use piteo_core::tenants::DeleteTenantInput;
 use piteo_core::tenants::UpdateTenantInput;
 use piteo_core::AuthId;
+use piteo_core::Candidacy;
 use piteo_core::Lease;
 use piteo_core::LeaseId;
 use piteo_core::Lender;
@@ -47,6 +49,12 @@ pub async fn create_user_with_account(
     input: CreateUserWithAccountInput,
 ) -> Result<Person, Error> {
     auth::create_user_with_account(&Pg::new(db_pool.clone()), &Stripe::init(), input).await
+}
+
+// # Candidacies
+
+pub fn create_candidacy(db_pool: &DbPool, input: CreateCandidacyInput) -> Result<Candidacy, Error> {
+    tenants::create_candidacy(&Pg::new(db_pool.clone()), input)
 }
 
 // # Tenants

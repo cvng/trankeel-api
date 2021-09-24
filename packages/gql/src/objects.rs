@@ -116,7 +116,7 @@ impl From<piteo::Address> for Address {
 #[derive(async_graphql::SimpleObject)]
 pub struct Company {
     address: Option<Address>,
-    display_name: String,
+    pub display_name: String,
     email: Email,
     id: ID,
     legal_entity: String,
@@ -419,8 +419,8 @@ impl From<piteo::Lender> for Lender {
     }
 }
 
-impl From<piteo::LenderWithLegalIdentity> for Lender {
-    fn from(item: piteo::LenderWithLegalIdentity) -> Self {
+impl From<piteo::LenderWithIdentity> for Lender {
+    fn from(item: piteo::LenderWithIdentity) -> Self {
         Self(item.0, Some(item.1))
     }
 }
@@ -431,13 +431,13 @@ impl From<piteo::LenderWithLegalIdentity> for Lender {
 pub struct Person {
     auth_id: Option<AuthId>,
     email: Email,
-    first_name: Option<String>,
-    last_name: Option<String>,
+    pub first_name: String,
+    pub last_name: String,
     address: Option<Address>,
     #[graphql(name = "photoURL")]
     photo_url: Option<Url>,
     role: Option<PersonRole>,
-    id: ID,
+    pub id: ID,
     phone_number: Option<PhoneNumber>,
     account_id: ID,
     pub display_name: String,
@@ -484,6 +484,11 @@ pub struct Plan {
     title: Option<String>,
     id: ID,
     features: Vec<Feature>,
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Advertisement {
+    id: ID,
 }
 
 pub struct Property(piteo::Property);
@@ -716,20 +721,26 @@ pub struct Task {
 }
 
 #[derive(async_graphql::SimpleObject)]
+pub struct Candidacy {
+    id: ID,
+}
+
+#[derive(async_graphql::SimpleObject)]
 pub struct Tenant {
     account_id: ID,
     apl: Option<bool>,
     birthdate: Date,
     birthplace: Option<String>,
     email: Email,
-    first_name: String,
-    last_name: String,
-    display_name: String,
+    pub first_name: String,
+    pub last_name: String,
+    pub display_name: String,
     note: Option<String>,
     phone_number: Option<PhoneNumber>,
-    id: ID,
+    pub id: ID,
     lease_id: Option<ID>,
-    visale_id: Option<String>,
+    is_student: Option<bool>,
+    warrants: Vec<Warrant>,
     //
     account: Option<Account>,
     property: Option<Property>,
@@ -760,7 +771,8 @@ impl From<piteo::Tenant> for Tenant {
             phone_number: item.phone_number.map(Into::into),
             id: item.id.into(),
             lease_id: item.lease_id.map(Into::into),
-            visale_id: item.visale_id,
+            is_student: Some(item.is_student),
+            warrants: Vec::new(),
             account: None,
             property: None,
             status: Some(TenantStatus::New),
@@ -771,6 +783,24 @@ impl From<piteo::Tenant> for Tenant {
             unpaid_rent_amount: None,
             files: None,
             lease: None,
+        }
+    }
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Warrant {
+    id: ID,
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct WarrantCompany {
+    identifier: String,
+}
+
+impl From<piteo::WarrantCompany> for WarrantCompany {
+    fn from(item: piteo::WarrantCompany) -> Self {
+        Self {
+            identifier: item.identifier,
         }
     }
 }

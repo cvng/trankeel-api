@@ -12,7 +12,7 @@ CREATE TABLE tenants (
     note TEXT,
     phone_number TEXT,
     lease_id UUID REFERENCES leases(id) ON DELETE SET NULL,
-    visale_id TEXT
+    is_student BOOLEAN NOT NULL DEFAULT false
 );
 
 SELECT diesel_manage_updated_at('tenants');

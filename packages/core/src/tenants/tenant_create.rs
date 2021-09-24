@@ -1,3 +1,4 @@
+use super::CreateWarrantInput;
 use crate::database::Db;
 use crate::AuthId;
 use crate::Date;
@@ -22,7 +23,8 @@ pub struct CreateTenantInput {
     pub last_name: String,
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
-    pub visale_id: Option<String>,
+    pub is_student: Option<bool>,
+    pub warrants: Option<Vec<CreateWarrantInput>>,
 }
 
 // # Operation
@@ -49,7 +51,7 @@ pub fn create_tenant(
         last_name: input.last_name,
         note: input.note,
         phone_number: input.phone_number,
-        visale_id: input.visale_id,
+        is_student: input.is_student.unwrap_or_default(),
         lease_id: None,
     })
 }
