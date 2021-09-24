@@ -212,16 +212,6 @@ joinable!(tenants -> accounts (account_id));
 joinable!(tenants -> leases (lease_id));
 
 allow_tables_to_appear_in_same_query!(
-    accounts,
-    companies,
-    events,
-    files,
-    leases,
-    lenders,
-    payments,
-    persons,
-    plans,
-    properties,
-    rents,
-    tenants,
+    accounts, companies, events, files, leases, lenders, payments, persons, plans, properties,
+    rents, tenants,
 );
