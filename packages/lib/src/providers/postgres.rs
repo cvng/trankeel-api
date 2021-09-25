@@ -58,6 +58,7 @@ use piteo_core::PersonData;
 use piteo_core::PersonId;
 use piteo_core::Plan;
 use piteo_core::PlanId;
+use piteo_core::ProfessionalWarrant;
 use piteo_core::Property;
 use piteo_core::PropertyData;
 use piteo_core::PropertyId;
@@ -327,33 +328,51 @@ impl database::WarrantStore for WarrantStore<'_> {
     }
 
     fn create(&mut self, data: WarrantWithIdentity) -> Result<WarrantWithIdentity> {
-        let warrant = insert_into(warrants::table)
-            .values(data.0.clone())
-            .get_result(&self.0.get()?)?;
-
-        let identity = match (data.0.type_, data.1) {
+        match (data.0.type_, data.1) {
             (WarrantType::Person, WarrantIdentity::Individual(person)) => {
                 let person = insert_into(persons::table)
                     .values(person)
-                    .get_result(&self.0.get()?)?;
-                WarrantIdentity::Individual(person)
-            }
-            (WarrantType::Visale, WarrantIdentity::Professional(visale)) => {
-                let visale = insert_into(professional_warrants::table)
-                    .values(visale)
-                    .get_result(&self.0.get()?)?;
-                WarrantIdentity::Professional(visale)
-            }
-            (WarrantType::Company, WarrantIdentity::Professional(company)) => {
-                let company = insert_into(professional_warrants::table)
-                    .values(company)
-                    .get_result(&self.0.get()?)?;
-                WarrantIdentity::Professional(company)
-            }
-            _ => return Err(Error::new(NotFound)),
-        };
+                    .get_result::<Person>(&self.0.get()?)?;
 
-        Ok((warrant, identity))
+                let warrant = insert_into(warrants::table)
+                    .values(Warrant {
+                        individual_id: Some(person.id),
+                        ..data.0
+                    })
+                    .get_result(&self.0.get()?)?;
+
+                Ok((warrant, WarrantIdentity::Individual(person)))
+            }
+            (WarrantType::Visale, WarrantIdentity::Professional(professional)) => {
+                let professional = insert_into(professional_warrants::table)
+                    .values(professional)
+                    .get_result::<ProfessionalWarrant>(&self.0.get()?)?;
+
+                let warrant = insert_into(warrants::table)
+                    .values(Warrant {
+                        professional_id: Some(professional.id),
+                        ..data.0
+                    })
+                    .get_result(&self.0.get()?)?;
+
+                Ok((warrant, WarrantIdentity::Professional(professional)))
+            }
+            (WarrantType::Company, WarrantIdentity::Professional(professional)) => {
+                let professional = insert_into(professional_warrants::table)
+                    .values(professional)
+                    .get_result::<ProfessionalWarrant>(&self.0.get()?)?;
+
+                let warrant = insert_into(warrants::table)
+                    .values(Warrant {
+                        professional_id: Some(professional.id),
+                        ..data.0
+                    })
+                    .get_result(&self.0.get()?)?;
+
+                Ok((warrant, WarrantIdentity::Professional(professional)))
+            }
+            _ => Err(Error::new(NotFound)),
+        }
     }
 }
 
