@@ -17,6 +17,12 @@ pub enum CandidacyStatus {
     Accepted,
 }
 
+impl Default for CandidacyStatus {
+    fn default() -> Self {
+        Self::Pending
+    }
+}
+
 #[derive(Clone, Debug, Insertable, Queryable)]
 #[table_name = "candidacies"]
 pub struct Candidacy {

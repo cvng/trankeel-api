@@ -137,8 +137,13 @@ impl Mutation {
         Ok(piteo::update_individual_lender(db_pool, auth_id, input)?.into())
     }
 
-    async fn candidacy_create(&self, _input: CreateCandidacyInput) -> Result<Candidacy> {
-        Err(wip())
+    async fn candidacy_create(
+        &self,
+        ctx: &Context<'_>,
+        input: CreateCandidacyInput,
+    ) -> Result<Candidacy> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(piteo::create_candidacy(db_pool, input)?.into())
     }
 
     async fn transaction_create(&self, _input: TransactionInput) -> Result<Payment> {

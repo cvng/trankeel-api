@@ -19,10 +19,10 @@ pub struct Advertisement {
     pub published: bool,
     pub lease_type: LeaseType,
     pub rent_amount: Amount,
-    pub rent_charges_amount: Amount,
-    pub deposit_amount: Amount,
+    pub rent_charges_amount: Option<Amount>,
+    pub deposit_amount: Option<Amount>,
     pub effect_date: DateTime,
-    pub flexibility: LenderFlexibility,
+    pub flexibility: Option<LenderFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: PropertyId,
 }

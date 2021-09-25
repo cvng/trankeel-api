@@ -66,6 +66,7 @@ pub trait Db {
 pub trait AccountStore {
     fn by_id(&mut self, id: &AccountId) -> Result<Account>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Account>;
+    fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId) -> Result<Account>;
     fn create(&mut self, data: Account) -> Result<Account>;
     fn update(&mut self, data: AccountData) -> Result<Account>;
 }
@@ -92,11 +93,14 @@ pub trait LenderStore {
 
 pub trait AdvertisementStore {
     fn by_id(&mut self, id: &AdvertisementId) -> Result<Advertisement>;
+    fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Advertisement>>;
+    fn create(&mut self, data: Advertisement) -> Result<Advertisement>;
 }
 
 pub trait CandidacyStore {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Candidacy>>;
+    fn create(&mut self, data: Candidacy) -> Result<Candidacy>;
 }
 
 pub trait PropertyStore {
@@ -118,6 +122,7 @@ pub trait TenantStore {
 
 pub trait WarrantStore {
     fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Vec<WarrantWithIdentity>>;
+    fn create(&mut self, data: WarrantWithIdentity) -> Result<WarrantWithIdentity>;
 }
 
 pub trait LeaseStore {

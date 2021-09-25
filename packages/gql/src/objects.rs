@@ -465,7 +465,7 @@ impl From<piteo::Person> for Person {
     fn from(item: piteo::Person) -> Self {
         Self {
             display_name: item.display_name(),
-            auth_id: Some(item.auth_id),
+            auth_id: item.auth_id,
             email: item.email,
             first_name: item.first_name,
             last_name: item.last_name,
@@ -498,10 +498,10 @@ pub struct Advertisement {
     published: bool,
     lease_type: LeaseType,
     rent_amount: Amount,
-    rent_charges_amount: Amount,
-    deposit_amount: Amount,
+    rent_charges_amount: Option<Amount>,
+    deposit_amount: Option<Amount>,
     effect_date: DateTime,
-    flexibility: LenderFlexibility,
+    flexibility: Option<LenderFlexibility>,
     referral_lease_id: Option<ID>,
     property_id: ID,
 }
@@ -650,6 +650,15 @@ impl Property {
                 .into_iter()
                 .map(Into::into)
                 .collect::<Vec<_>>(),
+        ))
+    }
+    async fn advertisements(&self, ctx: &Context<'_>) -> Result<Option<Vec<Advertisement>>> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(Some(
+            db(db_pool)
+                .advertisements()
+                .by_property_id(&self.0.id)
+                .and_then(map_res)?,
         ))
     }
 }
@@ -873,24 +882,17 @@ impl From<piteo::WarrantWithIdentity> for Warrant {
 }
 
 #[derive(async_graphql::SimpleObject)]
-pub struct WarrantCompany {
+pub struct ProfessionalWarrant {
+    name: String,
     identifier: String,
 }
 
-impl From<piteo::WarrantCompany> for WarrantCompany {
-    fn from(item: piteo::WarrantCompany) -> Self {
-        Self { identifier: item }
-    }
-}
-
-#[derive(async_graphql::SimpleObject)]
-pub struct Visale {
-    identifier: String,
-}
-
-impl From<piteo::Visale> for Visale {
-    fn from(item: piteo::Visale) -> Self {
-        Self { identifier: item }
+impl From<piteo::ProfessionalWarrant> for ProfessionalWarrant {
+    fn from(item: piteo::ProfessionalWarrant) -> Self {
+        Self {
+            name: item.name,
+            identifier: item.identifier,
+        }
     }
 }
 

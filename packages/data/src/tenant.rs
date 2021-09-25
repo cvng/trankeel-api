@@ -8,19 +8,27 @@ use crate::LeaseId;
 use crate::Name;
 use crate::PhoneNumber;
 use async_graphql::Enum;
+use diesel_enum_derive::DieselEnum;
 use serde::Deserialize;
+use serde::Serialize;
 
 // # Types
 
 pub type TenantId = Id;
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
 pub enum TenantStatus {
     Candidate,
     Gone,
     Late,
     New,
     Uptodate,
+}
+
+impl Default for TenantStatus {
+    fn default() -> Self {
+        Self::New
+    }
 }
 
 #[derive(Clone, Debug, Insertable, Queryable)]
@@ -37,11 +45,12 @@ pub struct Tenant {
     pub last_name: String,
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
+    pub status: TenantStatus,
     pub lease_id: Option<LeaseId>,
     pub is_student: Option<bool>,
 }
 
-#[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
+#[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
 #[table_name = "tenants"]
 pub struct TenantData {
     pub id: TenantId,
@@ -54,6 +63,7 @@ pub struct TenantData {
     pub last_name: Option<String>,
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
+    pub status: Option<TenantStatus>,
     pub lease_id: Option<LeaseId>,
     pub is_student: Option<bool>,
 }

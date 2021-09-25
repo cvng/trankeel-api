@@ -22,6 +22,7 @@ use piteo_core::schema::lenders;
 use piteo_core::schema::payments;
 use piteo_core::schema::persons;
 use piteo_core::schema::plans;
+use piteo_core::schema::professional_warrants;
 use piteo_core::schema::properties;
 use piteo_core::schema::rents;
 use piteo_core::schema::tenants;
@@ -205,6 +206,15 @@ impl database::AccountStore for AccountStore<'_> {
             .first(&self.0.get()?)?)
     }
 
+    fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(properties::table.on(properties::account_id.eq(accounts::id)))
+            .left_join(advertisements::table.on(advertisements::property_id.eq(properties::id)))
+            .filter(advertisements::id.eq(&advertisement_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn create(&mut self, data: Account) -> Result<Account> {
         Ok(insert_into(accounts::table)
             .values(data)
@@ -286,47 +296,84 @@ impl database::WarrantStore for WarrantStore<'_> {
             .filter(warrants::tenant_id.eq(tenant_id))
             .load::<Warrant>(&self.0.get()?)?
             .into_iter()
-            .map(
-                |warrant| match (warrant.type_, warrant.person_id, warrant.identifier.clone()) {
-                    (WarrantType::Person, Some(person_id), _) => {
-                        let person = persons::table.find(person_id).first(&self.0.get()?)?;
-                        Ok((warrant, WarrantIdentity::Person(person)))
+            .map(|warrant| {
+                let identity = match (
+                    warrant.type_,
+                    warrant.individual_id,
+                    warrant.professional_id,
+                ) {
+                    (WarrantType::Person, Some(individual_id), _) => {
+                        let person = persons::table.find(individual_id).first(&self.0.get()?)?;
+                        WarrantIdentity::Individual(person)
                     }
-                    (WarrantType::Visale, _, Some(identifier)) => {
-                        let visale = identifier;
-                        Ok((warrant, WarrantIdentity::Visale(visale)))
+                    (WarrantType::Visale, _, Some(professional_id)) => {
+                        let visale = professional_warrants::table
+                            .find(professional_id)
+                            .first(&self.0.get()?)?;
+                        WarrantIdentity::Professional(visale)
                     }
-                    (WarrantType::Company, _, Some(identifier)) => {
-                        let company = identifier;
-                        Ok((warrant, WarrantIdentity::Company(company)))
+                    (WarrantType::Company, _, Some(professional_id)) => {
+                        let company = professional_warrants::table
+                            .find(professional_id)
+                            .first(&self.0.get()?)?;
+                        WarrantIdentity::Professional(company)
                     }
-                    _ => Err(Error::new(NotFound)),
-                },
-            )
+                    _ => return Err(Error::new(NotFound)),
+                };
+
+                Ok((warrant, identity))
+            })
             .collect()
+    }
+
+    fn create(&mut self, data: WarrantWithIdentity) -> Result<WarrantWithIdentity> {
+        let warrant = insert_into(warrants::table)
+            .values(data.0.clone())
+            .get_result(&self.0.get()?)?;
+
+        let identity = match (data.0.type_, data.1) {
+            (WarrantType::Person, WarrantIdentity::Individual(person)) => {
+                let person = insert_into(persons::table)
+                    .values(person)
+                    .get_result(&self.0.get()?)?;
+                WarrantIdentity::Individual(person)
+            }
+            (WarrantType::Visale, WarrantIdentity::Professional(visale)) => {
+                let visale = insert_into(professional_warrants::table)
+                    .values(visale)
+                    .get_result(&self.0.get()?)?;
+                WarrantIdentity::Professional(visale)
+            }
+            (WarrantType::Company, WarrantIdentity::Professional(company)) => {
+                let company = insert_into(professional_warrants::table)
+                    .values(company)
+                    .get_result(&self.0.get()?)?;
+                WarrantIdentity::Professional(company)
+            }
+            _ => return Err(Error::new(NotFound)),
+        };
+
+        Ok((warrant, identity))
     }
 }
 
 impl database::LenderStore for LenderStore<'_> {
     fn by_id(&mut self, id: &LenderId) -> Result<LenderWithIdentity> {
         let lender: Lender = lenders::table.find(id).first(&self.0.get()?)?;
-        match lender {
-            Lender {
-                individual_id: Some(individual_id),
-                ..
-            } => {
+
+        let identity = match (lender.individual_id, lender.company_id) {
+            (Some(individual_id), _) => {
                 let person = persons::table.find(individual_id).first(&self.0.get()?)?;
-                Ok((lender, LegalIdentity::Individual(person)))
+                LegalIdentity::Individual(person)
             }
-            Lender {
-                company_id: Some(company_id),
-                ..
-            } => {
+            (_, Some(company_id)) => {
                 let company = companies::table.find(company_id).first(&self.0.get()?)?;
-                Ok((lender, LegalIdentity::Company(company)))
+                LegalIdentity::Company(company)
             }
-            _ => Err(Error::new(NotFound)),
-        }
+            _ => return Err(Error::new(NotFound)),
+        };
+
+        Ok((lender, identity))
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderWithIdentity>> {
@@ -363,6 +410,18 @@ impl database::AdvertisementStore for AdvertisementStore<'_> {
     fn by_id(&mut self, id: &AdvertisementId) -> Result<Advertisement> {
         Ok(advertisements::table.find(id).first(&self.0.get()?)?)
     }
+
+    fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Advertisement>> {
+        Ok(advertisements::table
+            .filter(advertisements::property_id.eq(property_id))
+            .load(&self.0.get()?)?)
+    }
+
+    fn create(&mut self, data: Advertisement) -> Result<Advertisement> {
+        Ok(insert_into(advertisements::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
+    }
 }
 
 impl database::CandidacyStore for CandidacyStore<'_> {
@@ -384,6 +443,12 @@ impl database::CandidacyStore for CandidacyStore<'_> {
             .left_join(properties::table.on(properties::id.eq(advertisements::property_id)))
             .filter(properties::id.eq(property_id))
             .load(&self.0.get()?)?)
+    }
+
+    fn create(&mut self, data: Candidacy) -> Result<Candidacy> {
+        Ok(insert_into(candidacies::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
     }
 }
 

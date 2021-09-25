@@ -1,12 +1,13 @@
 use crate::common::Id;
 use crate::Amount;
 use async_graphql::Enum;
+use diesel_enum_derive::DieselEnum;
 
 // # Types
 
 pub type PlanId = Id;
 
-#[derive(Copy, Clone, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
 pub enum PlanCode {
     Solo,
 }
@@ -14,7 +15,7 @@ pub enum PlanCode {
 #[derive(Queryable)]
 pub struct Plan {
     pub id: PlanId,
-    pub code: String,
+    pub code: PlanCode,
     pub price: Option<Amount>,
     pub subtitle: Option<String>,
     pub title: Option<String>,

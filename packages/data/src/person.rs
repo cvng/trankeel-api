@@ -26,6 +26,7 @@ pub enum PersonRole {
     Tenant,
     User,
     Viewer,
+    Warrant,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, DieselNewType)]
@@ -37,7 +38,7 @@ pub struct Person {
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
-    pub auth_id: AuthId,
+    pub auth_id: Option<AuthId>,
     pub email: Email,
     pub first_name: String,
     pub last_name: String,

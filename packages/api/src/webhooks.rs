@@ -75,7 +75,7 @@ async fn on_receipt_created(db_pool: &DbPool, receipt: &Receipt) {
         .by_account_id(&lease.account_id)
         .map(|mut users| users.remove(0))
         .unwrap();
-    let auth_id = &user.auth_id;
+    let auth_id = &user.auth_id.unwrap();
 
     piteo::send_receipts(db_pool, auth_id, input).await.ok();
 }

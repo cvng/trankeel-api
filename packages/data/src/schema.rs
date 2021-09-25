@@ -19,10 +19,10 @@ table! {
         published -> Bool,
         lease_type -> Text,
         rent_amount -> Numeric,
-        rent_charges_amount -> Numeric,
-        deposit_amount -> Numeric,
+        rent_charges_amount -> Nullable<Numeric>,
+        deposit_amount -> Nullable<Numeric>,
         effect_date -> Timestamptz,
-        flexibility -> Text,
+        flexibility -> Nullable<Text>,
         referral_lease_id -> Nullable<Uuid>,
         property_id -> Uuid,
     }
@@ -137,7 +137,7 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
-        auth_id -> Text,
+        auth_id -> Nullable<Text>,
         email -> Text,
         first_name -> Text,
         last_name -> Text,
@@ -155,6 +155,16 @@ table! {
         price -> Nullable<Numeric>,
         subtitle -> Nullable<Text>,
         title -> Nullable<Text>,
+    }
+}
+
+table! {
+    professional_warrants (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        name -> Text,
+        identifier -> Text,
     }
 }
 
@@ -220,6 +230,7 @@ table! {
         last_name -> Text,
         note -> Nullable<Text>,
         phone_number -> Nullable<Text>,
+        status -> Text,
         lease_id -> Nullable<Uuid>,
         is_student -> Nullable<Bool>,
     }
@@ -232,9 +243,9 @@ table! {
         updated_at -> Nullable<Timestamptz>,
         #[sql_name = "type"]
         type_ -> Text,
-        identifier -> Nullable<Text>,
-        person_id -> Nullable<Uuid>,
         tenant_id -> Uuid,
+        individual_id -> Nullable<Uuid>,
+        professional_id -> Nullable<Uuid>,
     }
 }
 
@@ -257,7 +268,8 @@ joinable!(properties -> lenders (lender_id));
 joinable!(rents -> leases (lease_id));
 joinable!(tenants -> accounts (account_id));
 joinable!(tenants -> leases (lease_id));
-joinable!(warrants -> persons (person_id));
+joinable!(warrants -> persons (individual_id));
+joinable!(warrants -> professional_warrants (professional_id));
 joinable!(warrants -> tenants (tenant_id));
 
 allow_tables_to_appear_in_same_query!(
@@ -272,6 +284,7 @@ allow_tables_to_appear_in_same_query!(
     payments,
     persons,
     plans,
+    professional_warrants,
     properties,
     rents,
     tenants,
