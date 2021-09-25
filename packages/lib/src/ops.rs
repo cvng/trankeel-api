@@ -16,6 +16,7 @@ use piteo_core::leases::UpdateFurnishedLeaseInput;
 use piteo_core::owners;
 use piteo_core::owners::UpdateIndividualLenderInput;
 use piteo_core::properties;
+use piteo_core::properties::CreateAdvertisementInput;
 use piteo_core::properties::CreatePropertyInput;
 use piteo_core::properties::DeletePropertyInput;
 use piteo_core::properties::UpdatePropertyInput;
@@ -24,6 +25,7 @@ use piteo_core::tenants::CreateCandidacyInput;
 use piteo_core::tenants::CreateTenantInput;
 use piteo_core::tenants::DeleteTenantInput;
 use piteo_core::tenants::UpdateTenantInput;
+use piteo_core::Advertisement;
 use piteo_core::AuthId;
 use piteo_core::Candidacy;
 use piteo_core::Lease;
@@ -64,7 +66,7 @@ pub fn create_tenant(
     auth_id: &AuthId,
     input: CreateTenantInput,
 ) -> Result<Tenant, Error> {
-    tenants::create_tenant(&Pg::new(db_pool.clone()), auth_id, input)
+    tenants::create_tenant(&Pg::new(db_pool.clone()), auth_id, input, None)
 }
 
 pub fn update_tenant(
@@ -107,6 +109,14 @@ pub fn delete_property(
         auth_id,
         DeletePropertyInput { id },
     )
+}
+
+pub fn create_advertisement(
+    db_pool: &DbPool,
+    auth_id: &AuthId,
+    input: CreateAdvertisementInput,
+) -> Result<Advertisement, Error> {
+    properties::create_advertisement(&Pg::new(db_pool.clone()), auth_id, input)
 }
 
 // # Leases

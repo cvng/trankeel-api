@@ -14,7 +14,8 @@
       "matklad.rust-analyzer",
       "vadimcn.vscode-lldb",
       "graphql.vscode-graphql",
-      "dbaeumer.vscode-eslint"
+      "dbaeumer.vscode-eslint",
+      "prisma.prisma"
     ]
   }
 }

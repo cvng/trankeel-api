@@ -58,6 +58,7 @@ impl From<UpdateTenantInput> for TenantData {
             phone_number: item.phone_number,
             is_student: item.is_student,
             lease_id: None,
+            status: None,
         }
     }
 }

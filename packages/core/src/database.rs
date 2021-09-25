@@ -2,7 +2,10 @@ use eyre::Error;
 use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::AccountId;
+use piteo_data::Advertisement;
+use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
+use piteo_data::Candidacy;
 use piteo_data::Company;
 use piteo_data::CompanyId;
 use piteo_data::Event;
@@ -34,6 +37,7 @@ use piteo_data::RentId;
 use piteo_data::Tenant;
 use piteo_data::TenantData;
 use piteo_data::TenantId;
+use piteo_data::WarrantWithIdentity;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -47,6 +51,9 @@ pub trait Db {
     fn companies(&self) -> Box<dyn CompanyStore + '_>;
     fn lenders(&self) -> Box<dyn LenderStore + '_>;
     fn tenants(&self) -> Box<dyn TenantStore + '_>;
+    fn warrants(&self) -> Box<dyn WarrantStore + '_>;
+    fn advertisements(&self) -> Box<dyn AdvertisementStore + '_>;
+    fn candidacies(&self) -> Box<dyn CandidacyStore + '_>;
     fn properties(&self) -> Box<dyn PropertyStore + '_>;
     fn leases(&self) -> Box<dyn LeaseStore + '_>;
     fn rents(&self) -> Box<dyn RentStore + '_>;
@@ -59,6 +66,7 @@ pub trait Db {
 pub trait AccountStore {
     fn by_id(&mut self, id: &AccountId) -> Result<Account>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Account>;
+    fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId) -> Result<Account>;
     fn create(&mut self, data: Account) -> Result<Account>;
     fn update(&mut self, data: AccountData) -> Result<Account>;
 }
@@ -83,6 +91,18 @@ pub trait LenderStore {
     fn update(&mut self, data: LenderData) -> Result<Lender>;
 }
 
+pub trait AdvertisementStore {
+    fn by_id(&mut self, id: &AdvertisementId) -> Result<Advertisement>;
+    fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Advertisement>>;
+    fn create(&mut self, data: Advertisement) -> Result<Advertisement>;
+}
+
+pub trait CandidacyStore {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>>;
+    fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Candidacy>>;
+    fn create(&mut self, data: Candidacy) -> Result<Candidacy>;
+}
+
 pub trait PropertyStore {
     fn by_id(&mut self, id: &PropertyId) -> Result<Property>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Property>>;
@@ -98,6 +118,11 @@ pub trait TenantStore {
     fn create(&mut self, data: Tenant) -> Result<Tenant>;
     fn delete(&mut self, data: TenantId) -> Result<Deleted>;
     fn update(&mut self, data: TenantData) -> Result<Tenant>;
+}
+
+pub trait WarrantStore {
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Vec<WarrantWithIdentity>>;
+    fn create(&mut self, data: WarrantWithIdentity) -> Result<WarrantWithIdentity>;
 }
 
 pub trait LeaseStore {

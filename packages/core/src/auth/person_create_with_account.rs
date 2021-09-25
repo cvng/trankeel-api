@@ -64,7 +64,7 @@ pub async fn create_user_with_account(
         id: PersonId::new_v4(),
         created_at: Default::default(),
         updated_at: Default::default(),
-        auth_id: input.auth_id,
+        auth_id: Some(input.auth_id),
         email: input.email.clone().into(),
         first_name: input.first_name,
         last_name: input.last_name,

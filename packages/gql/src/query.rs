@@ -18,6 +18,7 @@ use async_graphql::ID;
 use piteo::database::Db;
 use piteo::db;
 use piteo::reports;
+use piteo::AdvertisementId;
 use piteo::AuthId;
 use piteo::DateTime;
 use piteo::DbPool;
@@ -39,12 +40,33 @@ impl Query {
             .map(Person::from)?)
     }
 
-    async fn advertisement(&self, _ctx: &Context<'_>, _id: ID) -> Result<Advertisement> {
-        todo!()
+    async fn advertisement(&self, ctx: &Context<'_>, id: ID) -> Result<Advertisement> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(db(db_pool)
+            .advertisements()
+            .by_id(&id.parse::<AdvertisementId>()?)?
+            .into())
     }
 
-    async fn candidacies(&self, _ctx: &Context<'_>, _property_id: ID) -> Result<Vec<Candidacy>> {
-        todo!()
+    async fn candidacies(
+        &self,
+        ctx: &Context<'_>,
+        property_id: Option<ID>,
+    ) -> Result<Vec<Candidacy>> {
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+
+        if let Some(property_id) = property_id {
+            Ok(db(db_pool)
+                .candidacies()
+                .by_property_id(&property_id.parse::<PropertyId>()?)
+                .and_then(map_res)?)
+        } else {
+            Ok(db(db_pool)
+                .candidacies()
+                .by_auth_id(auth_id)
+                .and_then(map_res)?)
+        }
     }
 
     async fn properties(
@@ -55,10 +77,12 @@ impl Query {
     ) -> Result<Vec<Property>> {
         let db_pool = ctx.data::<DbPool>()?;
         let auth_id = ctx.data::<AuthId>()?;
-        let id = id.map(|id| PropertyId::parse_str(&id).unwrap_or_default());
 
         if let Some(id) = id {
-            Ok(vec![db(db_pool).properties().by_id(&id)?.into()])
+            Ok(vec![db(db_pool)
+                .properties()
+                .by_id(&id.parse::<PropertyId>()?)?
+                .into()])
         } else {
             Ok(db(db_pool)
                 .properties()

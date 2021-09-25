@@ -1,3 +1,4 @@
+use crate::query::map_res;
 use crate::unions::Eventable;
 use crate::unions::LegalIdentity;
 use crate::unions::WarrantIdentity;
@@ -9,6 +10,7 @@ use piteo::db;
 use piteo::AccountStatus;
 use piteo::Amount;
 use piteo::AuthId;
+use piteo::CandidacyStatus;
 use piteo::Date;
 use piteo::DateTime;
 use piteo::DbPool;
@@ -24,6 +26,7 @@ use piteo::LeaseRentReferenceIrl;
 use piteo::LeaseStatus;
 use piteo::LeaseType;
 use piteo::LegalEntityType;
+use piteo::LenderFlexibility;
 use piteo::Name;
 use piteo::PersonRole;
 use piteo::PhoneNumber;
@@ -462,7 +465,7 @@ impl From<piteo::Person> for Person {
     fn from(item: piteo::Person) -> Self {
         Self {
             display_name: item.display_name(),
-            auth_id: Some(item.auth_id),
+            auth_id: item.auth_id,
             email: item.email,
             first_name: item.first_name,
             last_name: item.last_name,
@@ -490,6 +493,63 @@ pub struct Plan {
 #[derive(async_graphql::SimpleObject)]
 pub struct Advertisement {
     id: ID,
+    created_at: Option<DateTime>,
+    updated_at: Option<DateTime>,
+    published: bool,
+    lease_type: LeaseType,
+    rent_amount: Amount,
+    rent_charges_amount: Option<Amount>,
+    deposit_amount: Option<Amount>,
+    effect_date: DateTime,
+    flexibility: Option<LenderFlexibility>,
+    referral_lease_id: Option<ID>,
+    property_id: ID,
+}
+
+impl From<piteo::Advertisement> for Advertisement {
+    fn from(item: piteo::Advertisement) -> Self {
+        Self {
+            id: item.id.into(),
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            published: item.published,
+            lease_type: item.lease_type,
+            rent_amount: item.rent_amount,
+            rent_charges_amount: item.rent_charges_amount,
+            deposit_amount: item.deposit_amount,
+            effect_date: item.effect_date,
+            flexibility: item.flexibility,
+            referral_lease_id: item.referral_lease_id.map(Into::into),
+            property_id: item.property_id.into(),
+        }
+    }
+}
+
+#[derive(async_graphql::SimpleObject)]
+pub struct Candidacy {
+    id: ID,
+    created_at: Option<DateTime>,
+    updated_at: Option<DateTime>,
+    status: CandidacyStatus,
+    advertisement_id: ID,
+    tenant_id: ID,
+    move_in_date: DateTime,
+    description: String,
+}
+
+impl From<piteo::Candidacy> for Candidacy {
+    fn from(item: piteo::Candidacy) -> Self {
+        Self {
+            id: item.id.into(),
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            status: item.status,
+            advertisement_id: item.advertisement_id.into(),
+            tenant_id: item.tenant_id.into(),
+            move_in_date: item.move_in_date,
+            description: item.description,
+        }
+    }
 }
 
 pub struct Property(piteo::Property);
@@ -590,6 +650,15 @@ impl Property {
                 .into_iter()
                 .map(Into::into)
                 .collect::<Vec<_>>(),
+        ))
+    }
+    async fn advertisements(&self, ctx: &Context<'_>) -> Result<Option<Vec<Advertisement>>> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(Some(
+            db(db_pool)
+                .advertisements()
+                .by_property_id(&self.0.id)
+                .and_then(map_res)?,
         ))
     }
 }
@@ -722,11 +791,7 @@ pub struct Task {
 }
 
 #[derive(async_graphql::SimpleObject)]
-pub struct Candidacy {
-    id: ID,
-}
-
-#[derive(async_graphql::SimpleObject)]
+#[graphql(complex)]
 pub struct Tenant {
     account_id: ID,
     apl: Option<bool>,
@@ -741,7 +806,6 @@ pub struct Tenant {
     pub id: ID,
     lease_id: Option<ID>,
     is_student: Option<bool>,
-    warrants: Option<Vec<Warrant>>,
     //
     account: Option<Account>,
     property: Option<Property>,
@@ -754,6 +818,19 @@ pub struct Tenant {
     unpaid_rent_amount: Option<u32>,
     files: Option<Vec<File>>,
     lease: Option<Lease>,
+}
+
+#[async_graphql::ComplexObject]
+impl Tenant {
+    async fn warrants(&self, ctx: &Context<'_>) -> Result<Option<Vec<Warrant>>> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(Some(
+            db(db_pool)
+                .warrants()
+                .by_tenant_id(&self.id.to_string().parse::<LeaseId>()?)
+                .and_then(map_res)?,
+        ))
+    }
 }
 
 impl From<piteo::Tenant> for Tenant {
@@ -773,7 +850,6 @@ impl From<piteo::Tenant> for Tenant {
             id: item.id.into(),
             lease_id: item.lease_id.map(Into::into),
             is_student: item.is_student,
-            warrants: None,
             account: None,
             property: None,
             status: Some(TenantStatus::New),
@@ -795,27 +871,28 @@ pub struct Warrant {
     identity: WarrantIdentity,
 }
 
-#[derive(async_graphql::SimpleObject)]
-pub struct WarrantCompany {
-    identifier: String,
-}
-
-impl From<piteo::WarrantCompany> for WarrantCompany {
-    fn from(item: piteo::WarrantCompany) -> Self {
+impl From<piteo::WarrantWithIdentity> for Warrant {
+    fn from(item: piteo::WarrantWithIdentity) -> Self {
         Self {
-            identifier: item.identifier,
+            id: item.0.id.into(),
+            r#type: item.0.type_,
+            identity: item.1.into(),
         }
     }
 }
 
 #[derive(async_graphql::SimpleObject)]
-pub struct Visale {
+pub struct ProfessionalWarrant {
+    name: String,
     identifier: String,
 }
 
-impl From<piteo::Visale> for Visale {
-    fn from(item: piteo::Visale) -> Self {
-        Self { identifier: item }
+impl From<piteo::ProfessionalWarrant> for ProfessionalWarrant {
+    fn from(item: piteo::ProfessionalWarrant) -> Self {
+        Self {
+            name: item.name,
+            identifier: item.identifier,
+        }
     }
 }
 

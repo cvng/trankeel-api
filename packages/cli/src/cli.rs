@@ -3,10 +3,13 @@ use piteo::auth::AddressInput;
 use piteo::auth::CreateUserWithAccountInput;
 use piteo::database::Db;
 use piteo::leases::CreateFurnishedLeaseInput;
+use piteo::properties::CreateAdvertisementInput;
 use piteo::properties::CreatePropertyInput;
 use piteo::tenants::CreateTenantInput;
 use piteo::Amount;
 use piteo::AuthId;
+use piteo::LeaseType;
+use piteo::LenderFlexibility;
 use piteo::Pg;
 use piteo::PropertyBuildPeriodType;
 use piteo::PropertyBuildingLegalStatus;
@@ -135,9 +138,25 @@ async fn seed() {
     )
     .unwrap();
 
+    let advertisement = piteo::create_advertisement(
+        db_pool,
+        auth_id,
+        CreateAdvertisementInput {
+            published: true,
+            lease_type: LeaseType::Furnished,
+            rent_amount: Amount::new(360, 0),
+            rent_charges_amount: Some(Amount::new(90, 0)),
+            deposit_amount: None,
+            effect_date: Utc::now().into(),
+            flexibility: Some(LenderFlexibility::OneDay),
+            referral_lease_id: Some(lease.id),
+            property_id: property.id,
+        },
+    )
+    .unwrap();
+
     println!(
-        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",
-        user, lender, property, tenant, lease
+        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",
+        user, lender, property, tenant, lease, advertisement
     );
-    println!("🌱 Database seeded.");
 }

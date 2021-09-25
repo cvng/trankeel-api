@@ -14,6 +14,7 @@ use piteo_data::Rent;
 use piteo_data::Tenant;
 use piteo_data::TenantData;
 use piteo_data::TenantId;
+use piteo_data::TenantStatus;
 use validator::Validate;
 
 // # Input
@@ -97,6 +98,7 @@ fn add_lease_tenants(
             db.tenants().update(TenantData {
                 id: tenant_id,
                 lease_id: Some(lease_id),
+                status: Some(TenantStatus::Uptodate),
                 account_id: Default::default(),
                 apl: Default::default(),
                 birthdate: Default::default(),

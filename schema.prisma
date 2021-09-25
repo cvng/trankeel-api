@@ -1,0 +1,310 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at             DateTime? @default(now()) @db.Timestamptz
+  updated_at             DateTime? @db.Timestamptz
+  plan_id                String?   @db.Uuid
+  status                 String? // AccountStatus
+  stripe_customer_id     String?
+  stripe_subscription_id String?
+  trial_end              DateTime? @db.Timestamptz
+
+  plan       Plan?      @relation(fields: [plan_id], references: [id])
+  persons    Person[]
+  lenders    Lender[]
+  properties Property[]
+  leases     Lease[]
+  tenants    Tenant[]
+  events     Event[]
+
+  @@map("accounts")
+}
+
+model Advertisement {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at          DateTime? @default(now()) @db.Timestamptz
+  updated_at          DateTime? @db.Timestamptz
+  published           Boolean
+  lease_type          String // LeaseType
+  rent_amount         Decimal
+  rent_charges_amount Decimal?
+  deposit_amount      Decimal?
+  effect_date         DateTime  @db.Timestamptz
+  flexibility         String? // LenderFlexibility
+  referral_lease_id   String?   @db.Uuid
+  property_id         String    @db.Uuid
+
+  referral_lease Lease?      @relation(fields: [referral_lease_id], references: [id])
+  property       Property    @relation(fields: [property_id], references: [id])
+  candidacies    Candidacy[]
+
+  @@map("advertisements")
+}
+
+model Candidacy {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at       DateTime? @default(now()) @db.Timestamptz
+  updated_at       DateTime? @db.Timestamptz
+  status           String // CandidacyStatus
+  advertisement_id String    @db.Uuid
+  tenant_id        String    @db.Uuid
+  move_in_date     DateTime  @db.Timestamptz
+  description      String
+
+  advertisement Advertisement @relation(fields: [advertisement_id], references: [id])
+  tenant        Tenant        @relation(fields: [tenant_id], references: [id])
+
+  @@map("candidacies")
+}
+
+model Company {
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at              DateTime? @default(now()) @db.Timestamptz
+  updated_at              DateTime? @db.Timestamptz
+  address                 Json?     @db.JsonB
+  email                   String
+  legal_entity            String
+  legal_entity_identifier String?
+  legal_entity_type       String? // LegalEntityType
+  legal_entity_type_other String?
+  phone_number            String?
+
+  lenders Lender[]
+
+  @@map("companies")
+}
+
+model Event {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at     DateTime? @default(now()) @db.Timestamptz
+  updated_at     DateTime? @db.Timestamptz
+  account_id     String    @db.Uuid
+  eventable_id   String    @db.Uuid
+  eventable_type String // EventableType
+  type           String // EventType
+
+  account Account @relation(fields: [account_id], references: [id])
+
+  @@map("events")
+}
+
+model File {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at   DateTime? @default(now()) @db.Timestamptz
+  updated_at   DateTime? @db.Timestamptz
+  download_url String?
+  external_id  String?
+  filename     String?
+  preview_url  String?
+  status       String? // FileStatus
+  type         String // FileType
+
+  leases Lease[]
+
+  @@map("files")
+}
+
+model Lease {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at          DateTime? @default(now()) @db.Timestamptz
+  updated_at          DateTime? @db.Timestamptz
+  account_id          String    @db.Uuid
+  deposit_amount      Decimal?
+  effect_date         DateTime  @db.Timestamptz
+  signature_date      DateTime? @db.Timestamptz
+  rent_amount         Decimal
+  rent_charges_amount Decimal?
+  type                String // LeaseType
+  lease_id            String?   @db.Uuid
+  property_id         String    @db.Uuid
+  details             Json?     @db.JsonB
+  expired_at          DateTime? @db.Timestamptz
+  renew_date          DateTime? @db.Timestamptz
+  duration            String // FurnishedLeaseDuration
+
+  account        Account         @relation(fields: [account_id], references: [id])
+  lease          File?           @relation(fields: [lease_id], references: [id])
+  property       Property        @relation(fields: [property_id], references: [id])
+  advertisements Advertisement[]
+  rents          Rent[]
+  tenants        Tenant[]
+
+  @@map("leases")
+}
+
+model Lender {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime? @default(now()) @db.Timestamptz
+  updated_at    DateTime? @db.Timestamptz
+  account_id    String    @db.Uuid
+  individual_id String?   @db.Uuid
+  company_id    String?   @db.Uuid
+
+  account    Account    @relation(fields: [account_id], references: [id])
+  individual Person?    @relation(fields: [individual_id], references: [id])
+  company    Company?   @relation(fields: [company_id], references: [id])
+  properties Property[]
+
+  @@map("lenders")
+}
+
+model Payment {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamptz
+  updated_at DateTime? @db.Timestamptz
+  rent_id    String    @db.Uuid
+  amount     Decimal
+  date       DateTime  @db.Timestamptz
+  type       String // TransactionType
+  label      String?
+
+  rent Rent @relation(fields: [rent_id], references: [id])
+
+  @@map("payments")
+}
+
+model Person {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at   DateTime? @default(now()) @db.Timestamptz
+  updated_at   DateTime? @db.Timestamptz
+  account_id   String    @db.Uuid
+  auth_id      String?   @unique
+  email        String
+  first_name   String
+  last_name    String
+  address      Json?     @db.JsonB
+  photo_url    String?
+  role         String? // PersonRole
+  phone_number String?
+
+  account  Account   @relation(fields: [account_id], references: [id])
+  lenders  Lender[]
+  warrants Warrant[]
+
+  @@map("persons")
+}
+
+model Plan {
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code     String // PlanCode
+  price    Decimal?
+  subtitle String?
+  title    String?
+
+  accounts Account[]
+
+  @@map("plans")
+}
+
+model ProfessionalWarrant {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamptz
+  updated_at DateTime? @db.Timestamptz
+  name       String
+  identifier String
+
+  warrants Warrant[]
+
+  @@map("professional_warrants")
+}
+
+model Property {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at            DateTime? @default(now()) @db.Timestamptz
+  updated_at            DateTime? @db.Timestamptz
+  account_id            String    @db.Uuid
+  address               Json      @db.JsonB
+  build_period          String? // PropertyBuildPeriodType
+  building_legal_status String? // PropertyBuildingLegalStatus
+  common_spaces         String?
+  energy_class          String? // PropertyEnergyClass
+  equipments            String?
+  gas_emission          String? // PropertyGasEmission
+  heating_method        String? // PropertyUsageType
+  housing_type          String? // PropertyUsageType
+  name                  String
+  note                  String?
+  description           String?
+  ntic_equipments       String?
+  other_spaces          String?
+  tax                   Decimal?
+  room_count            String // PropertyRoomType
+  status                String? // PropertyStatus
+  surface               Float     @db.Real
+  tenant_private_spaces String?
+  usage_type            String? // PropertyHabitationUsageType
+  water_heating_method  String? // PropertyUsageType
+  lender_id             String    @db.Uuid
+
+  account        Account         @relation(fields: [account_id], references: [id])
+  lender         Lender          @relation(fields: [lender_id], references: [id])
+  advertisements Advertisement[]
+  leases         Lease[]
+
+  @@map("properties")
+}
+
+model Rent {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at     DateTime? @default(now()) @db.Timestamptz
+  updated_at     DateTime? @db.Timestamptz
+  period_end     DateTime  @db.Timestamptz
+  period_start   DateTime  @db.Timestamptz
+  amount         Decimal
+  charges_amount Decimal?
+  full_amount    Decimal
+  status         String // RentStatus
+  lease_id       String    @db.Uuid
+  receipt_id     String?   @db.Uuid
+  notice_id      String?   @db.Uuid
+
+  lease    Lease     @relation(fields: [lease_id], references: [id])
+  payments Payment[]
+
+  @@map("rents")
+}
+
+model Tenant {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at   DateTime? @default(now()) @db.Timestamptz
+  updated_at   DateTime? @db.Timestamptz
+  account_id   String    @db.Uuid
+  apl          Boolean?
+  birthdate    DateTime  @db.Date
+  birthplace   String?
+  email        String
+  first_name   String
+  last_name    String
+  note         String?
+  phone_number String?
+  status       String // TenantStatus
+  lease_id     String?   @db.Uuid
+  is_student   Boolean?
+
+  account      Account     @relation(fields: [account_id], references: [id])
+  lease        Lease?      @relation(fields: [lease_id], references: [id])
+  candidaciess Candidacy[]
+  warrants     Warrant[]
+
+  @@map("tenants")
+}
+
+model Warrant {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at      DateTime? @default(now()) @db.Timestamptz
+  updated_at      DateTime? @db.Timestamptz
+  type            String // WarrantType
+  tenant_id       String    @db.Uuid
+  individual_id   String?   @db.Uuid
+  professional_id String?   @db.Uuid
+
+  tenant       Tenant               @relation(fields: [tenant_id], references: [id])
+  individual   Person?              @relation(fields: [individual_id], references: [id])
+  professional ProfessionalWarrant? @relation(fields: [professional_id], references: [id])
+
+  @@map("warrants")
+}

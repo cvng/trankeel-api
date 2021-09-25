@@ -12,6 +12,36 @@ table! {
 }
 
 table! {
+    advertisements (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        published -> Bool,
+        lease_type -> Text,
+        rent_amount -> Numeric,
+        rent_charges_amount -> Nullable<Numeric>,
+        deposit_amount -> Nullable<Numeric>,
+        effect_date -> Timestamptz,
+        flexibility -> Nullable<Text>,
+        referral_lease_id -> Nullable<Uuid>,
+        property_id -> Uuid,
+    }
+}
+
+table! {
+    candidacies (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        status -> Text,
+        advertisement_id -> Uuid,
+        tenant_id -> Uuid,
+        move_in_date -> Timestamptz,
+        description -> Text,
+    }
+}
+
+table! {
     companies (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -107,7 +137,7 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
-        auth_id -> Text,
+        auth_id -> Nullable<Text>,
         email -> Text,
         first_name -> Text,
         last_name -> Text,
@@ -125,6 +155,16 @@ table! {
         price -> Nullable<Numeric>,
         subtitle -> Nullable<Text>,
         title -> Nullable<Text>,
+    }
+}
+
+table! {
+    professional_warrants (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        name -> Text,
+        identifier -> Text,
     }
 }
 
@@ -190,12 +230,30 @@ table! {
         last_name -> Text,
         note -> Nullable<Text>,
         phone_number -> Nullable<Text>,
+        status -> Text,
         lease_id -> Nullable<Uuid>,
         is_student -> Nullable<Bool>,
     }
 }
 
+table! {
+    warrants (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        #[sql_name = "type"]
+        type_ -> Text,
+        tenant_id -> Uuid,
+        individual_id -> Nullable<Uuid>,
+        professional_id -> Nullable<Uuid>,
+    }
+}
+
 joinable!(accounts -> plans (plan_id));
+joinable!(advertisements -> leases (referral_lease_id));
+joinable!(advertisements -> properties (property_id));
+joinable!(candidacies -> advertisements (advertisement_id));
+joinable!(candidacies -> tenants (tenant_id));
 joinable!(events -> accounts (account_id));
 joinable!(leases -> accounts (account_id));
 joinable!(leases -> files (lease_id));
@@ -210,8 +268,25 @@ joinable!(properties -> lenders (lender_id));
 joinable!(rents -> leases (lease_id));
 joinable!(tenants -> accounts (account_id));
 joinable!(tenants -> leases (lease_id));
+joinable!(warrants -> persons (individual_id));
+joinable!(warrants -> professional_warrants (professional_id));
+joinable!(warrants -> tenants (tenant_id));
 
 allow_tables_to_appear_in_same_query!(
-    accounts, companies, events, files, leases, lenders, payments, persons, plans, properties,
-    rents, tenants,
+    accounts,
+    advertisements,
+    candidacies,
+    companies,
+    events,
+    files,
+    leases,
+    lenders,
+    payments,
+    persons,
+    plans,
+    professional_warrants,
+    properties,
+    rents,
+    tenants,
+    warrants,
 );
