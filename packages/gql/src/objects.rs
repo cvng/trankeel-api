@@ -5,7 +5,6 @@ use crate::unions::WarrantIdentity;
 use async_graphql::Result;
 use async_graphql::ID;
 use async_graphql::*;
-use piteo::database::Db;
 use piteo::db;
 use piteo::AccountStatus;
 use piteo::Amount;
@@ -13,6 +12,7 @@ use piteo::AuthId;
 use piteo::CandidacyStatus;
 use piteo::Date;
 use piteo::DateTime;
+use piteo::Db;
 use piteo::DbPool;
 use piteo::Email;
 use piteo::EventType;
@@ -56,8 +56,8 @@ pub struct Error {
     message: String,
 }
 
-impl From<piteo::error::Error> for Error {
-    fn from(item: piteo::error::Error) -> Self {
+impl From<piteo::Error> for Error {
+    fn from(item: piteo::Error) -> Self {
         Self {
             message: item.to_string(),
         }

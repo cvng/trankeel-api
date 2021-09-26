@@ -15,12 +15,11 @@ use crate::objects::Tenant;
 use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
-use piteo::database::Db;
 use piteo::db;
-use piteo::reports;
 use piteo::AdvertisementId;
 use piteo::AuthId;
 use piteo::DateTime;
+use piteo::Db;
 use piteo::DbPool;
 use piteo::LenderId;
 use piteo::PropertyId;
@@ -97,7 +96,7 @@ impl Query {
         _since: Option<DateTime>,
         _until: Option<DateTime>,
     ) -> Result<Summary> {
-        Ok(reports::get_summary().map(Summary::from)?)
+        Ok(piteo::get_summary().map(Summary::from)?)
     }
 
     async fn tenants(
@@ -191,7 +190,7 @@ impl Query {
 
 // # Utils
 
-pub(crate) fn map_res<T, U>(vec: Vec<T>) -> std::result::Result<Vec<U>, piteo::error::Error>
+pub(crate) fn map_res<T, U>(vec: Vec<T>) -> std::result::Result<Vec<U>, piteo::Error>
 where
     T: Clone,
     U: From<T>,

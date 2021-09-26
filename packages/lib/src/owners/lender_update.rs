@@ -1,9 +1,8 @@
 use crate::auth::AddressInput;
 use crate::companies::UpdateCompanyInput;
-use crate::database::Db;
 use async_graphql::InputObject;
-use eyre::eyre as err;
-use eyre::Error;
+use piteo_core::database::Db;
+use piteo_core::error::Error;
 use piteo_data::AuthId;
 use piteo_data::LegalIdentity;
 use piteo_data::Lender;
@@ -48,7 +47,7 @@ pub fn update_individual_lender(
 
     let person = match &identity {
         LegalIdentity::Individual(person) => person,
-        _ => return Err(err!("Lender is not an individual")),
+        _ => return Err(Error::msg("Lender is not an individual")),
     };
 
     db.persons().update(PersonData {

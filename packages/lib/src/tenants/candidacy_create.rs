@@ -1,10 +1,10 @@
 use super::create_tenant;
 use super::CreateTenantInput;
 use crate::auth::CreatePersonInput;
-use crate::database::Db;
 use crate::files::CreateFileInput;
 use async_graphql::InputObject;
-use eyre::Error;
+use piteo_core::database::Db;
+use piteo_core::error::Error;
 use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;

@@ -1,7 +1,7 @@
-use crate::error::no;
-use crate::mailer::Contact;
-use crate::mailer::IntoMail;
-use eyre::Error;
+use piteo_core::error::no;
+use piteo_core::error::Error;
+use piteo_core::mailer::Contact;
+use piteo_core::mailer::IntoMail;
 use piteo_data::Amount;
 use piteo_data::DateTime;
 use piteo_data::FileId;

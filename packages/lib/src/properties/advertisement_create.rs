@@ -1,6 +1,6 @@
-use crate::database::Db;
 use async_graphql::InputObject;
-use eyre::Error;
+use piteo_core::database::Db;
+use piteo_core::error::Error;
 use piteo_data::Advertisement;
 use piteo_data::AdvertisementId;
 use piteo_data::Amount;

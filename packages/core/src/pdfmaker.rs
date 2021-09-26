@@ -1,15 +1,9 @@
 use async_trait::async_trait;
 use eyre::Error;
-use piteo_data::ExternalId;
-use piteo_data::FileStatus;
-use piteo_data::Url;
+use piteo_data::Document;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Debug;
-
-pub type DocumentTemplateId = ExternalId;
-
-pub type DocumentId = ExternalId;
 
 #[async_trait]
 pub trait Pdfmaker {
@@ -28,21 +22,6 @@ pub trait IntoDocument: Serialize + Clone + Debug + Send + Sync {
             _filename: self.filename(),
         }
     }
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct Document {
-    pub id: DocumentId,
-    pub status: FileStatus,
-    pub document_template_id: DocumentTemplateId,
-    pub payload: String,
-    pub checksum: String,
-    pub download_url: Option<Url>,
-    pub preview_url: Url,
-    pub meta: Option<String>,
-    pub errors: Option<Vec<String>>,
-    pub created_at: String,
-    pub updated_at: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
