@@ -245,7 +245,7 @@ impl Lease {
         self.0.status()
     }
     async fn rents(&self, ctx: &Context<'_>) -> Result<Vec<Rent>> {
-        Ok(piteo::db(&ctx.into())
+        Ok(db(&ctx.into())
             .rents()
             .by_lease_id(&self.0.id)?
             .into_iter()
@@ -256,7 +256,7 @@ impl Lease {
         None
     }
     async fn tenants(&self, ctx: &Context<'_>) -> Result<Vec<Tenant>> {
-        Ok(piteo::db(&ctx.into())
+        Ok(db(&ctx.into())
             .tenants()
             .by_lease_id(&self.0.id)?
             .into_iter()
@@ -267,7 +267,7 @@ impl Lease {
         None
     }
     async fn property(&self, ctx: &Context<'_>) -> Result<Property> {
-        Ok(piteo::db(&ctx.into())
+        Ok(db(&ctx.into())
             .properties()
             .by_id(&self.0.property_id)?
             .into())
