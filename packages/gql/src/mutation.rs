@@ -14,6 +14,7 @@ use crate::wip;
 use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
+use piteo::AcceptCandidacyInput;
 use piteo::AccountActivatePlanInput;
 use piteo::AccountUpdateInput;
 use piteo::AuthId;
@@ -144,6 +145,16 @@ impl Mutation {
     ) -> Result<Candidacy> {
         let db_pool = ctx.data::<DbPool>()?;
         Ok(piteo::create_candidacy(db_pool, input)?.into())
+    }
+
+    async fn candidacy_accept(
+        &self,
+        ctx: &Context<'_>,
+        input: AcceptCandidacyInput,
+    ) -> Result<Candidacy> {
+        let db_pool = ctx.data::<DbPool>()?;
+        let auth_id = ctx.data::<AuthId>()?;
+        Ok(piteo::accept_candidacy(db_pool, auth_id, input)?.into())
     }
 
     async fn transaction_create(&self, _input: TransactionInput) -> Result<Payment> {

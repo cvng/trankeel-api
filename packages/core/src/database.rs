@@ -6,6 +6,8 @@ use piteo_data::Advertisement;
 use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
+use piteo_data::CandidacyData;
+use piteo_data::CandidacyId;
 use piteo_data::Company;
 use piteo_data::CompanyId;
 use piteo_data::Event;
@@ -93,6 +95,7 @@ pub trait LenderStore {
 
 pub trait AdvertisementStore {
     fn by_id(&mut self, id: &AdvertisementId) -> Result<Advertisement>;
+    fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Advertisement>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Advertisement>>;
     fn create(&mut self, data: Advertisement) -> Result<Advertisement>;
 }
@@ -101,6 +104,12 @@ pub trait CandidacyStore {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Candidacy>>;
     fn create(&mut self, data: Candidacy) -> Result<Candidacy>;
+    fn update(&mut self, data: CandidacyData) -> Result<Candidacy>;
+    fn update_by_advertisement_id(
+        &mut self,
+        advertisement_id: &AdvertisementId,
+        data: CandidacyData,
+    ) -> Result<Vec<Candidacy>>;
 }
 
 pub trait PropertyStore {

@@ -1,7 +1,7 @@
-use super::create_tenant;
-use super::CreateTenantInput;
 use crate::auth::CreatePersonInput;
 use crate::files::CreateFileInput;
+use crate::tenants::create_tenant;
+use crate::tenants::CreateTenantInput;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
 use piteo_core::error::Error;

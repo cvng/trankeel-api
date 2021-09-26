@@ -1,5 +1,6 @@
 mod auth;
 mod billing;
+mod candidacies;
 mod companies;
 mod documents;
 mod error;

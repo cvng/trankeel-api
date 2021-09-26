@@ -526,6 +526,7 @@ impl From<piteo::Advertisement> for Advertisement {
 }
 
 #[derive(async_graphql::SimpleObject)]
+#[graphql(complex)]
 pub struct Candidacy {
     id: ID,
     created_at: Option<DateTime>,
@@ -535,6 +536,17 @@ pub struct Candidacy {
     tenant_id: ID,
     move_in_date: DateTime,
     description: String,
+}
+
+#[async_graphql::ComplexObject]
+impl Candidacy {
+    async fn tenant(&self, ctx: &Context<'_>) -> Result<Tenant> {
+        let db_pool = ctx.data::<DbPool>()?;
+        Ok(db(db_pool)
+            .tenants()
+            .by_id(&self.tenant_id.clone().try_into()?)
+            .map(Into::into)?)
+    }
 }
 
 impl From<piteo::Candidacy> for Candidacy {
@@ -827,7 +839,7 @@ impl Tenant {
         Ok(Some(
             db(db_pool)
                 .warrants()
-                .by_tenant_id(&self.id.to_string().parse::<LeaseId>()?)
+                .by_tenant_id(&self.id.clone().try_into()?)
                 .and_then(map_res)?,
         ))
     }

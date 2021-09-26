@@ -2,6 +2,8 @@ pub use crate::auth::AccountActivatePlanInput;
 pub use crate::auth::AccountUpdateInput;
 pub use crate::auth::AddressInput;
 pub use crate::auth::CreateUserWithAccountInput;
+pub use crate::candidacies::AcceptCandidacyInput;
+pub use crate::candidacies::CreateCandidacyInput;
 pub use crate::files::CreateFileInput;
 pub use crate::imports::ImportInput;
 pub use crate::leases::CreateFurnishedLeaseInput;
@@ -16,7 +18,6 @@ pub use crate::properties::CreateAdvertisementInput;
 pub use crate::properties::CreatePropertyInput;
 pub use crate::properties::DeletePropertyInput;
 pub use crate::properties::UpdatePropertyInput;
-pub use crate::tenants::CreateCandidacyInput;
 pub use crate::tenants::CreateTenantInput;
 pub use crate::tenants::DeleteTenantInput;
 pub use crate::tenants::UpdateTenantInput;
@@ -60,7 +61,15 @@ pub async fn create_user_with_account(
 // # Candidacies
 
 pub fn create_candidacy(db_pool: &DbPool, input: CreateCandidacyInput) -> Result<Candidacy, Error> {
-    crate::tenants::create_candidacy(&Pg::new(db_pool.clone()), input)
+    crate::candidacies::create_candidacy(&Pg::new(db_pool.clone()), input)
+}
+
+pub fn accept_candidacy(
+    db_pool: &DbPool,
+    auth_id: &AuthId,
+    input: AcceptCandidacyInput,
+) -> Result<Candidacy, Error> {
+    crate::candidacies::accept_candidacy(&Pg::new(db_pool.clone()), auth_id, input)
 }
 
 // # Tenants

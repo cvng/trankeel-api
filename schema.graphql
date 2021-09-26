@@ -1,3 +1,6 @@
+input AcceptCandidacyInput {
+	id: UUID!
+}
 type Account {
 	planId: ID
 	status: SubscriptionStatus
@@ -55,6 +58,7 @@ type Candidacy {
 	tenantId: ID!
 	moveInDate: DateTime!
 	description: String!
+	tenant: Tenant!
 }
 enum CandidacyStatus {
 	PENDING
@@ -365,6 +369,7 @@ type Mutation {
 	leaseDelete(id: ID!): ID!
 	lenderIndividualUpdate(input: LenderIndividualUpdateInput!): Lender!
 	candidacyCreate(input: CreateCandidacyInput!): Candidacy!
+	candidacyAccept(input: AcceptCandidacyInput!): Candidacy!
 	transactionCreate(input: TransactionInput!): Transaction!
 	transactionDelete(id: ID!): ID!
 	fileUpload(input: CreateFileInput!): File!
