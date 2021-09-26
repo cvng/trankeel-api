@@ -16,14 +16,11 @@ use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
 use piteo::db;
-use piteo::AdvertisementId;
 use piteo::AuthId;
 use piteo::DateTime;
 use piteo::Db;
-use piteo::LenderId;
-use piteo::PropertyId;
-use piteo::TenantId;
 use piteo::TenantStatus;
+use std::convert::TryInto;
 
 pub struct Query;
 
@@ -39,7 +36,7 @@ impl Query {
     async fn advertisement(&self, ctx: &Context<'_>, id: ID) -> Result<Advertisement> {
         Ok(db(&ctx.into())
             .advertisements()
-            .by_id(&id.parse::<AdvertisementId>()?)?
+            .by_id(&id.try_into()?)?
             .into())
     }
 
@@ -51,7 +48,7 @@ impl Query {
         if let Some(property_id) = property_id {
             Ok(db(&ctx.into())
                 .candidacies()
-                .by_property_id(&property_id.parse::<PropertyId>()?)
+                .by_property_id(&property_id.try_into()?)
                 .and_then(map_res)?)
         } else {
             Ok(db(&ctx.into())
@@ -70,7 +67,7 @@ impl Query {
         if let Some(id) = id {
             Ok(vec![db(&ctx.into())
                 .properties()
-                .by_id(&id.parse::<PropertyId>()?)?
+                .by_id(&id.try_into()?)?
                 .into()])
         } else {
             Ok(db(&ctx.into())
@@ -96,10 +93,11 @@ impl Query {
         _query: Option<String>,
         _status: Option<TenantStatus>,
     ) -> Result<Vec<Tenant>> {
-        let id = id.map(|id| id.parse::<TenantId>().unwrap_or_default());
-
         if let Some(id) = id {
-            Ok(vec![db(&ctx.into()).tenants().by_id(&id)?.into()])
+            Ok(vec![db(&ctx.into())
+                .tenants()
+                .by_id(&id.try_into()?)?
+                .into()])
         } else {
             Ok(db(&ctx.into())
                 .tenants()
@@ -126,10 +124,12 @@ impl Query {
         id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Lender>> {
-        let id = id.map(|id| id.parse::<LenderId>().unwrap_or_default());
-
         if let Some(id) = id {
-            Ok(vec![db(&ctx.into()).lenders().by_id(&id)?.0.into()])
+            Ok(vec![db(&ctx.into())
+                .lenders()
+                .by_id(&id.try_into()?)?
+                .0
+                .into()])
         } else {
             Ok(db(&ctx.into())
                 .lenders()

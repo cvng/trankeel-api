@@ -19,7 +19,6 @@ use piteo::EventableType;
 use piteo::FileStatus;
 use piteo::FileType;
 use piteo::FurnishedLeaseDuration;
-use piteo::LeaseId;
 use piteo::LeaseRentPeriodicity;
 use piteo::LeaseRentReferenceIrl;
 use piteo::LeaseStatus;
@@ -39,7 +38,6 @@ use piteo::PropertyRoomType;
 use piteo::PropertyStatus;
 use piteo::PropertyUsageType;
 use piteo::RentChargesRecuperationMode;
-use piteo::RentId;
 use piteo::RentPaymentMethod;
 use piteo::RentStatus;
 use piteo::TenantStatus;
@@ -697,7 +695,7 @@ impl Rent {
     async fn lease(&self, ctx: &Context<'_>) -> Result<Lease> {
         Ok(db(&ctx.into())
             .leases()
-            .by_id(&self.lease_id.to_string().parse::<LeaseId>()?)?
+            .by_id(&self.lease_id.clone().try_into()?)?
             .into())
     }
 }
@@ -916,7 +914,7 @@ impl Payment {
     async fn lease(&self, ctx: &Context<'_>) -> Result<Lease> {
         Ok(db(&ctx.into())
             .leases()
-            .by_rent_id(&self.rent_id.to_string().parse::<RentId>()?)?
+            .by_rent_id(&self.rent_id.clone().try_into()?)?
             .into())
     }
 }
