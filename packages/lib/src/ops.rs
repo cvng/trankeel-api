@@ -39,20 +39,20 @@ use crate::Receipt;
 use crate::Tenant;
 use crate::TenantId;
 use async_graphql::Context;
-use piteo_core::providers::DbPool;
+use piteo_core::providers::PgPool;
 use piteo_core::providers::Pdfmonkey;
 use piteo_core::providers::Sendinblue;
 use piteo_core::providers::Stripe;
 use piteo_data::Summary;
 
-pub struct Client(DbPool, AuthId);
+pub struct Client(PgPool, AuthId);
 
 impl Client {
-    pub fn new(db_pool: DbPool) -> Self {
+    pub fn new(db_pool: PgPool) -> Self {
         Self(db_pool, AuthId::default())
     }
 
-    pub fn with_auth_id(db_pool: DbPool, auth_id: AuthId) -> Self {
+    pub fn with_auth_id(db_pool: PgPool, auth_id: AuthId) -> Self {
         Self(db_pool, auth_id)
     }
 }
@@ -195,7 +195,7 @@ pub fn get_summary() -> Result<Summary, Error> {
 impl From<&Context<'_>> for Client {
     fn from(item: &Context<'_>) -> Self {
         Self(
-            item.data_unchecked::<DbPool>().clone(),
+            item.data_unchecked::<PgPool>().clone(),
             item.data_opt::<AuthId>().cloned().unwrap_or_default(),
         )
     }

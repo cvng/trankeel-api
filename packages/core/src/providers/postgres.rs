@@ -81,48 +81,48 @@ type Result<T, E = Error> = std::result::Result<T, E>;
 
 type Deleted = usize;
 
-pub type DbPool = Pool<ConnectionManager<PgConnection>>;
+pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 
-struct AccountStore<'a>(&'a DbPool);
+struct AccountStore<'a>(&'a PgPool);
 
-struct EventStore<'a>(&'a DbPool);
+struct EventStore<'a>(&'a PgPool);
 
-struct PersonStore<'a>(&'a DbPool);
+struct PersonStore<'a>(&'a PgPool);
 
-struct CompanyStore<'a>(&'a DbPool);
+struct CompanyStore<'a>(&'a PgPool);
 
-struct TenantStore<'a>(&'a DbPool);
+struct TenantStore<'a>(&'a PgPool);
 
-struct WarrantStore<'a>(&'a DbPool);
+struct WarrantStore<'a>(&'a PgPool);
 
-struct LenderStore<'a>(&'a DbPool);
+struct LenderStore<'a>(&'a PgPool);
 
-struct AdvertisementStore<'a>(&'a DbPool);
+struct AdvertisementStore<'a>(&'a PgPool);
 
-struct CandidacyStore<'a>(&'a DbPool);
+struct CandidacyStore<'a>(&'a PgPool);
 
-struct PropertyStore<'a>(&'a DbPool);
+struct PropertyStore<'a>(&'a PgPool);
 
-struct LeaseStore<'a>(&'a DbPool);
+struct LeaseStore<'a>(&'a PgPool);
 
-struct LeaseTenantStore<'a>(&'a DbPool);
+struct LeaseTenantStore<'a>(&'a PgPool);
 
-struct RentStore<'a>(&'a DbPool);
+struct RentStore<'a>(&'a PgPool);
 
-struct FileStore<'a>(&'a DbPool);
+struct FileStore<'a>(&'a PgPool);
 
-struct PaymentStore<'a>(&'a DbPool);
+struct PaymentStore<'a>(&'a PgPool);
 
-struct PlanStore<'a>(&'a DbPool);
+struct PlanStore<'a>(&'a PgPool);
 
-pub struct Pg(DbPool);
+pub struct Pg(PgPool);
 
 impl Pg {
-    pub fn new(db_pool: DbPool) -> Self {
+    pub fn new(db_pool: PgPool) -> Self {
         Self(db_pool)
     }
 
-    pub fn inner(&self) -> DbPool {
+    pub fn inner(&self) -> PgPool {
         self.0.clone()
     }
 }
@@ -704,7 +704,7 @@ impl database::EventStore for EventStore<'_> {
 
 // # Utils
 
-fn build_connection_pool(database_url: &str) -> Result<DbPool> {
+fn build_connection_pool(database_url: &str) -> Result<PgPool> {
     let manager = ConnectionManager::<PgConnection>::new(database_url);
 
     Pool::builder()
