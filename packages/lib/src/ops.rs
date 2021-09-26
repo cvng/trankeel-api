@@ -24,18 +24,6 @@ pub use crate::tenants::DeleteTenantInput;
 pub use crate::tenants::UpdateTenantInput;
 pub use piteo_core::database::Db;
 
-use crate::Advertisement;
-use crate::AuthId;
-use crate::Candidacy;
-use crate::Lease;
-use crate::LeaseId;
-use crate::Lender;
-use crate::Person;
-use crate::Property;
-use crate::PropertyId;
-use crate::Receipt;
-use crate::Tenant;
-use crate::TenantId;
 use async_graphql::Context;
 use piteo_core::providers::Pdfmonkey;
 use piteo_core::providers::Pg;
@@ -43,7 +31,19 @@ use piteo_core::providers::PgPool;
 use piteo_core::providers::Provider;
 use piteo_core::providers::Sendinblue;
 use piteo_core::providers::Stripe;
+use piteo_data::Advertisement;
+use piteo_data::AuthId;
+use piteo_data::Candidacy;
+use piteo_data::Lease;
+use piteo_data::LeaseId;
+use piteo_data::Lender;
+use piteo_data::Person;
+use piteo_data::Property;
+use piteo_data::PropertyId;
+use piteo_data::Receipt;
 use piteo_data::Summary;
+use piteo_data::Tenant;
+use piteo_data::TenantId;
 
 // # Client
 
@@ -114,8 +114,8 @@ pub fn update_tenant(client: &Client, input: UpdateTenantInput) -> Result<Tenant
     crate::tenants::update_tenant(&client.db(), &client.auth_id()?, input)
 }
 
-pub fn delete_tenant(client: &Client, id: TenantId) -> Result<TenantId, Error> {
-    crate::tenants::delete_tenant(&client.db(), &client.auth_id()?, DeleteTenantInput { id })
+pub fn delete_tenant(client: &Client, input: DeleteTenantInput) -> Result<TenantId, Error> {
+    crate::tenants::delete_tenant(&client.db(), &client.auth_id()?, input)
 }
 
 // # Properties
@@ -128,8 +128,8 @@ pub fn update_property(client: &Client, input: UpdatePropertyInput) -> Result<Pr
     crate::properties::update_property(&client.db(), &client.auth_id()?, input)
 }
 
-pub fn delete_property(client: &Client, id: PropertyId) -> Result<TenantId, Error> {
-    crate::properties::delete_property(&client.db(), &client.auth_id()?, DeletePropertyInput { id })
+pub fn delete_property(client: &Client, input: DeletePropertyInput) -> Result<PropertyId, Error> {
+    crate::properties::delete_property(&client.db(), &client.auth_id()?, input)
 }
 
 // # Avertisements
@@ -157,8 +157,8 @@ pub fn update_furnished_lease(
     crate::leases::update_furnished_lease(&client.db(), &client.auth_id()?, input)
 }
 
-pub fn delete_lease(client: &Client, id: LeaseId) -> Result<LeaseId, Error> {
-    crate::leases::delete_lease(&client.db(), &client.auth_id()?, DeleteLeaseInput { id })
+pub fn delete_lease(client: &Client, input: DeleteLeaseInput) -> Result<LeaseId, Error> {
+    crate::leases::delete_lease(&client.db(), &client.auth_id()?, input)
 }
 
 // # Lenders

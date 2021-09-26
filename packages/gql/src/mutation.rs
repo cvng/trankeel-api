@@ -24,6 +24,9 @@ use piteo::CreatePropertyInput;
 use piteo::CreateReceiptsInput;
 use piteo::CreateTenantInput;
 use piteo::CreateUserWithAccountInput;
+use piteo::DeleteLeaseInput;
+use piteo::DeletePropertyInput;
+use piteo::DeleteTenantInput;
 use piteo::ImportInput;
 use piteo::SendPaymentNoticeInput;
 use piteo::TransactionInput;
@@ -64,7 +67,7 @@ impl Mutation {
     }
 
     async fn tenant_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
-        Ok(piteo::delete_tenant(&ctx.into(), id.try_into()?)?.into())
+        Ok(piteo::delete_tenant(&ctx.into(), DeleteTenantInput { id: id.try_into()? })?.into())
     }
 
     async fn property_create(
@@ -84,7 +87,7 @@ impl Mutation {
     }
 
     async fn property_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
-        Ok(piteo::delete_property(&ctx.into(), id.try_into()?)?.into())
+        Ok(piteo::delete_property(&ctx.into(), DeletePropertyInput { id: id.try_into()? })?.into())
     }
 
     async fn lease_furnished_create(
@@ -104,7 +107,7 @@ impl Mutation {
     }
 
     async fn lease_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
-        Ok(piteo::delete_lease(&ctx.into(), id.try_into()?)?.into())
+        Ok(piteo::delete_lease(&ctx.into(), DeleteLeaseInput { id: id.try_into()? })?.into())
     }
 
     async fn lender_individual_update(
