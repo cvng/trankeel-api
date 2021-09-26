@@ -10,13 +10,9 @@ use crate::PropertyId;
 use crate::Rent;
 use crate::RentId;
 use crate::RentStatus;
-use async_graphql::Enum;
 use chrono::Datelike;
 use chrono::Utc;
 use chronoutil::DateRule;
-use diesel_enum_derive::DieselEnum;
-use serde::Deserialize;
-use serde::Serialize;
 
 // # Types
 

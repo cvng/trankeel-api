@@ -4,8 +4,6 @@ use crate::DateTime;
 use crate::Id;
 use crate::Payment;
 use crate::Rent;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
 
 // # Types
 

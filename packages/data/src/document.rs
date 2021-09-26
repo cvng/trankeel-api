@@ -1,7 +1,6 @@
 use crate::ExternalId;
 use crate::FileStatus;
 use crate::Url;
-use serde::Deserialize;
 use std::fmt::Debug;
 
 pub type DocumentTemplateId = ExternalId;

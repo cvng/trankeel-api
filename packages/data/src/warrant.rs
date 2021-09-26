@@ -5,10 +5,6 @@ use crate::Id;
 use crate::Person;
 use crate::PersonId;
 use crate::TenantId;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
-use serde::Deserialize;
-use serde::Serialize;
 
 pub type WarrantId = Id;
 

@@ -1,7 +1,4 @@
 use crate::locale;
-use diesel_as_jsonb::AsJsonb;
-use serde::Deserialize;
-use serde::Serialize;
 use std::fmt;
 use std::fmt::Display;
 

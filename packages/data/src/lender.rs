@@ -5,9 +5,6 @@ use crate::CompanyId;
 use crate::DateTime;
 use crate::LegalIdentity;
 use crate::PersonId;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
-use serde::Deserialize;
 
 // # Types
 

@@ -7,10 +7,6 @@ use crate::Email;
 use crate::LeaseId;
 use crate::Name;
 use crate::PhoneNumber;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
-use serde::Deserialize;
-use serde::Serialize;
 
 // # Types
 

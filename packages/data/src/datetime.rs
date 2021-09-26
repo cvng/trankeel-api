@@ -1,11 +1,8 @@
-use async_graphql::scalar;
 use chrono::Datelike;
 use chrono::NaiveDate;
 use chrono::TimeZone;
 use chrono::Utc;
 use chronoutil::delta;
-use serde::Deserialize;
-use serde::Serialize;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct Date(chrono::NaiveDate);
