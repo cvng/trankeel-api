@@ -1,6 +1,6 @@
+use crate::error::Result;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::Advertisement;
 use piteo_data::AdvertisementId;
 use piteo_data::Amount;
@@ -33,7 +33,7 @@ pub fn create_advertisement(
     db: &impl Db,
     _auth_id: &AuthId,
     input: CreateAdvertisementInput,
-) -> Result<Advertisement, Error> {
+) -> Result<Advertisement> {
     input.validate()?;
 
     db.advertisements().create(Advertisement {

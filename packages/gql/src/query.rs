@@ -16,34 +16,27 @@ use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
 use piteo::db;
-use piteo::AdvertisementId;
 use piteo::AuthId;
 use piteo::DateTime;
 use piteo::Db;
-use piteo::DbPool;
-use piteo::LenderId;
-use piteo::PropertyId;
-use piteo::TenantId;
 use piteo::TenantStatus;
+use std::convert::TryInto;
 
 pub struct Query;
 
 #[async_graphql::Object]
 impl Query {
     async fn viewer(&self, ctx: &Context<'_>) -> Result<Person> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(db(db_pool)
+        Ok(db(&ctx.into())
             .persons()
-            .by_auth_id(auth_id)
+            .by_auth_id(ctx.data::<AuthId>()?)
             .map(Person::from)?)
     }
 
     async fn advertisement(&self, ctx: &Context<'_>, id: ID) -> Result<Advertisement> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool)
+        Ok(db(&ctx.into())
             .advertisements()
-            .by_id(&id.parse::<AdvertisementId>()?)?
+            .by_id(&id.try_into()?)?
             .into())
     }
 
@@ -52,18 +45,15 @@ impl Query {
         ctx: &Context<'_>,
         property_id: Option<ID>,
     ) -> Result<Vec<Candidacy>> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-
         if let Some(property_id) = property_id {
-            Ok(db(db_pool)
+            Ok(db(&ctx.into())
                 .candidacies()
-                .by_property_id(&property_id.parse::<PropertyId>()?)
+                .by_property_id(&property_id.try_into()?)
                 .and_then(map_res)?)
         } else {
-            Ok(db(db_pool)
+            Ok(db(&ctx.into())
                 .candidacies()
-                .by_auth_id(auth_id)
+                .by_auth_id(ctx.data::<AuthId>()?)
                 .and_then(map_res)?)
         }
     }
@@ -74,18 +64,15 @@ impl Query {
         id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Property>> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-
         if let Some(id) = id {
-            Ok(vec![db(db_pool)
+            Ok(vec![db(&ctx.into())
                 .properties()
-                .by_id(&id.parse::<PropertyId>()?)?
+                .by_id(&id.try_into()?)?
                 .into()])
         } else {
-            Ok(db(db_pool)
+            Ok(db(&ctx.into())
                 .properties()
-                .by_auth_id(auth_id)
+                .by_auth_id(ctx.data::<AuthId>()?)
                 .and_then(map_res)?)
         }
     }
@@ -106,16 +93,15 @@ impl Query {
         _query: Option<String>,
         _status: Option<TenantStatus>,
     ) -> Result<Vec<Tenant>> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        let id = id.map(|id| TenantId::parse_str(&id).unwrap_or_default());
-
         if let Some(id) = id {
-            Ok(vec![db(db_pool).tenants().by_id(&id)?.into()])
-        } else {
-            Ok(db(db_pool)
+            Ok(vec![db(&ctx.into())
                 .tenants()
-                .by_auth_id(auth_id)
+                .by_id(&id.try_into()?)?
+                .into()])
+        } else {
+            Ok(db(&ctx.into())
+                .tenants()
+                .by_auth_id(ctx.data::<AuthId>()?)
                 .and_then(map_res)?)
         }
     }
@@ -126,10 +112,10 @@ impl Query {
         _id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Lease>> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-
-        Ok(db(db_pool).leases().by_auth_id(auth_id).and_then(map_res)?)
+        Ok(db(&ctx.into())
+            .leases()
+            .by_auth_id(ctx.data::<AuthId>()?)
+            .and_then(map_res)?)
     }
 
     async fn lenders(
@@ -138,16 +124,16 @@ impl Query {
         id: Option<ID>,
         _query: Option<String>,
     ) -> Result<Vec<Lender>> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        let id = id.map(|id| LenderId::parse_str(&id).unwrap_or_default());
-
         if let Some(id) = id {
-            Ok(vec![db(db_pool).lenders().by_id(&id)?.0.into()])
-        } else {
-            Ok(db(db_pool)
+            Ok(vec![db(&ctx.into())
                 .lenders()
-                .by_auth_id(auth_id)
+                .by_id(&id.try_into()?)?
+                .0
+                .into()])
+        } else {
+            Ok(db(&ctx.into())
+                .lenders()
+                .by_auth_id(ctx.data::<AuthId>()?)
                 .and_then(map_res)?)
         }
     }
@@ -158,17 +144,17 @@ impl Query {
         _since: DateTime,
         _until: DateTime,
     ) -> Result<Vec<Rent>> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-
-        Ok(db(db_pool).rents().by_auth_id(auth_id).and_then(map_res)?)
+        Ok(db(&ctx.into())
+            .rents()
+            .by_auth_id(ctx.data::<AuthId>()?)
+            .and_then(map_res)?)
     }
 
     async fn events(&self, ctx: &Context<'_>) -> Result<Vec<Event>> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-
-        Ok(db(db_pool).events().by_auth_id(auth_id).and_then(map_res)?)
+        Ok(db(&ctx.into())
+            .events()
+            .by_auth_id(ctx.data::<AuthId>()?)
+            .and_then(map_res)?)
     }
 
     async fn transactions(&self, _ctx: &Context<'_>, _id: Option<ID>) -> Result<Vec<Payment>> {

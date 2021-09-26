@@ -1,10 +1,11 @@
 use crate::candidacies::CreateWarrantInput;
+use crate::error::Error;
+use crate::error::Result;
 use crate::AuthId;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::AccountId;
 use piteo_data::Person;
 use piteo_data::PersonId;
@@ -46,7 +47,7 @@ pub fn create_tenant(
     auth_id: &AuthId,
     input: CreateTenantInput,
     account_id: Option<AccountId>,
-) -> Result<Tenant, Error> {
+) -> Result<Tenant> {
     input.validate()?;
 
     let account_id = match account_id {
@@ -86,7 +87,7 @@ fn add_tenant_warrants(
     tenant_id: &TenantId,
     account_id: &AccountId,
     warrant_inputs: Vec<CreateWarrantInput>,
-) -> Result<Vec<WarrantWithIdentity>, Error> {
+) -> Result<Vec<WarrantWithIdentity>> {
     let mut warrants = vec![];
 
     for warrant_input in warrant_inputs {

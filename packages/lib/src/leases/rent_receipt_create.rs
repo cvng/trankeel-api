@@ -1,4 +1,5 @@
 use crate::documents::ReceiptDocument;
+use crate::error::Result;
 use crate::messages::ReceiptMail;
 use async_graphql::InputObject;
 use chrono::Utc;
@@ -43,7 +44,7 @@ pub async fn create_receipts(
     auth_id: &AuthId,
     pdfmaker: &impl Pdfmaker,
     input: CreateReceiptsInput,
-) -> Result<Vec<Receipt>, Error> {
+) -> Result<Vec<Receipt>> {
     input.validate()?;
 
     let rents = setlle_rents(db, auth_id, input.rent_ids)?;
@@ -58,7 +59,7 @@ pub async fn send_receipts(
     auth_id: &AuthId,
     mailer: &impl Mailer,
     input: SendReceiptsInput,
-) -> Result<Vec<Receipt>, Error> {
+) -> Result<Vec<Receipt>> {
     input.validate()?;
 
     let mut receipts = vec![];
@@ -86,7 +87,7 @@ pub async fn send_receipts(
 
 // # Utils
 
-fn setlle_rents(db: &impl Db, auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<Vec<Rent>, Error> {
+fn setlle_rents(db: &impl Db, auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
     let mut rents = vec![];
 
     for rent_id in rent_ids {
@@ -120,7 +121,7 @@ async fn generate_receipts(
     auth_id: &AuthId,
     pdfmaker: &impl Pdfmaker,
     rents: Vec<Rent>,
-) -> Result<Vec<Receipt>, Error> {
+) -> Result<Vec<Receipt>> {
     let mut receipts = vec![];
 
     for rent in rents {

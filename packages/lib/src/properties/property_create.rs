@@ -1,8 +1,8 @@
 use crate::auth::AddressInput;
+use crate::error::Result;
 use crate::AuthId;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::Amount;
 use piteo_data::LenderId;
 use piteo_data::Property;
@@ -52,7 +52,7 @@ pub fn create_property(
     db: &impl Db,
     auth_id: &AuthId,
     input: CreatePropertyInput,
-) -> Result<Property, Error> {
+) -> Result<Property> {
     input.validate()?;
 
     let account = db.accounts().by_auth_id(auth_id)?;

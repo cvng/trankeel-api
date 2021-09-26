@@ -1,8 +1,9 @@
 use crate::auth::AddressInput;
 use crate::companies::UpdateCompanyInput;
+use crate::error::Error;
+use crate::error::Result;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::AuthId;
 use piteo_data::LegalIdentity;
 use piteo_data::Lender;
@@ -40,7 +41,7 @@ pub fn update_individual_lender(
     db: &impl Db,
     _auth_id: &AuthId,
     input: UpdateIndividualLenderInput,
-) -> Result<Lender, Error> {
+) -> Result<Lender> {
     input.validate()?;
 
     let (lender, identity) = db.lenders().by_id(&input.id)?;

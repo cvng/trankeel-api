@@ -1,6 +1,6 @@
+use crate::error::Result;
 use crate::AuthId;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::TenantId;
 use validator::Validate;
 
@@ -17,7 +17,7 @@ pub fn delete_tenant(
     db: &impl Db,
     _auth_id: &AuthId,
     input: DeleteTenantInput,
-) -> Result<TenantId, Error> {
+) -> Result<TenantId> {
     input.validate()?;
 
     db.tenants().delete(input.id)?;
