@@ -1,5 +1,5 @@
+use crate::error::no;
 use crate::error::Result;
-use piteo_core::error::no;
 use piteo_core::mailer::Contact;
 use piteo_core::mailer::IntoMail;
 use piteo_data::locale;
