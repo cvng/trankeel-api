@@ -1,6 +1,6 @@
+use crate::error::Result;
 use crate::AuthId;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::PropertyId;
 use validator::Validate;
 
@@ -17,7 +17,7 @@ pub fn delete_property(
     db: &impl Db,
     _auth_id: &AuthId,
     input: DeletePropertyInput,
-) -> Result<PropertyId, Error> {
+) -> Result<PropertyId> {
     input.validate()?;
 
     db.properties().delete(input.id)?;

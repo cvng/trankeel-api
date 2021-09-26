@@ -1,8 +1,8 @@
 use crate::auth::AddressInput;
+use crate::error::Result;
 use crate::AuthId;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::Amount;
 use piteo_data::Property;
 use piteo_data::PropertyBuildPeriodType;
@@ -52,7 +52,7 @@ pub fn update_property(
     db: &impl Db,
     _auth_id: &AuthId,
     input: UpdatePropertyInput,
-) -> Result<Property, Error> {
+) -> Result<Property> {
     input.validate()?;
 
     db.properties().update(input.into())

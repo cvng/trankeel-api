@@ -1,5 +1,5 @@
+use crate::error::Result;
 use piteo_core::error::no;
-use piteo_core::error::Error;
 use piteo_core::mailer::Contact;
 use piteo_core::mailer::IntoMail;
 use piteo_data::locale;
@@ -41,7 +41,7 @@ impl ReceiptMail {
         rent: &Rent,
         tenants: Vec<Tenant>,
         date: DateTime,
-    ) -> Result<Self, Error> {
+    ) -> Result<Self> {
         Ok(Self {
             is_receipt: (match receipt.type_ {
                 FileType::RentReceipt => Some(true),

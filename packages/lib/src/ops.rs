@@ -5,6 +5,7 @@ pub use crate::auth::CreateUserWithAccountInput;
 pub use crate::candidacies::AcceptCandidacyInput;
 pub use crate::candidacies::CreateCandidacyInput;
 pub use crate::error::Error;
+pub use crate::error::Result;
 pub use crate::files::CreateFileInput;
 pub use crate::imports::ImportInput;
 pub use crate::leases::CreateFurnishedLeaseInput;
@@ -70,7 +71,7 @@ impl Client {
         self.0.clone()
     }
 
-    fn auth_id(&self) -> Result<AuthId, Error> {
+    fn auth_id(&self) -> Result<AuthId> {
         self.1.clone().ok_or_else(|| Error::msg("no auth id"))
     }
 }
@@ -90,45 +91,45 @@ pub fn db(client: &Client) -> Pg {
 pub async fn create_user_with_account(
     client: &Client,
     input: CreateUserWithAccountInput,
-) -> Result<Person, Error> {
+) -> Result<Person> {
     crate::auth::create_user_with_account(&client.db(), &Stripe::init(), input).await
 }
 
 // # Candidacies
 
-pub fn create_candidacy(client: &Client, input: CreateCandidacyInput) -> Result<Candidacy, Error> {
+pub fn create_candidacy(client: &Client, input: CreateCandidacyInput) -> Result<Candidacy> {
     crate::candidacies::create_candidacy(&client.db(), input)
 }
 
-pub fn accept_candidacy(client: &Client, input: AcceptCandidacyInput) -> Result<Candidacy, Error> {
+pub fn accept_candidacy(client: &Client, input: AcceptCandidacyInput) -> Result<Candidacy> {
     crate::candidacies::accept_candidacy(&client.db(), &client.auth_id()?, input)
 }
 
 // # Tenants
 
-pub fn create_tenant(client: &Client, input: CreateTenantInput) -> Result<Tenant, Error> {
+pub fn create_tenant(client: &Client, input: CreateTenantInput) -> Result<Tenant> {
     crate::tenants::create_tenant(&client.db(), &client.auth_id()?, input, None)
 }
 
-pub fn update_tenant(client: &Client, input: UpdateTenantInput) -> Result<Tenant, Error> {
+pub fn update_tenant(client: &Client, input: UpdateTenantInput) -> Result<Tenant> {
     crate::tenants::update_tenant(&client.db(), &client.auth_id()?, input)
 }
 
-pub fn delete_tenant(client: &Client, input: DeleteTenantInput) -> Result<TenantId, Error> {
+pub fn delete_tenant(client: &Client, input: DeleteTenantInput) -> Result<TenantId> {
     crate::tenants::delete_tenant(&client.db(), &client.auth_id()?, input)
 }
 
 // # Properties
 
-pub fn create_property(client: &Client, input: CreatePropertyInput) -> Result<Property, Error> {
+pub fn create_property(client: &Client, input: CreatePropertyInput) -> Result<Property> {
     crate::properties::create_property(&client.db(), &client.auth_id()?, input)
 }
 
-pub fn update_property(client: &Client, input: UpdatePropertyInput) -> Result<Property, Error> {
+pub fn update_property(client: &Client, input: UpdatePropertyInput) -> Result<Property> {
     crate::properties::update_property(&client.db(), &client.auth_id()?, input)
 }
 
-pub fn delete_property(client: &Client, input: DeletePropertyInput) -> Result<PropertyId, Error> {
+pub fn delete_property(client: &Client, input: DeletePropertyInput) -> Result<PropertyId> {
     crate::properties::delete_property(&client.db(), &client.auth_id()?, input)
 }
 
@@ -137,27 +138,21 @@ pub fn delete_property(client: &Client, input: DeletePropertyInput) -> Result<Pr
 pub fn create_advertisement(
     client: &Client,
     input: CreateAdvertisementInput,
-) -> Result<Advertisement, Error> {
+) -> Result<Advertisement> {
     crate::properties::create_advertisement(&client.db(), &client.auth_id()?, input)
 }
 
 // # Leases
 
-pub fn create_furnished_lease(
-    client: &Client,
-    input: CreateFurnishedLeaseInput,
-) -> Result<Lease, Error> {
+pub fn create_furnished_lease(client: &Client, input: CreateFurnishedLeaseInput) -> Result<Lease> {
     crate::leases::create_furnished_lease(&client.db(), &client.auth_id()?, input)
 }
 
-pub fn update_furnished_lease(
-    client: &Client,
-    input: UpdateFurnishedLeaseInput,
-) -> Result<Lease, Error> {
+pub fn update_furnished_lease(client: &Client, input: UpdateFurnishedLeaseInput) -> Result<Lease> {
     crate::leases::update_furnished_lease(&client.db(), &client.auth_id()?, input)
 }
 
-pub fn delete_lease(client: &Client, input: DeleteLeaseInput) -> Result<LeaseId, Error> {
+pub fn delete_lease(client: &Client, input: DeleteLeaseInput) -> Result<LeaseId> {
     crate::leases::delete_lease(&client.db(), &client.auth_id()?, input)
 }
 
@@ -166,30 +161,24 @@ pub fn delete_lease(client: &Client, input: DeleteLeaseInput) -> Result<LeaseId,
 pub fn update_individual_lender(
     client: &Client,
     input: UpdateIndividualLenderInput,
-) -> Result<Lender, Error> {
+) -> Result<Lender> {
     crate::owners::update_individual_lender(&client.db(), &client.auth_id()?, input)
 }
 
 // # Receipts
 
-pub async fn create_receipts(
-    client: &Client,
-    input: CreateReceiptsInput,
-) -> Result<Vec<Receipt>, Error> {
+pub async fn create_receipts(client: &Client, input: CreateReceiptsInput) -> Result<Vec<Receipt>> {
     crate::leases::create_receipts(&client.db(), &client.auth_id()?, &Pdfmonkey::init(), input)
         .await
 }
 
-pub async fn send_receipts(
-    client: &Client,
-    input: SendReceiptsInput,
-) -> Result<Vec<Receipt>, Error> {
+pub async fn send_receipts(client: &Client, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
     crate::leases::send_receipts(&client.db(), &client.auth_id()?, &Sendinblue::init(), input).await
 }
 
 // # Reports
 
-pub fn get_summary() -> Result<Summary, Error> {
+pub fn get_summary() -> Result<Summary> {
     crate::reports::get_summary()
 }
 

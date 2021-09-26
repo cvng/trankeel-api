@@ -1,7 +1,7 @@
+use crate::error::Result;
 use crate::files::CreateFileInput;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::Amount;
 use piteo_data::AuthId;
 use piteo_data::DateTime;
@@ -41,7 +41,7 @@ pub fn create_furnished_lease(
     db: &impl Db,
     auth_id: &AuthId,
     input: CreateFurnishedLeaseInput,
-) -> Result<Lease, Error> {
+) -> Result<Lease> {
     input.validate()?;
 
     let account = db.accounts().by_auth_id(auth_id)?;
@@ -83,7 +83,7 @@ pub fn create_furnished_lease(
 
 // # Utils
 
-fn add_lease_rents(db: &impl Db, lease: &Lease) -> Result<Vec<Rent>, Error> {
+fn add_lease_rents(db: &impl Db, lease: &Lease) -> Result<Vec<Rent>> {
     db.rents().create_many(lease.rents())
 }
 
@@ -91,7 +91,7 @@ fn add_lease_tenants(
     db: &impl Db,
     lease_id: LeaseId,
     tenant_ids: Vec<TenantId>,
-) -> Result<Vec<Tenant>, Error> {
+) -> Result<Vec<Tenant>> {
     tenant_ids
         .iter()
         .map(|&tenant_id| {

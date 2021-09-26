@@ -1,10 +1,10 @@
 use crate::auth::CreatePersonInput;
+use crate::error::Result;
 use crate::files::CreateFileInput;
 use crate::tenants::create_tenant;
 use crate::tenants::CreateTenantInput;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
@@ -51,7 +51,7 @@ pub struct CreateCandidacyInput {
 
 // # Operation
 
-pub fn create_candidacy(db: &impl Db, input: CreateCandidacyInput) -> Result<Candidacy, Error> {
+pub fn create_candidacy(db: &impl Db, input: CreateCandidacyInput) -> Result<Candidacy> {
     input.validate()?;
 
     let account = db.accounts().by_advertisement_id(&input.advertisement_id)?;

@@ -1,7 +1,7 @@
+use crate::error::Result;
 use async_graphql::InputObject;
 use log::info;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_core::payment::PaymentProvider;
 use piteo_data::Account;
 use piteo_data::AccountData;
@@ -44,7 +44,7 @@ pub async fn create_user_with_account(
     db: &impl Db,
     payment_provider: &impl PaymentProvider,
     input: CreateUserWithAccountInput,
-) -> Result<Person, Error> {
+) -> Result<Person> {
     input.validate()?;
 
     // Create account.

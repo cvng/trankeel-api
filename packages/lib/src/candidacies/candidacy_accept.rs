@@ -1,6 +1,6 @@
+use crate::error::Result;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
 use piteo_data::CandidacyData;
@@ -21,7 +21,7 @@ pub fn accept_candidacy(
     db: &impl Db,
     _auth_id: &AuthId,
     input: AcceptCandidacyInput,
-) -> Result<Candidacy, Error> {
+) -> Result<Candidacy> {
     input.validate()?;
 
     let advertisement = db.advertisements().by_candidacy_id(&input.id)?;

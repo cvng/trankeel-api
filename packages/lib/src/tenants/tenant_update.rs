@@ -1,10 +1,10 @@
 use crate::candidacies::CreateWarrantInput;
+use crate::error::Result;
 use crate::AuthId;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::PhoneNumber;
 use piteo_data::TenantData;
 use piteo_data::TenantId;
@@ -31,11 +31,7 @@ pub struct UpdateTenantInput {
 
 // # Operation
 
-pub fn update_tenant(
-    db: &impl Db,
-    _auth_id: &AuthId,
-    input: UpdateTenantInput,
-) -> Result<Tenant, Error> {
+pub fn update_tenant(db: &impl Db, _auth_id: &AuthId, input: UpdateTenantInput) -> Result<Tenant> {
     input.validate()?;
 
     db.tenants().update(input.into())

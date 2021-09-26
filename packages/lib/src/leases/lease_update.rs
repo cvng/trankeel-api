@@ -1,8 +1,8 @@
+use crate::error::Result;
 use crate::files::CreateFileInput;
 use crate::AuthId;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::FurnishedLeaseDetails;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
@@ -26,7 +26,7 @@ pub fn update_furnished_lease(
     db: &impl Db,
     _auth_id: &AuthId,
     input: UpdateFurnishedLeaseInput,
-) -> Result<Lease, Error> {
+) -> Result<Lease> {
     input.validate()?;
 
     db.leases().update(input.into())

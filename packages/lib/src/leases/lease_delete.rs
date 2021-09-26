@@ -1,6 +1,6 @@
+use crate::error::Result;
 use crate::AuthId;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
 use piteo_data::LeaseId;
 use validator::Validate;
 
@@ -13,11 +13,7 @@ pub struct DeleteLeaseInput {
 
 // # Operation
 
-pub fn delete_lease(
-    db: &impl Db,
-    _auth_id: &AuthId,
-    input: DeleteLeaseInput,
-) -> Result<LeaseId, Error> {
+pub fn delete_lease(db: &impl Db, _auth_id: &AuthId, input: DeleteLeaseInput) -> Result<LeaseId> {
     input.validate()?;
 
     db.leases().delete(input.id)?;

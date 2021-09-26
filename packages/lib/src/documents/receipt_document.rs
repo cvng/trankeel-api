@@ -1,3 +1,4 @@
+use crate::error::Result;
 use crate::Amount;
 use crate::DateTime;
 use crate::FileType;
@@ -7,7 +8,6 @@ use crate::Property;
 use crate::Rent;
 use crate::Tenant;
 use piteo_core::error::no;
-use piteo_core::error::Error;
 use piteo_core::pdfmaker::IntoDocument;
 use piteo_data::Receipt;
 use serde::Serialize;
@@ -51,7 +51,7 @@ impl ReceiptDocument {
         tenants: Vec<Tenant>,
         property: Property,
         date: DateTime,
-    ) -> Result<Self, Error> {
+    ) -> Result<Self> {
         Ok(Self {
             is_receipt: (match receipt.type_ {
                 FileType::RentReceipt => Some(true),
