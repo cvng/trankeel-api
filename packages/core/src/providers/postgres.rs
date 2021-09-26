@@ -34,6 +34,8 @@ use piteo_data::Advertisement;
 use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
+use piteo_data::CandidacyData;
+use piteo_data::CandidacyId;
 use piteo_data::Company;
 use piteo_data::CompanyId;
 use piteo_data::Event;
@@ -430,6 +432,14 @@ impl database::AdvertisementStore for AdvertisementStore<'_> {
         Ok(advertisements::table.find(id).first(&self.0.get()?)?)
     }
 
+    fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Advertisement> {
+        Ok(advertisements::table
+            .select(advertisements::all_columns)
+            .left_join(candidacies::table.on(candidacies::advertisement_id.eq(advertisements::id)))
+            .filter(candidacies::id.eq(candidacy_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Advertisement>> {
         Ok(advertisements::table
             .filter(advertisements::property_id.eq(property_id))
@@ -468,6 +478,22 @@ impl database::CandidacyStore for CandidacyStore<'_> {
         Ok(insert_into(candidacies::table)
             .values(data)
             .get_result(&self.0.get()?)?)
+    }
+
+    fn update(&mut self, data: CandidacyData) -> Result<Candidacy> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    }
+
+    fn update_by_advertisement_id(
+        &mut self,
+        advertisement_id: &AdvertisementId,
+        data: CandidacyData,
+    ) -> Result<Vec<Candidacy>> {
+        Ok(
+            update(candidacies::table.filter(candidacies::advertisement_id.eq(advertisement_id)))
+                .set(&data)
+                .get_results(&self.0.get()?)?,
+        )
     }
 }
 

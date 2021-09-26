@@ -1542,7 +1542,6 @@ dependencies = [
  "log",
  "piteo-core",
  "piteo-data",
- "piteo-kit",
  "serde",
  "serde_json",
  "validator",
@@ -1603,7 +1602,6 @@ dependencies = [
  "diesel_as_jsonb",
  "diesel_enum_derive",
  "eyre",
- "piteo-kit",
  "rust_decimal",
  "serde",
  "serde_json",
@@ -1619,10 +1617,6 @@ dependencies = [
  "piteo",
  "serde",
 ]
-
-[[package]]
-name = "piteo-kit"
-version = "0.1.0"
 
 [[package]]
 name = "piteo-web"

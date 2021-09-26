@@ -22,6 +22,7 @@ mod lease;
 mod lease_details;
 mod legal_identity;
 mod lender;
+pub mod locale;
 mod payment;
 mod payment_notice;
 mod person;

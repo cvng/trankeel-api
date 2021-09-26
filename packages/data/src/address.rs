@@ -1,5 +1,5 @@
+use crate::locale;
 use diesel_as_jsonb::AsJsonb;
-use piteo_kit::locale;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt;

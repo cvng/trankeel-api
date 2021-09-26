@@ -1,4 +1,4 @@
-use super::CreateWarrantInput;
+use crate::candidacies::CreateWarrantInput;
 use crate::AuthId;
 use crate::Date;
 use crate::Tenant;
