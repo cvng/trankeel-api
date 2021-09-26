@@ -13,8 +13,6 @@ use crate::query::Query;
 use async_graphql::extensions::ApolloTracing;
 use async_graphql::EmptySubscription;
 use async_graphql::Schema;
-use piteo::Pg;
-use piteo::Provider;
 use std::fs::File;
 use std::io::Write;
 
@@ -25,7 +23,7 @@ pub type PiteoSchema = Schema<Query, Mutation, EmptySubscription>;
 
 /// Build Piteo GraphQL schema. https://async-graphql.github.io
 pub fn build_schema() -> Result<PiteoSchema> {
-    let client = piteo::Client::new(Pg::init().inner());
+    let client = piteo::init();
 
     let schema = Schema::build(Query, Mutation, EmptySubscription)
         .register_type::<PersonInterface>()

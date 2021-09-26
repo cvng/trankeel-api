@@ -4,6 +4,7 @@ pub use crate::auth::AddressInput;
 pub use crate::auth::CreateUserWithAccountInput;
 pub use crate::candidacies::AcceptCandidacyInput;
 pub use crate::candidacies::CreateCandidacyInput;
+pub use crate::error::Error;
 pub use crate::files::CreateFileInput;
 pub use crate::imports::ImportInput;
 pub use crate::leases::CreateFurnishedLeaseInput;
@@ -22,9 +23,6 @@ pub use crate::tenants::CreateTenantInput;
 pub use crate::tenants::DeleteTenantInput;
 pub use crate::tenants::UpdateTenantInput;
 pub use piteo_core::database::Db;
-pub use piteo_core::error::Error;
-pub use piteo_core::providers::Pg;
-pub use piteo_core::providers::Provider;
 
 use crate::Advertisement;
 use crate::AuthId;
@@ -39,22 +37,32 @@ use crate::Receipt;
 use crate::Tenant;
 use crate::TenantId;
 use async_graphql::Context;
-use piteo_core::providers::PgPool;
 use piteo_core::providers::Pdfmonkey;
+use piteo_core::providers::Pg;
+use piteo_core::providers::PgPool;
+use piteo_core::providers::Provider;
 use piteo_core::providers::Sendinblue;
 use piteo_core::providers::Stripe;
 use piteo_data::Summary;
 
-pub struct Client(PgPool, AuthId);
+pub struct Client(PgPool, Option<AuthId>);
 
 impl Client {
     pub fn new(db_pool: PgPool) -> Self {
-        Self(db_pool, AuthId::default())
+        Self(db_pool, None)
     }
 
-    pub fn with_auth_id(db_pool: PgPool, auth_id: AuthId) -> Self {
-        Self(db_pool, auth_id)
+    pub fn set_auth_id(&mut self, auth_id: AuthId) {
+        self.1 = Some(auth_id);
     }
+
+    pub fn auth_id(&self) -> Result<AuthId, Error> {
+        self.1.clone().ok_or_else(|| Error::msg("no auth id"))
+    }
+}
+
+pub fn init() -> Client {
+    Client(Pg::init().inner(), None)
 }
 
 // # Datasources
@@ -79,23 +87,23 @@ pub fn create_candidacy(client: &Client, input: CreateCandidacyInput) -> Result<
 }
 
 pub fn accept_candidacy(client: &Client, input: AcceptCandidacyInput) -> Result<Candidacy, Error> {
-    crate::candidacies::accept_candidacy(&Pg::new(client.0.clone()), &client.1, input)
+    crate::candidacies::accept_candidacy(&Pg::new(client.0.clone()), &client.auth_id()?, input)
 }
 
 // # Tenants
 
 pub fn create_tenant(client: &Client, input: CreateTenantInput) -> Result<Tenant, Error> {
-    crate::tenants::create_tenant(&Pg::new(client.0.clone()), &client.1, input, None)
+    crate::tenants::create_tenant(&Pg::new(client.0.clone()), &client.auth_id()?, input, None)
 }
 
 pub fn update_tenant(client: &Client, input: UpdateTenantInput) -> Result<Tenant, Error> {
-    crate::tenants::update_tenant(&Pg::new(client.0.clone()), &client.1, input)
+    crate::tenants::update_tenant(&Pg::new(client.0.clone()), &client.auth_id()?, input)
 }
 
 pub fn delete_tenant(client: &Client, id: TenantId) -> Result<TenantId, Error> {
     crate::tenants::delete_tenant(
         &Pg::new(client.0.clone()),
-        &client.1,
+        &client.auth_id()?,
         DeleteTenantInput { id },
     )
 }
@@ -103,17 +111,17 @@ pub fn delete_tenant(client: &Client, id: TenantId) -> Result<TenantId, Error> {
 // # Properties
 
 pub fn create_property(client: &Client, input: CreatePropertyInput) -> Result<Property, Error> {
-    crate::properties::create_property(&Pg::new(client.0.clone()), &client.1, input)
+    crate::properties::create_property(&Pg::new(client.0.clone()), &client.auth_id()?, input)
 }
 
 pub fn update_property(client: &Client, input: UpdatePropertyInput) -> Result<Property, Error> {
-    crate::properties::update_property(&Pg::new(client.0.clone()), &client.1, input)
+    crate::properties::update_property(&Pg::new(client.0.clone()), &client.auth_id()?, input)
 }
 
 pub fn delete_property(client: &Client, id: PropertyId) -> Result<TenantId, Error> {
     crate::properties::delete_property(
         &Pg::new(client.0.clone()),
-        &client.1,
+        &client.auth_id()?,
         DeletePropertyInput { id },
     )
 }
@@ -122,7 +130,7 @@ pub fn create_advertisement(
     client: &Client,
     input: CreateAdvertisementInput,
 ) -> Result<Advertisement, Error> {
-    crate::properties::create_advertisement(&Pg::new(client.0.clone()), &client.1, input)
+    crate::properties::create_advertisement(&Pg::new(client.0.clone()), &client.auth_id()?, input)
 }
 
 // # Leases
@@ -131,20 +139,20 @@ pub fn create_furnished_lease(
     client: &Client,
     input: CreateFurnishedLeaseInput,
 ) -> Result<Lease, Error> {
-    crate::leases::create_furnished_lease(&Pg::new(client.0.clone()), &client.1, input)
+    crate::leases::create_furnished_lease(&Pg::new(client.0.clone()), &client.auth_id()?, input)
 }
 
 pub fn update_furnished_lease(
     client: &Client,
     input: UpdateFurnishedLeaseInput,
 ) -> Result<Lease, Error> {
-    crate::leases::update_furnished_lease(&Pg::new(client.0.clone()), &client.1, input)
+    crate::leases::update_furnished_lease(&Pg::new(client.0.clone()), &client.auth_id()?, input)
 }
 
 pub fn delete_lease(client: &Client, id: LeaseId) -> Result<LeaseId, Error> {
     crate::leases::delete_lease(
         &Pg::new(client.0.clone()),
-        &client.1,
+        &client.auth_id()?,
         DeleteLeaseInput { id },
     )
 }
@@ -155,7 +163,7 @@ pub fn update_individual_lender(
     client: &Client,
     input: UpdateIndividualLenderInput,
 ) -> Result<Lender, Error> {
-    crate::owners::update_individual_lender(&Pg::new(client.0.clone()), &client.1, input)
+    crate::owners::update_individual_lender(&Pg::new(client.0.clone()), &client.auth_id()?, input)
 }
 
 // # Receipts
@@ -166,7 +174,7 @@ pub async fn create_receipts(
 ) -> Result<Vec<Receipt>, Error> {
     crate::leases::create_receipts(
         &Pg::new(client.0.clone()),
-        &client.1,
+        &client.auth_id()?,
         &Pdfmonkey::init(),
         input,
     )
@@ -179,7 +187,7 @@ pub async fn send_receipts(
 ) -> Result<Vec<Receipt>, Error> {
     crate::leases::send_receipts(
         &Pg::new(client.0.clone()),
-        &client.1,
+        &client.auth_id()?,
         &Sendinblue::init(),
         input,
     )
@@ -195,8 +203,8 @@ pub fn get_summary() -> Result<Summary, Error> {
 impl From<&Context<'_>> for Client {
     fn from(item: &Context<'_>) -> Self {
         Self(
-            item.data_unchecked::<PgPool>().clone(),
-            item.data_opt::<AuthId>().cloned().unwrap_or_default(),
+            item.data_unchecked::<Client>().0.clone(),
+            item.data_opt::<AuthId>().cloned(),
         )
     }
 }

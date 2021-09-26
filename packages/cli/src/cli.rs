@@ -10,13 +10,11 @@ use piteo::CreateUserWithAccountInput;
 use piteo::Db;
 use piteo::LeaseType;
 use piteo::LenderFlexibility;
-use piteo::Pg;
 use piteo::PropertyBuildPeriodType;
 use piteo::PropertyBuildingLegalStatus;
 use piteo::PropertyHabitationUsageType;
 use piteo::PropertyRoomType;
 use piteo::PropertyUsageType;
-use piteo::Provider;
 use std::env;
 
 #[tokio::main]
@@ -39,13 +37,14 @@ async fn write_schema() {
 }
 
 async fn seed() {
-    let auth_id = &AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
-    let client = &piteo::Client::with_auth_id(Pg::init().inner(), auth_id.clone());
+    let auth_id = AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
+    let mut client = piteo::init();
+    client.set_auth_id(auth_id.clone());
 
-    let db = piteo::db(client);
+    let db = piteo::db(&client);
 
     let user = piteo::create_user_with_account(
-        client,
+        &client,
         CreateUserWithAccountInput {
             auth_id: auth_id.clone(),
             email: "dev@piteo.fr".into(),
@@ -67,7 +66,7 @@ async fn seed() {
     let (lender, _) = db.lenders().by_individual_id(&user.id).unwrap();
 
     let property = piteo::create_property(
-        client,
+        &client,
         CreatePropertyInput {
             address: AddressInput {
                 city: "Talence".into(),
@@ -102,7 +101,7 @@ async fn seed() {
     .unwrap();
 
     let tenant = piteo::create_tenant(
-        client,
+        &client,
         CreateTenantInput {
             apl: None,
             birthdate: Utc::now().date().naive_utc().into(),
@@ -119,7 +118,7 @@ async fn seed() {
     .unwrap();
 
     let lease = piteo::create_furnished_lease(
-        client,
+        &client,
         CreateFurnishedLeaseInput {
             details: None,
             deposit_amount: None,
@@ -136,7 +135,7 @@ async fn seed() {
     .unwrap();
 
     let advertisement = piteo::create_advertisement(
-        client,
+        &client,
         CreateAdvertisementInput {
             published: true,
             lease_type: LeaseType::Furnished,
