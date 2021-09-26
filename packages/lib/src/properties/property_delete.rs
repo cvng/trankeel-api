@@ -1,6 +1,6 @@
-use crate::database::Db;
 use crate::AuthId;
-use eyre::Error;
+use piteo_core::database::Db;
+use piteo_core::error::Error;
 use piteo_data::PropertyId;
 use validator::Validate;
 

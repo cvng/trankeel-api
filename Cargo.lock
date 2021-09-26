@@ -1537,16 +1537,15 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 name = "piteo"
 version = "0.1.0"
 dependencies = [
- "async-trait",
- "diesel",
- "eyre",
+ "async-graphql",
+ "chrono",
+ "log",
  "piteo-core",
- "reqwest 0.11.4",
- "sendinblue",
+ "piteo-data",
+ "piteo-kit",
  "serde",
  "serde_json",
- "stripe-rust",
- "tokio 0.2.25",
+ "validator",
 ]
 
 [[package]]
@@ -1579,18 +1578,17 @@ dependencies = [
 name = "piteo-core"
 version = "0.1.0"
 dependencies = [
- "async-graphql",
  "async-trait",
- "chrono",
  "diesel",
  "erased-serde",
  "eyre",
- "log",
  "piteo-data",
- "piteo-kit",
+ "reqwest 0.11.4",
+ "sendinblue",
  "serde",
  "serde_json",
- "validator",
+ "stripe-rust",
+ "tokio 0.2.25",
 ]
 
 [[package]]

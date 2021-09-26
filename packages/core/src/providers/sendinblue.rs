@@ -1,9 +1,9 @@
-use crate::Provider;
+use crate::mailer::IntoMail;
+use crate::mailer::Mail;
+use crate::mailer::Mailer;
+use crate::providers::Provider;
 use async_trait::async_trait;
 use eyre::Error;
-use piteo_core::mailer::IntoMail;
-use piteo_core::mailer::Mail;
-use piteo_core::mailer::Mailer;
 use sendinblue::Mailer as Line;
 use sendinblue::TransactionalBody;
 use std::env;

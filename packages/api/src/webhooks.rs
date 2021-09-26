@@ -1,13 +1,13 @@
-use piteo::database::Db;
-use piteo::leases::SendReceiptsInput;
-use piteo::pdfmaker::Document;
+use piteo::Db;
 use piteo::DbPool;
+use piteo::Document;
 use piteo::FileData;
 use piteo::FileStatus;
 use piteo::FileType;
 use piteo::Pg;
 use piteo::Provider;
 use piteo::Receipt;
+use piteo::SendReceiptsInput;
 use rocket::http::Status;
 use rocket::info;
 use rocket::post;

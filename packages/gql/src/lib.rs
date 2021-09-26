@@ -18,7 +18,7 @@ use piteo::Provider;
 use std::fs::File;
 use std::io::Write;
 
-type Result<T> = std::result::Result<T, piteo::error::Error>;
+type Result<T> = std::result::Result<T, piteo::Error>;
 
 /// Piteo GraphQL schema.
 pub type PiteoSchema = Schema<Query, Mutation, EmptySubscription>;

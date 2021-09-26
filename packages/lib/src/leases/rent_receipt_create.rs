@@ -1,13 +1,12 @@
-use crate::activity::trace;
-use crate::database::Db;
 use crate::documents::ReceiptDocument;
-use crate::mailer::Mailer;
 use crate::messages::ReceiptMail;
-use crate::pdfmaker::Pdfmaker;
 use async_graphql::InputObject;
 use chrono::Utc;
-use diesel::result::Error::NotFound;
-use eyre::Error;
+use piteo_core::activity::trace;
+use piteo_core::database::Db;
+use piteo_core::error::Error;
+use piteo_core::mailer::Mailer;
+use piteo_core::pdfmaker::Pdfmaker;
 use piteo_data::Attachable;
 use piteo_data::AuthId;
 use piteo_data::EventType;
@@ -69,7 +68,7 @@ pub async fn send_receipts(
         let lease = db.leases().by_id(&rent.lease_id)?;
         let tenants = db.tenants().by_lease_id(&lease.id)?;
 
-        let receipt_id = rent.receipt_id.ok_or_else(|| Error::new(NotFound))?;
+        let receipt_id = rent.receipt_id.ok_or_else(|| Error::msg("not found"))?;
         let receipt = match db.files().by_id(&receipt_id) {
             Ok(receipt) => receipt,
             Err(err) => return Err(err),

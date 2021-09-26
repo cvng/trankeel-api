@@ -1,5 +1,3 @@
-use crate::error::no;
-use crate::pdfmaker::IntoDocument;
 use crate::Amount;
 use crate::DateTime;
 use crate::FileType;
@@ -8,7 +6,9 @@ use crate::Name;
 use crate::Property;
 use crate::Rent;
 use crate::Tenant;
-use eyre::Error;
+use piteo_core::error::no;
+use piteo_core::error::Error;
+use piteo_core::pdfmaker::IntoDocument;
 use piteo_data::Receipt;
 use serde::Serialize;
 

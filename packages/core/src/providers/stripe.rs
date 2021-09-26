@@ -1,10 +1,10 @@
-use crate::Provider;
+use crate::error::Context;
+use crate::error::Error;
+use crate::payment::PaymentProvider;
+use crate::providers::Provider;
 use async_trait::async_trait;
-use piteo_core::error::Context;
-use piteo_core::error::Error;
-use piteo_core::payment::PaymentProvider;
-use piteo_core::Email;
-use piteo_core::Subscription;
+use piteo_data::Email;
+use piteo_data::Subscription;
 use std::env;
 
 // # Provider
