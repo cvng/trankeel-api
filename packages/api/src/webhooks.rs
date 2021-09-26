@@ -1,5 +1,4 @@
 use piteo::Db;
-use piteo::DbPool;
 use piteo::Document;
 use piteo::FileData;
 use piteo::FileStatus;
@@ -25,8 +24,8 @@ pub struct PdfmonkeyPayload {
 pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
     info!("Received pdfmonkey request: {:?}", request);
 
-    let db_pool = Pg::init().inner();
-    let db = piteo::db(&db_pool);
+    let client = piteo::Client::new(Pg::init().inner());
+    let db = piteo::db(&client);
 
     let document = request.document.clone();
 
@@ -51,7 +50,7 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
     // Specific processing by document type.
     match file.type_ {
-        FileType::RentReceipt => on_receipt_created(&db_pool, &file).await,
+        FileType::RentReceipt => on_receipt_created(&client, &file).await,
         _ => panic!(),
     }
 
@@ -60,8 +59,8 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
 // # Handlers
 
-async fn on_receipt_created(db_pool: &DbPool, receipt: &Receipt) {
-    let db = piteo::db(db_pool);
+async fn on_receipt_created(client: &piteo::Client, receipt: &Receipt) {
+    let db = piteo::db(client);
 
     let rent = db.rents().by_receipt_id(&receipt.id).unwrap();
     let input = SendReceiptsInput {
@@ -75,7 +74,8 @@ async fn on_receipt_created(db_pool: &DbPool, receipt: &Receipt) {
         .by_account_id(&lease.account_id)
         .map(|mut users| users.remove(0))
         .unwrap();
-    let auth_id = &user.auth_id.unwrap();
+    let auth_id = user.auth_id.unwrap();
+    let client = piteo::Client::with_auth_id(Pg::init().inner(), auth_id);
 
-    piteo::send_receipts(db_pool, auth_id, input).await.ok();
+    piteo::send_receipts(&client, input).await.ok();
 }

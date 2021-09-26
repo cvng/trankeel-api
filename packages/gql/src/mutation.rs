@@ -17,7 +17,6 @@ use async_graphql::ID;
 use piteo::AcceptCandidacyInput;
 use piteo::AccountActivatePlanInput;
 use piteo::AccountUpdateInput;
-use piteo::AuthId;
 use piteo::CreateCandidacyInput;
 use piteo::CreateFileInput;
 use piteo::CreateFurnishedLeaseInput;
@@ -25,7 +24,6 @@ use piteo::CreatePropertyInput;
 use piteo::CreateReceiptsInput;
 use piteo::CreateTenantInput;
 use piteo::CreateUserWithAccountInput;
-use piteo::DbPool;
 use piteo::ImportInput;
 use piteo::SendPaymentNoticeInput;
 use piteo::TransactionInput;
@@ -44,8 +42,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateUserWithAccountInput,
     ) -> Result<Person> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(piteo::create_user_with_account(db_pool, input)
+        Ok(piteo::create_user_with_account(&ctx.into(), input)
             .await?
             .into())
     }
@@ -59,21 +56,15 @@ impl Mutation {
     }
 
     async fn tenant_create(&self, ctx: &Context<'_>, input: CreateTenantInput) -> Result<Tenant> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::create_tenant(db_pool, auth_id, input)?.into())
+        Ok(piteo::create_tenant(&ctx.into(), input)?.into())
     }
 
     async fn tenant_update(&self, ctx: &Context<'_>, input: UpdateTenantInput) -> Result<Tenant> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::update_tenant(db_pool, auth_id, input)?.into())
+        Ok(piteo::update_tenant(&ctx.into(), input)?.into())
     }
 
     async fn tenant_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::delete_tenant(db_pool, auth_id, id.try_into()?)?.into())
+        Ok(piteo::delete_tenant(&ctx.into(), id.try_into()?)?.into())
     }
 
     async fn property_create(
@@ -81,9 +72,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreatePropertyInput,
     ) -> Result<Property> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::create_property(db_pool, auth_id, input)?.into())
+        Ok(piteo::create_property(&ctx.into(), input)?.into())
     }
 
     async fn property_update(
@@ -91,15 +80,11 @@ impl Mutation {
         ctx: &Context<'_>,
         input: UpdatePropertyInput,
     ) -> Result<Property> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::update_property(db_pool, auth_id, input)?.into())
+        Ok(piteo::update_property(&ctx.into(), input)?.into())
     }
 
     async fn property_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::delete_property(db_pool, auth_id, id.try_into()?)?.into())
+        Ok(piteo::delete_property(&ctx.into(), id.try_into()?)?.into())
     }
 
     async fn lease_furnished_create(
@@ -107,9 +92,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::create_furnished_lease(db_pool, auth_id, input)?.into())
+        Ok(piteo::create_furnished_lease(&ctx.into(), input)?.into())
     }
 
     async fn lease_furnished_update(
@@ -117,15 +100,11 @@ impl Mutation {
         ctx: &Context<'_>,
         input: UpdateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::update_furnished_lease(db_pool, auth_id, input)?.into())
+        Ok(piteo::update_furnished_lease(&ctx.into(), input)?.into())
     }
 
     async fn lease_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::delete_lease(db_pool, auth_id, id.try_into()?)?.into())
+        Ok(piteo::delete_lease(&ctx.into(), id.try_into()?)?.into())
     }
 
     async fn lender_individual_update(
@@ -133,9 +112,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: UpdateIndividualLenderInput,
     ) -> Result<Lender> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::update_individual_lender(db_pool, auth_id, input)?.into())
+        Ok(piteo::update_individual_lender(&ctx.into(), input)?.into())
     }
 
     async fn candidacy_create(
@@ -143,8 +120,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateCandidacyInput,
     ) -> Result<Candidacy> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(piteo::create_candidacy(db_pool, input)?.into())
+        Ok(piteo::create_candidacy(&ctx.into(), input)?.into())
     }
 
     async fn candidacy_accept(
@@ -152,9 +128,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        Ok(piteo::accept_candidacy(db_pool, auth_id, input)?.into())
+        Ok(piteo::accept_candidacy(&ctx.into(), input)?.into())
     }
 
     async fn transaction_create(&self, _input: TransactionInput) -> Result<Payment> {
@@ -178,9 +152,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateReceiptsInput,
     ) -> Result<CreateReceiptsPayload> {
-        let db_pool = ctx.data::<DbPool>()?;
-        let auth_id = ctx.data::<AuthId>()?;
-        match piteo::create_receipts(db_pool, auth_id, input).await {
+        match piteo::create_receipts(&ctx.into(), input).await {
             Ok(receipts) => Ok(CreateReceiptsPayload {
                 receipts: Some(map_res(receipts)?),
                 errors: None,

@@ -25,13 +25,13 @@ pub type PiteoSchema = Schema<Query, Mutation, EmptySubscription>;
 
 /// Build Piteo GraphQL schema. https://async-graphql.github.io
 pub fn build_schema() -> Result<PiteoSchema> {
-    let db_pool = Pg::init().inner();
+    let client = piteo::Client::new(Pg::init().inner());
 
     let schema = Schema::build(Query, Mutation, EmptySubscription)
         .register_type::<PersonInterface>()
         .register_type::<LegalIdentityInterface>()
         .extension(ApolloTracing)
-        .data(db_pool)
+        .data(client)
         .finish();
 
     Ok(schema)

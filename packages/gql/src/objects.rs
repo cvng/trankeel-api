@@ -13,7 +13,6 @@ use piteo::CandidacyStatus;
 use piteo::Date;
 use piteo::DateTime;
 use piteo::Db;
-use piteo::DbPool;
 use piteo::Email;
 use piteo::EventType;
 use piteo::EventableType;
@@ -248,8 +247,7 @@ impl Lease {
         self.0.status()
     }
     async fn rents(&self, ctx: &Context<'_>) -> Result<Vec<Rent>> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(piteo::db(db_pool)
+        Ok(piteo::db(&ctx.into())
             .rents()
             .by_lease_id(&self.0.id)?
             .into_iter()
@@ -260,8 +258,7 @@ impl Lease {
         None
     }
     async fn tenants(&self, ctx: &Context<'_>) -> Result<Vec<Tenant>> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(piteo::db(db_pool)
+        Ok(piteo::db(&ctx.into())
             .tenants()
             .by_lease_id(&self.0.id)?
             .into_iter()
@@ -272,8 +269,7 @@ impl Lease {
         None
     }
     async fn property(&self, ctx: &Context<'_>) -> Result<Property> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(piteo::db(db_pool)
+        Ok(piteo::db(&ctx.into())
             .properties()
             .by_id(&self.0.property_id)?
             .into())
@@ -401,19 +397,17 @@ impl Lender {
     async fn display_name(&self, ctx: &Context<'_>) -> Result<String> {
         match &self.1 {
             Some(legal_identity) => Ok(legal_identity.display_name()),
-            None => {
-                let db_pool = ctx.data::<DbPool>()?;
-                Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.display_name())
-            }
+            None => Ok(db(&ctx.into())
+                .lenders()
+                .by_id(&self.0.id)?
+                .1
+                .display_name()),
         }
     }
     async fn identity(&self, ctx: &Context<'_>) -> Result<LegalIdentity> {
         match &self.1 {
             Some(legal_identity) => Ok(legal_identity.clone().into()),
-            None => {
-                let db_pool = ctx.data::<DbPool>()?;
-                Ok(db(db_pool).lenders().by_id(&self.0.id)?.1.into())
-            }
+            None => Ok(db(&ctx.into()).lenders().by_id(&self.0.id)?.1.into()),
         }
     }
 }
@@ -452,11 +446,13 @@ pub struct Person {
 #[async_graphql::ComplexObject]
 impl Person {
     async fn account(&self, ctx: &Context<'_>) -> Result<Option<Account>> {
-        let db_pool = ctx.data::<DbPool>()?;
         let account_id = self.account_id.clone().try_into()?;
 
         Ok(Some(
-            db(db_pool).accounts().by_id(&account_id).map(Into::into)?,
+            db(&ctx.into())
+                .accounts()
+                .by_id(&account_id)
+                .map(Into::into)?,
         ))
     }
 }
@@ -541,8 +537,7 @@ pub struct Candidacy {
 #[async_graphql::ComplexObject]
 impl Candidacy {
     async fn tenant(&self, ctx: &Context<'_>) -> Result<Tenant> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool)
+        Ok(db(&ctx.into())
             .tenants()
             .by_id(&self.tenant_id.clone().try_into()?)
             .map(Into::into)?)
@@ -648,15 +643,13 @@ impl Property {
         None
     }
     async fn lender(&self, ctx: &Context<'_>) -> Result<Option<Lender>> {
-        let db_pool = ctx.data::<DbPool>()?;
         Ok(Some(
-            db(db_pool).lenders().by_id(&self.0.lender_id)?.0.into(),
+            db(&ctx.into()).lenders().by_id(&self.0.lender_id)?.0.into(),
         ))
     }
     async fn leases(&self, ctx: &Context<'_>) -> Result<Option<Vec<Lease>>> {
-        let db_pool = ctx.data::<DbPool>()?;
         Ok(Some(
-            db(db_pool)
+            db(&ctx.into())
                 .leases()
                 .by_property_id(&self.0.id)?
                 .into_iter()
@@ -665,9 +658,8 @@ impl Property {
         ))
     }
     async fn advertisements(&self, ctx: &Context<'_>) -> Result<Option<Vec<Advertisement>>> {
-        let db_pool = ctx.data::<DbPool>()?;
         Ok(Some(
-            db(db_pool)
+            db(&ctx.into())
                 .advertisements()
                 .by_property_id(&self.0.id)
                 .and_then(map_res)?,
@@ -703,8 +695,7 @@ pub struct Rent {
 #[async_graphql::ComplexObject]
 impl Rent {
     async fn lease(&self, ctx: &Context<'_>) -> Result<Lease> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool)
+        Ok(db(&ctx.into())
             .leases()
             .by_id(&self.lease_id.to_string().parse::<LeaseId>()?)?
             .into())
@@ -835,9 +826,8 @@ pub struct Tenant {
 #[async_graphql::ComplexObject]
 impl Tenant {
     async fn warrants(&self, ctx: &Context<'_>) -> Result<Option<Vec<Warrant>>> {
-        let db_pool = ctx.data::<DbPool>()?;
         Ok(Some(
-            db(db_pool)
+            db(&ctx.into())
                 .warrants()
                 .by_tenant_id(&self.id.clone().try_into()?)
                 .and_then(map_res)?,
@@ -924,8 +914,7 @@ pub struct Payment {
 #[async_graphql::ComplexObject]
 impl Payment {
     async fn lease(&self, ctx: &Context<'_>) -> Result<Lease> {
-        let db_pool = ctx.data::<DbPool>()?;
-        Ok(db(db_pool)
+        Ok(db(&ctx.into())
             .leases()
             .by_rent_id(&self.rent_id.to_string().parse::<RentId>()?)?
             .into())

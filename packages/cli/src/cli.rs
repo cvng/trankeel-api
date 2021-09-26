@@ -39,13 +39,13 @@ async fn write_schema() {
 }
 
 async fn seed() {
-    let db_pool = &Pg::init().inner();
     let auth_id = &AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
+    let client = &piteo::Client::with_auth_id(Pg::init().inner(), auth_id.clone());
 
-    let db = piteo::db(db_pool);
+    let db = piteo::db(client);
 
     let user = piteo::create_user_with_account(
-        db_pool,
+        client,
         CreateUserWithAccountInput {
             auth_id: auth_id.clone(),
             email: "dev@piteo.fr".into(),
@@ -67,8 +67,7 @@ async fn seed() {
     let (lender, _) = db.lenders().by_individual_id(&user.id).unwrap();
 
     let property = piteo::create_property(
-        db_pool,
-        auth_id,
+        client,
         CreatePropertyInput {
             address: AddressInput {
                 city: "Talence".into(),
@@ -103,8 +102,7 @@ async fn seed() {
     .unwrap();
 
     let tenant = piteo::create_tenant(
-        db_pool,
-        auth_id,
+        client,
         CreateTenantInput {
             apl: None,
             birthdate: Utc::now().date().naive_utc().into(),
@@ -121,8 +119,7 @@ async fn seed() {
     .unwrap();
 
     let lease = piteo::create_furnished_lease(
-        db_pool,
-        auth_id,
+        client,
         CreateFurnishedLeaseInput {
             details: None,
             deposit_amount: None,
@@ -139,8 +136,7 @@ async fn seed() {
     .unwrap();
 
     let advertisement = piteo::create_advertisement(
-        db_pool,
-        auth_id,
+        client,
         CreateAdvertisementInput {
             published: true,
             lease_type: LeaseType::Furnished,
