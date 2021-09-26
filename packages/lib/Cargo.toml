@@ -11,7 +11,6 @@ chrono = "0.4.19"
 log = "0.4.14"
 piteo-core = { path = "../core" }
 piteo-data = { path = "../data" }
-piteo-kit = { path = "../kit" }
 serde = "1.0"
 serde_json = "1.0"
 validator = { version = "0.14.0", features = ["derive"] }
