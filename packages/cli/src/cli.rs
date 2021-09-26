@@ -37,8 +37,8 @@ async fn write_schema() {
 }
 
 async fn seed() {
-    let auth_id = AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
     let mut client = piteo::init();
+    let auth_id = AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
     client.set_auth_id(auth_id.clone());
 
     let db = piteo::db(&client);
