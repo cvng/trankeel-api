@@ -34,6 +34,7 @@ use piteo_data::Advertisement;
 use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
+use piteo_data::CandidacyData;
 use piteo_data::CandidacyId;
 use piteo_data::Company;
 use piteo_data::CompanyId;
@@ -479,14 +480,14 @@ impl database::CandidacyStore for CandidacyStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: piteo_data::CandidacyData) -> Result<Candidacy> {
+    fn update(&mut self, data: CandidacyData) -> Result<Candidacy> {
         Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
     }
 
     fn update_by_advertisement_id(
         &mut self,
         advertisement_id: &AdvertisementId,
-        data: piteo_data::CandidacyData,
+        data: CandidacyData,
     ) -> Result<Vec<Candidacy>> {
         Ok(
             update(candidacies::table.filter(candidacies::advertisement_id.eq(advertisement_id)))
