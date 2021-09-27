@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "advertisements" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -16,11 +15,8 @@ CREATE TABLE "advertisements" (
     CONSTRAINT "advertisements_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
 ALTER TABLE "advertisements" ADD CONSTRAINT "advertisements_referral_lease_id_fkey" FOREIGN KEY ("referral_lease_id") REFERENCES "leases"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "advertisements" ADD CONSTRAINT "advertisements_property_id_fkey" FOREIGN KEY ("property_id") REFERENCES "properties"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- ManageUpdatedAt
 SELECT manage_updated_at('advertisements');

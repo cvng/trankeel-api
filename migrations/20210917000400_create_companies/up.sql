@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "companies" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -14,5 +13,4 @@ CREATE TABLE "companies" (
     CONSTRAINT "companies_pkey" PRIMARY KEY ("id")
 );
 
--- ManageUpdatedAt
 SELECT manage_updated_at('companies');

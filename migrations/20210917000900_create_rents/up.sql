@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "rents" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -16,8 +15,6 @@ CREATE TABLE "rents" (
     CONSTRAINT "rents_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
 ALTER TABLE "rents" ADD CONSTRAINT "rents_lease_id_fkey" FOREIGN KEY ("lease_id") REFERENCES "leases"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- ManageUpdatedAt
 SELECT manage_updated_at('rents');

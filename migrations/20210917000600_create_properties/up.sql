@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "properties" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -30,11 +29,8 @@ CREATE TABLE "properties" (
     CONSTRAINT "properties_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
 ALTER TABLE "properties" ADD CONSTRAINT "properties_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "accounts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "properties" ADD CONSTRAINT "properties_lender_id_fkey" FOREIGN KEY ("lender_id") REFERENCES "lenders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- ManageUpdatedAt
 SELECT manage_updated_at('properties');

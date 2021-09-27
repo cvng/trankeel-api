@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "plans" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "code" TEXT NOT NULL,

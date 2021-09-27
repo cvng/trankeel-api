@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "events" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -11,8 +10,6 @@ CREATE TABLE "events" (
     CONSTRAINT "events_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
 ALTER TABLE "events" ADD CONSTRAINT "events_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "accounts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- ManageUpdatedAt
 SELECT manage_updated_at('events');
