@@ -1582,6 +1582,7 @@ dependencies = [
  "dotenv",
  "piteo",
  "piteo-graphql",
+ "regex",
  "tokio 1.10.0",
 ]
 
