@@ -1,6 +1,6 @@
 CREATE TABLE "tenants" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ DEFAULT current_timestamp,
     "updated_at" TIMESTAMPTZ,
     "account_id" UUID NOT NULL,
     "apl" BOOLEAN,

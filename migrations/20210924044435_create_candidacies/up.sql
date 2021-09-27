@@ -1,6 +1,6 @@
 CREATE TABLE "candidacies" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ DEFAULT current_timestamp,
     "updated_at" TIMESTAMPTZ,
     "status" TEXT NOT NULL,
     "advertisement_id" UUID NOT NULL,

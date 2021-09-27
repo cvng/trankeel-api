@@ -1,6 +1,6 @@
 CREATE TABLE "rents" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ DEFAULT current_timestamp,
     "updated_at" TIMESTAMPTZ,
     "period_end" TIMESTAMPTZ NOT NULL,
     "period_start" TIMESTAMPTZ NOT NULL,

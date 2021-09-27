@@ -1,6 +1,6 @@
 CREATE TABLE "files" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ DEFAULT current_timestamp,
     "updated_at" TIMESTAMPTZ,
     "download_url" TEXT,
     "external_id" TEXT,
