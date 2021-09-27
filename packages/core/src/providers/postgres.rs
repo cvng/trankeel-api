@@ -54,6 +54,7 @@ use piteo_data::LenderData;
 use piteo_data::LenderId;
 use piteo_data::LenderWithIdentity;
 use piteo_data::Payment;
+use piteo_data::PaymentNoticeId;
 use piteo_data::Person;
 use piteo_data::PersonData;
 use piteo_data::PersonId;
@@ -545,6 +546,14 @@ impl database::LeaseStore for LeaseStore<'_> {
             .first(&self.0.get()?)?)
     }
 
+    fn by_notice_id(&mut self, notice_id: &PaymentNoticeId) -> Result<Lease> {
+        Ok(leases::table
+            .select(leases::all_columns)
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .filter(rents::notice_id.eq(notice_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Lease> {
         Ok(leases::table
             .select(leases::all_columns)
@@ -595,6 +604,12 @@ impl database::RentStore for RentStore<'_> {
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Rent> {
         Ok(rents::table
             .filter(rents::receipt_id.eq(&receipt_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_notice_id(&mut self, notice_id: &piteo_data::PaymentNoticeId) -> Result<Rent> {
+        Ok(rents::table
+            .filter(rents::notice_id.eq(&notice_id))
             .first(&self.0.get()?)?)
     }
 

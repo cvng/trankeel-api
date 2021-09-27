@@ -141,8 +141,8 @@ impl Query {
     async fn rents(
         &self,
         ctx: &Context<'_>,
-        _since: DateTime,
-        _until: DateTime,
+        // _since: DateTime,
+        // _until: DateTime,
     ) -> Result<Vec<Rent>> {
         Ok(db(&ctx.into())
             .rents()

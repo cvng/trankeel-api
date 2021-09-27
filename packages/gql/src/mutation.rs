@@ -20,6 +20,7 @@ use piteo::AccountUpdateInput;
 use piteo::CreateCandidacyInput;
 use piteo::CreateFileInput;
 use piteo::CreateFurnishedLeaseInput;
+use piteo::CreateNoticesInput;
 use piteo::CreatePropertyInput;
 use piteo::CreateReceiptsInput;
 use piteo::CreateTenantInput;
@@ -28,7 +29,6 @@ use piteo::DeleteLeaseInput;
 use piteo::DeletePropertyInput;
 use piteo::DeleteTenantInput;
 use piteo::ImportInput;
-use piteo::SendPaymentNoticeInput;
 use piteo::TransactionInput;
 use piteo::UpdateFurnishedLeaseInput;
 use piteo::UpdateIndividualLenderInput;
@@ -150,7 +150,7 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn rent_receipt_create(
+    async fn edit_rent_receipts(
         &self,
         ctx: &Context<'_>,
         input: CreateReceiptsInput,
@@ -167,11 +167,21 @@ impl Mutation {
         }
     }
 
-    async fn send_payment_notice(
+    async fn send_payment_notices(
         &self,
-        _input: SendPaymentNoticeInput,
-    ) -> Result<SendPaymentNoticePayload> {
-        Err(wip())
+        ctx: &Context<'_>,
+        input: CreateNoticesInput,
+    ) -> Result<CreateNoticesPayload> {
+        match piteo::create_notices(&ctx.into(), input).await {
+            Ok(receipts) => Ok(CreateNoticesPayload {
+                notices: Some(map_res(receipts)?),
+                errors: None,
+            }),
+            Err(err) => Ok(CreateNoticesPayload {
+                notices: None,
+                errors: Some(vec![err.into()]),
+            }),
+        }
     }
 }
 
@@ -185,7 +195,7 @@ struct CreateReceiptsPayload {
 }
 
 #[derive(async_graphql::SimpleObject)]
-struct SendPaymentNoticePayload {
+struct CreateNoticesPayload {
     errors: Option<Vec<Error>>,
     notices: Option<Vec<File>>,
 }

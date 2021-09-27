@@ -10,6 +10,7 @@ use piteo_core::mailer::Mailer;
 use piteo_core::pdfmaker::Pdfmaker;
 use piteo_data::Attachable;
 use piteo_data::AuthId;
+use piteo_data::DateTime;
 use piteo_data::EventType;
 use piteo_data::FileType;
 use piteo_data::Payment;
@@ -29,7 +30,8 @@ use validator::Validate;
 #[graphql(name = "RentReceiptInput")]
 pub struct CreateReceiptsInput {
     rent_ids: Vec<RentId>,
-    send_mail: bool,
+    date: Option<DateTime>,
+    send_mail: Option<bool>,
 }
 
 #[derive(InputObject, Validate)]
@@ -69,7 +71,13 @@ pub async fn send_receipts(
         let lease = db.leases().by_id(&rent.lease_id)?;
         let tenants = db.tenants().by_lease_id(&lease.id)?;
 
-        let receipt_id = rent.receipt_id.ok_or_else(|| Error::msg("not found"))?;
+        let receipt_id = if let Some(receipt_id) = rent.receipt_id {
+            receipt_id
+        } else if let Some(notice_id) = rent.notice_id {
+            notice_id
+        } else {
+            return Err(Error::msg("not found"));
+        };
         let receipt = match db.files().by_id(&receipt_id) {
             Ok(receipt) => receipt,
             Err(err) => return Err(err),
@@ -79,7 +87,10 @@ pub async fn send_receipts(
         let mail = ReceiptMail::try_new(&receipt, &rent, tenants, Utc::now().into())?;
         mailer.batch(vec![mail]).await?;
 
-        trace(db, auth_id, EventType::RentReceiptSent, rent.id).ok();
+        match receipt.type_ {
+            FileType::RentReceipt => trace(db, auth_id, EventType::RentReceiptSent, rent.id).ok(),
+            _ => trace(db, auth_id, EventType::PaymentNoticeSent, rent.id).ok(),
+        };
     }
 
     Ok(receipts)

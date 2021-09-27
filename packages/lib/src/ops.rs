@@ -9,9 +9,9 @@ pub use crate::error::Result;
 pub use crate::files::CreateFileInput;
 pub use crate::imports::ImportInput;
 pub use crate::leases::CreateFurnishedLeaseInput;
+pub use crate::leases::CreateNoticesInput;
 pub use crate::leases::CreateReceiptsInput;
 pub use crate::leases::DeleteLeaseInput;
-pub use crate::leases::SendPaymentNoticeInput;
 pub use crate::leases::SendReceiptsInput;
 pub use crate::leases::TransactionInput;
 pub use crate::leases::UpdateFurnishedLeaseInput;
@@ -37,6 +37,7 @@ use piteo_data::Candidacy;
 use piteo_data::Lease;
 use piteo_data::LeaseId;
 use piteo_data::Lender;
+use piteo_data::PaymentNotice;
 use piteo_data::Person;
 use piteo_data::Property;
 use piteo_data::PropertyId;
@@ -173,6 +174,15 @@ pub async fn create_receipts(client: &Client, input: CreateReceiptsInput) -> Res
 
 pub async fn send_receipts(client: &Client, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
     crate::leases::send_receipts(&client.db(), &client.auth_id()?, &Sendinblue::init(), input).await
+}
+
+// # Notices
+
+pub async fn create_notices(
+    client: &Client,
+    input: CreateNoticesInput,
+) -> Result<Vec<PaymentNotice>> {
+    crate::leases::create_notices(&client.db(), &client.auth_id()?, &Pdfmonkey::init(), input).await
 }
 
 // # Reports

@@ -15,6 +15,8 @@ pub type EventWithEventable = (Event, Eventable);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
 pub enum EventType {
+    PaymentNoticeCreated,
+    PaymentNoticeSent,
     RentReceiptCreated,
     RentReceiptSent,
     #[graphql(name = "TRANSACTION_CREATED")]
@@ -36,6 +38,8 @@ pub enum EventableType {
 impl From<EventType> for EventableType {
     fn from(item: EventType) -> Self {
         match item {
+            EventType::PaymentNoticeCreated => Self::Rent,
+            EventType::PaymentNoticeSent => Self::Rent,
             EventType::RentReceiptCreated => Self::Rent,
             EventType::RentReceiptSent => Self::Rent,
             EventType::PaymentCreated => Self::Payment,

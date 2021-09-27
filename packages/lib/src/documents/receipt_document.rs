@@ -12,6 +12,8 @@ use piteo_core::pdfmaker::IntoDocument;
 use piteo_data::Receipt;
 use serde::Serialize;
 
+pub type NoticeDocument = ReceiptDocument; // alias for a ReceiptDocument
+
 /// Receipt or notice document. https://dashboard.pdfmonkey.io/templates/8269e571-7ece-4f0d-bc37-854d77999e0d
 #[derive(Clone, Debug, Serialize)]
 pub struct ReceiptDocument {
