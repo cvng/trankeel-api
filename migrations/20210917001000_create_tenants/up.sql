@@ -11,6 +11,7 @@ CREATE TABLE tenants (
     last_name TEXT NOT NULL,
     note TEXT,
     phone_number TEXT,
+    status TEXT NOT NULL,
     lease_id UUID REFERENCES leases(id) ON DELETE SET NULL,
     is_student BOOLEAN
 );

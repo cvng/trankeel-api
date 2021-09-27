@@ -5,7 +5,7 @@ CREATE TABLE persons (
     created_at TIMESTAMPTZ DEFAULT current_timestamp,
     updated_at TIMESTAMPTZ,
     account_id UUID NOT NULL REFERENCES accounts(id),
-    auth_id TEXT NOT NULL UNIQUE,
+    auth_id TEXT UNIQUE,
     email TEXT NOT NULL UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
