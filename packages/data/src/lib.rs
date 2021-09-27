@@ -1,5 +1,3 @@
-#![allow(unused_imports)]
-
 #[macro_use]
 extern crate async_graphql;
 #[macro_use]

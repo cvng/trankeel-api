@@ -1,5 +1,6 @@
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     accounts (id) {
@@ -16,6 +17,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     advertisements (id) {
@@ -36,6 +38,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     candidacies (id) {
@@ -52,6 +55,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     companies (id) {
@@ -70,6 +74,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     events (id) {
@@ -86,6 +91,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     files (id) {
@@ -104,6 +110,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     leases (id) {
@@ -129,6 +136,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     lenders (id) {
@@ -143,6 +151,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     payments (id) {
@@ -160,6 +169,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     persons (id) {
@@ -180,6 +190,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     plans (id) {
@@ -193,6 +204,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     professional_warrants (id) {
@@ -206,6 +218,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     properties (id) {
@@ -240,6 +253,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     rents (id) {
@@ -260,6 +274,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     tenants (id) {
@@ -283,6 +298,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
+    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     warrants (id) {
