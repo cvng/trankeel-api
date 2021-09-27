@@ -1,10 +1,13 @@
+-- CreateType
+CREATE TYPE accountstatus AS ENUM ('active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'trialing', 'unpaid');
+
 -- CreateTable
 CREATE TABLE "accounts" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ,
     "plan_id" UUID,
-    "status" TEXT,
+    "status" ACCOUNTSTATUS,
     "stripe_customer_id" TEXT,
     "stripe_subscription_id" TEXT,
     "trial_end" TIMESTAMPTZ,

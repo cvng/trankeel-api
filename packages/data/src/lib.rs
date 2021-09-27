@@ -1,9 +1,13 @@
+#![allow(unused_imports)]
+
 #[macro_use]
 extern crate async_graphql;
 #[macro_use]
 extern crate diesel;
 #[macro_use]
 extern crate diesel_as_jsonb;
+#[macro_use]
+extern crate diesel_derive_enum;
 #[macro_use]
 extern crate diesel_enum_derive;
 #[macro_use]
@@ -37,6 +41,7 @@ mod plan;
 mod property;
 mod rent;
 mod rent_receipt;
+mod sql_types;
 mod subscription;
 mod summary;
 mod task;
@@ -66,6 +71,7 @@ pub use crate::plan::*;
 pub use crate::property::*;
 pub use crate::rent::*;
 pub use crate::rent_receipt::*;
+pub use crate::sql_types::*;
 pub use crate::subscription::*;
 pub use crate::summary::*;
 pub use crate::tenant::*;

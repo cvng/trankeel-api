@@ -1,3 +1,6 @@
+-- CreateType
+CREATE TYPE personrole AS ENUM ('admin', 'tenant', 'user', 'viewer', 'warrant');
+
 -- CreateTable
 CREATE TABLE "persons" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
@@ -10,7 +13,7 @@ CREATE TABLE "persons" (
     "last_name" TEXT NOT NULL,
     "address" JSONB,
     "photo_url" TEXT,
-    "role" TEXT,
+    "role" PERSONROLE,
     "phone_number" TEXT,
 
     CONSTRAINT "persons_pkey" PRIMARY KEY ("id")

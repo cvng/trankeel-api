@@ -1,10 +1,13 @@
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     accounts (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         plan_id -> Nullable<Uuid>,
-        status -> Nullable<Text>,
+        status -> Nullable<Accountstatus>,
         stripe_customer_id -> Nullable<Text>,
         stripe_subscription_id -> Nullable<Text>,
         trial_end -> Nullable<Timestamptz>,
@@ -12,6 +15,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     advertisements (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -29,6 +35,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     candidacies (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -42,6 +51,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     companies (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -57,6 +69,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     events (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -70,6 +85,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     files (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -85,6 +103,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     leases (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -107,6 +128,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     lenders (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -118,6 +142,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     payments (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -132,6 +159,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     persons (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -143,12 +173,15 @@ table! {
         last_name -> Text,
         address -> Nullable<Jsonb>,
         photo_url -> Nullable<Text>,
-        role -> Nullable<Text>,
+        role -> Nullable<Personrole>,
         phone_number -> Nullable<Text>,
     }
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     plans (id) {
         id -> Uuid,
         code -> Text,
@@ -159,6 +192,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     professional_warrants (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -169,6 +205,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     properties (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -200,6 +239,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     rents (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -217,6 +259,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     tenants (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -237,6 +282,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     warrants (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
