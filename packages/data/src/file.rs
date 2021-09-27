@@ -3,10 +3,6 @@ use crate::schema::files;
 use crate::DateTime;
 use crate::ExternalId;
 use crate::Url;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
-use serde::Deserialize;
-use serde::Serialize;
 
 // # Types
 

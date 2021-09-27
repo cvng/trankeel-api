@@ -1,7 +1,5 @@
 use crate::common::Id;
 use crate::Amount;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
 
 // # Types
 

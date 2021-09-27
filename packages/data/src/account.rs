@@ -4,9 +4,6 @@ use crate::CustomerId;
 use crate::DateTime;
 use crate::PlanId;
 use crate::SubscriptionId;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
-use serde::Deserialize;
 
 // # Types
 

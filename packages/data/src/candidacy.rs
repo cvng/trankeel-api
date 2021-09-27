@@ -3,10 +3,6 @@ use crate::AdvertisementId;
 use crate::DateTime;
 use crate::Id;
 use crate::TenantId;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
-use serde::Deserialize;
-use serde::Serialize;
 
 // # Types
 

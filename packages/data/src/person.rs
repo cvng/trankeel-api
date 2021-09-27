@@ -7,11 +7,6 @@ use crate::Email;
 use crate::Name;
 use crate::PhoneNumber;
 use crate::Url;
-use async_graphql::scalar;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
-use serde::Deserialize;
-use serde::Serialize;
 use std::fmt;
 use std::fmt::Display;
 

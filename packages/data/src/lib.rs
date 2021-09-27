@@ -1,8 +1,15 @@
 #[macro_use]
+extern crate async_graphql;
+#[macro_use]
 extern crate diesel;
-
+#[macro_use]
+extern crate diesel_as_jsonb;
+#[macro_use]
+extern crate diesel_enum_derive;
 #[macro_use]
 extern crate diesel_derive_newtype;
+#[macro_use]
+extern crate serde;
 
 pub mod schema; // Export database schema.
 

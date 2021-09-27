@@ -5,9 +5,6 @@ use crate::Address;
 use crate::Amount;
 use crate::DateTime;
 use crate::LenderId;
-use async_graphql::Enum;
-use diesel_enum_derive::DieselEnum;
-use serde::Deserialize;
 
 // # Types
 
