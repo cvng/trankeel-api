@@ -9,14 +9,8 @@
     "lint": "cargo clippy",
     "test": "cargo test",
     "fmt": "cargo fmt",
-    "migrate": "prisma migrate reset --force --skip-generate",
+    "migrate": "diesel migration run",
     "generate": "cargo run --bin piteo-cli -- generate",
-    "postmigrate": "diesel print-schema > packages/data/src/schema.rs"
-  },
-  "prisma": {
-    "seed": "./seed.sh"
-  },
-  "devDependencies": {
-    "prisma": "^3.1.1"
+    "postmigrate": "cargo run --bin piteo-cli -- seed"
   }
 }

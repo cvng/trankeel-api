@@ -154,4 +154,5 @@ async fn seed() {
         "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",
         user, lender, property, tenant, lease, advertisement
     );
+    println!("🌱 Database seeded.");
 }
