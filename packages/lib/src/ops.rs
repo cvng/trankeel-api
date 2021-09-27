@@ -29,7 +29,6 @@ use async_graphql::Context;
 use piteo_core::providers::Pdfmonkey;
 use piteo_core::providers::Pg;
 use piteo_core::providers::PgPool;
-use piteo_core::providers::Provider;
 use piteo_core::providers::Sendinblue;
 use piteo_core::providers::Stripe;
 use piteo_data::Advertisement;

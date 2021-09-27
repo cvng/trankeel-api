@@ -6,15 +6,14 @@ mod lib;
 use super::pdfmonkey::lib as pdfmonkey;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
-use crate::providers::Provider;
 use async_trait::async_trait;
 use eyre::Error;
 use piteo_data::Document;
 
 pub struct Pdfmonkey(pdfmonkey::Pdfmonkey);
 
-impl Provider for Pdfmonkey {
-    fn init() -> Self {
+impl Pdfmonkey {
+    pub fn init() -> Self {
         Self(pdfmonkey::Pdfmonkey::new())
     }
 }

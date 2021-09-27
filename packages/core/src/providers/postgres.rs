@@ -2,7 +2,6 @@ use crate::database;
 use crate::database::Db;
 use crate::error::Context;
 use crate::error::Error;
-use crate::providers::Provider;
 use diesel::delete;
 use diesel::insert_into;
 use diesel::prelude::*;
@@ -127,8 +126,8 @@ impl Pg {
     }
 }
 
-impl Provider for Pg {
-    fn init() -> Self {
+impl Pg {
+    pub fn init() -> Self {
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL");
         Self::new(build_connection_pool(&database_url).unwrap())
     }

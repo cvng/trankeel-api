@@ -1,7 +1,6 @@
 use crate::error::Context;
 use crate::error::Error;
 use crate::payment::PaymentProvider;
-use crate::providers::Provider;
 use async_trait::async_trait;
 use piteo_data::Email;
 use piteo_data::Subscription;
@@ -11,8 +10,8 @@ use std::env;
 
 pub struct Stripe(stripe::Client);
 
-impl Provider for Stripe {
-    fn init() -> Self {
+impl Stripe {
+    pub fn init() -> Self {
         let secret_key = env::var("STRIPE_SECRET_KEY").expect("STRIPE_SECRET_KEY");
         Self(stripe::Client::new(secret_key))
     }
