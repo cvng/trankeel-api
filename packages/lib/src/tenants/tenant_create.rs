@@ -118,7 +118,7 @@ fn add_tenant_warrants(
                     address: Some(person_input.address.into()),
                     phone_number: person_input.phone_number,
                     photo_url: None,
-                    role: Some(PersonRole::Warrant),
+                    role: PersonRole::Warrant,
                 }),
             ))?,
             (WarrantType::Visale, _, Some(company_input)) => db.warrants().create((

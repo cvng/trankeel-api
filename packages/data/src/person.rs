@@ -30,7 +30,7 @@ pub struct Person {
     pub last_name: String,
     pub address: Option<Address>,
     pub photo_url: Option<Url>,
-    pub role: Option<PersonRole>,
+    pub role: PersonRole,
     pub phone_number: Option<PhoneNumber>,
 }
 

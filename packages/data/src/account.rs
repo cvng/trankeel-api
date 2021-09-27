@@ -16,7 +16,7 @@ pub struct Account {
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub plan_id: Option<PlanId>,
-    pub status: Option<AccountStatus>,
+    pub status: AccountStatus,
     pub stripe_customer_id: Option<CustomerId>,
     pub stripe_subscription_id: Option<SubscriptionId>,
     pub trial_end: Option<DateTime>,
