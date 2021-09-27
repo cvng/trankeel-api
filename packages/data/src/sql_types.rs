@@ -1,4 +1,4 @@
-/// https://stripe.com/docs/billing/subscriptions/overview#subscription-states
+/// https://stripe.com/docs/billing/subscriptions/overview
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[graphql(name = "SubscriptionStatus")]
 #[DieselType = "Accountstatus"]
@@ -12,6 +12,12 @@ pub enum AccountStatus {
     Unpaid,
 }
 
+impl Default for AccountStatus {
+    fn default() -> Self {
+        Self::Trialing
+    }
+}
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[graphql(name = "UserRole")]
 #[DieselType = "Personrole"]
@@ -21,4 +27,10 @@ pub enum PersonRole {
     User,
     Viewer,
     Warrant,
+}
+
+impl Default for PersonRole {
+    fn default() -> Self {
+        Self::Viewer
+    }
 }

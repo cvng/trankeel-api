@@ -8,7 +8,7 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         plan_id -> Nullable<Uuid>,
-        status -> Nullable<Accountstatus>,
+        status -> Accountstatus,
         stripe_customer_id -> Nullable<Text>,
         stripe_subscription_id -> Nullable<Text>,
         trial_end -> Nullable<Timestamptz>,
@@ -183,7 +183,7 @@ table! {
         last_name -> Text,
         address -> Nullable<Jsonb>,
         photo_url -> Nullable<Text>,
-        role -> Nullable<Personrole>,
+        role -> Personrole,
         phone_number -> Nullable<Text>,
     }
 }

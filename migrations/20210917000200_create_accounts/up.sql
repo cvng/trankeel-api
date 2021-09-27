@@ -5,7 +5,7 @@ CREATE TABLE accounts (
     created_at TIMESTAMPTZ DEFAULT current_timestamp,
     updated_at TIMESTAMPTZ,
     plan_id UUID REFERENCES plans(id),
-    status ACCOUNTSTATUS,
+    status ACCOUNTSTATUS NOT NULL,
     stripe_customer_id TEXT,
     stripe_subscription_id TEXT,
     trial_end TIMESTAMPTZ

@@ -3,7 +3,7 @@ input AcceptCandidacyInput {
 }
 type Account {
 	planId: ID
-	status: SubscriptionStatus
+	status: SubscriptionStatus!
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	trialEnd: DateTime
@@ -377,14 +377,14 @@ type Mutation {
 	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
 	sendPaymentNotice(input: SendPaymentNoticeInput!): SendPaymentNoticePayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!
 	lastName: String!
 	address: Address
 	photoURL: URL
-	role: UserRole
+	role: UserRole!
 	id: ID!
 	phoneNumber: PhoneNumber
 	accountId: ID!
@@ -608,7 +608,7 @@ type SendPaymentNoticePayload {
 	notices: [File!]
 }
 """
-https://stripe.com/docs/billing/subscriptions/overview#subscription-states
+https://stripe.com/docs/billing/subscriptions/overview
 """
 enum SubscriptionStatus {
 	ACTIVE

@@ -6,6 +6,7 @@ use piteo_core::payment::PaymentProvider;
 use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::AccountId;
+use piteo_data::AccountStatus;
 use piteo_data::Address;
 use piteo_data::AuthId;
 use piteo_data::Lender;
@@ -53,7 +54,7 @@ pub async fn create_user_with_account(
         created_at: Default::default(),
         updated_at: Default::default(),
         plan_id: None,
-        status: None,
+        status: AccountStatus::Trialing,
         stripe_customer_id: None,
         stripe_subscription_id: None,
         trial_end: None,
@@ -70,7 +71,7 @@ pub async fn create_user_with_account(
         last_name: input.last_name,
         address: input.address.map(Into::into),
         photo_url: None,
-        role: Some(PersonRole::User),
+        role: PersonRole::User,
         phone_number: None,
         account_id: account.id,
     })?;

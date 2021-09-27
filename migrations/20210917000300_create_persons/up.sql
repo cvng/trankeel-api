@@ -11,7 +11,7 @@ CREATE TABLE persons (
     last_name TEXT NOT NULL,
     address JSONB,
     photo_url TEXT,
-    role PERSONROLE,
+    role PERSONROLE NOT NULL,
     phone_number TEXT
 );
 

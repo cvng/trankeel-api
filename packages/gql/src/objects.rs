@@ -65,7 +65,7 @@ impl From<piteo::Error> for Error {
 #[graphql(complex)]
 pub struct Account {
     plan_id: Option<ID>,
-    status: Option<AccountStatus>,
+    status: AccountStatus,
     stripe_customer_id: Option<String>,
     stripe_subscription_id: Option<String>,
     trial_end: Option<DateTime>,
@@ -83,7 +83,7 @@ impl From<piteo::Account> for Account {
     fn from(item: piteo::Account) -> Self {
         Self {
             plan_id: item.plan_id.map(Into::into),
-            status: item.status.map(Into::into),
+            status: item.status,
             stripe_customer_id: item.stripe_customer_id,
             stripe_subscription_id: item.stripe_subscription_id,
             trial_end: item.trial_end.map(Into::into),
@@ -432,7 +432,7 @@ pub struct Person {
     address: Option<Address>,
     #[graphql(name = "photoURL")]
     photo_url: Option<Url>,
-    role: Option<PersonRole>,
+    role: PersonRole,
     pub id: ID,
     phone_number: Option<PhoneNumber>,
     account_id: ID,
@@ -465,7 +465,7 @@ impl From<piteo::Person> for Person {
             last_name: item.last_name,
             address: item.address.map(Into::into),
             photo_url: item.photo_url,
-            role: item.role.map(Into::into),
+            role: item.role,
             id: item.id.into(),
             phone_number: item.phone_number.map(Into::into),
             account_id: item.account_id.into(),
