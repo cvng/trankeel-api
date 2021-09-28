@@ -1,65 +1,68 @@
 use crate::AccountId;
 use crate::Amount;
 use crate::DateTime;
-use diesel::sql_types::*;
 
-// # Types
+table! {
+    reports (id) {
+        id -> Uuid,
+        account_id -> Uuid,
+        current_month -> Timestamptz,
+        amount_expected -> Numeric,
+        amount_received -> Numeric,
+        amount_settled -> Numeric,
+        amount_partial -> Numeric,
+        amount_pending -> Numeric,
+        n_expected -> Int4,
+        n_received -> Int4,
+        n_settled -> Int4,
+        n_partial -> Int4,
+        n_pending -> Int4,
+        ratio_expected -> Float8,
+        ratio_received -> Float8,
+        ratio_settled -> Float8,
+        ratio_partial -> Float8,
+        ratio_pending -> Float8,
+        variation_expected -> Float8,
+        variation_received -> Float8,
+        variation_settled -> Float8,
+        variation_partial -> Float8,
+        variation_pending -> Float8,
+        payment_rate -> Float8,
+        occupation_rate -> Float8,
+    }
+}
 
-/// Synthesis of collected rents.
 #[derive(Clone, Debug, QueryableByName)]
+#[table_name = "reports"]
 pub struct Summary {
-    #[sql_type = "Uuid"]
     pub account_id: AccountId,
-    #[sql_type = "Timestamptz"]
     pub current_month: DateTime,
     //
-    #[sql_type = "Numeric"]
     pub amount_expected: Amount,
-    #[sql_type = "Numeric"]
     pub amount_received: Amount,
-    #[sql_type = "Numeric"]
     pub amount_settled: Amount,
-    #[sql_type = "Numeric"]
     pub amount_partial: Amount,
-    #[sql_type = "Numeric"]
     pub amount_pending: Amount,
     //
-    #[sql_type = "Int4"]
     pub n_expected: i32,
-    #[sql_type = "Int4"]
     pub n_received: i32,
-    #[sql_type = "Int4"]
     pub n_settled: i32,
-    #[sql_type = "Int4"]
     pub n_partial: i32,
-    #[sql_type = "Int4"]
     pub n_pending: i32,
     //
-    #[sql_type = "Float8"]
     pub ratio_expected: f64,
-    #[sql_type = "Float8"]
     pub ratio_received: f64,
-    #[sql_type = "Float8"]
     pub ratio_settled: f64,
-    #[sql_type = "Float8"]
     pub ratio_partial: f64,
-    #[sql_type = "Float8"]
     pub ratio_pending: f64,
     //
-    #[sql_type = "Float8"]
     pub variation_expected: f64,
-    #[sql_type = "Float8"]
     pub variation_received: f64,
-    #[sql_type = "Float8"]
     pub variation_settled: f64,
-    #[sql_type = "Float8"]
     pub variation_partial: f64,
-    #[sql_type = "Float8"]
     pub variation_pending: f64,
     //
-    #[sql_type = "Float8"]
     pub payment_rate: f64,
-    #[sql_type = "Float8"]
     pub occupation_rate: f64,
 }
 
