@@ -387,7 +387,7 @@ type Mutation {
 	editRentReceipts(input: RentReceiptInput!): RentReceiptPayload!
 	sendPaymentNotices(input: CreateNoticesInput!): CreateNoticesPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!
@@ -560,11 +560,11 @@ type Query {
 	advertisement(id: ID!): Advertisement!
 	candidacies(propertyId: ID): [Candidacy!]!
 	properties(id: ID, query: String): [Property!]!
-	summary(since: DateTime, until: DateTime): Summary!
 	tenants(id: ID, query: String, status: TenantStatus): [Tenant!]!
 	leases(id: ID, query: String): [Lease!]!
 	lenders(id: ID, query: String): [Lender!]!
 	rents: [Rent!]!
+	summary: Summary!
 	events: [Event!]!
 	transactions(id: ID): [Transaction!]!
 	invoices: [Invoice!]!
