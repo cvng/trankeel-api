@@ -731,7 +731,7 @@ impl database::ReportStore for ReportStore<'_> {
             "
             SELECT * FROM reports
             LEFT JOIN persons ON persons.account_id = reports.account_id
-            WHERE persons.auth_id = ?;",
+            WHERE persons.auth_id = $1;",
         )
         .bind::<Text, _>(auth_id)
         .get_result(&self.0.get()?)?)
