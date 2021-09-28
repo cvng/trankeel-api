@@ -8,6 +8,8 @@ use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::result::Error::NotFound;
+use diesel::sql_query;
+use diesel::sql_types::Text;
 use diesel::update;
 use diesel::PgConnection;
 use piteo_data::schema::accounts;
@@ -68,6 +70,7 @@ use piteo_data::ReceiptId;
 use piteo_data::Rent;
 use piteo_data::RentData;
 use piteo_data::RentId;
+use piteo_data::Summary;
 use piteo_data::Tenant;
 use piteo_data::TenantData;
 use piteo_data::TenantId;
@@ -114,6 +117,8 @@ struct FileStore<'a>(&'a PgPool);
 struct PaymentStore<'a>(&'a PgPool);
 
 struct PlanStore<'a>(&'a PgPool);
+
+struct ReportStore<'a>(&'a PgPool);
 
 pub struct Pg(PgPool);
 
@@ -193,6 +198,10 @@ impl Db for Pg {
 
     fn events(&self) -> Box<dyn database::EventStore + '_> {
         Box::new(EventStore(&self.0))
+    }
+
+    fn reports(&self) -> Box<dyn database::ReportStore + '_> {
+        Box::new(ReportStore(&self.0))
     }
 }
 
@@ -713,6 +722,19 @@ impl database::EventStore for EventStore<'_> {
         Ok(insert_into(events::table)
             .values(data)
             .get_result(&self.0.get()?)?)
+    }
+}
+
+impl database::ReportStore for ReportStore<'_> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Summary> {
+        Ok(sql_query(
+            "
+            SELECT * FROM reports
+            LEFT JOIN persons ON persons.account_id = reports.account_id
+            WHERE persons.auth_id = ?;",
+        )
+        .bind::<Text, _>(auth_id)
+        .get_result(&self.0.get()?)?)
     }
 }
 
