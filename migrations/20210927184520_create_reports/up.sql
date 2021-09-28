@@ -60,11 +60,11 @@ SELECT
     100.0 * amount_partial / amount_expected AS ratio_partial,
     100.0 * amount_pending / amount_expected AS ratio_pending,
     --
-    0 AS variation_expected, -- TODO
-    0 AS variation_received, -- TODO
-    0 AS variation_settled, -- TODO
-    0 AS variation_partial, -- TODO
-    0 AS variation_pending, -- TODO
+    0.0 AS variation_expected, -- TODO
+    0.0 AS variation_received, -- TODO
+    0.0 AS variation_settled, -- TODO
+    0.0 AS variation_partial, -- TODO
+    0.0 AS variation_pending, -- TODO
     --
     100.0 * n_received / n_expected AS payment_rate,
     100.0 * n_units_rented / n_units_owned AS occupation_rate
