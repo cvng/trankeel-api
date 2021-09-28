@@ -37,6 +37,7 @@ use piteo_data::ReceiptId;
 use piteo_data::Rent;
 use piteo_data::RentData;
 use piteo_data::RentId;
+use piteo_data::Summary;
 use piteo_data::Tenant;
 use piteo_data::TenantData;
 use piteo_data::TenantId;
@@ -64,6 +65,7 @@ pub trait Db {
     fn payments(&self) -> Box<dyn PaymentStore + '_>;
     fn plans(&self) -> Box<dyn PlanStore + '_>;
     fn events(&self) -> Box<dyn EventStore + '_>;
+    fn reports(&self) -> Box<dyn ReportStore + '_>;
 }
 
 pub trait AccountStore {
@@ -177,4 +179,8 @@ pub trait EventStore {
     fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>>;
     fn create(&mut self, data: Event) -> Result<Event>;
+}
+
+pub trait ReportStore {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Summary>;
 }
