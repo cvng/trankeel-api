@@ -21,7 +21,7 @@ CREATE TABLE properties (
     other_spaces TEXT,
     tax NUMERIC,
     room_count TEXT NOT NULL,
-    status PROPERTYSTATUS,
+    status PROPERTYSTATUS NOT NULL,
     surface REAL NOT NULL,
     tenant_private_spaces TEXT,
     usage_type TEXT,
