@@ -387,7 +387,7 @@ type Mutation {
 	editRentReceipts(input: RentReceiptInput!): RentReceiptPayload!
 	sendPaymentNotices(input: CreateNoticesInput!): CreateNoticesPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!
@@ -441,7 +441,7 @@ type Property {
 	otherSpaces: String
 	tax: Decimal
 	roomCount: PropertyRoomType!
-	status: PropertyStatus
+	status: PropertyStatus!
 	surface: Float!
 	tenantPrivateSpaces: String
 	usageType: PropertyHabitationUsageType
@@ -606,9 +606,9 @@ type RentReceiptPayload {
 	receipts: [File!]
 }
 enum RentStatus {
-	PARTIAL
-	PENDING
-	SETTLED
+	OPEN
+	PAID
+	PARTIALLY_PAID
 }
 """
 https://stripe.com/docs/billing/subscriptions/overview
@@ -623,8 +623,8 @@ enum SubscriptionStatus {
 	UNPAID
 }
 type Summary {
-	since: DateTime!
-	until: DateTime!
+	accountId: ID!
+	currentMonth: DateTime!
 	amountExpected: Decimal!
 	amountReceived: Decimal!
 	amountSettled: Decimal!
