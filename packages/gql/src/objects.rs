@@ -612,8 +612,8 @@ impl Property {
     async fn room_count(&self) -> PropertyRoomType {
         self.0.room_count
     }
-    async fn status(&self) -> Option<PropertyStatus> {
-        self.0.status.map(Into::into)
+    async fn status(&self) -> PropertyStatus {
+        self.0.status
     }
     async fn surface(&self) -> f32 {
         self.0.surface
