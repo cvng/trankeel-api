@@ -722,8 +722,8 @@ impl From<piteo::Rent> for Rent {
 
 #[derive(async_graphql::SimpleObject)]
 pub struct Summary {
-    since: DateTime,
-    until: DateTime,
+    account_id: ID,
+    current_month: DateTime,
     //
     amount_expected: Amount,
     amount_received: Amount,
@@ -731,11 +731,11 @@ pub struct Summary {
     amount_partial: Amount,
     amount_pending: Amount,
     //
-    n_expected: u32,
-    n_received: u32,
-    n_settled: u32,
-    n_partial: u32,
-    n_pending: u32,
+    n_expected: i32,
+    n_received: i32,
+    n_settled: i32,
+    n_partial: i32,
+    n_pending: i32,
     //
     ratio_expected: f64,
     ratio_received: f64,
@@ -756,8 +756,8 @@ pub struct Summary {
 impl From<piteo::Summary> for Summary {
     fn from(item: piteo::Summary) -> Self {
         Summary {
-            since: item.since,
-            until: item.until,
+            account_id: item.account_id.into(),
+            current_month: item.current_month,
             amount_expected: item.amount_expected,
             amount_received: item.amount_received,
             amount_settled: item.amount_settled,
