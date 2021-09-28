@@ -37,14 +37,14 @@ impl Default for PropertyStatus {
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Rentstatus"]
 pub enum RentStatus {
-    Partial,
-    Pending,
-    Settled,
+    Open,
+    Paid,
+    PartiallyPaid,
 }
 
 impl Default for RentStatus {
     fn default() -> Self {
-        Self::Pending
+        Self::Open
     }
 }
 
