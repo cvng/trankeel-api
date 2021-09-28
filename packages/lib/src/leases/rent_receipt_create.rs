@@ -104,7 +104,7 @@ fn setlle_rents(db: &impl Db, auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result
     for rent_id in rent_ids {
         let rent = db.rents().update(RentData {
             id: rent_id,
-            status: Some(RentStatus::Settled),
+            status: Some(RentStatus::Paid),
             ..Default::default()
         })?;
 
