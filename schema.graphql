@@ -387,7 +387,7 @@ type Mutation {
 	editRentReceipts(input: RentReceiptInput!): RentReceiptPayload!
 	sendPaymentNotices(input: CreateNoticesInput!): CreateNoticesPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!
