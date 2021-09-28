@@ -5,6 +5,7 @@ use crate::Address;
 use crate::Amount;
 use crate::DateTime;
 use crate::LenderId;
+use crate::PropertyStatus;
 
 // # Types
 
@@ -19,15 +20,6 @@ pub enum PropertyRoomType {
     T4,
     T5,
     T6,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
-pub enum PropertyStatus {
-    ForSale,
-    Inactive,
-    Rented,
-    UnderConstruction,
-    Unrented,
 }
 
 #[allow(non_camel_case_types)]
@@ -103,7 +95,7 @@ pub struct Property {
     pub other_spaces: Option<String>,
     pub tax: Option<Amount>,
     pub room_count: PropertyRoomType,
-    pub status: Option<PropertyStatus>,
+    pub status: PropertyStatus,
     pub surface: f32,
     pub tenant_private_spaces: Option<String>,
     pub usage_type: Option<PropertyHabitationUsageType>,
@@ -111,7 +103,7 @@ pub struct Property {
     pub lender_id: LenderId,
 }
 
-#[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
+#[derive(AsChangeset, Identifiable, Insertable)]
 #[table_name = "properties"]
 pub struct PropertyData {
     pub id: PropertyId,
