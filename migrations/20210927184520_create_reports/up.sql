@@ -6,12 +6,12 @@ summary_1 AS (
         date_trunc('month', current_timestamp) AS current_month,
         --
         sum(full_amount) AS amount_expected,
-        sum(full_amount) FILTER (WHERE rents.status = 'settled') AS amount_settled,
-        sum(full_amount) FILTER (WHERE rents.status = 'partial') AS amount_partial,
+        sum(full_amount) FILTER (WHERE rents.status = 'paid') AS amount_settled,
+        sum(full_amount) FILTER (WHERE rents.status = 'partially_paid') AS amount_partial,
         --
         count(rents.id) AS n_expected,
-        count(rents.id) FILTER (WHERE rents.status = 'settled') AS n_settled,
-        count(rents.id) FILTER (WHERE rents.status = 'partial') AS n_partial
+        count(rents.id) FILTER (WHERE rents.status = 'paid') AS n_settled,
+        count(rents.id) FILTER (WHERE rents.status = 'partially_paid') AS n_partial
     FROM rents
     LEFT JOIN leases ON leases.id = rents.lease_id
     LEFT JOIN accounts ON accounts.id = leases.account_id
