@@ -17,7 +17,6 @@ use async_graphql::Result;
 use async_graphql::ID;
 use piteo::db;
 use piteo::AuthId;
-use piteo::DateTime;
 use piteo::Db;
 use piteo::TenantStatus;
 use std::convert::TryInto;
@@ -75,15 +74,6 @@ impl Query {
                 .by_auth_id(ctx.data::<AuthId>()?)
                 .and_then(map_res)?)
         }
-    }
-
-    async fn summary(
-        &self,
-        _ctx: &Context<'_>,
-        _since: Option<DateTime>,
-        _until: Option<DateTime>,
-    ) -> Result<Summary> {
-        Ok(piteo::get_summary().map(Summary::from)?)
     }
 
     async fn tenants(
@@ -148,6 +138,18 @@ impl Query {
             .rents()
             .by_auth_id(ctx.data::<AuthId>()?)
             .and_then(map_res)?)
+    }
+
+    async fn summary(
+        &self,
+        ctx: &Context<'_>,
+        // _since: Option<DateTime>,
+        // _until: Option<DateTime>,
+    ) -> Result<Summary> {
+        Ok(db(&ctx.into())
+            .reports()
+            .by_auth_id(ctx.data::<AuthId>()?)?
+            .into())
     }
 
     async fn events(&self, ctx: &Context<'_>) -> Result<Vec<Event>> {
