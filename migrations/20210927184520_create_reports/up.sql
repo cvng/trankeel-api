@@ -98,7 +98,6 @@ BEGIN
     ),
     expected_rents_last_month AS (
         SELECT
-            account_id,
             amount_expected AS last_amount_expected,
             amount_received AS last_amount_received,
             amount_settled AS last_amount_settled,
