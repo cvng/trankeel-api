@@ -6,7 +6,7 @@ table! {
     reports (id) {
         id -> Uuid,
         account_id -> Uuid,
-        current_month -> Timestamptz,
+        created_at -> Timestamptz,
         amount_expected -> Numeric,
         amount_received -> Numeric,
         amount_settled -> Numeric,
@@ -36,32 +36,32 @@ table! {
 #[table_name = "reports"]
 pub struct Summary {
     pub account_id: AccountId,
-    pub current_month: DateTime,
-    //
+    pub created_at: DateTime,
+
     pub amount_expected: Amount,
     pub amount_received: Amount,
     pub amount_settled: Amount,
     pub amount_partial: Amount,
     pub amount_pending: Amount,
-    //
+
     pub n_expected: i32,
     pub n_received: i32,
     pub n_settled: i32,
     pub n_partial: i32,
     pub n_pending: i32,
-    //
+
     pub ratio_expected: f64,
     pub ratio_received: f64,
     pub ratio_settled: f64,
     pub ratio_partial: f64,
     pub ratio_pending: f64,
-    //
+
     pub variation_expected: f64,
     pub variation_received: f64,
     pub variation_settled: f64,
     pub variation_partial: f64,
     pub variation_pending: f64,
-    //
+
     pub payment_rate: f64,
     pub occupation_rate: f64,
 }
@@ -70,7 +70,7 @@ impl Default for Summary {
     fn default() -> Self {
         Self {
             account_id: Default::default(),
-            current_month: DateTime::default(),
+            created_at: DateTime::default(),
             amount_expected: Default::default(),
             amount_received: Default::default(),
             amount_settled: Default::default(),
