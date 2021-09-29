@@ -624,7 +624,7 @@ enum SubscriptionStatus {
 }
 type Summary {
 	accountId: ID!
-	currentMonth: DateTime!
+	createdAt: DateTime!
 	amountExpected: Decimal!
 	amountReceived: Decimal!
 	amountSettled: Decimal!
