@@ -39,15 +39,6 @@ CREATE TYPE summary_reports AS (
     occupation_rate FLOAT
 );
 
-CREATE OR REPLACE FUNCTION variation(x NUMERIC, y NUMERIC) RETURNS NUMERIC AS $$
-BEGIN
-    IF y = 0 THEN
-        RETURN 0;
-    END IF;
-    RETURN (x - y) / y * 100;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE FUNCTION get_expected_rents(current_month TIMESTAMPTZ) RETURNS SETOF expected_rents AS $$
 BEGIN
     RETURN QUERY
@@ -124,20 +115,20 @@ BEGIN
     ),
     ratio_and_variations AS (
         SELECT
-            100.0 * amount_expected / amount_expected AS ratio_expected,
-            100.0 * amount_received / amount_expected AS ratio_received,
-            100.0 * amount_settled / amount_expected AS ratio_settled,
-            100.0 * amount_partial / amount_expected AS ratio_partial,
-            100.0 * amount_pending / amount_expected AS ratio_pending,
+            100.0 * (amount_expected / amount_expected) AS ratio_expected,
+            100.0 * (amount_received / amount_expected) AS ratio_received,
+            100.0 * (amount_settled / amount_expected) AS ratio_settled,
+            100.0 * (amount_partial / amount_expected) AS ratio_partial,
+            100.0 * (amount_pending / amount_expected) AS ratio_pending,
 
-            variation(amount_expected, last_amount_expected) AS variation_expected,
-            variation(amount_received, last_amount_received) AS variation_received,
-            variation(amount_settled, last_amount_settled) AS variation_settled,
-            variation(amount_partial, last_amount_partial) AS variation_partial,
-            variation(amount_pending, last_amount_pending) AS variation_pending,
+            100.0 * (amount_expected - last_amount_expected) / last_amount_expected AS variation_expected,
+            100.0 * (amount_received - last_amount_received) / last_amount_received AS variation_received,
+            100.0 * (amount_settled - last_amount_settled) / last_amount_settled AS variation_settled,
+            100.0 * (amount_partial - last_amount_partial) / last_amount_partial AS variation_partial,
+            100.0 * (amount_pending - last_amount_pending) / last_amount_pending AS variation_pending,
 
-            100.0 * n_received / n_expected AS payment_rate,
-            100.0 * n_units_rented / n_units_owned AS occupation_rate
+            100.0 * (n_received / n_expected) AS payment_rate,
+            100.0 * (n_units_rented / n_units_owned) AS occupation_rate
         FROM expected_rents, rented_properties
         LEFT JOIN LATERAL (SELECT * FROM expected_rents_last_month) last_month ON TRUE
     )
