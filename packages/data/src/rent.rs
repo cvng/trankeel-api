@@ -1,9 +1,7 @@
 use crate::common::Id;
 use crate::schema::rents;
 use crate::Amount;
-use crate::Attachable;
 use crate::DateTime;
-use crate::FileId;
 use crate::LeaseId;
 use crate::PaymentNoticeId;
 use crate::ReceiptId;
@@ -48,16 +46,4 @@ pub struct RentData {
     pub lease_id: Option<LeaseId>,
     pub receipt_id: Option<ReceiptId>,
     pub notice_id: Option<PaymentNoticeId>,
-}
-
-// # Impls
-
-impl Attachable for Rent {
-    fn to_filename(&self, file_id: &FileId) -> String {
-        let id = file_id.to_string();
-        let id = id.split('-').next().unwrap_or("id");
-        let date = self.period_start.inner().to_rfc3339();
-        let date = date.split('T').next().unwrap_or("date");
-        format!("{}-quittance-{}.pdf", &date, &id) // Ex: "07-21-quittance-ab60265a.pdf"
-    }
 }

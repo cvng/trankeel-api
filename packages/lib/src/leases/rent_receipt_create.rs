@@ -8,7 +8,7 @@ use piteo_core::database::Db;
 use piteo_core::error::Error;
 use piteo_core::mailer::Mailer;
 use piteo_core::pdfmaker::Pdfmaker;
-use piteo_data::Attachable;
+use piteo_data::receipt_filename;
 use piteo_data::AuthId;
 use piteo_data::DateTime;
 use piteo_data::EventType;
@@ -147,7 +147,7 @@ async fn generate_receipts(
         let mut receipt = Receipt {
             id: receipt_id,
             type_: FileType::RentReceipt,
-            filename: Some(rent.to_filename(&receipt_id)),
+            filename: Some(receipt_filename(&receipt_id, &rent)),
             status: None,
             external_id: None,
             download_url: None,

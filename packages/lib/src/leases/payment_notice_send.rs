@@ -5,7 +5,7 @@ use chrono::Utc;
 use piteo_core::activity::trace;
 use piteo_core::database::Db;
 use piteo_core::pdfmaker::Pdfmaker;
-use piteo_data::Attachable;
+use piteo_data::notice_filename;
 use piteo_data::AuthId;
 use piteo_data::DateTime;
 use piteo_data::EventType;
@@ -75,7 +75,7 @@ async fn generate_notices(
         let mut notice = PaymentNotice {
             id: notice_id,
             type_: FileType::PaymentNotice,
-            filename: Some(rent.to_filename(&notice_id)),
+            filename: Some(notice_filename(&notice_id, &rent)),
             status: None,
             external_id: None,
             download_url: None,

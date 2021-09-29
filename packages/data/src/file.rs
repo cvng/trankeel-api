@@ -2,6 +2,8 @@ use crate::common::Id;
 use crate::schema::files;
 use crate::DateTime;
 use crate::ExternalId;
+use crate::Lease;
+use crate::Rent;
 use crate::Url;
 
 // # Types
@@ -23,8 +25,8 @@ pub enum FileStatus {
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
 pub enum FileType {
-    PaymentNotice,
     LeaseDocument,
+    PaymentNotice,
     RentReceipt,
 }
 
@@ -74,4 +76,33 @@ impl From<String> for FileStatus {
             _ => unreachable!(),
         }
     }
+}
+
+// # Utils
+
+/// Ex: "07-21-bail-ab60265a.pdf"
+pub fn lease_filename(file_id: &FileId, lease: &Lease) -> String {
+    let id = file_id.to_string();
+    let id = id.split('-').next().unwrap_or("id");
+    let date = lease.effect_date.inner().to_rfc3339();
+    let date = date.split('T').next().unwrap_or("date");
+    format!("{}-bail-{}.pdf", &date, &id) // TODO: localize
+}
+
+/// Ex: "07-21-avis-ab60265a.pdf"
+pub fn notice_filename(file_id: &FileId, rent: &Rent) -> String {
+    let id = file_id.to_string();
+    let id = id.split('-').next().unwrap_or("id");
+    let date = rent.period_start.inner().to_rfc3339();
+    let date = date.split('T').next().unwrap_or("date");
+    format!("{}-avis-{}.pdf", &date, &id) // TODO: localize
+}
+
+/// Ex: "07-21-quittance-ab60265a.pdf"
+pub fn receipt_filename(file_id: &FileId, rent: &Rent) -> String {
+    let id = file_id.to_string();
+    let id = id.split('-').next().unwrap_or("id");
+    let date = rent.period_start.inner().to_rfc3339();
+    let date = date.split('T').next().unwrap_or("date");
+    format!("{}-quittance-{}.pdf", &date, &id) // TODO: localize
 }
