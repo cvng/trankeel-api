@@ -105,6 +105,16 @@ BEGIN
     expected_rents AS (
         SELECT * FROM get_expected_rents(current_month)
     ),
+    expected_rents_last_month AS (
+        SELECT
+            account_id,
+            amount_expected AS last_amount_expected,
+            amount_received AS last_amount_received,
+            amount_settled AS last_amount_settled,
+            amount_partial AS last_amount_partial,
+            amount_pending AS last_amount_pending
+        FROM get_expected_rents(current_month - '1 month'::INTERVAL)
+    ),
     rented_properties AS (
         SELECT
             count(properties.id) AS n_units_owned,
@@ -120,15 +130,16 @@ BEGIN
             100.0 * amount_partial / amount_expected AS ratio_partial,
             100.0 * amount_pending / amount_expected AS ratio_pending,
 
-            variation(0, 0) AS variation_expected, -- TODO
-            variation(0, 0) AS variation_received, -- TODO
-            variation(0, 0) AS variation_settled, -- TODO
-            variation(0, 0) AS variation_partial, -- TODO
-            variation(0, 0) AS variation_pending, -- TODO
+            variation(amount_expected, last_amount_expected) AS variation_expected,
+            variation(amount_received, last_amount_received) AS variation_received,
+            variation(amount_settled, last_amount_settled) AS variation_settled,
+            variation(amount_partial, last_amount_partial) AS variation_partial,
+            variation(amount_pending, last_amount_pending) AS variation_pending,
 
             100.0 * n_received / n_expected AS payment_rate,
             100.0 * n_units_rented / n_units_owned AS occupation_rate
         FROM expected_rents, rented_properties
+        LEFT JOIN LATERAL (SELECT * FROM expected_rents_last_month) last_month ON TRUE
     )
     SELECT
         account_id,
