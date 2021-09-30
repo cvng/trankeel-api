@@ -39,7 +39,6 @@ use piteo::PropertyStatus;
 use piteo::PropertyUsageType;
 use piteo::RentChargesRecuperationMode;
 use piteo::RentPaymentMethod;
-use piteo::RentStatus;
 use piteo::TenantStatus;
 use piteo::TransactionType;
 use piteo::Url;
@@ -424,6 +423,7 @@ impl From<piteo::LenderWithIdentity> for Lender {
 
 #[derive(async_graphql::SimpleObject)]
 #[graphql(complex)]
+#[graphql(name = "User")]
 pub struct Person {
     auth_id: Option<AuthId>,
     email: Email,
@@ -709,7 +709,7 @@ impl From<piteo::Rent> for Rent {
             amount: item.amount,
             charges_amount: item.charges_amount.map(Into::into),
             full_amount: item.full_amount,
-            status: item.status,
+            status: item.status.into(),
             lease_id: item.lease_id.into(),
             receipt_id: item.receipt_id.map(Into::into),
             notice_id: item.notice_id.map(Into::into),
@@ -955,6 +955,25 @@ impl From<piteo::EventWithEventable> for Event {
             eventable_type: item.0.eventable_type,
             r#type: item.0.type_,
             eventable: item.1.into(),
+        }
+    }
+}
+
+// # Enums
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Enum)]
+enum RentStatus {
+    Pending,
+    Settled,
+    Partial,
+}
+
+impl From<piteo::RentStatus> for RentStatus {
+    fn from(item: piteo::RentStatus) -> Self {
+        match item {
+            piteo::RentStatus::Open => Self::Pending,
+            piteo::RentStatus::Paid => Self::Settled,
+            piteo::RentStatus::PartiallyPaid => Self::Partial,
         }
     }
 }
