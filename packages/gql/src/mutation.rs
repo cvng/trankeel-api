@@ -22,6 +22,7 @@ use piteo::CreateAdvertisementInput;
 use piteo::CreateCandidacyInput;
 use piteo::CreateFileInput;
 use piteo::CreateFurnishedLeaseInput;
+use piteo::CreateNakedLeaseInput;
 use piteo::CreateNoticesInput;
 use piteo::CreatePropertyInput;
 use piteo::CreateReceiptsInput;
@@ -123,6 +124,14 @@ impl Mutation {
         input: UpdateFurnishedLeaseInput,
     ) -> Result<Lease> {
         Ok(piteo::update_furnished_lease(&ctx.into(), input)?.into())
+    }
+
+    async fn lease_naked_create(
+        &self,
+        _ctx: &Context<'_>,
+        _input: CreateNakedLeaseInput,
+    ) -> Result<Lease> {
+        Err(wip())
     }
 
     async fn lease_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {

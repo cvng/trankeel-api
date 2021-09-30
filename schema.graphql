@@ -322,6 +322,16 @@ input LeaseFurnishedUpdateInput {
 	file: FileInput
 	id: UUID!
 }
+input LeaseNakedDataInput {
+	duration: LeaseNakedDuration
+}
+enum LeaseNakedDuration {
+	THREE_YEARS
+	SIX_YEARS
+}
+input LeaseNakedInput {
+	data: LeaseNakedDataInput
+}
 enum LeaseRentPeriodicity {
 	ANNUALY
 	MONTHLY
@@ -386,6 +396,7 @@ type Mutation {
 	updateAdvertisement(input: UpdateAdvertisementInput!): Advertisement!
 	leaseFurnishedCreate(input: LeaseFurnishedInput!): Lease!
 	leaseFurnishedUpdate(input: LeaseFurnishedUpdateInput!): Lease!
+	leaseNakedCreate(input: LeaseNakedInput!): Lease!
 	leaseDelete(id: ID!): ID!
 	lenderIndividualUpdate(input: LenderIndividualUpdateInput!): Lender!
 	candidacyCreate(input: CreateCandidacyInput!): Candidacy!

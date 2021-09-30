@@ -9,6 +9,7 @@ pub use crate::error::Result;
 pub use crate::files::CreateFileInput;
 pub use crate::imports::ImportInput;
 pub use crate::leases::CreateFurnishedLeaseInput;
+pub use crate::leases::CreateNakedLeaseInput;
 pub use crate::leases::CreateNoticesInput;
 pub use crate::leases::CreateReceiptsInput;
 pub use crate::leases::DeleteLeaseInput;
