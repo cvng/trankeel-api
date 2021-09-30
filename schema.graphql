@@ -587,9 +587,9 @@ type RentReceiptPayload {
 	receipts: [File!]
 }
 enum RentStatus {
-	Pending
-	Settled
-	Partial
+	PENDING
+	SETTLED
+	PARTIAL
 }
 input SendPaymentNoticeInput {
 	rentIds: [UUID!]!
@@ -723,7 +723,7 @@ enum TransactionType {
 }
 scalar URL
 scalar UUID
-type User implements LegalIdentityInterface & PersonInterface {
+type User implements PersonInterface & LegalIdentityInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!
