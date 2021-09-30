@@ -88,7 +88,13 @@ impl IntoMail for ReceiptMail {
     }
 
     fn subject(&self) -> String {
-        locale::text("receipt_mail_subject")
+        if self.is_receipt {
+            // "Votre quittance de loyer est arrivée !"
+            locale::text("receipt_mail_subject")
+        } else {
+            // "Votre avis d'échéance est arrivé !"
+            locale::text("notice_mail_subject")
+        }
     }
 
     fn recipients(&self) -> Vec<Contact> {

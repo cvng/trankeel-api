@@ -24,6 +24,7 @@ use piteo_data::LenderData;
 use piteo_data::LenderId;
 use piteo_data::LenderWithIdentity;
 use piteo_data::Payment;
+use piteo_data::PaymentNoticeId;
 use piteo_data::Person;
 use piteo_data::PersonData;
 use piteo_data::PersonId;
@@ -138,6 +139,7 @@ pub trait LeaseStore {
     fn by_id(&mut self, id: &LeaseId) -> Result<Lease>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Lease>>;
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Lease>;
+    fn by_notice_id(&mut self, notice_id: &PaymentNoticeId) -> Result<Lease>;
     fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Lease>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Lease>>;
     fn create(&mut self, data: Lease) -> Result<Lease>;
@@ -149,6 +151,7 @@ pub trait RentStore {
     fn by_id(&mut self, id: &RentId) -> Result<Rent>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Rent>>;
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Rent>;
+    fn by_notice_id(&mut self, notice_id: &PaymentNoticeId) -> Result<Rent>;
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Rent>>;
     fn create(&mut self, data: Rent) -> Result<Rent>;
     fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>>;

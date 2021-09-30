@@ -12,6 +12,8 @@ use piteo_core::pdfmaker::IntoDocument;
 use piteo_data::Receipt;
 use serde::Serialize;
 
+pub type NoticeDocument = ReceiptDocument; // alias for a ReceiptDocument
+
 /// Receipt or notice document. https://dashboard.pdfmonkey.io/templates/8269e571-7ece-4f0d-bc37-854d77999e0d
 #[derive(Clone, Debug, Serialize)]
 pub struct ReceiptDocument {
@@ -120,7 +122,7 @@ impl ReceiptDocument {
 
 impl IntoDocument for ReceiptDocument {
     fn template_id(&self) -> String {
-        "756B77DA-7498-4D5C-ADBE-EF4AC4DBE151".into()
+        "8269E571-7ECE-4F0D-BC37-854D77999E0D".into()
     }
 
     fn filename(&self) -> String {

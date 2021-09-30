@@ -1,7 +1,6 @@
 use crate::mailer::IntoMail;
 use crate::mailer::Mail;
 use crate::mailer::Mailer;
-use crate::providers::Provider;
 use async_trait::async_trait;
 use eyre::Error;
 use sendinblue::Mailer as Line;
@@ -16,8 +15,8 @@ const DEFAULT_SENDER_EMAIL: &str = "support@piteo.fr";
 
 pub struct Sendinblue(sendinblue::Sendinblue);
 
-impl Provider for Sendinblue {
-    fn init() -> Self {
+impl Sendinblue {
+    pub fn init() -> Self {
         let api_key = env::var("SENDINBLUE_API_KEY").expect("SENDINBLUE_API_KEY");
         Self(sendinblue::Sendinblue::production(api_key))
     }

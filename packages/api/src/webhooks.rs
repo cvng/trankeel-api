@@ -3,6 +3,7 @@ use piteo::Document;
 use piteo::FileData;
 use piteo::FileStatus;
 use piteo::FileType;
+use piteo::PaymentNotice;
 use piteo::Receipt;
 use piteo::SendReceiptsInput;
 use rocket::http::Status;
@@ -49,6 +50,7 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
     // Specific processing by document type.
     match file.type_ {
         FileType::RentReceipt => on_receipt_created(&mut client, &file).await,
+        FileType::PaymentNotice => on_notice_created(&mut client, &file).await,
         _ => panic!(),
     }
 
@@ -67,6 +69,27 @@ async fn on_receipt_created(client: &mut piteo::Client, receipt: &Receipt) {
 
     // Guess auth_id from given receipt (first user of the account).
     let lease = db.leases().by_receipt_id(&receipt.id).unwrap();
+    let user = db
+        .persons()
+        .by_account_id(&lease.account_id)
+        .map(|mut users| users.remove(0))
+        .unwrap();
+    let auth_id = user.auth_id.unwrap();
+    client.set_auth_id(auth_id);
+
+    piteo::send_receipts(client, input).await.ok();
+}
+
+async fn on_notice_created(client: &mut piteo::Client, notice: &PaymentNotice) {
+    let db = piteo::db(client);
+
+    let rent = db.rents().by_notice_id(&notice.id).unwrap();
+    let input = SendReceiptsInput {
+        rent_ids: vec![rent.id],
+    };
+
+    // Guess auth_id from given receipt (first user of the account).
+    let lease = db.leases().by_notice_id(&notice.id).unwrap();
     let user = db
         .persons()
         .by_account_id(&lease.account_id)

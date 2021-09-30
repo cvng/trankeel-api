@@ -93,6 +93,14 @@ input CreateFileInput {
 	downloadUrl: URL!
 	type: FileType!
 }
+input CreateNoticesInput {
+	rentIds: [UUID!]!
+	date: DateTime
+}
+type CreateNoticesPayload {
+	errors: [Error!]
+	notices: [File!]
+}
 input CreatePersonInput {
 	email: Email!
 	firstName: String!
@@ -126,6 +134,8 @@ type Event {
 	object: Eventable!
 }
 enum EventType {
+	PAYMENT_NOTICE_CREATED
+	PAYMENT_NOTICE_SENT
 	RENT_RECEIPT_CREATED
 	RENT_RECEIPT_SENT
 	TRANSACTION_CREATED
@@ -374,8 +384,8 @@ type Mutation {
 	transactionDelete(id: ID!): ID!
 	fileUpload(input: CreateFileInput!): File!
 	importUpload(input: ImportInput!): Task!
-	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
-	sendPaymentNotice(input: SendPaymentNoticeInput!): SendPaymentNoticePayload!
+	editRentReceipts(input: RentReceiptInput!): RentReceiptPayload!
+	sendPaymentNotices(input: CreateNoticesInput!): CreateNoticesPayload!
 }
 type Person implements LegalIdentityInterface & PersonInterface {
 	authId: AuthenticationID
@@ -554,7 +564,7 @@ type Query {
 	tenants(id: ID, query: String, status: TenantStatus): [Tenant!]!
 	leases(id: ID, query: String): [Lease!]!
 	lenders(id: ID, query: String): [Lender!]!
-	rents(since: DateTime!, until: DateTime!): [Rent!]!
+	rents: [Rent!]!
 	events: [Event!]!
 	transactions(id: ID): [Transaction!]!
 	invoices: [Invoice!]!
@@ -588,7 +598,8 @@ enum RentPaymentMethod {
 }
 input RentReceiptInput {
 	rentIds: [UUID!]!
-	sendMail: Boolean!
+	date: DateTime
+	sendMail: Boolean
 }
 type RentReceiptPayload {
 	errors: [Error!]
@@ -598,14 +609,6 @@ enum RentStatus {
 	PARTIAL
 	PENDING
 	SETTLED
-}
-input SendPaymentNoticeInput {
-	rentIds: [UUID!]!
-	date: DateTime
-}
-type SendPaymentNoticePayload {
-	errors: [Error!]
-	notices: [File!]
 }
 """
 https://stripe.com/docs/billing/subscriptions/overview

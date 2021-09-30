@@ -1,3 +1,6 @@
+mod seed_util;
+
+use crate::seed_util::author;
 use chrono::Utc;
 use piteo::AddressInput;
 use piteo::Amount;
@@ -39,6 +42,7 @@ async fn write_schema() {
 async fn seed() {
     let mut client = piteo::init();
     let auth_id = AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
+    let author = author(env::var("AUTHOR").unwrap()).unwrap();
     client.set_auth_id(auth_id.clone());
 
     let db = piteo::db(&client);
@@ -47,9 +51,9 @@ async fn seed() {
         &client,
         CreateUserWithAccountInput {
             auth_id: auth_id.clone(),
-            email: "dev@piteo.fr".into(),
-            first_name: "Dev".into(),
-            last_name: "PITEO".into(),
+            email: author.email.clone(),
+            first_name: author.first_name,
+            last_name: author.last_name,
             address: Some(AddressInput {
                 city: "PTP".into(),
                 line1: "542".into(),
@@ -106,7 +110,7 @@ async fn seed() {
             apl: None,
             birthdate: Utc::now().date().naive_utc().into(),
             birthplace: None,
-            email: "tenant@piteo.dev".into(),
+            email: author.email,
             first_name: "Tenant".into(),
             last_name: "PITEO".into(),
             note: None,

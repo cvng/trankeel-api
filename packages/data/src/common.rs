@@ -1,5 +1,3 @@
-use crate::FileId;
-
 pub(crate) type Id = uuid::Uuid;
 
 pub type ExternalId = String; // ID of an external service
@@ -26,10 +24,6 @@ pub trait Name {
             .trim()
             .to_string()
     }
-}
-
-pub trait Attachable {
-    fn to_filename(&self, file_id: &FileId) -> String;
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, DieselNewType)]
