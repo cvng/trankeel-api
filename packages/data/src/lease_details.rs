@@ -29,6 +29,13 @@ impl Default for FurnishedLeaseDuration {
     }
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[graphql(name = "LeaseNakedDuration")]
+pub enum NakedLeaseDuration {
+    ThreeYears,
+    SixYears,
+}
+
 /// https://www.service-public.fr/particuliers/vosdroits/F13723
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 pub enum LeaseRentReferenceIrl {
@@ -52,12 +59,6 @@ pub enum RentChargesRecuperationMode {
 pub enum RentPaymentMethod {
     After,
     Before,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
-pub enum LeaseNakedDuration {
-    ThreeYears,
-    SixYears,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, AsJsonb, InputObject)]
@@ -101,4 +102,11 @@ pub struct FurnishedLeaseDetails {
     pub works_decence_since_last_rental: Option<String>,
     pub works_rent_decrease_tenant: Option<String>,
     pub works_rent_increase_lender: Option<String>,
+}
+
+#[derive(Clone, Default, Debug, Serialize, Deserialize, AsJsonb, InputObject)]
+#[serde(rename_all = "camelCase")]
+#[graphql(name = "LeaseNakedDataInput")]
+pub struct NakedLeaseDetails {
+    pub duration: Option<NakedLeaseDuration>,
 }

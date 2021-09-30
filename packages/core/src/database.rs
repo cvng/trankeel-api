@@ -3,6 +3,7 @@ use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::AccountId;
 use piteo_data::Advertisement;
+use piteo_data::AdvertisementData;
 use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
@@ -101,6 +102,7 @@ pub trait AdvertisementStore {
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Advertisement>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Advertisement>>;
     fn create(&mut self, data: Advertisement) -> Result<Advertisement>;
+    fn update(&mut self, data: AdvertisementData) -> Result<Advertisement>;
 }
 
 pub trait CandidacyStore {
@@ -118,6 +120,7 @@ pub trait CandidacyStore {
 pub trait PropertyStore {
     fn by_id(&mut self, id: &PropertyId) -> Result<Property>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Property>>;
+    fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId) -> Result<Property>;
     fn create(&mut self, data: Property) -> Result<Property>;
     fn delete(&mut self, data: PropertyId) -> Result<Deleted>;
     fn update(&mut self, data: PropertyData) -> Result<Property>;

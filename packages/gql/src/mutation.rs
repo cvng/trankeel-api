@@ -1,4 +1,5 @@
 use crate::objects::Account;
+use crate::objects::Advertisement;
 use crate::objects::Candidacy;
 use crate::objects::Error;
 use crate::objects::File;
@@ -17,9 +18,11 @@ use async_graphql::ID;
 use piteo::AcceptCandidacyInput;
 use piteo::AccountActivatePlanInput;
 use piteo::AccountUpdateInput;
+use piteo::CreateAdvertisementInput;
 use piteo::CreateCandidacyInput;
 use piteo::CreateFileInput;
 use piteo::CreateFurnishedLeaseInput;
+use piteo::CreateNakedLeaseInput;
 use piteo::CreateNoticesInput;
 use piteo::CreatePropertyInput;
 use piteo::CreateReceiptsInput;
@@ -30,6 +33,7 @@ use piteo::DeletePropertyInput;
 use piteo::DeleteTenantInput;
 use piteo::ImportInput;
 use piteo::TransactionInput;
+use piteo::UpdateAdvertisementInput;
 use piteo::UpdateFurnishedLeaseInput;
 use piteo::UpdateIndividualLenderInput;
 use piteo::UpdatePropertyInput;
@@ -90,6 +94,22 @@ impl Mutation {
         Ok(piteo::delete_property(&ctx.into(), DeletePropertyInput { id: id.try_into()? })?.into())
     }
 
+    async fn create_advertisement(
+        &self,
+        ctx: &Context<'_>,
+        input: CreateAdvertisementInput,
+    ) -> Result<Advertisement> {
+        Ok(piteo::create_advertisement(&ctx.into(), input)?.into())
+    }
+
+    async fn update_advertisement(
+        &self,
+        ctx: &Context<'_>,
+        input: UpdateAdvertisementInput,
+    ) -> Result<Advertisement> {
+        Ok(piteo::update_advertisement(&ctx.into(), input)?.into())
+    }
+
     async fn lease_furnished_create(
         &self,
         ctx: &Context<'_>,
@@ -104,6 +124,14 @@ impl Mutation {
         input: UpdateFurnishedLeaseInput,
     ) -> Result<Lease> {
         Ok(piteo::update_furnished_lease(&ctx.into(), input)?.into())
+    }
+
+    async fn lease_naked_create(
+        &self,
+        _ctx: &Context<'_>,
+        _input: CreateNakedLeaseInput,
+    ) -> Result<Lease> {
+        Err(wip())
     }
 
     async fn lease_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {

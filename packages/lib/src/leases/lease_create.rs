@@ -9,6 +9,7 @@ use piteo_data::FurnishedLeaseDetails;
 use piteo_data::Lease;
 use piteo_data::LeaseId;
 use piteo_data::LeaseType;
+use piteo_data::NakedLeaseDetails;
 use piteo_data::PropertyId;
 use piteo_data::Rent;
 use piteo_data::Tenant;
@@ -33,6 +34,14 @@ pub struct CreateFurnishedLeaseInput {
     pub rent_charges_amount: Option<Amount>,
     pub signature_date: Option<DateTime>,
     pub tenant_ids: Vec<TenantId>,
+}
+
+// TODO: naked lease
+#[derive(InputObject, Validate)]
+#[graphql(name = "LeaseNakedInput")]
+pub struct CreateNakedLeaseInput {
+    #[graphql(name = "data")]
+    pub details: Option<NakedLeaseDetails>,
 }
 
 // # Operation

@@ -423,7 +423,6 @@ impl From<piteo::LenderWithIdentity> for Lender {
 
 #[derive(async_graphql::SimpleObject)]
 #[graphql(complex)]
-#[graphql(name = "User")]
 pub struct Person {
     auth_id: Option<AuthId>,
     email: Email,
@@ -485,6 +484,7 @@ pub struct Plan {
 }
 
 #[derive(async_graphql::SimpleObject)]
+#[graphql(complex)]
 pub struct Advertisement {
     id: ID,
     created_at: Option<DateTime>,
@@ -498,6 +498,16 @@ pub struct Advertisement {
     flexibility: Option<LenderFlexibility>,
     referral_lease_id: Option<ID>,
     property_id: ID,
+}
+
+#[async_graphql::ComplexObject]
+impl Advertisement {
+    async fn property(&self, ctx: &Context<'_>) -> Result<Property> {
+        Ok(db(&ctx.into())
+            .properties()
+            .by_advertisement_id(&self.id.clone().try_into()?)?
+            .into())
+    }
 }
 
 impl From<piteo::Advertisement> for Advertisement {
@@ -599,6 +609,9 @@ impl Property {
     }
     async fn note(&self) -> Option<String> {
         self.0.note.clone()
+    }
+    async fn description(&self) -> Option<String> {
+        self.0.description.clone()
     }
     async fn ntic_equipments(&self) -> Option<String> {
         self.0.ntic_equipments.clone()

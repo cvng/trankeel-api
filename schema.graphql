@@ -47,6 +47,7 @@ type Advertisement {
 	flexibility: LenderFlexibility
 	referralLeaseId: ID
 	propertyId: ID!
+	property: Property!
 }
 scalar AuthenticationID
 type Candidacy {
@@ -75,6 +76,17 @@ type Company implements LegalIdentityInterface {
 	legalEntityType: LegalEntityType
 	legalEntityTypeOther: String
 	phoneNumber: PhoneNumber
+}
+input CreateAdvertisementInput {
+	published: Boolean!
+	leaseType: LeaseType!
+	rentAmount: Decimal!
+	rentChargesAmount: Decimal
+	depositAmount: Decimal
+	effectDate: DateTime!
+	flexibility: LenderFlexibility
+	referralLeaseId: UUID
+	propertyId: UUID!
 }
 input CreateCandidacyInput {
 	advertisementId: UUID!
@@ -310,6 +322,16 @@ input LeaseFurnishedUpdateInput {
 	file: FileInput
 	id: UUID!
 }
+input LeaseNakedDataInput {
+	duration: LeaseNakedDuration
+}
+enum LeaseNakedDuration {
+	THREE_YEARS
+	SIX_YEARS
+}
+input LeaseNakedInput {
+	data: LeaseNakedDataInput
+}
 enum LeaseRentPeriodicity {
 	ANNUALY
 	MONTHLY
@@ -339,7 +361,7 @@ enum LegalEntityType {
 	SCP
 	SNC
 }
-union LegalIdentity = | User | Company
+union LegalIdentity = | Person | Company
 interface LegalIdentityInterface {
 	displayName: String!
 }
@@ -361,7 +383,7 @@ input LenderIndividualUpdateInput {
 	individual: UserUpdateInput!
 }
 type Mutation {
-	userCreateWithAccount(input: UserWithAccountInput!): User!
+	userCreateWithAccount(input: UserWithAccountInput!): Person!
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
 	tenantCreate(input: TenantInput!): Tenant!
@@ -370,8 +392,11 @@ type Mutation {
 	propertyCreate(input: PropertyInput!): Property!
 	propertyUpdate(input: PropertyUpdateInput!): Property!
 	propertyDelete(id: ID!): ID!
+	createAdvertisement(input: CreateAdvertisementInput!): Advertisement!
+	updateAdvertisement(input: UpdateAdvertisementInput!): Advertisement!
 	leaseFurnishedCreate(input: LeaseFurnishedInput!): Lease!
 	leaseFurnishedUpdate(input: LeaseFurnishedUpdateInput!): Lease!
+	leaseNakedCreate(input: LeaseNakedInput!): Lease!
 	leaseDelete(id: ID!): ID!
 	lenderIndividualUpdate(input: LenderIndividualUpdateInput!): Lender!
 	candidacyCreate(input: CreateCandidacyInput!): Candidacy!
@@ -382,6 +407,21 @@ type Mutation {
 	importUpload(input: ImportInput!): Task!
 	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
 	sendPaymentNotice(input: SendPaymentNoticeInput!): CreateNoticesPayload!
+}
+type Person implements PersonInterface & LegalIdentityInterface {
+	authId: AuthenticationID
+	email: Email!
+	firstName: String!
+	lastName: String!
+	address: Address
+	photoURL: URL
+	role: UserRole!
+	id: ID!
+	phoneNumber: PhoneNumber
+	accountId: ID!
+	displayName: String!
+	accounts: [Account!]
+	account: Account
 }
 interface PersonInterface {
 	firstName: String!
@@ -418,6 +458,7 @@ type Property {
 	housingType: PropertyUsageType
 	name: String!
 	note: String
+	description: String
 	nticEquipments: String
 	otherSpaces: String
 	tax: Decimal
@@ -537,7 +578,7 @@ enum PropertyUsageType {
 	INDIVIDUAL
 }
 type Query {
-	viewer: User!
+	viewer: Person!
 	advertisement(id: ID!): Advertisement!
 	candidacies(propertyId: ID): [Candidacy!]!
 	properties(id: ID, query: String): [Property!]!
@@ -723,20 +764,16 @@ enum TransactionType {
 }
 scalar URL
 scalar UUID
-type User implements PersonInterface & LegalIdentityInterface {
-	authId: AuthenticationID
-	email: Email!
-	firstName: String!
-	lastName: String!
-	address: Address
-	photoURL: URL
-	role: UserRole!
-	id: ID!
-	phoneNumber: PhoneNumber
-	accountId: ID!
-	displayName: String!
-	accounts: [Account!]
-	account: Account
+input UpdateAdvertisementInput {
+	id: UUID!
+	published: Boolean
+	leaseType: LeaseType
+	rentAmount: Decimal
+	rentChargesAmount: Decimal
+	depositAmount: Decimal
+	effectDate: DateTime
+	flexibility: LenderFlexibility
+	referralLeaseId: UUID
 }
 enum UserRole {
 	ADMIN
@@ -763,7 +800,7 @@ type Warrant {
 	type: WarrantType!
 	identity: WarrantIdentity!
 }
-union WarrantIdentity = | User | ProfessionalWarrant
+union WarrantIdentity = | Person | ProfessionalWarrant
 enum WarrantType {
 	PERSON
 	VISALE

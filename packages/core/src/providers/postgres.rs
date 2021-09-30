@@ -32,6 +32,7 @@ use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::AccountId;
 use piteo_data::Advertisement;
+use piteo_data::AdvertisementData;
 use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
@@ -460,6 +461,10 @@ impl database::AdvertisementStore for AdvertisementStore<'_> {
             .values(data)
             .get_result(&self.0.get()?)?)
     }
+
+    fn update(&mut self, data: AdvertisementData) -> Result<Advertisement> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    }
 }
 
 impl database::CandidacyStore for CandidacyStore<'_> {
@@ -517,6 +522,14 @@ impl database::PropertyStore for PropertyStore<'_> {
             .left_join(persons::table.on(persons::account_id.eq(properties::account_id)))
             .filter(persons::auth_id.eq(auth_id.inner()))
             .load(&self.0.get()?)?)
+    }
+
+    fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId) -> Result<Property> {
+        Ok(properties::table
+            .select(properties::all_columns)
+            .left_join(advertisements::table.on(advertisements::property_id.eq(properties::id)))
+            .filter(advertisements::id.eq(advertisement_id))
+            .first(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Property) -> Result<Property> {

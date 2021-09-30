@@ -9,6 +9,7 @@ pub use crate::error::Result;
 pub use crate::files::CreateFileInput;
 pub use crate::imports::ImportInput;
 pub use crate::leases::CreateFurnishedLeaseInput;
+pub use crate::leases::CreateNakedLeaseInput;
 pub use crate::leases::CreateNoticesInput;
 pub use crate::leases::CreateReceiptsInput;
 pub use crate::leases::DeleteLeaseInput;
@@ -19,6 +20,7 @@ pub use crate::owners::UpdateIndividualLenderInput;
 pub use crate::properties::CreateAdvertisementInput;
 pub use crate::properties::CreatePropertyInput;
 pub use crate::properties::DeletePropertyInput;
+pub use crate::properties::UpdateAdvertisementInput;
 pub use crate::properties::UpdatePropertyInput;
 pub use crate::tenants::CreateTenantInput;
 pub use crate::tenants::DeleteTenantInput;
@@ -140,6 +142,13 @@ pub fn create_advertisement(
     input: CreateAdvertisementInput,
 ) -> Result<Advertisement> {
     crate::properties::create_advertisement(&client.db(), &client.auth_id()?, input)
+}
+
+pub fn update_advertisement(
+    client: &Client,
+    input: UpdateAdvertisementInput,
+) -> Result<Advertisement> {
+    crate::properties::update_advertisement(&client.db(), &client.auth_id()?, input)
 }
 
 // # Leases
