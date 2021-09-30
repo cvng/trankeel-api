@@ -15,6 +15,7 @@ use crate::objects::Tenant;
 use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::ID;
+use piteo::DateTime;
 use piteo::db;
 use piteo::AuthId;
 use piteo::Db;
@@ -131,8 +132,8 @@ impl Query {
     async fn rents(
         &self,
         ctx: &Context<'_>,
-        // _since: DateTime,
-        // _until: DateTime,
+        _since: DateTime,
+        _until: DateTime,
     ) -> Result<Vec<Rent>> {
         Ok(db(&ctx.into())
             .rents()
@@ -143,8 +144,8 @@ impl Query {
     async fn summary(
         &self,
         ctx: &Context<'_>,
-        // _since: Option<DateTime>,
-        // _until: Option<DateTime>,
+        _since: DateTime,
+        _until: DateTime,
     ) -> Result<Summary> {
         Ok(db(&ctx.into())
             .reports()

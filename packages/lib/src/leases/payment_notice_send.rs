@@ -20,6 +20,7 @@ use validator::Validate;
 // # Input
 
 #[derive(InputObject, Validate)]
+#[graphql(name = "SendPaymentNoticeInput")]
 pub struct CreateNoticesInput {
     rent_ids: Vec<RentId>,
     date: Option<DateTime>,

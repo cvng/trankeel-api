@@ -424,6 +424,7 @@ impl From<piteo::LenderWithIdentity> for Lender {
 
 #[derive(async_graphql::SimpleObject)]
 #[graphql(complex)]
+#[graphql(name = "User")]
 pub struct Person {
     auth_id: Option<AuthId>,
     email: Email,

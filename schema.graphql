@@ -86,16 +86,8 @@ input CreateCandidacyInput {
 	phoneNumber: PhoneNumber!
 	moveInDate: DateTime!
 	description: String!
-	files: [CreateFileInput!]
+	files: [FileInput!]
 	warrants: [CreateWarrantInput!]
-}
-input CreateFileInput {
-	downloadUrl: URL!
-	type: FileType!
-}
-input CreateNoticesInput {
-	rentIds: [UUID!]!
-	date: DateTime
 }
 type CreateNoticesPayload {
 	errors: [Error!]
@@ -161,6 +153,10 @@ type File {
 	updatedAt: DateTime
 	id: ID!
 }
+input FileInput {
+	downloadUrl: URL!
+	type: FileType!
+}
 """
 https://www.pdfmonkey.io/fr/doc/api/generer-un-document
 """
@@ -172,12 +168,12 @@ enum FileStatus {
 	SUCCESS
 }
 enum FileType {
-	PAYMENT_NOTICE
 	LEASE_DOCUMENT
+	PAYMENT_NOTICE
 	RENT_RECEIPT
 }
 input ImportInput {
-	files: [CreateFileInput!]!
+	files: [FileInput!]!
 	source: ImportSource!
 }
 enum ImportSource {
@@ -302,7 +298,7 @@ input LeaseFurnishedInput {
 	depositAmount: Decimal
 	effectDate: DateTime!
 	renewDate: DateTime
-	file: CreateFileInput
+	file: FileInput
 	propertyId: UUID!
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
@@ -311,7 +307,7 @@ input LeaseFurnishedInput {
 }
 input LeaseFurnishedUpdateInput {
 	data: LeaseFurnishedDataInput
-	file: CreateFileInput
+	file: FileInput
 	id: UUID!
 }
 enum LeaseRentPeriodicity {
@@ -343,7 +339,7 @@ enum LegalEntityType {
 	SCP
 	SNC
 }
-union LegalIdentity = | Person | Company
+union LegalIdentity = | User | Company
 interface LegalIdentityInterface {
 	displayName: String!
 }
@@ -365,7 +361,7 @@ input LenderIndividualUpdateInput {
 	individual: UserUpdateInput!
 }
 type Mutation {
-	userCreateWithAccount(input: UserWithAccountInput!): Person!
+	userCreateWithAccount(input: UserWithAccountInput!): User!
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
 	tenantCreate(input: TenantInput!): Tenant!
@@ -382,25 +378,10 @@ type Mutation {
 	candidacyAccept(input: AcceptCandidacyInput!): Candidacy!
 	transactionCreate(input: TransactionInput!): Transaction!
 	transactionDelete(id: ID!): ID!
-	fileUpload(input: CreateFileInput!): File!
+	fileUpload(input: FileInput!): File!
 	importUpload(input: ImportInput!): Task!
-	editRentReceipts(input: RentReceiptInput!): RentReceiptPayload!
-	sendPaymentNotices(input: CreateNoticesInput!): CreateNoticesPayload!
-}
-type Person implements LegalIdentityInterface & PersonInterface {
-	authId: AuthenticationID
-	email: Email!
-	firstName: String!
-	lastName: String!
-	address: Address
-	photoURL: URL
-	role: UserRole!
-	id: ID!
-	phoneNumber: PhoneNumber
-	accountId: ID!
-	displayName: String!
-	accounts: [Account!]
-	account: Account
+	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
+	sendPaymentNotice(input: SendPaymentNoticeInput!): CreateNoticesPayload!
 }
 interface PersonInterface {
 	firstName: String!
@@ -556,15 +537,15 @@ enum PropertyUsageType {
 	INDIVIDUAL
 }
 type Query {
-	viewer: Person!
+	viewer: User!
 	advertisement(id: ID!): Advertisement!
 	candidacies(propertyId: ID): [Candidacy!]!
 	properties(id: ID, query: String): [Property!]!
 	tenants(id: ID, query: String, status: TenantStatus): [Tenant!]!
 	leases(id: ID, query: String): [Lease!]!
 	lenders(id: ID, query: String): [Lender!]!
-	rents: [Rent!]!
-	summary: Summary!
+	rents(since: DateTime!, until: DateTime!): [Rent!]!
+	summary(since: DateTime!, until: DateTime!): Summary!
 	events: [Event!]!
 	transactions(id: ID): [Transaction!]!
 	invoices: [Invoice!]!
@@ -606,9 +587,13 @@ type RentReceiptPayload {
 	receipts: [File!]
 }
 enum RentStatus {
-	OPEN
-	PAID
-	PARTIALLY_PAID
+	Pending
+	Settled
+	Partial
+}
+input SendPaymentNoticeInput {
+	rentIds: [UUID!]!
+	date: DateTime
 }
 """
 https://stripe.com/docs/billing/subscriptions/overview
@@ -738,6 +723,21 @@ enum TransactionType {
 }
 scalar URL
 scalar UUID
+type User implements LegalIdentityInterface & PersonInterface {
+	authId: AuthenticationID
+	email: Email!
+	firstName: String!
+	lastName: String!
+	address: Address
+	photoURL: URL
+	role: UserRole!
+	id: ID!
+	phoneNumber: PhoneNumber
+	accountId: ID!
+	displayName: String!
+	accounts: [Account!]
+	account: Account
+}
 enum UserRole {
 	ADMIN
 	TENANT
@@ -763,7 +763,7 @@ type Warrant {
 	type: WarrantType!
 	identity: WarrantIdentity!
 }
-union WarrantIdentity = | Person | ProfessionalWarrant
+union WarrantIdentity = | User | ProfessionalWarrant
 enum WarrantType {
 	PERSON
 	VISALE

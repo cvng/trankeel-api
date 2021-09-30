@@ -37,8 +37,11 @@ impl Default for PropertyStatus {
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Rentstatus"]
 pub enum RentStatus {
+    #[graphql(name = "Pending")]
     Open,
+    #[graphql(name = "Settled")]
     Paid,
+    #[graphql(name = "Partial")]
     PartiallyPaid,
 }
 
