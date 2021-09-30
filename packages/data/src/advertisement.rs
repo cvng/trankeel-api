@@ -26,3 +26,18 @@ pub struct Advertisement {
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: PropertyId,
 }
+
+#[derive(Default, AsChangeset, Identifiable, Insertable)]
+#[table_name = "advertisements"]
+pub struct AdvertisementData {
+    pub id: AdvertisementId,
+    pub published: Option<bool>,
+    pub lease_type: Option<LeaseType>,
+    pub rent_amount: Option<Amount>,
+    pub rent_charges_amount: Option<Amount>,
+    pub deposit_amount: Option<Amount>,
+    pub effect_date: Option<DateTime>,
+    pub flexibility: Option<LenderFlexibility>,
+    pub referral_lease_id: Option<LeaseId>,
+    pub property_id: Option<PropertyId>,
+}
