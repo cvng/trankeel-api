@@ -79,7 +79,7 @@ pub fn create_property(
         other_spaces: input.other_spaces,
         tax: input.tax,
         room_count: input.room_count,
-        status: input.status,
+        status: input.status.unwrap_or_default(),
         surface: input.surface,
         tenant_private_spaces: input.tenant_private_spaces,
         usage_type: Some(input.usage_type),

@@ -1,3 +1,5 @@
+CREATE TYPE propertystatus AS ENUM ('for_sale', 'inactive', 'rented', 'under_construction', 'unrented');
+
 CREATE TABLE properties (
     id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMPTZ DEFAULT current_timestamp,
@@ -19,7 +21,7 @@ CREATE TABLE properties (
     other_spaces TEXT,
     tax NUMERIC,
     room_count TEXT NOT NULL,
-    status TEXT,
+    status PROPERTYSTATUS NOT NULL,
     surface REAL NOT NULL,
     tenant_private_spaces TEXT,
     usage_type TEXT,

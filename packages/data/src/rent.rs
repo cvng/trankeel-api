@@ -5,17 +5,11 @@ use crate::DateTime;
 use crate::LeaseId;
 use crate::PaymentNoticeId;
 use crate::ReceiptId;
+use crate::RentStatus;
 
 // # Types
 
 pub type RentId = Id;
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
-pub enum RentStatus {
-    Partial,
-    Pending,
-    Settled,
-}
 
 #[derive(Clone, Insertable, Queryable)]
 pub struct Rent {
@@ -33,7 +27,7 @@ pub struct Rent {
     pub notice_id: Option<PaymentNoticeId>,
 }
 
-#[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
+#[derive(Default, AsChangeset, Identifiable, Insertable)]
 #[table_name = "rents"]
 pub struct RentData {
     pub id: Id,

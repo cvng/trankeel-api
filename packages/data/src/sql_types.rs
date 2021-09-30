@@ -19,6 +19,36 @@ impl Default for AccountStatus {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[DieselType = "Propertystatus"]
+pub enum PropertyStatus {
+    ForSale,
+    Inactive,
+    Rented,
+    UnderConstruction,
+    Unrented,
+}
+
+impl Default for PropertyStatus {
+    fn default() -> Self {
+        Self::Unrented
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[DieselType = "Rentstatus"]
+pub enum RentStatus {
+    Open,
+    Paid,
+    PartiallyPaid,
+}
+
+impl Default for RentStatus {
+    fn default() -> Self {
+        Self::Open
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[graphql(name = "UserRole")]
 #[DieselType = "Personrole"]
 pub enum PersonRole {

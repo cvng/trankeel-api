@@ -136,7 +136,7 @@ impl Lease {
                     amount: rent,
                     charges_amount: Some(charges),
                     full_amount: total,
-                    status: RentStatus::Pending,
+                    status: RentStatus::default(),
                     lease_id: self.id,
                     receipt_id: None,
                     notice_id: None,

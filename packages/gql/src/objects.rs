@@ -612,8 +612,8 @@ impl Property {
     async fn room_count(&self) -> PropertyRoomType {
         self.0.room_count
     }
-    async fn status(&self) -> Option<PropertyStatus> {
-        self.0.status.map(Into::into)
+    async fn status(&self) -> PropertyStatus {
+        self.0.status
     }
     async fn surface(&self) -> f32 {
         self.0.surface
@@ -722,33 +722,33 @@ impl From<piteo::Rent> for Rent {
 
 #[derive(async_graphql::SimpleObject)]
 pub struct Summary {
-    since: DateTime,
-    until: DateTime,
-    //
+    account_id: ID,
+    created_at: DateTime,
+
     amount_expected: Amount,
     amount_received: Amount,
     amount_settled: Amount,
     amount_partial: Amount,
     amount_pending: Amount,
-    //
-    n_expected: u32,
-    n_received: u32,
-    n_settled: u32,
-    n_partial: u32,
-    n_pending: u32,
-    //
+
+    n_expected: i32,
+    n_received: i32,
+    n_settled: i32,
+    n_partial: i32,
+    n_pending: i32,
+
     ratio_expected: f64,
     ratio_received: f64,
     ratio_settled: f64,
     ratio_partial: f64,
     ratio_pending: f64,
-    //
+
     variation_expected: f64,
     variation_received: f64,
     variation_settled: f64,
     variation_partial: f64,
     variation_pending: f64,
-    //
+
     payment_rate: f64,
     occupation_rate: f64,
 }
@@ -756,8 +756,8 @@ pub struct Summary {
 impl From<piteo::Summary> for Summary {
     fn from(item: piteo::Summary) -> Self {
         Summary {
-            since: item.since,
-            until: item.until,
+            account_id: item.account_id.into(),
+            created_at: item.created_at,
             amount_expected: item.amount_expected,
             amount_received: item.amount_received,
             amount_settled: item.amount_settled,
