@@ -1,6 +1,5 @@
 {
   "name": "piteo",
-  "version": "0.1.0",
   "private": "true",
   "scripts": {
     "dev": "cargo watch -i schema.graphql -x run",
