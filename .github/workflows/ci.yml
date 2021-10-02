@@ -13,9 +13,12 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
+          components: clippy
 
       - uses: swatinem/rust-cache@v1
 
       - run: cargo build --release --locked
+
+      - run: cargo clippy --release --locked
 
       - run: cargo test --release --locked
