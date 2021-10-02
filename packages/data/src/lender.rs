@@ -33,7 +33,7 @@ pub struct Lender {
 #[table_name = "lenders"]
 pub struct LenderData {
     pub id: LenderId,
-    pub account_id: AccountId,
+    pub account_id: Option<AccountId>,
     pub individual_id: Option<PersonId>,
     pub company_id: Option<CompanyId>,
 }

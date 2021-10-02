@@ -1,6 +1,6 @@
 use crate::documents::ReceiptDocument;
 use crate::error::Result;
-use crate::messages::ReceiptMail;
+use crate::notifications::ReceiptMail;
 use async_graphql::InputObject;
 use chrono::Utc;
 use piteo_core::activity::trace;

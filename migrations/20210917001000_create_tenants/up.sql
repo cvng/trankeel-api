@@ -3,6 +3,7 @@ CREATE TABLE tenants (
     created_at TIMESTAMPTZ DEFAULT current_timestamp,
     updated_at TIMESTAMPTZ,
     account_id UUID NOT NULL REFERENCES accounts(id),
+    person_id UUID NOT NULL REFERENCES persons(id),
     apl BOOLEAN,
     birthdate DATE NOT NULL,
     birthplace TEXT,

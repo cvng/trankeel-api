@@ -1,6 +1,7 @@
 mod interfaces;
 mod mutation;
 mod objects;
+mod payloads;
 mod query;
 mod unions;
 

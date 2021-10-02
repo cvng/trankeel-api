@@ -1,5 +1,6 @@
 use crate::objects::Advertisement;
 use crate::objects::Candidacy;
+use crate::objects::Discussion;
 use crate::objects::Event;
 use crate::objects::File;
 use crate::objects::Invoice;
@@ -158,6 +159,20 @@ impl Query {
             .events()
             .by_auth_id(ctx.data::<AuthId>()?)
             .and_then(map_res)?)
+    }
+
+    async fn discussions(&self, ctx: &Context<'_>, id: Option<ID>) -> Result<Vec<Discussion>> {
+        if let Some(id) = id {
+            Ok(vec![db(&ctx.into())
+                .discussions()
+                .by_id(&id.try_into()?)?
+                .into()])
+        } else {
+            Ok(db(&ctx.into())
+                .discussions()
+                .by_auth_id(ctx.data::<AuthId>()?)
+                .and_then(map_res)?)
+        }
     }
 
     async fn transactions(&self, _ctx: &Context<'_>, _id: Option<ID>) -> Result<Vec<Payment>> {

@@ -6,6 +6,7 @@ use crate::DateTime;
 use crate::Email;
 use crate::LeaseId;
 use crate::Name;
+use crate::PersonId;
 use crate::PhoneNumber;
 
 // # Types
@@ -33,6 +34,7 @@ pub struct Tenant {
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
+    pub person_id: PersonId,
     pub apl: Option<bool>,
     pub birthdate: Date,
     pub birthplace: Option<String>,
@@ -51,6 +53,7 @@ pub struct Tenant {
 pub struct TenantData {
     pub id: TenantId,
     pub account_id: Option<AccountId>,
+    pub person_id: Option<PersonId>,
     pub apl: Option<bool>,
     pub birthdate: Option<Date>,
     pub birthplace: Option<String>,

@@ -109,6 +109,7 @@ fn add_lease_tenants(
                 lease_id: Some(lease_id),
                 status: Some(TenantStatus::Uptodate),
                 account_id: Default::default(),
+                person_id: Default::default(),
                 apl: Default::default(),
                 birthdate: Default::default(),
                 birthplace: Default::default(),

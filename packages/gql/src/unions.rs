@@ -1,3 +1,4 @@
+use crate::objects::Candidacy;
 use crate::objects::Company;
 use crate::objects::FurnishedLeaseDetails;
 use crate::objects::Payment;
@@ -53,4 +54,17 @@ impl From<piteo::Eventable> for Eventable {
 #[derive(async_graphql::Union)]
 pub enum LeaseDetails {
     FurnishedLeaseDetails(FurnishedLeaseDetails),
+}
+
+#[derive(async_graphql::Union)]
+pub enum DiscussionSubject {
+    Candidacy(Candidacy),
+}
+
+impl From<piteo::DiscussionSubject> for DiscussionSubject {
+    fn from(item: piteo::DiscussionSubject) -> Self {
+        match item {
+            piteo::DiscussionSubject::Candidacy(candidacy) => Self::Candidacy(candidacy.into()),
+        }
+    }
 }

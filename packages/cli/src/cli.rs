@@ -6,6 +6,7 @@ use piteo::AddressInput;
 use piteo::Amount;
 use piteo::AuthId;
 use piteo::CreateAdvertisementInput;
+use piteo::CreateCandidacyInput;
 use piteo::CreateFurnishedLeaseInput;
 use piteo::CreatePropertyInput;
 use piteo::CreateTenantInput;
@@ -154,9 +155,27 @@ async fn seed() {
     )
     .unwrap();
 
+    let candidacy = piteo::create_candidacy(
+        &client,
+        CreateCandidacyInput {
+            advertisement_id: advertisement.id,
+            is_student: true,
+            first_name: "Candidate".into(),
+            last_name: "PITEO".into(),
+            birthdate: Utc::now().date().naive_utc().into(),
+            email: "candidate@piteo.dev".into(),
+            phone_number: "+33633123456".to_string().into(),
+            move_in_date: Utc::now().into(),
+            description: "Hello, Lender!".into(),
+            files: None,
+            warrants: None,
+        },
+    )
+    .unwrap();
+
     println!(
-        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",
-        user, lender, property, tenant, lease, advertisement
+        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",
+        user, lender, property, tenant, lease, advertisement, candidacy
     );
     println!("🌱 Database seeded.");
 }

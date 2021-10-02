@@ -124,6 +124,29 @@ input CreateWarrantInput {
 scalar Date
 scalar DateTime
 scalar Decimal
+input DeleteDiscussionInput {
+	id: UUID!
+}
+type DeleteDiscussionPayload {
+	errors: [Error!]
+	id: ID
+}
+type Discussion {
+	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
+	initiatorId: ID!
+	type: DiscussionType!
+	initiator: Person!
+	subject: DiscussionSubject
+	snippet: Message!
+	messages: [Message!]!
+}
+union DiscussionSubject = | Candidacy
+enum DiscussionType {
+	CANDIDACY
+	NORMAL
+}
 scalar Email
 type Error {
 	message: String!
@@ -382,6 +405,14 @@ input LenderIndividualUpdateInput {
 	id: UUID!
 	individual: UserUpdateInput!
 }
+type Message {
+	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
+	senderId: ID!
+	content: String!
+	sender: Person!
+}
 type Mutation {
 	userCreateWithAccount(input: UserWithAccountInput!): Person!
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
@@ -407,8 +438,10 @@ type Mutation {
 	importUpload(input: ImportInput!): Task!
 	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
 	sendPaymentNotice(input: SendPaymentNoticeInput!): CreateNoticesPayload!
+	pushMessage(input: PushMessageInput!): PushMessagePayload!
+	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!
@@ -577,6 +610,15 @@ enum PropertyUsageType {
 	COLLECTIVE
 	INDIVIDUAL
 }
+input PushMessageInput {
+	discussionId: UUID!
+	senderId: UUID!
+	message: String!
+}
+type PushMessagePayload {
+	errors: [Error!]
+	message: Message
+}
 type Query {
 	viewer: Person!
 	advertisement(id: ID!): Advertisement!
@@ -588,6 +630,7 @@ type Query {
 	rents(since: DateTime!, until: DateTime!): [Rent!]!
 	summary(since: DateTime!, until: DateTime!): Summary!
 	events: [Event!]!
+	discussions(id: ID): [Discussion!]!
 	transactions(id: ID): [Transaction!]!
 	invoices: [Invoice!]!
 	plans: [Plan!]!

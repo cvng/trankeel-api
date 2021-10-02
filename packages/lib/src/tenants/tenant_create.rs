@@ -55,11 +55,27 @@ pub fn create_tenant(
         None => db.accounts().by_auth_id(auth_id)?.id,
     };
 
+    let person = db.persons().create(Person {
+        id: PersonId::new_v4(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
+        account_id,
+        auth_id: None, // Not authenticable when created.
+        email: input.email.clone().into(),
+        first_name: input.first_name.clone(),
+        last_name: input.last_name.clone(),
+        address: None,
+        photo_url: None,
+        role: PersonRole::Tenant,
+        phone_number: input.phone_number.clone(),
+    })?;
+
     let tenant = db.tenants().create(Tenant {
         id: TenantId::new_v4(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id,
+        person_id: person.id,
         apl: input.apl,
         birthdate: input.birthdate,
         birthplace: input.birthplace,

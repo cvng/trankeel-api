@@ -77,6 +77,23 @@ table! {
     #[allow(unused_imports)]
     use crate::sql_types::*;
 
+    discussions (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        account_id -> Uuid,
+        initiator_id -> Uuid,
+        subject_id -> Nullable<Uuid>,
+        #[sql_name = "type"]
+        type_ -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    #[allow(unused_imports)]
+    use crate::sql_types::*;
+
     events (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -146,6 +163,21 @@ table! {
         account_id -> Uuid,
         individual_id -> Nullable<Uuid>,
         company_id -> Nullable<Uuid>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    #[allow(unused_imports)]
+    use crate::sql_types::*;
+
+    messages (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        discussion_id -> Uuid,
+        sender_id -> Uuid,
+        content -> Text,
     }
 }
 
@@ -282,6 +314,7 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
+        person_id -> Uuid,
         apl -> Nullable<Bool>,
         birthdate -> Date,
         birthplace -> Nullable<Text>,
@@ -318,6 +351,8 @@ joinable!(advertisements -> leases (referral_lease_id));
 joinable!(advertisements -> properties (property_id));
 joinable!(candidacies -> advertisements (advertisement_id));
 joinable!(candidacies -> tenants (tenant_id));
+joinable!(discussions -> accounts (account_id));
+joinable!(discussions -> persons (initiator_id));
 joinable!(events -> accounts (account_id));
 joinable!(leases -> accounts (account_id));
 joinable!(leases -> files (lease_id));
@@ -325,6 +360,8 @@ joinable!(leases -> properties (property_id));
 joinable!(lenders -> accounts (account_id));
 joinable!(lenders -> companies (company_id));
 joinable!(lenders -> persons (individual_id));
+joinable!(messages -> discussions (discussion_id));
+joinable!(messages -> persons (sender_id));
 joinable!(payments -> rents (rent_id));
 joinable!(persons -> accounts (account_id));
 joinable!(properties -> accounts (account_id));
@@ -332,6 +369,7 @@ joinable!(properties -> lenders (lender_id));
 joinable!(rents -> leases (lease_id));
 joinable!(tenants -> accounts (account_id));
 joinable!(tenants -> leases (lease_id));
+joinable!(tenants -> persons (person_id));
 joinable!(warrants -> persons (individual_id));
 joinable!(warrants -> professional_warrants (professional_id));
 joinable!(warrants -> tenants (tenant_id));
@@ -341,10 +379,12 @@ allow_tables_to_appear_in_same_query!(
     advertisements,
     candidacies,
     companies,
+    discussions,
     events,
     files,
     leases,
     lenders,
+    messages,
     payments,
     persons,
     plans,
