@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 async-trait = "0.1.51"
-diesel = { version = "1.4.7", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }
+diesel = { version = "1.4.8", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }
 erased-serde = "0.3"
 eyre = "0.6.5"
 piteo-data = { path = "../data" }
