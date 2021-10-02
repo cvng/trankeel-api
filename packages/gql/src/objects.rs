@@ -1,4 +1,5 @@
 use crate::query::map_res;
+use crate::unions::DiscussionSubject;
 use crate::unions::Eventable;
 use crate::unions::LegalIdentity;
 use crate::unions::WarrantIdentity;
@@ -13,6 +14,7 @@ use piteo::CandidacyStatus;
 use piteo::Date;
 use piteo::DateTime;
 use piteo::Db;
+use piteo::DiscussionType;
 use piteo::Email;
 use piteo::EventType;
 use piteo::EventableType;
@@ -968,6 +970,96 @@ impl From<piteo::EventWithEventable> for Event {
             eventable_type: item.0.eventable_type,
             r#type: item.0.type_,
             eventable: item.1.into(),
+        }
+    }
+}
+
+// # Inbox
+
+#[derive(async_graphql::SimpleObject)]
+#[graphql(complex)]
+pub struct Discussion {
+    pub id: ID,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
+    pub initiator_id: ID,
+    pub r#type: DiscussionType,
+}
+
+#[async_graphql::ComplexObject]
+impl Discussion {
+    async fn initiator(&self, ctx: &Context<'_>) -> Result<Person> {
+        Ok(db(&ctx.into())
+            .persons()
+            .by_id(&self.initiator_id.clone().try_into()?)?
+            .into())
+    }
+
+    async fn subject(&self, ctx: &Context<'_>) -> Result<Option<DiscussionSubject>> {
+        Ok(db(&ctx.into())
+            .discussions()
+            .related_subject(&self.id.clone().try_into()?)?
+            .map(Into::into))
+    }
+
+    async fn snippet(&self, ctx: &Context<'_>) -> Result<Message> {
+        Ok(db(&ctx.into())
+            .messages()
+            .by_discussion_id(&self.id.clone().try_into()?)?
+            .first()
+            .cloned()
+            .ok_or_else(|| piteo::Error::msg("no message for snippet"))?
+            .into())
+    }
+
+    async fn messages(&self, ctx: &Context<'_>) -> Result<Vec<Message>> {
+        Ok(db(&ctx.into())
+            .messages()
+            .by_discussion_id(&self.id.clone().try_into()?)
+            .and_then(map_res)?)
+    }
+}
+
+impl From<piteo::Discussion> for Discussion {
+    fn from(item: piteo::Discussion) -> Self {
+        Self {
+            id: item.id.into(),
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            initiator_id: item.initiator_id.into(),
+            r#type: item.type_,
+        }
+    }
+}
+
+#[derive(async_graphql::SimpleObject)]
+#[graphql(complex)]
+pub struct Message {
+    pub id: ID,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
+    pub sender_id: ID,
+    pub content: String,
+}
+
+#[async_graphql::ComplexObject]
+impl Message {
+    async fn sender(&self, ctx: &Context<'_>) -> Result<Person> {
+        Ok(db(&ctx.into())
+            .persons()
+            .by_id(&self.sender_id.clone().try_into()?)?
+            .into())
+    }
+}
+
+impl From<piteo::Message> for Message {
+    fn from(item: piteo::Message) -> Self {
+        Self {
+            id: item.id.into(),
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            sender_id: item.sender_id.into(),
+            content: item.content,
         }
     }
 }

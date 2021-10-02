@@ -6,7 +6,7 @@ CREATE TABLE persons (
     updated_at TIMESTAMPTZ,
     account_id UUID NOT NULL REFERENCES accounts(id),
     auth_id TEXT UNIQUE,
-    email TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     address JSONB,

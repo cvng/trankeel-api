@@ -91,7 +91,7 @@ mod tests {
     impl Default for Person {
         fn default() -> Self {
             Self {
-                id: Default::default(),
+                id: PersonId::new_v4(),
                 created_at: Default::default(),
                 updated_at: Default::default(),
                 phone_number: Default::default(),

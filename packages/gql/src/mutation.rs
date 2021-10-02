@@ -1,7 +1,6 @@
 use crate::objects::Account;
 use crate::objects::Advertisement;
 use crate::objects::Candidacy;
-use crate::objects::Error;
 use crate::objects::File;
 use crate::objects::Lease;
 use crate::objects::Lender;
@@ -10,7 +9,10 @@ use crate::objects::Person;
 use crate::objects::Property;
 use crate::objects::Task;
 use crate::objects::Tenant;
-use crate::query::map_res;
+use crate::payloads::CreateNoticesPayload;
+use crate::payloads::CreateReceiptsPayload;
+use crate::payloads::DeleteDiscussionPayload;
+use crate::payloads::PushMessagePayload;
 use crate::wip;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -28,10 +30,12 @@ use piteo::CreatePropertyInput;
 use piteo::CreateReceiptsInput;
 use piteo::CreateTenantInput;
 use piteo::CreateUserWithAccountInput;
+use piteo::DeleteDiscussionInput;
 use piteo::DeleteLeaseInput;
 use piteo::DeletePropertyInput;
 use piteo::DeleteTenantInput;
 use piteo::ImportInput;
+use piteo::PushMessageInput;
 use piteo::TransactionInput;
 use piteo::UpdateAdvertisementInput;
 use piteo::UpdateFurnishedLeaseInput;
@@ -184,16 +188,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateReceiptsInput,
     ) -> Result<CreateReceiptsPayload> {
-        match piteo::create_receipts(&ctx.into(), input).await {
-            Ok(receipts) => Ok(CreateReceiptsPayload {
-                receipts: Some(map_res(receipts)?),
-                errors: None,
-            }),
-            Err(err) => Ok(CreateReceiptsPayload {
-                receipts: None,
-                errors: Some(vec![err.into()]),
-            }),
-        }
+        Ok(piteo::create_receipts(&ctx.into(), input).await.into())
     }
 
     #[graphql(name = "sendPaymentNotice")]
@@ -202,30 +197,22 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateNoticesInput,
     ) -> Result<CreateNoticesPayload> {
-        match piteo::create_notices(&ctx.into(), input).await {
-            Ok(receipts) => Ok(CreateNoticesPayload {
-                notices: Some(map_res(receipts)?),
-                errors: None,
-            }),
-            Err(err) => Ok(CreateNoticesPayload {
-                notices: None,
-                errors: Some(vec![err.into()]),
-            }),
-        }
+        Ok(piteo::create_notices(&ctx.into(), input).await.into())
     }
-}
 
-// # Payloads
+    async fn push_message(
+        &self,
+        ctx: &Context<'_>,
+        input: PushMessageInput,
+    ) -> Result<PushMessagePayload> {
+        Ok(piteo::push_message(&ctx.into(), input).into())
+    }
 
-#[derive(async_graphql::SimpleObject)]
-#[graphql(name = "RentReceiptPayload")]
-struct CreateReceiptsPayload {
-    errors: Option<Vec<Error>>,
-    receipts: Option<Vec<File>>,
-}
-
-#[derive(async_graphql::SimpleObject)]
-struct CreateNoticesPayload {
-    errors: Option<Vec<Error>>,
-    notices: Option<Vec<File>>,
+    async fn delete_discussion(
+        &self,
+        ctx: &Context<'_>,
+        input: DeleteDiscussionInput,
+    ) -> Result<DeleteDiscussionPayload> {
+        Ok(piteo::delete_discussion(&ctx.into(), input).into())
+    }
 }

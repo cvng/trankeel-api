@@ -93,7 +93,8 @@ async fn on_notice_created(client: &mut piteo::Client, notice: &PaymentNotice) {
     let user = db
         .persons()
         .by_account_id(&lease.account_id)
-        .map(|mut users| users.remove(0))
+        .map(|users| users.first().cloned())
+        .unwrap()
         .unwrap();
     let auth_id = user.auth_id.unwrap();
     client.set_auth_id(auth_id);

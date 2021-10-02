@@ -165,7 +165,7 @@ mod tests {
     impl Default for Lease {
         fn default() -> Self {
             Self {
-                id: Default::default(),
+                id: LeaseId::new_v4(),
                 created_at: Default::default(),
                 updated_at: Default::default(),
                 account_id: Default::default(),

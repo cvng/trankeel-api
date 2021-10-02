@@ -44,6 +44,7 @@ impl From<UpdateTenantInput> for TenantData {
         Self {
             id: item.id,
             account_id: Default::default(),
+            person_id: Default::default(),
             apl: item.apl,
             birthdate: item.birthdate,
             birthplace: item.birthplace,

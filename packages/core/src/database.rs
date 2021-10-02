@@ -11,6 +11,9 @@ use piteo_data::CandidacyData;
 use piteo_data::CandidacyId;
 use piteo_data::Company;
 use piteo_data::CompanyId;
+use piteo_data::Discussion;
+use piteo_data::DiscussionId;
+use piteo_data::DiscussionSubject;
 use piteo_data::Event;
 use piteo_data::EventId;
 use piteo_data::EventWithEventable;
@@ -24,6 +27,7 @@ use piteo_data::Lender;
 use piteo_data::LenderData;
 use piteo_data::LenderId;
 use piteo_data::LenderWithIdentity;
+use piteo_data::Message;
 use piteo_data::Payment;
 use piteo_data::PaymentNoticeId;
 use piteo_data::Person;
@@ -46,7 +50,7 @@ use piteo_data::WarrantWithIdentity;
 
 type Result<T> = std::result::Result<T, Error>;
 
-type Deleted = usize;
+pub type Executed = usize;
 
 // # Interfaces
 
@@ -67,20 +71,24 @@ pub trait Db {
     fn plans(&self) -> Box<dyn PlanStore + '_>;
     fn events(&self) -> Box<dyn EventStore + '_>;
     fn reports(&self) -> Box<dyn ReportStore + '_>;
+    fn discussions(&self) -> Box<dyn DiscussionStore + '_>;
+    fn messages(&self) -> Box<dyn MessageStore + '_>;
 }
 
 pub trait AccountStore {
     fn by_id(&mut self, id: &AccountId) -> Result<Account>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Account>;
     fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId) -> Result<Account>;
+    fn by_person_id(&mut self, person_id: &PersonId) -> Result<Account>;
     fn create(&mut self, data: Account) -> Result<Account>;
     fn update(&mut self, data: AccountData) -> Result<Account>;
 }
 
 pub trait PersonStore {
     fn by_id(&mut self, id: &PersonId) -> Result<Person>;
-    fn by_account_id(&mut self, account_id: &AccountId) -> Result<Vec<Person>>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Person>;
+    fn by_account_id(&mut self, account_id: &AccountId) -> Result<Vec<Person>>;
+    fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Person>;
     fn create(&mut self, data: Person) -> Result<Person>;
     fn update(&mut self, data: PersonData) -> Result<Person>;
 }
@@ -106,6 +114,7 @@ pub trait AdvertisementStore {
 }
 
 pub trait CandidacyStore {
+    fn by_id(&mut self, id: &CandidacyId) -> Result<Candidacy>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Candidacy>>;
     fn create(&mut self, data: Candidacy) -> Result<Candidacy>;
@@ -122,7 +131,7 @@ pub trait PropertyStore {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Property>>;
     fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId) -> Result<Property>;
     fn create(&mut self, data: Property) -> Result<Property>;
-    fn delete(&mut self, data: PropertyId) -> Result<Deleted>;
+    fn delete(&mut self, data: PropertyId) -> Result<Executed>;
     fn update(&mut self, data: PropertyData) -> Result<Property>;
 }
 
@@ -131,7 +140,7 @@ pub trait TenantStore {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Tenant>>;
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Tenant>>;
     fn create(&mut self, data: Tenant) -> Result<Tenant>;
-    fn delete(&mut self, data: TenantId) -> Result<Deleted>;
+    fn delete(&mut self, data: TenantId) -> Result<Executed>;
     fn update(&mut self, data: TenantData) -> Result<Tenant>;
 }
 
@@ -148,7 +157,7 @@ pub trait LeaseStore {
     fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Lease>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Lease>>;
     fn create(&mut self, data: Lease) -> Result<Lease>;
-    fn delete(&mut self, data: LeaseId) -> Result<Deleted>;
+    fn delete(&mut self, data: LeaseId) -> Result<Executed>;
     fn update(&mut self, data: LeaseData) -> Result<Lease>;
 }
 
@@ -186,4 +195,18 @@ pub trait EventStore {
 
 pub trait ReportStore {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Summary>;
+}
+
+pub trait DiscussionStore {
+    fn by_id(&mut self, id: &DiscussionId) -> Result<Discussion>;
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Discussion>>;
+    fn create(&mut self, data: Discussion) -> Result<Discussion>;
+    fn delete(&mut self, data: DiscussionId) -> Result<Executed>;
+    fn related_subject(&mut self, id: &DiscussionId) -> Result<Option<DiscussionSubject>>;
+    fn touch(&mut self, data: DiscussionId) -> Result<Executed>;
+}
+
+pub trait MessageStore {
+    fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Vec<Message>>;
+    fn create(&mut self, data: Message) -> Result<Message>;
 }

@@ -1,8 +1,10 @@
 use crate::database;
 use crate::database::Db;
+use crate::database::Executed;
 use crate::error::Context;
 use crate::error::Error;
 use diesel::delete;
+use diesel::dsl::now;
 use diesel::insert_into;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
@@ -16,10 +18,12 @@ use piteo_data::schema::accounts;
 use piteo_data::schema::advertisements;
 use piteo_data::schema::candidacies;
 use piteo_data::schema::companies;
+use piteo_data::schema::discussions;
 use piteo_data::schema::events;
 use piteo_data::schema::files;
 use piteo_data::schema::leases;
 use piteo_data::schema::lenders;
+use piteo_data::schema::messages;
 use piteo_data::schema::payments;
 use piteo_data::schema::persons;
 use piteo_data::schema::plans;
@@ -40,6 +44,9 @@ use piteo_data::CandidacyData;
 use piteo_data::CandidacyId;
 use piteo_data::Company;
 use piteo_data::CompanyId;
+use piteo_data::Discussion;
+use piteo_data::DiscussionId;
+use piteo_data::DiscussionSubject;
 use piteo_data::Event;
 use piteo_data::EventId;
 use piteo_data::EventWithEventable;
@@ -56,6 +63,7 @@ use piteo_data::Lender;
 use piteo_data::LenderData;
 use piteo_data::LenderId;
 use piteo_data::LenderWithIdentity;
+use piteo_data::Message;
 use piteo_data::Payment;
 use piteo_data::PaymentNoticeId;
 use piteo_data::Person;
@@ -82,8 +90,6 @@ use piteo_data::WarrantWithIdentity;
 use std::env;
 
 type Result<T, E = Error> = std::result::Result<T, E>;
-
-type Deleted = usize;
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 
@@ -120,6 +126,10 @@ struct PaymentStore<'a>(&'a PgPool);
 struct PlanStore<'a>(&'a PgPool);
 
 struct ReportStore<'a>(&'a PgPool);
+
+struct DiscussionStore<'a>(&'a PgPool);
+
+struct MessageStore<'a>(&'a PgPool);
 
 pub struct Pg(PgPool);
 
@@ -204,6 +214,14 @@ impl Db for Pg {
     fn reports(&self) -> Box<dyn database::ReportStore + '_> {
         Box::new(ReportStore(&self.0))
     }
+
+    fn discussions(&self) -> Box<dyn database::DiscussionStore + '_> {
+        Box::new(DiscussionStore(&self.0))
+    }
+
+    fn messages(&self) -> Box<dyn database::MessageStore + '_> {
+        Box::new(MessageStore(&self.0))
+    }
 }
 
 impl database::AccountStore for AccountStore<'_> {
@@ -228,6 +246,14 @@ impl database::AccountStore for AccountStore<'_> {
             .first(&self.0.get()?)?)
     }
 
+    fn by_person_id(&mut self, person_id: &PersonId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
+            .filter(persons::id.eq(&person_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn create(&mut self, data: Account) -> Result<Account> {
         Ok(insert_into(accounts::table)
             .values(data)
@@ -244,15 +270,24 @@ impl database::PersonStore for PersonStore<'_> {
         Ok(persons::table.find(id).first(&self.0.get()?)?)
     }
 
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Person> {
+        Ok(persons::table
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .first(&self.0.get()?)?)
+    }
+
     fn by_account_id(&mut self, account_id: &AccountId) -> Result<Vec<Person>> {
         Ok(persons::table
             .filter(persons::account_id.eq(account_id))
             .load(&self.0.get()?)?)
     }
 
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Person> {
+    fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Person> {
         Ok(persons::table
-            .filter(persons::auth_id.eq(auth_id.inner()))
+            .select(persons::all_columns)
+            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
+            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .filter(candidacies::id.eq(&candidacy_id))
             .first(&self.0.get()?)?)
     }
 
@@ -292,7 +327,7 @@ impl database::TenantStore for TenantStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
-    fn delete(&mut self, data: TenantId) -> Result<Deleted> {
+    fn delete(&mut self, data: TenantId) -> Result<Executed> {
         Ok(delete(tenants::table)
             .filter(tenants::id.eq(data))
             .execute(&self.0.get()?)?)
@@ -468,6 +503,10 @@ impl database::AdvertisementStore for AdvertisementStore<'_> {
 }
 
 impl database::CandidacyStore for CandidacyStore<'_> {
+    fn by_id(&mut self, id: &CandidacyId) -> Result<Candidacy> {
+        Ok(candidacies::table.find(id).first(&self.0.get()?)?)
+    }
+
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>> {
         Ok(candidacies::table
             .select(candidacies::all_columns)
@@ -538,7 +577,7 @@ impl database::PropertyStore for PropertyStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
-    fn delete(&mut self, data: PropertyId) -> Result<Deleted> {
+    fn delete(&mut self, data: PropertyId) -> Result<Executed> {
         Ok(delete(properties::table)
             .filter(properties::id.eq(data))
             .execute(&self.0.get()?)?)
@@ -598,7 +637,7 @@ impl database::LeaseStore for LeaseStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
-    fn delete(&mut self, data: LeaseId) -> Result<Deleted> {
+    fn delete(&mut self, data: LeaseId) -> Result<Executed> {
         Ok(delete(leases::table)
             .filter(leases::id.eq(data))
             .execute(&self.0.get()?)?)
@@ -748,6 +787,68 @@ impl database::ReportStore for ReportStore<'_> {
         )
         .bind::<Text, _>(auth_id)
         .get_result(&self.0.get()?)?)
+    }
+}
+
+impl database::DiscussionStore for DiscussionStore<'_> {
+    fn by_id(&mut self, id: &DiscussionId) -> Result<Discussion> {
+        Ok(discussions::table.find(id).first(&self.0.get()?)?)
+    }
+
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Discussion>> {
+        Ok(discussions::table
+            .select(discussions::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(discussions::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .load(&self.0.get()?)?)
+    }
+
+    fn create(&mut self, data: Discussion) -> Result<Discussion> {
+        Ok(insert_into(discussions::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
+    }
+
+    fn delete(&mut self, data: DiscussionId) -> Result<Executed> {
+        Ok(delete(discussions::table)
+            .filter(discussions::id.eq(data))
+            .execute(&self.0.get()?)?)
+    }
+
+    fn related_subject(&mut self, id: &DiscussionId) -> Result<Option<DiscussionSubject>> {
+        let discussion: Discussion = discussions::table.find(id).first(&self.0.get()?)?;
+
+        match discussion.subject_id {
+            Some(subject_id) => {
+                if let Ok(candidacy) = candidacies::table.find(subject_id).first(&self.0.get()?) {
+                    Ok(Some(DiscussionSubject::Candidacy(candidacy)))
+                } else {
+                    Ok(None)
+                }
+            }
+            None => Ok(None),
+        }
+    }
+
+    fn touch(&mut self, data: DiscussionId) -> Result<Executed> {
+        Ok(update(discussions::table)
+            .filter(discussions::id.eq(data))
+            .set(discussions::updated_at.eq(now))
+            .execute(&self.0.get()?)?)
+    }
+}
+
+impl database::MessageStore for MessageStore<'_> {
+    fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Vec<Message>> {
+        Ok(messages::table
+            .filter(messages::discussion_id.eq(discussion_id))
+            .load(&self.0.get()?)?)
+    }
+
+    fn create(&mut self, data: Message) -> Result<Message> {
+        Ok(insert_into(messages::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
     }
 }
 

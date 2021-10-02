@@ -16,6 +16,9 @@ pub use crate::leases::DeleteLeaseInput;
 pub use crate::leases::SendReceiptsInput;
 pub use crate::leases::TransactionInput;
 pub use crate::leases::UpdateFurnishedLeaseInput;
+pub use crate::messaging::CreateDiscussionInput;
+pub use crate::messaging::DeleteDiscussionInput;
+pub use crate::messaging::PushMessageInput;
 pub use crate::owners::UpdateIndividualLenderInput;
 pub use crate::properties::CreateAdvertisementInput;
 pub use crate::properties::CreatePropertyInput;
@@ -36,9 +39,11 @@ use piteo_core::providers::Stripe;
 use piteo_data::Advertisement;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
+use piteo_data::DiscussionId;
 use piteo_data::Lease;
 use piteo_data::LeaseId;
 use piteo_data::Lender;
+use piteo_data::Message;
 use piteo_data::PaymentNotice;
 use piteo_data::Person;
 use piteo_data::Property;
@@ -198,6 +203,16 @@ pub async fn create_notices(
 
 pub fn get_summary() -> Result<Summary> {
     crate::reports::get_summary()
+}
+
+// # Inbox
+
+pub fn delete_discussion(client: &Client, input: DeleteDiscussionInput) -> Result<DiscussionId> {
+    crate::messaging::delete_discussion(&client.db(), &client.auth_id()?, input)
+}
+
+pub fn push_message(client: &Client, input: PushMessageInput) -> Result<Message> {
+    crate::messaging::push_message(&client.db(), input)
 }
 
 // # Utils
