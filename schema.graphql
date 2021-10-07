@@ -457,7 +457,7 @@ type Mutation {
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -752,7 +752,7 @@ type Tenant implements PersonInterface {
 	accountId: ID!
 	personId: ID!
 	apl: Boolean
-	birthdate: Date!
+	birthdate: Date
 	birthplace: String
 	email: Email!
 	firstName: String!
@@ -777,7 +777,7 @@ type Tenant implements PersonInterface {
 }
 input TenantInput {
 	apl: Boolean
-	birthdate: Date!
+	birthdate: Date
 	birthplace: String
 	email: String!
 	firstName: String!

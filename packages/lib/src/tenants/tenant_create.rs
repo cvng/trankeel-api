@@ -28,7 +28,7 @@ use validator::Validate;
 #[graphql(name = "TenantInput")]
 pub struct CreateTenantInput {
     pub apl: Option<bool>,
-    pub birthdate: Date,
+    pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
     #[validate(email)]
     pub email: String, // Email,
