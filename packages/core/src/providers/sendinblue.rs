@@ -1,8 +1,8 @@
+use crate::error::Error;
 use crate::mailer::IntoMail;
 use crate::mailer::Mail;
 use crate::mailer::Mailer;
 use async_trait::async_trait;
-use eyre::Error;
 use sendinblue::Mailer as Line;
 use sendinblue::TransactionalBody;
 use std::env;

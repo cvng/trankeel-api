@@ -63,18 +63,12 @@ impl ReceiptDocument {
             .ok_or_else(|| no("receipt.type"))?,
 
             lender_name: lender.1.display_name(),
-            lender_address_city: lender
-                .1
-                .address()
-                .ok_or_else(|| no("lender.address"))?
-                .city
-                .ok_or_else(|| no("lender.address.city"))?,
+            lender_address_city: lender.1.address().ok_or_else(|| no("lender.address"))?.city,
             lender_address_line1: lender
                 .1
                 .address()
                 .ok_or_else(|| no("lender.address"))?
-                .line1
-                .ok_or_else(|| no("lender.address.line1"))?,
+                .line1,
             lender_address_line2: lender
                 .1
                 .address()
@@ -84,8 +78,7 @@ impl ReceiptDocument {
                 .1
                 .address()
                 .ok_or_else(|| no("lender.address"))?
-                .postal_code
-                .ok_or_else(|| no("lender.address.postal_code"))?,
+                .postal_code,
 
             tenant_name: tenants
                 .iter()
@@ -93,19 +86,10 @@ impl ReceiptDocument {
                 .collect::<Vec<_>>()
                 .join(", "),
 
-            property_address_city: property
-                .address
-                .city
-                .ok_or_else(|| no("property.address.city"))?,
-            property_address_line1: property
-                .address
-                .line1
-                .ok_or_else(|| no("property.address.line1"))?,
+            property_address_city: property.address.city,
+            property_address_line1: property.address.line1,
             property_address_line2: property.address.line2,
-            property_address_postal_code: property
-                .address
-                .postal_code
-                .ok_or_else(|| no("property.address.postal_code"))?,
+            property_address_postal_code: property.address.postal_code,
 
             rent_amount: rent.amount,
             rent_charges_amount: rent.charges_amount.unwrap_or_default(),

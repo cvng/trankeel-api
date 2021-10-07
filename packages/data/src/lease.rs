@@ -1,4 +1,3 @@
-use crate::common::Id;
 use crate::schema::leases;
 use crate::AccountId;
 use crate::Amount;
@@ -6,6 +5,7 @@ use crate::DateTime;
 use crate::FileId;
 use crate::FurnishedLeaseDetails;
 use crate::FurnishedLeaseDuration;
+use crate::Id;
 use crate::PropertyId;
 use crate::Rent;
 use crate::RentId;
@@ -30,6 +30,10 @@ pub enum LeaseType {
     Naked,
 }
 
+pub enum LeaseDetails {
+    FurnishedLeaseDetails(FurnishedLeaseDetails),
+}
+
 #[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Lease {
     pub id: LeaseId,
@@ -50,7 +54,7 @@ pub struct Lease {
     pub duration: FurnishedLeaseDuration,
 }
 
-#[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
+#[derive(AsChangeset, Identifiable, Insertable)]
 #[table_name = "leases"]
 pub struct LeaseData {
     pub id: LeaseId,
@@ -77,12 +81,10 @@ impl Lease {
     }
 
     pub fn status(&self) -> LeaseStatus {
-        if let Some(expired_at) = self.expired_at {
-            if Utc::now() > expired_at.inner() {
-                return LeaseStatus::Ended;
-            }
+        match self.expired_at {
+            Some(expired_at) if expired_at.inner() < Utc::now() => LeaseStatus::Ended,
+            _ => LeaseStatus::Active,
         }
-        LeaseStatus::Active
     }
 
     pub fn rents(&self) -> Vec<Rent> {

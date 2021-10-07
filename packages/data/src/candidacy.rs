@@ -34,7 +34,7 @@ pub struct Candidacy {
     pub description: String,
 }
 
-#[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
+#[derive(Default, AsChangeset, Identifiable, Insertable)]
 #[table_name = "candidacies"]
 pub struct CandidacyData {
     pub id: CandidacyId,

@@ -1,7 +1,7 @@
 use crate::database;
 use crate::database::Db;
 use crate::database::Executed;
-use crate::error::Context;
+use crate::database::Result;
 use crate::error::Error;
 use diesel::delete;
 use diesel::dsl::now;
@@ -52,6 +52,7 @@ use piteo_data::EventId;
 use piteo_data::EventWithEventable;
 use piteo_data::Eventable;
 use piteo_data::EventableType;
+use piteo_data::ExternalId;
 use piteo_data::File;
 use piteo_data::FileData;
 use piteo_data::FileId;
@@ -84,69 +85,25 @@ use piteo_data::Tenant;
 use piteo_data::TenantData;
 use piteo_data::TenantId;
 use piteo_data::Warrant;
+use piteo_data::WarrantId;
 use piteo_data::WarrantIdentity;
 use piteo_data::WarrantType;
 use piteo_data::WarrantWithIdentity;
 use std::env;
 
-type Result<T, E = Error> = std::result::Result<T, E>;
-
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
-
-struct AccountStore<'a>(&'a PgPool);
-
-struct EventStore<'a>(&'a PgPool);
-
-struct PersonStore<'a>(&'a PgPool);
-
-struct CompanyStore<'a>(&'a PgPool);
-
-struct TenantStore<'a>(&'a PgPool);
-
-struct WarrantStore<'a>(&'a PgPool);
-
-struct LenderStore<'a>(&'a PgPool);
-
-struct AdvertisementStore<'a>(&'a PgPool);
-
-struct CandidacyStore<'a>(&'a PgPool);
-
-struct PropertyStore<'a>(&'a PgPool);
-
-struct LeaseStore<'a>(&'a PgPool);
-
-struct LeaseTenantStore<'a>(&'a PgPool);
-
-struct RentStore<'a>(&'a PgPool);
-
-struct FileStore<'a>(&'a PgPool);
-
-struct PaymentStore<'a>(&'a PgPool);
-
-struct PlanStore<'a>(&'a PgPool);
-
-struct ReportStore<'a>(&'a PgPool);
-
-struct DiscussionStore<'a>(&'a PgPool);
-
-struct MessageStore<'a>(&'a PgPool);
 
 pub struct Pg(PgPool);
 
 impl Pg {
-    pub fn new(db_pool: PgPool) -> Self {
-        Self(db_pool)
-    }
-
-    pub fn inner(&self) -> PgPool {
-        self.0.clone()
-    }
-}
-
-impl Pg {
     pub fn init() -> Self {
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL");
-        Self::new(build_connection_pool(&database_url).unwrap())
+        let manager = ConnectionManager::<PgConnection>::new(&database_url);
+        Self(
+            Pool::builder()
+                .build(manager)
+                .expect("Error connecting to database"),
+        )
     }
 }
 
@@ -224,6 +181,44 @@ impl Db for Pg {
     }
 }
 
+pub struct AccountStore<'a>(pub &'a PgPool);
+
+pub struct EventStore<'a>(pub &'a PgPool);
+
+pub struct PersonStore<'a>(pub &'a PgPool);
+
+pub struct CompanyStore<'a>(pub &'a PgPool);
+
+pub struct TenantStore<'a>(pub &'a PgPool);
+
+pub struct WarrantStore<'a>(pub &'a PgPool);
+
+pub struct LenderStore<'a>(pub &'a PgPool);
+
+pub struct AdvertisementStore<'a>(pub &'a PgPool);
+
+pub struct CandidacyStore<'a>(pub &'a PgPool);
+
+pub struct PropertyStore<'a>(pub &'a PgPool);
+
+pub struct LeaseStore<'a>(pub &'a PgPool);
+
+pub struct LeaseTenantStore<'a>(pub &'a PgPool);
+
+pub struct RentStore<'a>(pub &'a PgPool);
+
+pub struct FileStore<'a>(pub &'a PgPool);
+
+pub struct PaymentStore<'a>(pub &'a PgPool);
+
+pub struct PlanStore<'a>(pub &'a PgPool);
+
+pub struct ReportStore<'a>(pub &'a PgPool);
+
+pub struct DiscussionStore<'a>(pub &'a PgPool);
+
+pub struct MessageStore<'a>(pub &'a PgPool);
+
 impl database::AccountStore for AccountStore<'_> {
     fn by_id(&mut self, id: &AccountId) -> Result<Account> {
         Ok(accounts::table.find(id).first(&self.0.get()?)?)
@@ -242,7 +237,7 @@ impl database::AccountStore for AccountStore<'_> {
             .select(accounts::all_columns)
             .left_join(properties::table.on(properties::account_id.eq(accounts::id)))
             .left_join(advertisements::table.on(advertisements::property_id.eq(properties::id)))
-            .filter(advertisements::id.eq(&advertisement_id))
+            .filter(advertisements::id.eq(advertisement_id))
             .first(&self.0.get()?)?)
     }
 
@@ -250,7 +245,7 @@ impl database::AccountStore for AccountStore<'_> {
         Ok(accounts::table
             .select(accounts::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
-            .filter(persons::id.eq(&person_id))
+            .filter(persons::id.eq(person_id))
             .first(&self.0.get()?)?)
     }
 
@@ -287,7 +282,7 @@ impl database::PersonStore for PersonStore<'_> {
             .select(persons::all_columns)
             .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
             .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
-            .filter(candidacies::id.eq(&candidacy_id))
+            .filter(candidacies::id.eq(candidacy_id))
             .first(&self.0.get()?)?)
     }
 
@@ -339,38 +334,44 @@ impl database::TenantStore for TenantStore<'_> {
 }
 
 impl database::WarrantStore for WarrantStore<'_> {
+    fn with_identity(&mut self, warrant: Warrant) -> Result<WarrantWithIdentity> {
+        let identity = match (
+            warrant.type_,
+            warrant.individual_id,
+            warrant.professional_id,
+        ) {
+            (WarrantType::Person, Some(individual_id), _) => {
+                let person = persons::table.find(individual_id).first(&self.0.get()?)?;
+                WarrantIdentity::Individual(person)
+            }
+            (WarrantType::Visale, _, Some(professional_id)) => {
+                let visale = professional_warrants::table
+                    .find(professional_id)
+                    .first(&self.0.get()?)?;
+                WarrantIdentity::Professional(visale)
+            }
+            (WarrantType::Company, _, Some(professional_id)) => {
+                let company = professional_warrants::table
+                    .find(professional_id)
+                    .first(&self.0.get()?)?;
+                WarrantIdentity::Professional(company)
+            }
+            _ => return Err(Error::new(NotFound)),
+        };
+
+        Ok((warrant, identity))
+    }
+
+    fn by_id(&mut self, id: &WarrantId) -> Result<WarrantWithIdentity> {
+        self.with_identity(warrants::table.find(id).first(&self.0.get()?)?)
+    }
+
     fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Vec<WarrantWithIdentity>> {
         warrants::table
             .filter(warrants::tenant_id.eq(tenant_id))
             .load::<Warrant>(&self.0.get()?)?
             .into_iter()
-            .map(|warrant| {
-                let identity = match (
-                    warrant.type_,
-                    warrant.individual_id,
-                    warrant.professional_id,
-                ) {
-                    (WarrantType::Person, Some(individual_id), _) => {
-                        let person = persons::table.find(individual_id).first(&self.0.get()?)?;
-                        WarrantIdentity::Individual(person)
-                    }
-                    (WarrantType::Visale, _, Some(professional_id)) => {
-                        let visale = professional_warrants::table
-                            .find(professional_id)
-                            .first(&self.0.get()?)?;
-                        WarrantIdentity::Professional(visale)
-                    }
-                    (WarrantType::Company, _, Some(professional_id)) => {
-                        let company = professional_warrants::table
-                            .find(professional_id)
-                            .first(&self.0.get()?)?;
-                        WarrantIdentity::Professional(company)
-                    }
-                    _ => return Err(Error::new(NotFound)),
-                };
-
-                Ok((warrant, identity))
-            })
+            .map(|warrant| self.with_identity(warrant))
             .collect()
     }
 
@@ -664,19 +665,19 @@ impl database::RentStore for RentStore<'_> {
 
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Rent> {
         Ok(rents::table
-            .filter(rents::receipt_id.eq(&receipt_id))
+            .filter(rents::receipt_id.eq(receipt_id))
             .first(&self.0.get()?)?)
     }
 
-    fn by_notice_id(&mut self, notice_id: &piteo_data::PaymentNoticeId) -> Result<Rent> {
+    fn by_notice_id(&mut self, notice_id: &PaymentNoticeId) -> Result<Rent> {
         Ok(rents::table
-            .filter(rents::notice_id.eq(&notice_id))
+            .filter(rents::notice_id.eq(notice_id))
             .first(&self.0.get()?)?)
     }
 
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Rent>> {
         Ok(rents::table
-            .filter(rents::lease_id.eq(&lease_id))
+            .filter(rents::lease_id.eq(lease_id))
             .load(&self.0.get()?)?)
     }
 
@@ -698,7 +699,7 @@ impl database::RentStore for RentStore<'_> {
 }
 
 impl database::FileStore for FileStore<'_> {
-    fn by_external_id(&mut self, external_id: &str) -> Result<File> {
+    fn by_external_id(&mut self, external_id: &ExternalId) -> Result<File> {
         Ok(files::table
             .filter(files::external_id.eq(external_id))
             .first(&self.0.get()?)?)
@@ -724,6 +725,14 @@ impl database::PaymentStore for PaymentStore<'_> {
         Ok(insert_into(payments::table)
             .values(data)
             .get_result(&self.0.get()?)?)
+    }
+
+    fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Vec<Payment>> {
+        Ok(payments::table
+            .select(payments::all_columns)
+            .left_join(rents::table.on(rents::id.eq(payments::rent_id)))
+            .filter(rents::id.eq(rent_id))
+            .load(&self.0.get()?)?)
     }
 }
 
@@ -850,14 +859,4 @@ impl database::MessageStore for MessageStore<'_> {
             .values(data)
             .get_result(&self.0.get()?)?)
     }
-}
-
-// # Utils
-
-fn build_connection_pool(database_url: &str) -> Result<PgPool> {
-    let manager = ConnectionManager::<PgConnection>::new(database_url);
-
-    Pool::builder()
-        .build(manager)
-        .context(format!("Error connecting to {}", database_url))
 }

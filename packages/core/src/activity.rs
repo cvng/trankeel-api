@@ -1,5 +1,5 @@
 use crate::database::Db;
-use eyre::Error;
+use crate::error::Error;
 use piteo_data::AuthId;
 use piteo_data::Event;
 use piteo_data::EventId;

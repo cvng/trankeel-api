@@ -1,22 +1,24 @@
 input AcceptCandidacyInput {
-	id: UUID!
+	id: ID!
 }
 type Account {
+	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
 	planId: ID
 	status: SubscriptionStatus!
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	trialEnd: DateTime
-	id: ID!
 	plan: Plan
 }
 input AccountActivatePlanInput {
-	id: UUID!
+	id: ID!
 	name: String!
 	planCode: PlanCode!
 }
 input AccountUpdateInput {
-	id: UUID!
+	id: ID!
 	paymentMethodId: String!
 }
 type Address {
@@ -67,15 +69,17 @@ enum CandidacyStatus {
 	ACCEPTED
 }
 type Company implements LegalIdentityInterface {
-	address: Address
-	displayName: String!
-	email: Email!
 	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
+	address: Address
+	email: Email!
 	legalEntity: String!
 	legalEntityIdentifier: String
 	legalEntityType: LegalEntityType
 	legalEntityTypeOther: String
 	phoneNumber: PhoneNumber
+	displayName: String!
 }
 input CreateAdvertisementInput {
 	published: Boolean!
@@ -85,11 +89,11 @@ input CreateAdvertisementInput {
 	depositAmount: Decimal
 	effectDate: DateTime!
 	flexibility: LenderFlexibility
-	referralLeaseId: UUID
-	propertyId: UUID!
+	referralLeaseId: ID
+	propertyId: ID!
 }
 input CreateCandidacyInput {
-	advertisementId: UUID!
+	advertisementId: ID!
 	isStudent: Boolean!
 	firstName: String!
 	lastName: String!
@@ -125,7 +129,7 @@ scalar Date
 scalar DateTime
 scalar Decimal
 input DeleteDiscussionInput {
-	id: UUID!
+	id: ID!
 }
 type DeleteDiscussionPayload {
 	errors: [Error!]
@@ -135,11 +139,13 @@ type Discussion {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
+	accountId: ID!
 	initiatorId: ID!
+	subjectId: ID
 	type: DiscussionType!
 	initiator: Person!
 	subject: DiscussionSubject
-	snippet: Message!
+	snippet: Message
 	messages: [Message!]!
 }
 union DiscussionSubject = | Candidacy
@@ -155,6 +161,7 @@ type Event {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
+	accountId: ID!
 	eventableId: ID!
 	eventableType: EventableType!
 	type: EventType!
@@ -178,15 +185,15 @@ type Feature {
 	key: String
 }
 type File {
+	id: ID!
 	createdAt: DateTime
+	updatedAt: DateTime
 	downloadUrl: URL
 	externalId: String
 	filename: String
 	previewUrl: URL
 	status: FileStatus
 	type: FileType!
-	updatedAt: DateTime
-	id: ID!
 }
 input FileInput {
 	downloadUrl: URL!
@@ -224,22 +231,24 @@ type Invoice {
 	planCode: PlanCode!
 }
 type Lease {
+	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
 	accountId: ID!
 	depositAmount: Decimal
 	effectDate: DateTime!
-	duration: LeaseFurnishedDuration!
 	signatureDate: DateTime
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
-	rentFullAmount: Decimal!
 	type: LeaseType!
 	leaseId: ID
 	propertyId: ID!
-	id: ID!
 	data: LeaseFurnishedData
 	expiredAt: DateTime
 	renewDate: DateTime
+	duration: LeaseFurnishedDuration!
 	status: LeaseStatus!
+	rentFullAmount: Decimal!
 	rents: [Rent!]!
 	lease: File
 	tenants: [Tenant!]!
@@ -334,16 +343,16 @@ input LeaseFurnishedInput {
 	effectDate: DateTime!
 	renewDate: DateTime
 	file: FileInput
-	propertyId: UUID!
+	propertyId: ID!
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
 	signatureDate: DateTime
-	tenantIds: [UUID!]!
+	tenantIds: [ID!]!
 }
 input LeaseFurnishedUpdateInput {
 	data: LeaseFurnishedDataInput
 	file: FileInput
-	id: UUID!
+	id: ID!
 }
 input LeaseNakedDataInput {
 	duration: LeaseNakedDuration
@@ -390,6 +399,8 @@ interface LegalIdentityInterface {
 }
 type Lender {
 	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
 	accountId: ID!
 	individualId: ID
 	companyId: ID
@@ -402,13 +413,14 @@ enum LenderFlexibility {
 	SEVEN_DAYS
 }
 input LenderIndividualUpdateInput {
-	id: UUID!
+	id: ID!
 	individual: UserUpdateInput!
 }
 type Message {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
+	discussionId: ID!
 	senderId: ID!
 	content: String!
 	sender: Person!
@@ -442,6 +454,10 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 }
 type Person implements LegalIdentityInterface & PersonInterface {
+	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
+	accountId: ID!
 	authId: AuthenticationID
 	email: Email!
 	firstName: String!
@@ -449,12 +465,10 @@ type Person implements LegalIdentityInterface & PersonInterface {
 	address: Address
 	photoURL: URL
 	role: UserRole!
-	id: ID!
 	phoneNumber: PhoneNumber
-	accountId: ID!
 	displayName: String!
+	account: Account!
 	accounts: [Account!]
-	account: Account
 }
 interface PersonInterface {
 	firstName: String!
@@ -463,22 +477,27 @@ interface PersonInterface {
 }
 scalar PhoneNumber
 type Plan {
+	id: ID!
 	code: PlanCode!
 	price: Decimal
 	subtitle: String
 	title: String
-	id: ID!
 	features: [Feature!]!
 }
 enum PlanCode {
 	SOLO
 }
 type ProfessionalWarrant {
+	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
 	name: String!
 	identifier: String!
 }
 type Property {
-	account: Account
+	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
 	accountId: ID!
 	address: Address!
 	buildPeriod: PropertyBuildPeriodType
@@ -501,13 +520,12 @@ type Property {
 	tenantPrivateSpaces: String
 	usageType: PropertyHabitationUsageType
 	waterHeatingMethod: PropertyUsageType
-	id: ID!
-	lenderId: ID
+	lenderId: ID!
 	expectedRents: Decimal
 	collectedRents: Decimal
-	lender: Lender
-	leases: [Lease!]
-	advertisements: [Advertisement!]
+	lender: Lender!
+	leases: [Lease!]!
+	advertisements: [Advertisement!]!
 }
 enum PropertyBuildPeriodType {
 	BEFORE_Y1949
@@ -552,7 +570,7 @@ input PropertyInput {
 	gasEmission: PropertyGasEmission
 	heatingMethod: PropertyUsageType!
 	housingType: PropertyUsageType!
-	lenderId: UUID!
+	lenderId: ID!
 	name: String!
 	note: String
 	description: String
@@ -592,7 +610,7 @@ input PropertyUpdateInput {
 	gasEmission: PropertyGasEmission
 	heatingMethod: PropertyUsageType
 	housingType: PropertyUsageType
-	id: UUID!
+	id: ID!
 	name: String
 	note: String
 	description: String
@@ -611,8 +629,8 @@ enum PropertyUsageType {
 	INDIVIDUAL
 }
 input PushMessageInput {
-	discussionId: UUID!
-	senderId: UUID!
+	discussionId: ID!
+	senderId: ID!
 	message: String!
 }
 type PushMessagePayload {
@@ -638,6 +656,8 @@ type Query {
 }
 type Rent {
 	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
 	periodEnd: DateTime!
 	periodStart: DateTime!
 	amount: Decimal!
@@ -647,10 +667,10 @@ type Rent {
 	leaseId: ID!
 	receiptId: ID
 	noticeId: ID
-	delay: Int
-	transactions: [Transaction!]
-	receipt: File
+	delay: Int!
 	lease: Lease!
+	transactions: [Transaction!]!
+	receipt: File
 }
 enum RentChargesRecuperationMode {
 	PACKAGE
@@ -662,7 +682,7 @@ enum RentPaymentMethod {
 	BEFORE
 }
 input RentReceiptInput {
-	rentIds: [UUID!]!
+	rentIds: [ID!]!
 	date: DateTime
 	sendMail: Boolean
 }
@@ -671,12 +691,12 @@ type RentReceiptPayload {
 	receipts: [File!]
 }
 enum RentStatus {
+	PARTIAL
 	PENDING
 	SETTLED
-	PARTIAL
 }
 input SendPaymentNoticeInput {
-	rentIds: [UUID!]!
+	rentIds: [ID!]!
 	date: DateTime
 }
 """
@@ -723,31 +743,34 @@ type Task {
 	progress: Int!
 }
 type Tenant implements PersonInterface {
+	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
 	accountId: ID!
+	personId: ID!
 	apl: Boolean
 	birthdate: Date!
 	birthplace: String
 	email: Email!
 	firstName: String!
 	lastName: String!
-	displayName: String!
 	note: String
 	phoneNumber: PhoneNumber
-	id: ID!
+	status: TenantStatus!
 	leaseId: ID
 	isStudent: Boolean
+	displayName: String!
 	account: Account
 	property: Property
-	status: TenantStatus
-	fullName: String!
+	fullName: String
 	shortName: String
 	lastTransaction: Transaction
 	propertyName: String
 	rentPayedThisYear: String
-	unpaidRentAmount: Int
+	unpaidRentAmount: Decimal
 	files: [File!]
 	lease: Lease
-	warrants: [Warrant!]
+	warrants: [Warrant!]!
 }
 input TenantInput {
 	apl: Boolean
@@ -773,7 +796,7 @@ input TenantUpdateInput {
 	birthdate: Date
 	birthplace: String
 	email: String
-	id: UUID!
+	id: ID!
 	firstName: String
 	lastName: String
 	note: String
@@ -783,16 +806,18 @@ input TenantUpdateInput {
 }
 type Transaction {
 	id: ID!
-	date: DateTime!
-	amount: Decimal!
-	type: TransactionType!
+	createdAt: DateTime
+	updatedAt: DateTime
 	rentId: ID!
-	accountId: ID
+	amount: Decimal!
+	date: DateTime!
+	type: TransactionType!
+	label: String
 	lease: Lease!
 }
 input TransactionInput {
 	amount: Decimal!
-	leaseId: UUID!
+	leaseId: ID!
 	date: DateTime!
 	type: TransactionType
 }
@@ -806,9 +831,8 @@ enum TransactionType {
 	RENT
 }
 scalar URL
-scalar UUID
 input UpdateAdvertisementInput {
-	id: UUID!
+	id: ID!
 	published: Boolean
 	leaseType: LeaseType
 	rentAmount: Decimal
@@ -816,7 +840,7 @@ input UpdateAdvertisementInput {
 	depositAmount: Decimal
 	effectDate: DateTime
 	flexibility: LenderFlexibility
-	referralLeaseId: UUID
+	referralLeaseId: ID
 }
 enum UserRole {
 	ADMIN
@@ -840,7 +864,12 @@ input UserWithAccountInput {
 }
 type Warrant {
 	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
 	type: WarrantType!
+	tenantId: ID!
+	individualId: ID
+	professionalId: ID
 	identity: WarrantIdentity!
 }
 union WarrantIdentity = | Person | ProfessionalWarrant

@@ -1,5 +1,5 @@
+use crate::error::Error;
 use async_trait::async_trait;
-use eyre::Error;
 use piteo_data::Document;
 use serde::Deserialize;
 use serde::Serialize;

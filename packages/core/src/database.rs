@@ -1,4 +1,4 @@
-use eyre::Error;
+use crate::error::Error;
 use piteo_data::Account;
 use piteo_data::AccountData;
 use piteo_data::AccountId;
@@ -17,6 +17,7 @@ use piteo_data::DiscussionSubject;
 use piteo_data::Event;
 use piteo_data::EventId;
 use piteo_data::EventWithEventable;
+use piteo_data::ExternalId;
 use piteo_data::File;
 use piteo_data::FileData;
 use piteo_data::FileId;
@@ -46,13 +47,13 @@ use piteo_data::Summary;
 use piteo_data::Tenant;
 use piteo_data::TenantData;
 use piteo_data::TenantId;
+use piteo_data::Warrant;
+use piteo_data::WarrantId;
 use piteo_data::WarrantWithIdentity;
 
-type Result<T> = std::result::Result<T, Error>;
+pub type Result<T> = std::result::Result<T, Error>;
 
 pub type Executed = usize;
-
-// # Interfaces
 
 pub trait Db {
     fn accounts(&self) -> Box<dyn AccountStore + '_>;
@@ -145,8 +146,10 @@ pub trait TenantStore {
 }
 
 pub trait WarrantStore {
+    fn by_id(&mut self, id: &WarrantId) -> Result<WarrantWithIdentity>;
     fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Vec<WarrantWithIdentity>>;
     fn create(&mut self, data: WarrantWithIdentity) -> Result<WarrantWithIdentity>;
+    fn with_identity(&mut self, data: Warrant) -> Result<WarrantWithIdentity>;
 }
 
 pub trait LeaseStore {
@@ -174,13 +177,15 @@ pub trait RentStore {
 
 pub trait FileStore {
     fn by_id(&mut self, id: &FileId) -> Result<File>;
-    fn by_external_id(&mut self, external_id: &str) -> Result<File>;
+    #[allow(clippy::ptr_arg)]
+    fn by_external_id(&mut self, external_id: &ExternalId) -> Result<File>;
     fn create(&mut self, data: File) -> Result<File>;
     fn update(&mut self, data: FileData) -> Result<File>;
 }
 
 pub trait PaymentStore {
     fn create(&mut self, data: Payment) -> Result<Payment>;
+    fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Vec<Payment>>;
 }
 
 pub trait PlanStore {

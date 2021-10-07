@@ -6,5 +6,5 @@ use piteo_data::Url;
 #[graphql(name = "FileInput")]
 pub struct CreateFileInput {
     download_url: Url,
-    r#type: FileType,
+    type_: FileType,
 }

@@ -1,4 +1,5 @@
-use crate::locale;
+use crate::Inline;
+use piteo_kit::locale;
 use std::fmt;
 use std::fmt::Display;
 
@@ -7,30 +8,34 @@ use std::fmt::Display;
 #[derive(Clone, Debug, Serialize, Deserialize, AsJsonb)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
-    pub city: Option<String>,
+    pub city: String,
     pub country: Option<String>,
-    pub line1: Option<String>,
+    pub line1: String,
     pub line2: Option<String>,
-    pub postal_code: Option<String>,
+    pub postal_code: String,
 }
 
 // # Impls
 
-impl Address {
-    pub fn inline(&self) -> String {
-        [
-            &self.line1,
-            &self.line2,
-            &self.postal_code,
-            &self.city,
-            &self.country,
-        ]
-        .iter()
-        .filter_map(|&v| v.clone())
-        .collect::<Vec<String>>()
-        .join(", ")
-        .trim()
-        .to_string()
+impl Inline for Address {
+    fn city(&self) -> Option<String> {
+        Some(self.city.clone())
+    }
+
+    fn country(&self) -> Option<String> {
+        self.country.clone()
+    }
+
+    fn line1(&self) -> Option<String> {
+        Some(self.line1.clone())
+    }
+
+    fn line2(&self) -> Option<String> {
+        self.line2.clone()
+    }
+
+    fn postal_code(&self) -> Option<String> {
+        Some(self.postal_code.clone())
     }
 }
 

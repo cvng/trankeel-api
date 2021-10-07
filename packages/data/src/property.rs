@@ -1,9 +1,9 @@
-use crate::common::Id;
 use crate::schema::properties;
 use crate::AccountId;
 use crate::Address;
 use crate::Amount;
 use crate::DateTime;
+use crate::Id;
 use crate::LenderId;
 use crate::PropertyStatus;
 

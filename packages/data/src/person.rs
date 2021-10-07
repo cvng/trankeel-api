@@ -1,9 +1,9 @@
-use crate::common::Id;
 use crate::schema::persons;
 use crate::AccountId;
 use crate::Address;
 use crate::DateTime;
 use crate::Email;
+use crate::Id;
 use crate::Name;
 use crate::PersonRole;
 use crate::PhoneNumber;
@@ -34,7 +34,7 @@ pub struct Person {
     pub phone_number: Option<PhoneNumber>,
 }
 
-#[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
+#[derive(Default, AsChangeset, Identifiable, Insertable)]
 #[table_name = "persons"]
 pub struct PersonData {
     pub id: PersonId,

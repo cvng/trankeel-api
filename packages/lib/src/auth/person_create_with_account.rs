@@ -117,11 +117,11 @@ pub async fn create_user_with_account(
 impl From<AddressInput> for Address {
     fn from(item: AddressInput) -> Self {
         Self {
-            city: Some(item.city),
+            city: item.city,
             country: item.country,
-            line1: Some(item.line1),
+            line1: item.line1,
             line2: item.line2,
-            postal_code: Some(item.postal_code),
+            postal_code: item.postal_code,
         }
     }
 }

@@ -1,4 +1,3 @@
-use piteo::Db;
 use piteo::Document;
 use piteo::FileData;
 use piteo::FileStatus;
@@ -23,14 +22,13 @@ pub struct PdfmonkeyPayload {
 pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
     info!("Received pdfmonkey request: {:?}", request);
 
-    let mut client = piteo::init();
-    let db = piteo::db(&client);
+    let client = piteo::init().unwrap();
 
     let document = request.document.clone();
 
     // General processing for any document.
-    let file = db.files().by_external_id(&document.id).unwrap();
-    let file = db
+    let file = client.files().by_external_id(&document.id).unwrap();
+    let file = client
         .files()
         .update(FileData {
             id: file.id,
@@ -49,8 +47,8 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
     // Specific processing by document type.
     match file.type_ {
-        FileType::RentReceipt => on_receipt_created(&mut client, &file).await,
-        FileType::PaymentNotice => on_notice_created(&mut client, &file).await,
+        FileType::RentReceipt => on_receipt_created(&client, &file).await,
+        FileType::PaymentNotice => on_notice_created(&client, &file).await,
         _ => panic!(),
     }
 
@@ -59,45 +57,39 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
 // # Handlers
 
-async fn on_receipt_created(client: &mut piteo::Client, receipt: &Receipt) {
-    let db = piteo::db(client);
-
-    let rent = db.rents().by_receipt_id(&receipt.id).unwrap();
+async fn on_receipt_created(client: &piteo::Client, receipt: &Receipt) {
+    let rent = client.rents().by_receipt_id(&receipt.id).unwrap();
     let input = SendReceiptsInput {
         rent_ids: vec![rent.id],
     };
 
     // Guess auth_id from given receipt (first user of the account).
-    let lease = db.leases().by_receipt_id(&receipt.id).unwrap();
-    let user = db
+    let lease = client.leases().by_receipt_id(&receipt.id).unwrap();
+    let user = client
         .persons()
         .by_account_id(&lease.account_id)
         .map(|mut users| users.remove(0))
         .unwrap();
     let auth_id = user.auth_id.unwrap();
-    client.set_auth_id(auth_id);
 
-    piteo::send_receipts(client, input).await.ok();
+    client.send_receipts(&auth_id, input).await.ok();
 }
 
-async fn on_notice_created(client: &mut piteo::Client, notice: &PaymentNotice) {
-    let db = piteo::db(client);
-
-    let rent = db.rents().by_notice_id(&notice.id).unwrap();
+async fn on_notice_created(client: &piteo::Client, notice: &PaymentNotice) {
+    let rent = client.rents().by_notice_id(&notice.id).unwrap();
     let input = SendReceiptsInput {
         rent_ids: vec![rent.id],
     };
 
     // Guess auth_id from given receipt (first user of the account).
-    let lease = db.leases().by_notice_id(&notice.id).unwrap();
-    let user = db
+    let lease = client.leases().by_notice_id(&notice.id).unwrap();
+    let user = client
         .persons()
         .by_account_id(&lease.account_id)
         .map(|users| users.first().cloned())
         .unwrap()
         .unwrap();
     let auth_id = user.auth_id.unwrap();
-    client.set_auth_id(auth_id);
 
-    piteo::send_receipts(client, input).await.ok();
+    client.send_receipts(&auth_id, input).await.ok();
 }

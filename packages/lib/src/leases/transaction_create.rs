@@ -9,5 +9,5 @@ pub struct TransactionInput {
     amount: Amount,
     lease_id: LeaseId,
     date: DateTime,
-    r#type: Option<TransactionType>,
+    type_: Option<TransactionType>,
 }
