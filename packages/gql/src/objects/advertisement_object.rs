@@ -25,6 +25,8 @@ pub struct Advertisement {
     pub flexibility: Option<LenderFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: PropertyId,
+    pub title: String,
+    pub description: String,
 }
 
 #[async_graphql::ComplexObject]
@@ -53,6 +55,8 @@ impl From<piteo::Advertisement> for Advertisement {
             flexibility: item.flexibility,
             referral_lease_id: item.referral_lease_id,
             property_id: item.property_id,
+            title: item.title,
+            description: item.description,
         }
     }
 }

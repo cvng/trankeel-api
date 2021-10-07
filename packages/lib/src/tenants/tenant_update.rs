@@ -34,28 +34,20 @@ pub struct UpdateTenantInput {
 pub fn update_tenant(db: &impl Db, _auth_id: &AuthId, input: UpdateTenantInput) -> Result<Tenant> {
     input.validate()?;
 
-    db.tenants().update(input.into())
-}
-
-// # Impls
-
-impl From<UpdateTenantInput> for TenantData {
-    fn from(item: UpdateTenantInput) -> Self {
-        Self {
-            id: item.id,
-            account_id: Default::default(),
-            person_id: Default::default(),
-            apl: item.apl,
-            birthdate: item.birthdate,
-            birthplace: item.birthplace,
-            email: item.email.map(Into::into),
-            first_name: item.first_name,
-            last_name: item.last_name,
-            note: item.note,
-            phone_number: item.phone_number,
-            is_student: item.is_student,
-            lease_id: None,
-            status: None,
-        }
-    }
+    db.tenants().update(TenantData {
+        id: input.id,
+        account_id: Default::default(),
+        person_id: Default::default(),
+        apl: input.apl,
+        birthdate: input.birthdate,
+        birthplace: input.birthplace,
+        email: input.email.map(Into::into),
+        first_name: input.first_name,
+        last_name: input.last_name,
+        note: input.note,
+        phone_number: input.phone_number,
+        is_student: input.is_student,
+        lease_id: None,
+        status: None,
+    })
 }

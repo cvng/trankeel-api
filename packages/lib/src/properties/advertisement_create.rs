@@ -25,6 +25,8 @@ pub struct CreateAdvertisementInput {
     pub flexibility: Option<LenderFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: PropertyId,
+    pub title: String,
+    pub description: String,
 }
 
 // # Operation
@@ -49,5 +51,7 @@ pub fn create_advertisement(
         flexibility: input.flexibility,
         referral_lease_id: input.referral_lease_id,
         property_id: input.property_id,
+        title: input.title,
+        description: input.description,
     })
 }

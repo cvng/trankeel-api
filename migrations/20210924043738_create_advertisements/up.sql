@@ -10,7 +10,9 @@ CREATE TABLE advertisements (
     effect_date TIMESTAMPTZ NOT NULL,
     flexibility TEXT,
     referral_lease_id UUID REFERENCES leases(id),
-    property_id UUID NOT NULL REFERENCES properties(id)
+    property_id UUID NOT NULL REFERENCES properties(id),
+    title TEXT NOT NULL,
+    description TEXT NOT NULL
 );
 
 SELECT manage_updated_at('advertisements');

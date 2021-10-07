@@ -55,38 +55,29 @@ pub fn update_property(
 ) -> Result<Property> {
     input.validate()?;
 
-    db.properties().update(input.into())
-}
-
-// # Impls
-
-impl From<UpdatePropertyInput> for PropertyData {
-    fn from(item: UpdatePropertyInput) -> Self {
-        Self {
-            id: item.id,
-            account_id: Default::default(),
-            address: item.address.map(Into::into),
-            build_period: item.build_period,
-            building_legal_status: item.building_legal_status,
-            common_spaces: item.common_spaces,
-            energy_class: item.energy_class,
-            equipments: item.equipments,
-            gas_emission: item.gas_emission,
-            heating_method: item.heating_method,
-            housing_type: item.housing_type,
-            lender_id: Default::default(),
-            name: item.name,
-            note: item.note,
-            description: item.description,
-            ntic_equipments: item.ntic_equipments,
-            other_spaces: item.other_spaces,
-            room_count: item.room_count,
-            status: item.status,
-            surface: item.surface,
-            tax: item.tax,
-            tenant_private_spaces: item.tenant_private_spaces,
-            usage_type: item.usage_type,
-            water_heating_method: item.water_heating_method,
-        }
-    }
+    db.properties().update(PropertyData {
+        id: input.id,
+        account_id: Default::default(),
+        address: input.address.map(Into::into),
+        build_period: input.build_period,
+        building_legal_status: input.building_legal_status,
+        common_spaces: input.common_spaces,
+        energy_class: input.energy_class,
+        equipments: input.equipments,
+        gas_emission: input.gas_emission,
+        heating_method: input.heating_method,
+        housing_type: input.housing_type,
+        lender_id: Default::default(),
+        name: input.name,
+        note: input.note,
+        ntic_equipments: input.ntic_equipments,
+        other_spaces: input.other_spaces,
+        room_count: input.room_count,
+        status: input.status,
+        surface: input.surface,
+        tax: input.tax,
+        tenant_private_spaces: input.tenant_private_spaces,
+        usage_type: input.usage_type,
+        water_heating_method: input.water_heating_method,
+    })
 }

@@ -16,7 +16,6 @@ CREATE TABLE properties (
     housing_type TEXT,
     name TEXT NOT NULL,
     note TEXT,
-    description TEXT,
     ntic_equipments TEXT,
     other_spaces TEXT,
     tax NUMERIC,
