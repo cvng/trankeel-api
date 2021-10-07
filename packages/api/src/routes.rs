@@ -20,6 +20,8 @@ pub async fn graphql_request(
     request: Request,
     auth: AuthGuard,
 ) -> Response {
-    let request = request.data(auth.inner());
-    request.execute(schema).await
+    match auth.inner() {
+        Some(auth_id) => request.data(auth_id).execute(schema).await,
+        None => request.execute(schema).await,
+    }
 }

@@ -12,7 +12,6 @@ const AUTH_ID_KEY: &str = "DEBUG_AUTH_ID";
 #[derive(Debug)]
 pub enum Error {
     Invalid,
-    Unauthorized,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -26,10 +25,10 @@ pub struct DecodedIdToken {
 }
 
 /// Authorization request guard. https://rocket.rs/v0.5-rc/guide/requests/#request-guards
-pub struct AuthGuard(AuthId);
+pub struct AuthGuard(Option<AuthId>);
 
 impl AuthGuard {
-    pub fn inner(&self) -> AuthId {
+    pub fn inner(&self) -> Option<AuthId> {
         self.0.clone()
     }
 }
@@ -53,11 +52,11 @@ impl<'r> FromRequest<'r> for AuthGuard {
                 // Try ID token fallback from env in development (debug).
                 match env::var(AUTH_ID_KEY) {
                     Ok(text) if cfg!(debug_assertions) => text,
-                    _ => return Outcome::Failure((Status::Unauthorized, Error::Unauthorized)),
+                    _ => return Outcome::Success(Self(None)),
                 }
             }
         };
 
-        Outcome::Success(Self(AuthId::new(auth_id)))
+        Outcome::Success(Self(Some(AuthId::new(auth_id))))
     }
 }
