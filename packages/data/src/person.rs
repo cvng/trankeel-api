@@ -1,6 +1,7 @@
 use crate::schema::persons;
 use crate::AccountId;
 use crate::Address;
+use crate::AuthId;
 use crate::DateTime;
 use crate::Email;
 use crate::Id;
@@ -14,9 +15,6 @@ use std::fmt::Display;
 // # Types
 
 pub type PersonId = Id;
-
-#[derive(Clone, Debug, Serialize, Deserialize, DieselNewType)]
-pub struct AuthId(String);
 
 #[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Person {
@@ -48,22 +46,6 @@ pub struct PersonData {
 
 // # Impls
 
-impl AuthId {
-    pub fn new(auth_id: String) -> Self {
-        Self(auth_id)
-    }
-
-    pub fn inner(&self) -> &str {
-        &self.0
-    }
-}
-
-impl Default for AuthId {
-    fn default() -> Self {
-        Self(Default::default())
-    }
-}
-
 impl Name for Person {
     fn first_name(&self) -> String {
         self.first_name.clone()
@@ -79,8 +61,6 @@ impl Display for Person {
         write!(f, "{}", &self.display_name())
     }
 }
-
-scalar!(AuthId, "AuthenticationID");
 
 // # Tests
 

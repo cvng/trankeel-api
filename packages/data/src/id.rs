@@ -1,3 +1,7 @@
+use async_graphql::InputValueError;
+use async_graphql::InputValueResult;
+use async_graphql::ScalarType;
+use async_graphql::Value;
 use std::fmt;
 use std::fmt::Display;
 
@@ -18,4 +22,17 @@ impl Display for Id {
     }
 }
 
-scalar!(Id, "ID");
+#[async_graphql::Scalar(name = "ID")]
+impl ScalarType for Id {
+    fn parse(value: Value) -> InputValueResult<Self> {
+        if let Value::String(value) = value {
+            Ok(uuid::Uuid::parse_str(&value).map(Id)?)
+        } else {
+            Err(InputValueError::expected_type(value))
+        }
+    }
+
+    fn to_value(&self) -> Value {
+        Value::String(self.0.to_string())
+    }
+}
