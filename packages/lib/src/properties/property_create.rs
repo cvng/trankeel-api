@@ -74,7 +74,6 @@ pub fn create_property(
         lender_id: input.lender_id,
         name: input.name,
         note: input.note,
-        description: input.description,
         ntic_equipments: input.ntic_equipments,
         other_spaces: input.other_spaces,
         tax: input.tax,

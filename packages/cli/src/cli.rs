@@ -150,6 +150,8 @@ async fn seed() {
                 flexibility: Some(LenderFlexibility::OneDay),
                 referral_lease_id: Some(lease.id),
                 property_id: property.id,
+                title: "Title".into(),
+                description: "Description".into(),
             },
         )
         .unwrap();

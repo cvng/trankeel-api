@@ -25,6 +25,8 @@ pub struct UpdateAdvertisementInput {
     pub effect_date: Option<DateTime>,
     pub flexibility: Option<LenderFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
+    pub title: Option<String>,
+    pub description: Option<String>,
 }
 
 // # Operation
@@ -47,5 +49,7 @@ pub fn update_advertisement(
         flexibility: input.flexibility,
         referral_lease_id: input.referral_lease_id,
         property_id: None,
+        title: input.title,
+        description: input.description,
     })
 }

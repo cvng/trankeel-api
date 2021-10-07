@@ -25,6 +25,8 @@ pub struct Advertisement {
     pub flexibility: Option<LenderFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: PropertyId,
+    pub title: String,
+    pub description: String,
 }
 
 #[derive(Default, AsChangeset, Identifiable, Insertable)]
@@ -40,4 +42,6 @@ pub struct AdvertisementData {
     pub flexibility: Option<LenderFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: Option<PropertyId>,
+    pub title: Option<String>,
+    pub description: Option<String>,
 }

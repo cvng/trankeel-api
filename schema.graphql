@@ -49,6 +49,8 @@ type Advertisement {
 	flexibility: LenderFlexibility
 	referralLeaseId: ID
 	propertyId: ID!
+	title: String!
+	description: String!
 	property: Property!
 }
 scalar AuthenticationID
@@ -91,6 +93,8 @@ input CreateAdvertisementInput {
 	flexibility: LenderFlexibility
 	referralLeaseId: ID
 	propertyId: ID!
+	title: String!
+	description: String!
 }
 input CreateCandidacyInput {
 	advertisementId: ID!
@@ -510,7 +514,6 @@ type Property {
 	housingType: PropertyUsageType
 	name: String!
 	note: String
-	description: String
 	nticEquipments: String
 	otherSpaces: String
 	tax: Decimal
@@ -841,6 +844,8 @@ input UpdateAdvertisementInput {
 	effectDate: DateTime
 	flexibility: LenderFlexibility
 	referralLeaseId: ID
+	title: String
+	description: String
 }
 enum UserRole {
 	ADMIN

@@ -33,6 +33,8 @@ table! {
         flexibility -> Nullable<Text>,
         referral_lease_id -> Nullable<Uuid>,
         property_id -> Uuid,
+        title -> Text,
+        description -> Text,
     }
 }
 
@@ -269,7 +271,6 @@ table! {
         housing_type -> Nullable<Text>,
         name -> Text,
         note -> Nullable<Text>,
-        description -> Nullable<Text>,
         ntic_equipments -> Nullable<Text>,
         other_spaces -> Nullable<Text>,
         tax -> Nullable<Numeric>,

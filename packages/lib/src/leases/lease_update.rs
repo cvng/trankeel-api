@@ -29,28 +29,20 @@ pub fn update_furnished_lease(
 ) -> Result<Lease> {
     input.validate()?;
 
-    db.leases().update(input.into())
-}
-
-// # Impls
-
-impl From<UpdateFurnishedLeaseInput> for LeaseData {
-    fn from(item: UpdateFurnishedLeaseInput) -> Self {
-        Self {
-            id: item.id,
-            details: item.details.map(Into::into),
-            account_id: None,
-            deposit_amount: None,
-            effect_date: None,
-            signature_date: None,
-            rent_amount: None,
-            rent_charges_amount: None,
-            type_: None,
-            lease_id: None,
-            property_id: None,
-            expired_at: None,
-            renew_date: None,
-            duration: None,
-        }
-    }
+    db.leases().update(LeaseData {
+        id: input.id,
+        details: input.details.map(Into::into),
+        account_id: None,
+        deposit_amount: None,
+        effect_date: None,
+        signature_date: None,
+        rent_amount: None,
+        rent_charges_amount: None,
+        type_: None,
+        lease_id: None,
+        property_id: None,
+        expired_at: None,
+        renew_date: None,
+        duration: None,
+    })
 }
