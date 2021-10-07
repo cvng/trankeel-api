@@ -4,10 +4,10 @@ mod document;
 mod lib;
 
 use super::pdfmonkey::lib as pdfmonkey;
+use crate::error::Error;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
 use async_trait::async_trait;
-use eyre::Error;
 use piteo_data::Document;
 
 pub struct Pdfmonkey(pdfmonkey::Pdfmonkey);

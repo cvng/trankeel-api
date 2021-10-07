@@ -108,7 +108,7 @@ fn add_tenant_warrants(
 
     for warrant_input in warrant_inputs {
         let warrant = match (
-            warrant_input.r#type,
+            warrant_input.type_,
             warrant_input.individual,
             warrant_input.company,
         ) {

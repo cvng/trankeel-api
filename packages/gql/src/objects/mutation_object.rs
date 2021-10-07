@@ -1,14 +1,14 @@
-use crate::objects::Account;
-use crate::objects::Advertisement;
-use crate::objects::Candidacy;
-use crate::objects::File;
-use crate::objects::Lease;
-use crate::objects::Lender;
-use crate::objects::Payment;
-use crate::objects::Person;
-use crate::objects::Property;
-use crate::objects::Task;
-use crate::objects::Tenant;
+use super::Account;
+use super::Advertisement;
+use super::Candidacy;
+use super::File;
+use super::Lease;
+use super::Lender;
+use super::Payment;
+use super::Person;
+use super::Property;
+use super::Task;
+use super::Tenant;
 use crate::payloads::CreateNoticesPayload;
 use crate::payloads::CreateReceiptsPayload;
 use crate::payloads::DeleteDiscussionPayload;
@@ -16,10 +16,11 @@ use crate::payloads::PushMessagePayload;
 use crate::wip;
 use async_graphql::Context;
 use async_graphql::Result;
-use async_graphql::ID;
 use piteo::AcceptCandidacyInput;
 use piteo::AccountActivatePlanInput;
 use piteo::AccountUpdateInput;
+use piteo::AuthId;
+use piteo::Client;
 use piteo::CreateAdvertisementInput;
 use piteo::CreateCandidacyInput;
 use piteo::CreateFileInput;
@@ -35,14 +36,17 @@ use piteo::DeleteLeaseInput;
 use piteo::DeletePropertyInput;
 use piteo::DeleteTenantInput;
 use piteo::ImportInput;
+use piteo::LeaseId;
+use piteo::PaymentId;
+use piteo::PropertyId;
 use piteo::PushMessageInput;
+use piteo::TenantId;
 use piteo::TransactionInput;
 use piteo::UpdateAdvertisementInput;
 use piteo::UpdateFurnishedLeaseInput;
 use piteo::UpdateIndividualLenderInput;
 use piteo::UpdatePropertyInput;
 use piteo::UpdateTenantInput;
-use std::convert::TryInto;
 
 pub struct Mutation;
 
@@ -53,7 +57,9 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateUserWithAccountInput,
     ) -> Result<Person> {
-        Ok(piteo::create_user_with_account(&ctx.into(), input)
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .create_user_with_account(input)
             .await?
             .into())
     }
@@ -67,15 +73,24 @@ impl Mutation {
     }
 
     async fn tenant_create(&self, ctx: &Context<'_>, input: CreateTenantInput) -> Result<Tenant> {
-        Ok(piteo::create_tenant(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .create_tenant(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
     async fn tenant_update(&self, ctx: &Context<'_>, input: UpdateTenantInput) -> Result<Tenant> {
-        Ok(piteo::update_tenant(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .update_tenant(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
-    async fn tenant_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
-        Ok(piteo::delete_tenant(&ctx.into(), DeleteTenantInput { id: id.try_into()? })?.into())
+    async fn tenant_delete(&self, ctx: &Context<'_>, id: TenantId) -> Result<TenantId> {
+        let input = DeleteTenantInput { id };
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .delete_tenant(ctx.data::<AuthId>()?, input)?)
     }
 
     async fn property_create(
@@ -83,7 +98,10 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreatePropertyInput,
     ) -> Result<Property> {
-        Ok(piteo::create_property(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .create_property(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
     async fn property_update(
@@ -91,11 +109,17 @@ impl Mutation {
         ctx: &Context<'_>,
         input: UpdatePropertyInput,
     ) -> Result<Property> {
-        Ok(piteo::update_property(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .update_property(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
-    async fn property_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
-        Ok(piteo::delete_property(&ctx.into(), DeletePropertyInput { id: id.try_into()? })?.into())
+    async fn property_delete(&self, ctx: &Context<'_>, id: PropertyId) -> Result<PropertyId> {
+        let input = DeletePropertyInput { id };
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .delete_property(ctx.data::<AuthId>()?, input)?)
     }
 
     async fn create_advertisement(
@@ -103,7 +127,10 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateAdvertisementInput,
     ) -> Result<Advertisement> {
-        Ok(piteo::create_advertisement(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .create_advertisement(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
     async fn update_advertisement(
@@ -111,7 +138,10 @@ impl Mutation {
         ctx: &Context<'_>,
         input: UpdateAdvertisementInput,
     ) -> Result<Advertisement> {
-        Ok(piteo::update_advertisement(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .update_advertisement(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
     async fn lease_furnished_create(
@@ -119,7 +149,10 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        Ok(piteo::create_furnished_lease(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .create_furnished_lease(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
     async fn lease_furnished_update(
@@ -127,7 +160,10 @@ impl Mutation {
         ctx: &Context<'_>,
         input: UpdateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        Ok(piteo::update_furnished_lease(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .update_furnished_lease(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
     async fn lease_naked_create(
@@ -138,8 +174,11 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn lease_delete(&self, ctx: &Context<'_>, id: ID) -> Result<ID> {
-        Ok(piteo::delete_lease(&ctx.into(), DeleteLeaseInput { id: id.try_into()? })?.into())
+    async fn lease_delete(&self, ctx: &Context<'_>, id: LeaseId) -> Result<LeaseId> {
+        let input = DeleteLeaseInput { id };
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .delete_lease(ctx.data::<AuthId>()?, input)?)
     }
 
     async fn lender_individual_update(
@@ -147,7 +186,10 @@ impl Mutation {
         ctx: &Context<'_>,
         input: UpdateIndividualLenderInput,
     ) -> Result<Lender> {
-        Ok(piteo::update_individual_lender(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .update_individual_lender(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
     async fn candidacy_create(
@@ -155,7 +197,10 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateCandidacyInput,
     ) -> Result<Candidacy> {
-        Ok(piteo::create_candidacy(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .create_candidacy(input)?
+            .into())
     }
 
     async fn candidacy_accept(
@@ -163,14 +208,17 @@ impl Mutation {
         ctx: &Context<'_>,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        Ok(piteo::accept_candidacy(&ctx.into(), input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .accept_candidacy(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
     async fn transaction_create(&self, _input: TransactionInput) -> Result<Payment> {
         Err(wip())
     }
 
-    async fn transaction_delete(&self, _id: ID) -> Result<ID> {
+    async fn transaction_delete(&self, _id: PaymentId) -> Result<PaymentId> {
         Err(wip())
     }
 
@@ -188,7 +236,11 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateReceiptsInput,
     ) -> Result<CreateReceiptsPayload> {
-        Ok(piteo::create_receipts(&ctx.into(), input).await.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .create_receipts(ctx.data::<AuthId>()?, input)
+            .await
+            .into())
     }
 
     #[graphql(name = "sendPaymentNotice")]
@@ -197,7 +249,11 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CreateNoticesInput,
     ) -> Result<CreateNoticesPayload> {
-        Ok(piteo::create_notices(&ctx.into(), input).await.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .create_notices(ctx.data::<AuthId>()?, input)
+            .await
+            .into())
     }
 
     async fn push_message(
@@ -205,7 +261,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: PushMessageInput,
     ) -> Result<PushMessagePayload> {
-        Ok(piteo::push_message(&ctx.into(), input).into())
+        Ok(ctx.data_unchecked::<Client>().push_message(input).into())
     }
 
     async fn delete_discussion(
@@ -213,6 +269,9 @@ impl Mutation {
         ctx: &Context<'_>,
         input: DeleteDiscussionInput,
     ) -> Result<DeleteDiscussionPayload> {
-        Ok(piteo::delete_discussion(&ctx.into(), input).into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .delete_discussion(ctx.data::<AuthId>()?, input)
+            .into())
     }
 }

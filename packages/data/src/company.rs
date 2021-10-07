@@ -1,7 +1,7 @@
-use crate::common::Id;
 use crate::Address;
 use crate::DateTime;
 use crate::Email;
+use crate::Id;
 use crate::PhoneNumber;
 
 // # Types

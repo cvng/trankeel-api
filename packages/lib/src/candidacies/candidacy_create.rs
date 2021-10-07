@@ -33,7 +33,7 @@ pub struct CreateProfessionalWarrantInput {
 
 #[derive(InputObject, Validate)]
 pub struct CreateWarrantInput {
-    pub r#type: WarrantType,
+    pub type_: WarrantType,
     pub individual: Option<CreatePersonInput>,
     pub company: Option<CreateProfessionalWarrantInput>,
 }

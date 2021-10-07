@@ -3,10 +3,6 @@ use crate::DateTime;
 
 // # Types
 
-pub enum LeaseDetails {
-    FurnishedLeaseDetails(FurnishedLeaseDetails),
-}
-
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
 #[graphql(name = "LeaseFurnishedDuration")]
 pub enum FurnishedLeaseDuration {
@@ -61,9 +57,8 @@ pub enum RentPaymentMethod {
     Before,
 }
 
-#[derive(Clone, Default, Debug, Serialize, Deserialize, AsJsonb, InputObject)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, AsJsonb)]
 #[serde(rename_all = "camelCase")]
-#[graphql(name = "LeaseFurnishedDataInput")]
 pub struct FurnishedLeaseDetails {
     pub charges_recuperation_mode: Option<RentChargesRecuperationMode>,
     pub charges_revision_method: Option<String>,
@@ -104,9 +99,8 @@ pub struct FurnishedLeaseDetails {
     pub works_rent_increase_lender: Option<String>,
 }
 
-#[derive(Clone, Default, Debug, Serialize, Deserialize, AsJsonb, InputObject)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, AsJsonb)]
 #[serde(rename_all = "camelCase")]
-#[graphql(name = "LeaseNakedDataInput")]
 pub struct NakedLeaseDetails {
     pub duration: Option<NakedLeaseDuration>,
 }

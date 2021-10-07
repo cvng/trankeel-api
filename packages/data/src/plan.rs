@@ -1,5 +1,5 @@
-use crate::common::Id;
 use crate::Amount;
+use crate::Id;
 
 // # Types
 

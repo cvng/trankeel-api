@@ -11,7 +11,6 @@ use piteo::CreateFurnishedLeaseInput;
 use piteo::CreatePropertyInput;
 use piteo::CreateTenantInput;
 use piteo::CreateUserWithAccountInput;
-use piteo::Db;
 use piteo::LeaseType;
 use piteo::LenderFlexibility;
 use piteo::PropertyBuildPeriodType;
@@ -41,16 +40,13 @@ async fn write_schema() {
 }
 
 async fn seed() {
-    let mut client = piteo::init();
+    let client = piteo::init().unwrap();
+
     let auth_id = AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
     let author = author(env::var("AUTHOR").unwrap()).unwrap();
-    client.set_auth_id(auth_id.clone());
 
-    let db = piteo::db(&client);
-
-    let user = piteo::create_user_with_account(
-        &client,
-        CreateUserWithAccountInput {
+    let user = client
+        .create_user_with_account(CreateUserWithAccountInput {
             auth_id: auth_id.clone(),
             email: author.email.clone(),
             first_name: author.first_name,
@@ -63,101 +59,103 @@ async fn seed() {
                 line2: None,
             }),
             skip_create_customer: Some(true),
-        },
-    )
-    .await
-    .unwrap();
+        })
+        .await
+        .unwrap();
 
-    let (lender, _) = db.lenders().by_individual_id(&user.id).unwrap();
+    let (lender, _) = client.lenders().by_individual_id(&user.id).unwrap();
 
-    let property = piteo::create_property(
-        &client,
-        CreatePropertyInput {
-            address: AddressInput {
-                city: "Talence".into(),
-                line1: "27 Rue de la petite mission".into(),
-                line2: Some("Etg 1 apt 12".into()),
-                postal_code: "16000".into(),
-                country: Default::default(),
+    let property = client
+        .create_property(
+            &auth_id,
+            CreatePropertyInput {
+                address: AddressInput {
+                    city: "Talence".into(),
+                    line1: "27 Rue de la petite mission".into(),
+                    line2: Some("Etg 1 apt 12".into()),
+                    postal_code: "16000".into(),
+                    country: Default::default(),
+                },
+                build_period: PropertyBuildPeriodType::BeforeY1949,
+                building_legal_status: PropertyBuildingLegalStatus::Copro,
+                common_spaces: None,
+                energy_class: None,
+                equipments: None,
+                gas_emission: None,
+                heating_method: PropertyUsageType::Collective,
+                housing_type: PropertyUsageType::Individual,
+                lender_id: lender.id,
+                name: "Petite mission".into(),
+                note: Some("RAS".into()),
+                description: Some("Description".into()),
+                ntic_equipments: None,
+                other_spaces: None,
+                room_count: PropertyRoomType::T1,
+                status: None,
+                surface: 20.0,
+                tax: None,
+                tenant_private_spaces: None,
+                usage_type: PropertyHabitationUsageType::Habitation,
+                water_heating_method: PropertyUsageType::Individual,
             },
-            build_period: PropertyBuildPeriodType::BeforeY1949,
-            building_legal_status: PropertyBuildingLegalStatus::Copro,
-            common_spaces: None,
-            energy_class: None,
-            equipments: None,
-            gas_emission: None,
-            heating_method: PropertyUsageType::Collective,
-            housing_type: PropertyUsageType::Individual,
-            lender_id: lender.id,
-            name: "Petite mission".into(),
-            note: Some("RAS".into()),
-            description: Some("Description".into()),
-            ntic_equipments: None,
-            other_spaces: None,
-            room_count: PropertyRoomType::T1,
-            status: None,
-            surface: 20.0,
-            tax: None,
-            tenant_private_spaces: None,
-            usage_type: PropertyHabitationUsageType::Habitation,
-            water_heating_method: PropertyUsageType::Individual,
-        },
-    )
-    .unwrap();
+        )
+        .unwrap();
 
-    let tenant = piteo::create_tenant(
-        &client,
-        CreateTenantInput {
-            apl: None,
-            birthdate: Utc::now().date().naive_utc().into(),
-            birthplace: None,
-            email: author.email,
-            first_name: "Tenant".into(),
-            last_name: "PITEO".into(),
-            note: None,
-            phone_number: None,
-            is_student: Some(false),
-            warrants: None,
-        },
-    )
-    .unwrap();
+    let tenant = client
+        .create_tenant(
+            &auth_id,
+            CreateTenantInput {
+                apl: None,
+                birthdate: Utc::now().date().naive_utc().into(),
+                birthplace: None,
+                email: author.email,
+                first_name: "Tenant".into(),
+                last_name: "PITEO".into(),
+                note: None,
+                phone_number: None,
+                is_student: Some(false),
+                warrants: None,
+            },
+        )
+        .unwrap();
 
-    let lease = piteo::create_furnished_lease(
-        &client,
-        CreateFurnishedLeaseInput {
-            details: None,
-            deposit_amount: None,
-            effect_date: Utc::now().into(),
-            renew_date: None,
-            file: None,
-            property_id: property.id,
-            rent_amount: Amount::new(360, 0),
-            rent_charges_amount: Some(Amount::new(90, 0)),
-            signature_date: None,
-            tenant_ids: vec![tenant.id],
-        },
-    )
-    .unwrap();
+    let lease = client
+        .create_furnished_lease(
+            &auth_id,
+            CreateFurnishedLeaseInput {
+                details: None,
+                deposit_amount: None,
+                effect_date: Utc::now().into(),
+                renew_date: None,
+                file: None,
+                property_id: property.id,
+                rent_amount: Amount::new(360, 0),
+                rent_charges_amount: Some(Amount::new(90, 0)),
+                signature_date: None,
+                tenant_ids: vec![tenant.id],
+            },
+        )
+        .unwrap();
 
-    let advertisement = piteo::create_advertisement(
-        &client,
-        CreateAdvertisementInput {
-            published: true,
-            lease_type: LeaseType::Furnished,
-            rent_amount: Amount::new(360, 0),
-            rent_charges_amount: Some(Amount::new(90, 0)),
-            deposit_amount: None,
-            effect_date: Utc::now().into(),
-            flexibility: Some(LenderFlexibility::OneDay),
-            referral_lease_id: Some(lease.id),
-            property_id: property.id,
-        },
-    )
-    .unwrap();
+    let advertisement = client
+        .create_advertisement(
+            &auth_id,
+            CreateAdvertisementInput {
+                published: true,
+                lease_type: LeaseType::Furnished,
+                rent_amount: Amount::new(360, 0),
+                rent_charges_amount: Some(Amount::new(90, 0)),
+                deposit_amount: None,
+                effect_date: Utc::now().into(),
+                flexibility: Some(LenderFlexibility::OneDay),
+                referral_lease_id: Some(lease.id),
+                property_id: property.id,
+            },
+        )
+        .unwrap();
 
-    let candidacy = piteo::create_candidacy(
-        &client,
-        CreateCandidacyInput {
+    let candidacy = client
+        .create_candidacy(CreateCandidacyInput {
             advertisement_id: advertisement.id,
             is_student: true,
             first_name: "Candidate".into(),
@@ -169,9 +167,8 @@ async fn seed() {
             description: "Hello, Lender!".into(),
             files: None,
             warrants: None,
-        },
-    )
-    .unwrap();
+        })
+        .unwrap();
 
     println!(
         "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",

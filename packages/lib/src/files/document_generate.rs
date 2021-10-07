@@ -5,5 +5,5 @@ use piteo_data::FileType;
 #[derive(InputObject)]
 pub struct DocumentGenerateInput {
     id: AttachableId,
-    r#type: FileType,
+    type_: FileType,
 }

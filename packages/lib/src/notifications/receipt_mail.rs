@@ -2,7 +2,6 @@ use crate::error::no;
 use crate::error::Result;
 use piteo_core::mailer::Contact;
 use piteo_core::mailer::IntoMail;
-use piteo_data::locale;
 use piteo_data::Amount;
 use piteo_data::DateTime;
 use piteo_data::FileId;
@@ -12,6 +11,7 @@ use piteo_data::Receipt;
 use piteo_data::Rent;
 use piteo_data::Tenant;
 use piteo_data::Url;
+use piteo_kit::locale;
 use serde::Serialize;
 
 #[derive(Clone, Debug, Serialize)]

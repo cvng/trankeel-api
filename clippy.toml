@@ -1,0 +1,3 @@
+# https://rust-lang.github.io/rust-clippy/stable/index.html
+
+disallowed-types = ["async_graphql::ID"]

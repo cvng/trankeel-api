@@ -1,8 +1,8 @@
-use crate::common::Id;
 use crate::schema::accounts;
 use crate::AccountStatus;
 use crate::CustomerId;
 use crate::DateTime;
+use crate::Id;
 use crate::PlanId;
 use crate::SubscriptionId;
 

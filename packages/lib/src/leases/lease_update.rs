@@ -1,9 +1,9 @@
+use super::CreateFurnishedLeaseDetailsInput;
 use crate::error::Result;
 use crate::files::CreateFileInput;
 use crate::AuthId;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
-use piteo_data::FurnishedLeaseDetails;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
 use piteo_data::LeaseId;
@@ -15,7 +15,7 @@ use validator::Validate;
 #[graphql(name = "LeaseFurnishedUpdateInput")]
 pub struct UpdateFurnishedLeaseInput {
     #[graphql(name = "data")]
-    details: Option<FurnishedLeaseDetails>,
+    details: Option<CreateFurnishedLeaseDetailsInput>,
     file: Option<CreateFileInput>,
     id: LeaseId,
 }
@@ -38,7 +38,7 @@ impl From<UpdateFurnishedLeaseInput> for LeaseData {
     fn from(item: UpdateFurnishedLeaseInput) -> Self {
         Self {
             id: item.id,
-            details: item.details,
+            details: item.details.map(Into::into),
             account_id: None,
             deposit_amount: None,
             effect_date: None,

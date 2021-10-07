@@ -1,7 +1,7 @@
-use crate::common::Id;
 use crate::schema::files;
 use crate::DateTime;
 use crate::ExternalId;
+use crate::Id;
 use crate::Lease;
 use crate::Rent;
 use crate::Url;
@@ -43,7 +43,7 @@ pub struct File {
     pub type_: FileType,
 }
 
-#[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
+#[derive(Default, AsChangeset, Identifiable, Insertable)]
 #[table_name = "files"]
 pub struct FileData {
     pub id: FileId,

@@ -1,9 +1,9 @@
-use crate::common::Id;
 use crate::schema::tenants;
 use crate::AccountId;
 use crate::Date;
 use crate::DateTime;
 use crate::Email;
+use crate::Id;
 use crate::LeaseId;
 use crate::Name;
 use crate::PersonId;
@@ -48,7 +48,7 @@ pub struct Tenant {
     pub is_student: Option<bool>,
 }
 
-#[derive(Default, Deserialize, AsChangeset, Identifiable, Insertable)]
+#[derive(Default, AsChangeset, Identifiable, Insertable)]
 #[table_name = "tenants"]
 pub struct TenantData {
     pub id: TenantId,

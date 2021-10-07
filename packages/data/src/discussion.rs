@@ -18,14 +18,14 @@ pub enum DiscussionType {
     Normal,
 }
 
-pub enum DiscussionSubject {
-    Candidacy(Candidacy),
-}
-
 impl Default for DiscussionType {
     fn default() -> Self {
         Self::Normal
     }
+}
+
+pub enum DiscussionSubject {
+    Candidacy(Candidacy),
 }
 
 #[derive(Clone, Debug, Insertable, Queryable)]

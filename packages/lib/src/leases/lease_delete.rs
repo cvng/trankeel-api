@@ -6,7 +6,7 @@ use validator::Validate;
 
 // # Input
 
-#[derive(Validate)]
+#[derive(InputObject, Validate)]
 pub struct DeleteLeaseInput {
     pub id: LeaseId,
 }

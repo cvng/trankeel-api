@@ -1,8 +1,8 @@
-use crate::common::Id;
 use crate::schema::lenders;
 use crate::AccountId;
 use crate::CompanyId;
 use crate::DateTime;
+use crate::Id;
 use crate::LegalIdentity;
 use crate::PersonId;
 
@@ -29,7 +29,7 @@ pub struct Lender {
     pub company_id: Option<CompanyId>,
 }
 
-#[derive(Deserialize, AsChangeset, Identifiable, Insertable)]
+#[derive(AsChangeset, Identifiable, Insertable)]
 #[table_name = "lenders"]
 pub struct LenderData {
     pub id: LenderId,

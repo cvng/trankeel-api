@@ -1,11 +1,13 @@
-use crate::common::Id;
 use crate::schema::rents;
 use crate::Amount;
 use crate::DateTime;
+use crate::Id;
 use crate::LeaseId;
 use crate::PaymentNoticeId;
 use crate::ReceiptId;
 use crate::RentStatus;
+use chrono::Duration;
+use chrono::Utc;
 
 // # Types
 
@@ -13,7 +15,7 @@ pub type RentId = Id;
 
 #[derive(Clone, Insertable, Queryable)]
 pub struct Rent {
-    pub id: Id,
+    pub id: RentId,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub period_end: DateTime,
@@ -27,10 +29,20 @@ pub struct Rent {
     pub notice_id: Option<PaymentNoticeId>,
 }
 
+impl Rent {
+    pub fn delay(&self) -> Duration {
+        if self.period_start.inner() > Utc::now() {
+            Utc::now() - self.period_start.inner()
+        } else {
+            Duration::zero()
+        }
+    }
+}
+
 #[derive(Default, AsChangeset, Identifiable, Insertable)]
 #[table_name = "rents"]
 pub struct RentData {
-    pub id: Id,
+    pub id: RentId,
     pub period_end: Option<DateTime>,
     pub period_start: Option<DateTime>,
     pub amount: Option<Amount>,
