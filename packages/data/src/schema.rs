@@ -317,7 +317,7 @@ table! {
         account_id -> Uuid,
         person_id -> Uuid,
         apl -> Nullable<Bool>,
-        birthdate -> Date,
+        birthdate -> Nullable<Date>,
         birthplace -> Nullable<Text>,
         email -> Text,
         first_name -> Text,

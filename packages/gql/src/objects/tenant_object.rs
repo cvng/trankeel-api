@@ -28,7 +28,7 @@ pub struct Tenant {
     pub account_id: AccountId,
     pub person_id: PersonId,
     pub apl: Option<bool>,
-    pub birthdate: Date,
+    pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
     pub email: Email,
     pub first_name: String,

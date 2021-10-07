@@ -67,7 +67,7 @@ pub fn create_candidacy(db: &impl Db, input: CreateCandidacyInput) -> Result<Can
         no_auth_id,
         CreateTenantInput {
             apl: None,
-            birthdate: input.birthdate,
+            birthdate: Some(input.birthdate),
             birthplace: None,
             email: input.email,
             first_name: input.first_name,

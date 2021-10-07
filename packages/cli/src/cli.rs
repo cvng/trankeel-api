@@ -106,7 +106,7 @@ async fn seed() {
             &auth_id,
             CreateTenantInput {
                 apl: None,
-                birthdate: Utc::now().date().naive_utc().into(),
+                birthdate: Some(Utc::now().date().naive_utc().into()),
                 birthplace: None,
                 email: author.email,
                 first_name: "Tenant".into(),

@@ -5,7 +5,7 @@ CREATE TABLE tenants (
     account_id UUID NOT NULL REFERENCES accounts(id),
     person_id UUID NOT NULL REFERENCES persons(id),
     apl BOOLEAN,
-    birthdate DATE NOT NULL,
+    birthdate DATE,
     birthplace TEXT,
     email TEXT NOT NULL,
     first_name TEXT NOT NULL,
