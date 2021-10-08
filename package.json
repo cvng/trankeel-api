@@ -2,14 +2,15 @@
   "name": "piteo",
   "private": "true",
   "scripts": {
-    "dev": "cargo watch -i schema.graphql -x run",
+    "start": "cargo watch -i schema.graphql -x run",
     "build": "cargo build",
-    "start": "cargo run",
+    "check": "cargo check",
     "lint": "cargo clippy",
     "test": "cargo test",
     "fmt": "cargo fmt",
     "migrate": "diesel migration run",
     "generate": "cargo run --bin piteo-cli -- generate",
-    "postmigrate": "cargo run --bin piteo-cli -- seed"
+    "seed": "cargo run --bin piteo-cli -- seed",
+    "postmigrate": "npm run seed"
   }
 }
