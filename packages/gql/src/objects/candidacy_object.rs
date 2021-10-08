@@ -1,3 +1,4 @@
+use super::Discussion;
 use super::Tenant;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -28,6 +29,14 @@ impl Candidacy {
             .data_unchecked::<Client>()
             .tenants()
             .by_id(&self.tenant_id)?
+            .into())
+    }
+
+    async fn discussion(&self, ctx: &Context<'_>) -> Result<Discussion> {
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .discussions()
+            .by_subject_id(&self.id)?
             .into())
     }
 }
