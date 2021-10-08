@@ -6,8 +6,8 @@ use std::ops::Add;
 pub struct Amount(rust_decimal::Decimal);
 
 impl Amount {
-    pub fn new(num: i64, scale: u32) -> Self {
-        Self(rust_decimal::Decimal::new(num, scale))
+    pub fn new(num: i64) -> Self {
+        Self(rust_decimal::Decimal::new(num, 2))
     }
 
     pub fn inner(&self) -> rust_decimal::Decimal {

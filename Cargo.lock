@@ -1619,6 +1619,7 @@ dependencies = [
  "eyre",
  "piteo-kit",
  "rust_decimal",
+ "rust_decimal_macros",
  "serde",
  "serde_json",
  "stripe-rust",
@@ -1637,6 +1638,9 @@ dependencies = [
 [[package]]
 name = "piteo-kit"
 version = "0.1.1"
+dependencies = [
+ "chrono",
+]
 
 [[package]]
 name = "piteo-web"
@@ -2055,6 +2059,16 @@ dependencies = [
  "diesel",
  "num-traits",
  "serde",
+]
+
+[[package]]
+name = "rust_decimal_macros"
+version = "1.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f1927f5f2552e7c5335f2daef329de05f91efd8ec4a71c3ff4066ad45361b1df"
+dependencies = [
+ "quote 1.0.9",
+ "rust_decimal",
 ]
 
 [[package]]

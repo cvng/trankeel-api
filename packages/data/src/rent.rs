@@ -32,7 +32,7 @@ pub struct Rent {
 impl Rent {
     pub fn delay(&self) -> Duration {
         if self.period_start.inner() > Utc::now() {
-            Utc::now() - self.period_start.inner()
+            self.period_start.inner() - Utc::now()
         } else {
             Duration::zero()
         }

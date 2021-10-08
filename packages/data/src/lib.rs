@@ -10,6 +10,9 @@ extern crate diesel_derive_enum;
 extern crate diesel_enum_derive;
 #[macro_use]
 extern crate diesel_derive_newtype;
+#[allow(unused_imports)]
+#[macro_use]
+extern crate rust_decimal_macros;
 #[macro_use]
 extern crate serde;
 
@@ -45,6 +48,7 @@ mod professional_warrant;
 mod property;
 mod rent;
 mod rent_receipt;
+mod rent_util;
 mod sql_types;
 mod subscription;
 mod summary;
@@ -82,6 +86,7 @@ pub use crate::professional_warrant::*;
 pub use crate::property::*;
 pub use crate::rent::*;
 pub use crate::rent_receipt::*;
+pub use crate::rent_util::*;
 pub use crate::sql_types::*;
 pub use crate::subscription::*;
 pub use crate::summary::*;

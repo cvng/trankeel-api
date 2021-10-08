@@ -25,9 +25,10 @@ impl Display for Id {
 #[async_graphql::Scalar(name = "ID")]
 impl ScalarType for Id {
     fn parse(value: Value) -> InputValueResult<Self> {
-        match value {
-            Value::String(value) => Ok(uuid::Uuid::parse_str(&value).map(Id)?),
-            _ => Err(InputValueError::expected_type(value)),
+        if let Value::String(value) = value {
+            Ok(uuid::Uuid::parse_str(&value).map(Id)?)
+        } else {
+            Err(InputValueError::expected_type(value))
         }
     }
 
