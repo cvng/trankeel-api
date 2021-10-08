@@ -29,7 +29,7 @@ impl From<stripe::Subscription> for Subscription {
             // https://stripe.com/docs/api/subscriptions/object#subscription_object-trial_end
             trial_end: item
                 .trial_end
-                .map(|trial_end| DateTime::from_timestamp(trial_end * 1000, 0)),
+                .map(|trial_end| DateTime::new(trial_end * 1000)),
         }
     }
 }
