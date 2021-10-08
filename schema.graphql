@@ -457,7 +457,7 @@ type Mutation {
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -643,6 +643,7 @@ type PushMessagePayload {
 type Query {
 	viewer: Person!
 	advertisement(id: ID!): Advertisement!
+	candidacy(id: ID!): Candidacy!
 	candidacies(propertyId: ID): [Candidacy!]!
 	properties(id: ID, query: String): [Property!]!
 	tenants(id: ID, query: String, status: TenantStatus): [Tenant!]!
