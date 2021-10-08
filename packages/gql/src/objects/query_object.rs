@@ -18,6 +18,7 @@ use async_graphql::Context;
 use async_graphql::Result;
 use piteo::AdvertisementId;
 use piteo::AuthId;
+use piteo::CandidacyId;
 use piteo::Client;
 use piteo::DateTime;
 use piteo::DiscussionId;
@@ -44,6 +45,14 @@ impl Query {
         Ok(ctx
             .data_unchecked::<Client>()
             .advertisements()
+            .by_id(&id)?
+            .into())
+    }
+
+    async fn candidacy(&self, ctx: &Context<'_>, id: CandidacyId) -> Result<Candidacy> {
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .candidacies()
             .by_id(&id)?
             .into())
     }
