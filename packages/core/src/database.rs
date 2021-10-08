@@ -21,6 +21,7 @@ use piteo_data::ExternalId;
 use piteo_data::File;
 use piteo_data::FileData;
 use piteo_data::FileId;
+use piteo_data::Id;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
 use piteo_data::LeaseId;
@@ -205,6 +206,7 @@ pub trait ReportStore {
 pub trait DiscussionStore {
     fn by_id(&mut self, id: &DiscussionId) -> Result<Discussion>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Discussion>>;
+    fn by_subject_id(&mut self, subject_id: &Id) -> Result<Discussion>;
     fn create(&mut self, data: Discussion) -> Result<Discussion>;
     fn delete(&mut self, data: DiscussionId) -> Result<Executed>;
     fn related_subject(&mut self, id: &DiscussionId) -> Result<Option<DiscussionSubject>>;

@@ -56,6 +56,7 @@ use piteo_data::ExternalId;
 use piteo_data::File;
 use piteo_data::FileData;
 use piteo_data::FileId;
+use piteo_data::Id;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
 use piteo_data::LeaseId;
@@ -810,6 +811,17 @@ impl database::DiscussionStore for DiscussionStore<'_> {
             .left_join(persons::table.on(persons::account_id.eq(discussions::account_id)))
             .filter(persons::auth_id.eq(auth_id.inner()))
             .load(&self.0.get()?)?)
+    }
+
+    fn by_subject_id(&mut self, subject_id: &Id) -> Result<Discussion> {
+        // TODO: match subject_id with discussion type
+        Ok(discussions::table
+            .select(discussions::all_columns)
+            .left_join(
+                candidacies::table.on(candidacies::id.nullable().eq(discussions::subject_id)),
+            )
+            .filter(candidacies::id.eq(subject_id))
+            .first(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Discussion) -> Result<Discussion> {
