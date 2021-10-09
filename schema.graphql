@@ -765,11 +765,11 @@ type Tenant implements PersonInterface {
 	leaseId: ID
 	isStudent: Boolean
 	displayName: String!
+	shortName: String!
+	fullName: String!
+	lastTransaction: Transaction
 	account: Account
 	property: Property
-	fullName: String
-	shortName: String
-	lastTransaction: Transaction
 	propertyName: String
 	rentPayedThisYear: String
 	unpaidRentAmount: Decimal
