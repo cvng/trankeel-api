@@ -56,7 +56,7 @@ pub fn create_tenant(
     };
 
     let person = db.persons().create(Person {
-        id: PersonId::new_v4(),
+        id: PersonId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id,
@@ -71,7 +71,7 @@ pub fn create_tenant(
     })?;
 
     let tenant = db.tenants().create(Tenant {
-        id: TenantId::new_v4(),
+        id: TenantId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id,
@@ -114,7 +114,7 @@ fn add_tenant_warrants(
         ) {
             (WarrantType::Person, Some(person_input), _) => db.warrants().create((
                 Warrant {
-                    id: WarrantId::new_v4(),
+                    id: WarrantId::new(),
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     type_: WarrantType::Person,
@@ -123,7 +123,7 @@ fn add_tenant_warrants(
                     professional_id: None,
                 },
                 WarrantIdentity::Individual(Person {
-                    id: PersonId::new_v4(),
+                    id: PersonId::new(),
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     account_id: *account_id,
@@ -139,7 +139,7 @@ fn add_tenant_warrants(
             ))?,
             (WarrantType::Visale, _, Some(company_input)) => db.warrants().create((
                 Warrant {
-                    id: WarrantId::new_v4(),
+                    id: WarrantId::new(),
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     type_: WarrantType::Visale,
@@ -148,7 +148,7 @@ fn add_tenant_warrants(
                     professional_id: Default::default(),
                 },
                 WarrantIdentity::Professional(ProfessionalWarrant {
-                    id: ProfessionalWarrantId::new_v4(),
+                    id: ProfessionalWarrantId::new(),
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     name: company_input.name,
@@ -157,7 +157,7 @@ fn add_tenant_warrants(
             ))?,
             (WarrantType::Company, _, Some(company_input)) => db.warrants().create((
                 Warrant {
-                    id: WarrantId::new_v4(),
+                    id: WarrantId::new(),
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     type_: WarrantType::Company,
@@ -166,7 +166,7 @@ fn add_tenant_warrants(
                     professional_id: Default::default(),
                 },
                 WarrantIdentity::Professional(ProfessionalWarrant {
-                    id: ProfessionalWarrantId::new_v4(),
+                    id: ProfessionalWarrantId::new(),
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     name: company_input.name,

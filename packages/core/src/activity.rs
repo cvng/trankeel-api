@@ -15,7 +15,7 @@ pub fn trace(
     let account = db.accounts().by_auth_id(auth_id)?;
 
     db.events().create(Event {
-        id: EventId::new_v4(),
+        id: EventId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id: account.id,

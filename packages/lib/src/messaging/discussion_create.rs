@@ -28,7 +28,7 @@ pub fn create_discussion_unauthenticated(
     let type_ = get_discussion_type(db, &input.subject_id);
 
     let discussion = db.discussions().create(Discussion {
-        id: DiscussionId::new_v4(),
+        id: DiscussionId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id: account.id,

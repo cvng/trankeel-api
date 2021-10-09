@@ -109,7 +109,7 @@ fn setlle_rents(db: &impl Db, auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result
         })?;
 
         let payment = db.payments().create(Payment {
-            id: PaymentId::new_v4(),
+            id: PaymentId::new(),
             created_at: Default::default(),
             updated_at: Default::default(),
             rent_id,
@@ -143,7 +143,7 @@ async fn generate_receipts(
         let lender = db.lenders().by_id(&property.lender_id)?;
 
         // Init new receipt.
-        let receipt_id = ReceiptId::new_v4();
+        let receipt_id = ReceiptId::new();
         let mut receipt = Receipt {
             id: receipt_id,
             type_: FileType::RentReceipt,

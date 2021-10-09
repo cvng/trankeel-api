@@ -17,7 +17,7 @@ pub fn push_message(db: &impl Db, input: PushMessageInput) -> Result<Message> {
     input.validate()?;
 
     let message = db.messages().create(Message {
-        id: MessageId::new_v4(),
+        id: MessageId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         discussion_id: input.discussion_id,

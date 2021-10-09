@@ -72,7 +72,7 @@ async fn generate_notices(
         let lender = db.lenders().by_id(&property.lender_id)?;
 
         // Init new notice.
-        let notice_id = PaymentNoticeId::new_v4();
+        let notice_id = PaymentNoticeId::new();
         let mut notice = PaymentNotice {
             id: notice_id,
             type_: FileType::PaymentNotice,
