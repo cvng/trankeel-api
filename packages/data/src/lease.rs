@@ -97,7 +97,7 @@ impl Lease {
         )
         .into_iter()
         .map(|rent| Rent {
-            id: RentId::new_v4(),
+            id: RentId::new(),
             created_at: Default::default(),
             updated_at: Default::default(),
             period_start: rent.0.into(),
@@ -121,7 +121,7 @@ mod tests {
     impl Default for Lease {
         fn default() -> Self {
             Self {
-                id: LeaseId::new_v4(),
+                id: LeaseId::new(),
                 created_at: Default::default(),
                 updated_at: Default::default(),
                 account_id: Default::default(),

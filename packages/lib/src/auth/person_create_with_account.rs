@@ -50,7 +50,7 @@ pub async fn create_user_with_account(
 
     // Create account.
     let account = db.accounts().create(Account {
-        id: AccountId::new_v4(),
+        id: AccountId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         plan_id: None,
@@ -62,7 +62,7 @@ pub async fn create_user_with_account(
 
     // Create user.
     let user = db.persons().create(Person {
-        id: PersonId::new_v4(),
+        id: PersonId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         auth_id: Some(input.auth_id),
@@ -78,7 +78,7 @@ pub async fn create_user_with_account(
 
     // Create lender.
     let _lender = db.lenders().create(Lender {
-        id: LenderId::new_v4(),
+        id: LenderId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id: account.id,

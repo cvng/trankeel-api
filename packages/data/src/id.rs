@@ -11,7 +11,7 @@ use std::fmt::Display;
 pub struct Id(uuid::Uuid);
 
 impl Id {
-    pub fn new_v4() -> Self {
+    pub fn new() -> Self {
         Self(uuid::Uuid::new_v4())
     }
 }

@@ -39,7 +39,7 @@ pub fn create_advertisement(
     input.validate()?;
 
     db.advertisements().create(Advertisement {
-        id: AdvertisementId::new_v4(),
+        id: AdvertisementId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         published: input.published,

@@ -87,7 +87,7 @@ pub fn create_candidacy(db: &impl Db, input: CreateCandidacyInput) -> Result<Can
     })?;
 
     let candidacy = db.candidacies().create(Candidacy {
-        id: CandidacyId::new_v4(),
+        id: CandidacyId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         status: CandidacyStatus::default(),

@@ -116,7 +116,7 @@ pub fn create_furnished_lease(
         .unwrap_or_default();
 
     let lease = db.leases().create(Lease {
-        id: LeaseId::new_v4(),
+        id: LeaseId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         details: input.details.map(Into::into),
