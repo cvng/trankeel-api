@@ -169,14 +169,16 @@ impl Query {
     async fn rents(
         &self,
         ctx: &Context<'_>,
-        _since: DateTime,
-        _until: DateTime,
+        #[graphql(name = "since")] from: DateTime,
+        #[graphql(name = "until")] to: DateTime,
     ) -> Result<Vec<Rent>> {
         Ok(ctx
             .data_unchecked::<Client>()
             .rents()
             .by_auth_id(ctx.data::<AuthId>()?)?
             .into_iter()
+            .filter(|rent| rent.period_start.inner() >= from.inner())
+            .filter(|rent| rent.period_start.inner() < to.inner())
             .map(Into::into)
             .collect())
     }
