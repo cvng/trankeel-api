@@ -19,6 +19,7 @@ use piteo_data::schema::advertisements;
 use piteo_data::schema::candidacies;
 use piteo_data::schema::companies;
 use piteo_data::schema::discussions;
+use piteo_data::schema::eventables;
 use piteo_data::schema::events;
 use piteo_data::schema::files;
 use piteo_data::schema::leases;
@@ -45,18 +46,18 @@ use piteo_data::CandidacyId;
 use piteo_data::Company;
 use piteo_data::CompanyId;
 use piteo_data::Discussion;
+use piteo_data::DiscussionData;
 use piteo_data::DiscussionId;
-use piteo_data::DiscussionSubject;
+use piteo_data::DiscussionItem;
+use piteo_data::DiscussionItemRow;
 use piteo_data::Event;
 use piteo_data::EventId;
 use piteo_data::EventWithEventable;
-use piteo_data::Eventable;
-use piteo_data::EventableType;
+use piteo_data::EventableRow;
 use piteo_data::ExternalId;
 use piteo_data::File;
 use piteo_data::FileData;
 use piteo_data::FileId;
-use piteo_data::Id;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
 use piteo_data::LeaseId;
@@ -66,8 +67,9 @@ use piteo_data::LenderData;
 use piteo_data::LenderId;
 use piteo_data::LenderWithIdentity;
 use piteo_data::Message;
+use piteo_data::NoticeId;
 use piteo_data::Payment;
-use piteo_data::PaymentNoticeId;
+use piteo_data::PaymentId;
 use piteo_data::Person;
 use piteo_data::PersonData;
 use piteo_data::PersonId;
@@ -242,6 +244,45 @@ impl database::AccountStore for AccountStore<'_> {
             .first(&self.0.get()?)?)
     }
 
+    fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(tenants::table.on(tenants::account_id.eq(accounts::id)))
+            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .filter(candidacies::id.eq(candidacy_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(leases::table.on(leases::account_id.eq(accounts::id)))
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .left_join(files::table.on(files::id.nullable().eq(rents::notice_id)))
+            .filter(files::id.eq(notice_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(leases::table.on(leases::account_id.eq(accounts::id)))
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .left_join(files::table.on(files::id.nullable().eq(rents::receipt_id)))
+            .filter(files::id.eq(receipt_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_payment_id(&mut self, payment_id: &PaymentId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(leases::table.on(leases::account_id.eq(accounts::id)))
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .left_join(payments::table.on(payments::rent_id.eq(rents::id)))
+            .filter(payments::id.eq(payment_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn by_person_id(&mut self, person_id: &PersonId) -> Result<Account> {
         Ok(accounts::table
             .select(accounts::all_columns)
@@ -284,6 +325,39 @@ impl database::PersonStore for PersonStore<'_> {
             .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
             .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
             .filter(candidacies::id.eq(candidacy_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_notice_id(&mut self, notice_id: &FileId) -> Result<Person> {
+        Ok(persons::table
+            .select(persons::all_columns)
+            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
+            .left_join(leases::table.on(leases::id.nullable().eq(tenants::lease_id)))
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .left_join(files::table.on(files::id.nullable().eq(rents::notice_id)))
+            .filter(files::id.eq(notice_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Person> {
+        Ok(persons::table
+            .select(persons::all_columns)
+            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
+            .left_join(leases::table.on(leases::id.nullable().eq(tenants::lease_id)))
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .left_join(files::table.on(files::id.nullable().eq(rents::receipt_id)))
+            .filter(files::id.eq(receipt_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_payment_id(&mut self, payment_id: &PaymentId) -> Result<Person> {
+        Ok(persons::table
+            .select(persons::all_columns)
+            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
+            .left_join(leases::table.on(leases::id.nullable().eq(tenants::lease_id)))
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .left_join(payments::table.on(payments::rent_id.eq(rents::id)))
+            .filter(payments::id.eq(payment_id))
             .first(&self.0.get()?)?)
     }
 
@@ -609,7 +683,7 @@ impl database::LeaseStore for LeaseStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn by_notice_id(&mut self, notice_id: &PaymentNoticeId) -> Result<Lease> {
+    fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Lease> {
         Ok(leases::table
             .select(leases::all_columns)
             .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
@@ -670,7 +744,7 @@ impl database::RentStore for RentStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn by_notice_id(&mut self, notice_id: &PaymentNoticeId) -> Result<Rent> {
+    fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Rent> {
         Ok(rents::table
             .filter(rents::notice_id.eq(notice_id))
             .first(&self.0.get()?)?)
@@ -751,22 +825,24 @@ impl database::CompanyStore for CompanyStore<'_> {
 
 impl database::EventStore for EventStore<'_> {
     fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable> {
-        let event: Event = events::table.find(id).first(&self.0.get()?)?;
-        let detailed_event = match event.eventable_type {
-            EventableType::Rent => {
-                let rent = rents::table
-                    .find(event.eventable_id)
-                    .first(&self.0.get()?)?;
-                (event, Eventable::Rent(rent))
-            }
-            EventableType::Payment => {
-                let payment = payments::table
-                    .find(event.eventable_id)
-                    .first(&self.0.get()?)?;
-                (event, Eventable::Payment(payment))
-            }
-        };
-        Ok(detailed_event)
+        let event = events::table
+            .left_join(eventables::table.on(eventables::id.eq(events::eventable_id)))
+            .left_join(files::table.on(files::id.nullable().eq(eventables::file_id)))
+            .left_join(rents::table.on(rents::id.nullable().eq(eventables::rent_id)))
+            .left_join(payments::table.on(payments::id.nullable().eq(eventables::payment_id)))
+            .left_join(
+                candidacies::table.on(candidacies::id.nullable().eq(eventables::candidacy_id)),
+            )
+            .select((
+                events::all_columns,
+                files::all_columns.nullable(),
+                rents::all_columns.nullable(),
+                payments::all_columns.nullable(),
+                candidacies::all_columns.nullable(),
+            ))
+            .filter(events::id.eq(id))
+            .first::<EventableRow>(&self.0.get()?)?;
+        Ok((event.0.clone(), event.into()))
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>> {
@@ -813,14 +889,11 @@ impl database::DiscussionStore for DiscussionStore<'_> {
             .load(&self.0.get()?)?)
     }
 
-    fn by_subject_id(&mut self, subject_id: &Id) -> Result<Discussion> {
-        // TODO: match subject_id with discussion type
+    fn by_initiator_id(&mut self, person_id: &PersonId) -> Result<Discussion> {
         Ok(discussions::table
             .select(discussions::all_columns)
-            .left_join(
-                candidacies::table.on(candidacies::id.nullable().eq(discussions::subject_id)),
-            )
-            .filter(candidacies::id.eq(subject_id))
+            .left_join(persons::table.on(persons::id.eq(discussions::initiator_id)))
+            .filter(persons::id.eq(person_id))
             .first(&self.0.get()?)?)
     }
 
@@ -830,25 +903,27 @@ impl database::DiscussionStore for DiscussionStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
+    fn update(&mut self, data: DiscussionData) -> Result<Discussion> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    }
+
     fn delete(&mut self, data: DiscussionId) -> Result<Executed> {
         Ok(delete(discussions::table)
             .filter(discussions::id.eq(data))
             .execute(&self.0.get()?)?)
     }
 
-    fn related_subject(&mut self, id: &DiscussionId) -> Result<Option<DiscussionSubject>> {
-        let discussion: Discussion = discussions::table.find(id).first(&self.0.get()?)?;
-
-        match discussion.subject_id {
-            Some(subject_id) => {
-                if let Ok(candidacy) = candidacies::table.find(subject_id).first(&self.0.get()?) {
-                    Ok(Some(DiscussionSubject::Candidacy(candidacy)))
-                } else {
-                    Ok(None)
-                }
-            }
-            None => Ok(None),
-        }
+    fn related_items(&mut self, id: &DiscussionId) -> Result<Vec<DiscussionItem>> {
+        Ok(discussions::table
+            .left_join(persons::table.on(persons::id.eq(discussions::initiator_id)))
+            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
+            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .select((candidacies::all_columns.nullable(),))
+            .filter(discussions::id.eq(id))
+            .load::<DiscussionItemRow>(&self.0.get()?)?
+            .into_iter()
+            .map(Into::into)
+            .collect())
     }
 
     fn touch(&mut self, data: DiscussionId) -> Result<Executed> {
