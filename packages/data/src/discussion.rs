@@ -10,8 +10,6 @@ pub type DiscussionId = Id;
 
 pub type DiscussionItemRow = (Option<Candidacy>,);
 
-pub type SubjectId = Id;
-
 pub type DiscussionWithMessages = (Discussion, Vec<Message>);
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, DbEnum, Enum)]
