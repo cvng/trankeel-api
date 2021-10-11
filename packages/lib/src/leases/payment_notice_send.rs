@@ -3,15 +3,15 @@ use crate::error::Result;
 use async_graphql::InputObject;
 use chrono::Utc;
 use piteo_core::activity::trace;
+use piteo_core::activity::Trace;
 use piteo_core::database::Db;
 use piteo_core::pdfmaker::Pdfmaker;
 use piteo_data::notice_filename;
 use piteo_data::AuthId;
 use piteo_data::DateTime;
-use piteo_data::EventType;
 use piteo_data::FileType;
-use piteo_data::PaymentNotice;
-use piteo_data::PaymentNoticeId;
+use piteo_data::Notice;
+use piteo_data::NoticeId;
 use piteo_data::Rent;
 use piteo_data::RentData;
 use piteo_data::RentId;
@@ -33,12 +33,12 @@ pub async fn create_notices(
     auth_id: &AuthId,
     pdfmaker: &impl Pdfmaker,
     input: CreateNoticesInput,
-) -> Result<Vec<PaymentNotice>> {
+) -> Result<Vec<Notice>> {
     input.validate()?;
 
     let rents = find_rents(db, auth_id, input.rent_ids)?;
 
-    let notices = generate_notices(db, auth_id, pdfmaker, rents).await?;
+    let notices = generate_notices(db, pdfmaker, rents).await?;
 
     Ok(notices)
 }
@@ -58,10 +58,9 @@ fn find_rents(db: &impl Db, _auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<
 
 async fn generate_notices(
     db: &impl Db,
-    auth_id: &AuthId,
     pdfmaker: &impl Pdfmaker,
     rents: Vec<Rent>,
-) -> Result<Vec<PaymentNotice>> {
+) -> Result<Vec<Notice>> {
     let mut notices = vec![];
 
     for rent in rents {
@@ -72,8 +71,8 @@ async fn generate_notices(
         let lender = db.lenders().by_id(&property.lender_id)?;
 
         // Init new notice.
-        let notice_id = PaymentNoticeId::new();
-        let mut notice = PaymentNotice {
+        let notice_id = NoticeId::new();
+        let mut notice = Notice {
             id: notice_id,
             type_: FileType::PaymentNotice,
             filename: Some(notice_filename(&notice_id, &rent)),
@@ -113,9 +112,9 @@ async fn generate_notices(
             ..Default::default()
         })?;
 
-        notices.push(notice);
+        notices.push(notice.clone());
 
-        trace(db, auth_id, EventType::PaymentNoticeCreated, rent.id).ok();
+        trace(db, Trace::NoticeCreated(notice)).ok();
     }
 
     Ok(notices)
