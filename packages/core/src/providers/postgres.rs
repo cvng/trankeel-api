@@ -897,6 +897,16 @@ impl database::DiscussionStore for DiscussionStore<'_> {
             .first(&self.0.get()?)?)
     }
 
+    fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Discussion> {
+        Ok(discussions::table
+            .select(discussions::all_columns)
+            .left_join(persons::table.on(persons::id.eq(discussions::initiator_id)))
+            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
+            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .filter(candidacies::id.eq(candidacy_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn create(&mut self, data: Discussion) -> Result<Discussion> {
         Ok(insert_into(discussions::table)
             .values(data)
