@@ -4,6 +4,7 @@ use crate::notifications::ReceiptMail;
 use async_graphql::InputObject;
 use chrono::Utc;
 use piteo_core::activity::trace;
+use piteo_core::activity::Trace;
 use piteo_core::database::Db;
 use piteo_core::error::Error;
 use piteo_core::mailer::Mailer;
@@ -11,7 +12,6 @@ use piteo_core::pdfmaker::Pdfmaker;
 use piteo_data::receipt_filename;
 use piteo_data::AuthId;
 use piteo_data::DateTime;
-use piteo_data::EventType;
 use piteo_data::FileType;
 use piteo_data::Payment;
 use piteo_data::PaymentId;
@@ -43,22 +43,22 @@ pub struct SendReceiptsInput {
 
 pub async fn create_receipts(
     db: &impl Db,
-    auth_id: &AuthId,
+    _auth_id: &AuthId,
     pdfmaker: &impl Pdfmaker,
     input: CreateReceiptsInput,
 ) -> Result<Vec<Receipt>> {
     input.validate()?;
 
-    let rents = setlle_rents(db, auth_id, input.rent_ids)?;
+    let rents = setlle_rents(db, input.rent_ids)?;
 
-    let receipts = generate_receipts(db, auth_id, pdfmaker, rents).await?;
+    let receipts = generate_receipts(db, pdfmaker, rents).await?;
 
     Ok(receipts)
 }
 
 pub async fn send_receipts(
     db: &impl Db,
-    auth_id: &AuthId,
+    _auth_id: &AuthId,
     mailer: &impl Mailer,
     input: SendReceiptsInput,
 ) -> Result<Vec<Receipt>> {
@@ -88,8 +88,8 @@ pub async fn send_receipts(
         mailer.batch(vec![mail]).await?;
 
         match receipt.type_ {
-            FileType::RentReceipt => trace(db, auth_id, EventType::RentReceiptSent, rent.id).ok(),
-            _ => trace(db, auth_id, EventType::PaymentNoticeSent, rent.id).ok(),
+            FileType::RentReceipt => trace(db, Trace::ReceiptSent(receipt)).ok(),
+            _ => trace(db, Trace::NoticeSent(receipt)).ok(),
         };
     }
 
@@ -98,7 +98,7 @@ pub async fn send_receipts(
 
 // # Utils
 
-fn setlle_rents(db: &impl Db, auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
+fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
     let mut rents = vec![];
 
     for rent_id in rent_ids {
@@ -121,7 +121,7 @@ fn setlle_rents(db: &impl Db, auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result
 
         rents.push(rent);
 
-        trace(db, auth_id, EventType::PaymentCreated, payment.id).ok();
+        trace(db, Trace::PaymentCreated(payment)).ok();
     }
 
     Ok(rents)
@@ -129,7 +129,6 @@ fn setlle_rents(db: &impl Db, auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result
 
 async fn generate_receipts(
     db: &impl Db,
-    auth_id: &AuthId,
     pdfmaker: &impl Pdfmaker,
     rents: Vec<Rent>,
 ) -> Result<Vec<Receipt>> {
@@ -184,9 +183,9 @@ async fn generate_receipts(
             ..Default::default()
         })?;
 
-        receipts.push(receipt);
+        receipts.push(receipt.clone());
 
-        trace(db, auth_id, EventType::RentReceiptCreated, rent.id).ok();
+        trace(db, Trace::ReceiptCreated(receipt)).ok();
     }
 
     Ok(receipts)
