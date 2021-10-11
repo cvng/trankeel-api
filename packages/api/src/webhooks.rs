@@ -2,7 +2,7 @@ use piteo::Document;
 use piteo::FileData;
 use piteo::FileStatus;
 use piteo::FileType;
-use piteo::PaymentNotice;
+use piteo::Notice;
 use piteo::Receipt;
 use piteo::SendReceiptsInput;
 use rocket::http::Status;
@@ -75,7 +75,7 @@ async fn on_receipt_created(client: &piteo::Client, receipt: &Receipt) {
     client.send_receipts(&auth_id, input).await.ok();
 }
 
-async fn on_notice_created(client: &piteo::Client, notice: &PaymentNotice) {
+async fn on_notice_created(client: &piteo::Client, notice: &Notice) {
     let rent = client.rents().by_notice_id(&notice.id).unwrap();
     let input = SendReceiptsInput {
         rent_ids: vec![rent.id],
