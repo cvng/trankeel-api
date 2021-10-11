@@ -9,8 +9,8 @@ pub struct CreateNoticesPayload {
     notices: Option<Vec<File>>,
 }
 
-impl From<piteo::Result<Vec<piteo::PaymentNotice>>> for CreateNoticesPayload {
-    fn from(item: piteo::Result<Vec<piteo::PaymentNotice>>) -> Self {
+impl From<piteo::Result<Vec<piteo::Notice>>> for CreateNoticesPayload {
+    fn from(item: piteo::Result<Vec<piteo::Notice>>) -> Self {
         match item {
             Ok(res) => Self {
                 errors: None,
