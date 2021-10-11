@@ -50,7 +50,7 @@ use piteo_data::Lease;
 use piteo_data::LeaseId;
 use piteo_data::Lender;
 use piteo_data::Message;
-use piteo_data::PaymentNotice;
+use piteo_data::Notice;
 use piteo_data::Person;
 use piteo_data::Property;
 use piteo_data::PropertyId;
@@ -260,7 +260,7 @@ impl<'a> Client {
         &self,
         auth_id: &AuthId,
         input: CreateNoticesInput,
-    ) -> Result<Vec<PaymentNotice>> {
+    ) -> Result<Vec<Notice>> {
         crate::leases::create_notices(&self.0, auth_id, &self.1, input).await
     }
 
