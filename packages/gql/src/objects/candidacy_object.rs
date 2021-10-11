@@ -36,7 +36,7 @@ impl Candidacy {
         Ok(ctx
             .data_unchecked::<Client>()
             .discussions()
-            .by_subject_id(&self.id)?
+            .by_candidacy_id(&self.id)?
             .into())
     }
 }
