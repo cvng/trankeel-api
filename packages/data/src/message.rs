@@ -1,6 +1,7 @@
 use crate::schema::messages;
 use crate::DateTime;
 use crate::DiscussionId;
+use crate::EventId;
 use crate::Id;
 use crate::PersonId;
 
@@ -13,5 +14,6 @@ pub struct Message {
     pub updated_at: Option<DateTime>,
     pub discussion_id: DiscussionId,
     pub sender_id: PersonId,
-    pub content: String,
+    pub content: Option<String>,
+    pub event_id: Option<EventId>,
 }
