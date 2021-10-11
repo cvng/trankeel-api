@@ -30,9 +30,9 @@ use piteo_data::LenderData;
 use piteo_data::LenderId;
 use piteo_data::LenderWithIdentity;
 use piteo_data::Message;
+use piteo_data::NoticeId;
 use piteo_data::Payment;
 use piteo_data::PaymentId;
-use piteo_data::NoticeId;
 use piteo_data::Person;
 use piteo_data::PersonData;
 use piteo_data::PersonId;
@@ -215,6 +215,7 @@ pub trait DiscussionStore {
     fn by_id(&mut self, id: &DiscussionId) -> Result<Discussion>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Discussion>>;
     fn by_initiator_id(&mut self, person_id: &PersonId) -> Result<Discussion>;
+    fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Discussion>;
     fn create(&mut self, data: Discussion) -> Result<Discussion>;
     fn update(&mut self, data: DiscussionData) -> Result<Discussion>;
     fn delete(&mut self, data: DiscussionId) -> Result<Executed>;
