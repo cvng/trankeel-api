@@ -2,7 +2,7 @@
   "name": "piteo",
   "private": "true",
   "scripts": {
-    "start": "cargo watch -i schema.graphql -x run",
+    "start": "cargo watch --ignore schema.graphql --exec run --clear",
     "build": "cargo build",
     "check": "cargo check",
     "lint": "cargo clippy",
