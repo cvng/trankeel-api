@@ -3,9 +3,8 @@ use crate::Amount;
 use crate::DateTime;
 use crate::Id;
 use crate::LeaseId;
-use crate::PaymentNoticeId;
+use crate::NoticeId;
 use crate::ReceiptId;
-use crate::RentStatus;
 use chrono::Duration;
 use chrono::Utc;
 
@@ -13,7 +12,21 @@ use chrono::Utc;
 
 pub type RentId = Id;
 
-#[derive(Clone, Insertable, Queryable)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[DieselType = "Rentstatus"]
+pub enum RentStatus {
+    Open,
+    Paid,
+    PartiallyPaid,
+}
+
+impl Default for RentStatus {
+    fn default() -> Self {
+        Self::Open
+    }
+}
+
+#[derive(Clone, Insertable, Queryable, SimpleObject)]
 pub struct Rent {
     pub id: RentId,
     pub created_at: Option<DateTime>,
@@ -26,7 +39,7 @@ pub struct Rent {
     pub status: RentStatus,
     pub lease_id: LeaseId,
     pub receipt_id: Option<ReceiptId>,
-    pub notice_id: Option<PaymentNoticeId>,
+    pub notice_id: Option<NoticeId>,
 }
 
 impl Rent {
@@ -51,5 +64,5 @@ pub struct RentData {
     pub status: Option<RentStatus>,
     pub lease_id: Option<LeaseId>,
     pub receipt_id: Option<ReceiptId>,
-    pub notice_id: Option<PaymentNoticeId>,
+    pub notice_id: Option<NoticeId>,
 }
