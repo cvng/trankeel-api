@@ -4,6 +4,7 @@ use piteo_data::AccountId;
 use piteo_data::Candidacy;
 use piteo_data::EventId;
 use piteo_data::EventType;
+use piteo_data::Eventable;
 use piteo_data::EventableId;
 use piteo_data::File;
 use piteo_data::Message;
@@ -40,12 +41,12 @@ impl From<Trace> for EventType {
 
 pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
     let (eventable_id, account_id, participant_id) = match &trace {
-        Trace::CandidacyCreated(candidacy) => on_candidacy_created(db, candidacy)?,
-        Trace::PaymentCreated(payment) => on_payment_created(db, payment)?,
-        Trace::NoticeCreated(file) => on_notice_created(db, file)?,
-        Trace::NoticeSent(file) => on_notice_created(db, file)?,
-        Trace::ReceiptCreated(file) => on_receipt_created(db, file)?,
-        Trace::ReceiptSent(file) => on_receipt_created(db, file)?,
+        Trace::CandidacyCreated(candidacy) => on_candidacy_created(db, candidacy.clone())?,
+        Trace::PaymentCreated(payment) => on_payment_created(db, payment.clone())?,
+        Trace::NoticeCreated(notice) => on_notice_created(db, notice.clone())?,
+        Trace::NoticeSent(notice) => on_notice_created(db, notice.clone())?,
+        Trace::ReceiptCreated(receipt) => on_receipt_created(db, receipt.clone())?,
+        Trace::ReceiptSent(receipt) => on_receipt_created(db, receipt.clone())?,
     };
 
     let event = db.events().create(piteo_data::Event {
@@ -73,30 +74,34 @@ pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
     Ok(trace)
 }
 
-fn on_candidacy_created(db: &impl Db, eventable: &Candidacy) -> Result<Meta> {
-    let account = db.accounts().by_candidacy_id(&eventable.id)?;
-    let participant = db.persons().by_candidacy_id(&eventable.id)?;
+fn on_candidacy_created(db: &impl Db, candidacy: Candidacy) -> Result<Meta> {
+    let account = db.accounts().by_candidacy_id(&candidacy.id)?;
+    let participant = db.persons().by_candidacy_id(&candidacy.id)?;
+    let eventable = db.eventables().create(Eventable::Candidacy(candidacy))?;
 
-    Ok((eventable.id, account.id, participant.id))
+    Ok((eventable.id(), account.id, participant.id))
 }
 
-fn on_payment_created(db: &impl Db, eventable: &Payment) -> Result<Meta> {
-    let account = db.accounts().by_payment_id(&eventable.id)?;
-    let participant = db.persons().by_payment_id(&eventable.id)?;
+fn on_payment_created(db: &impl Db, payment: Payment) -> Result<Meta> {
+    let account = db.accounts().by_payment_id(&payment.id)?;
+    let participant = db.persons().by_payment_id(&payment.id)?;
+    let eventable = db.eventables().create(Eventable::Payment(payment))?;
 
-    Ok((eventable.id, account.id, participant.id))
+    Ok((eventable.id(), account.id, participant.id))
 }
 
-fn on_notice_created(db: &impl Db, eventable: &Notice) -> Result<Meta> {
-    let account = db.accounts().by_notice_id(&eventable.id)?;
-    let participant = db.persons().by_notice_id(&eventable.id)?;
+fn on_notice_created(db: &impl Db, notice: Notice) -> Result<Meta> {
+    let account = db.accounts().by_notice_id(&notice.id)?;
+    let participant = db.persons().by_notice_id(&notice.id)?;
+    let eventable = db.eventables().create(Eventable::File(notice))?;
 
-    Ok((eventable.id, account.id, participant.id))
+    Ok((eventable.id(), account.id, participant.id))
 }
 
-fn on_receipt_created(db: &impl Db, eventable: &Receipt) -> Result<Meta> {
-    let account = db.accounts().by_receipt_id(&eventable.id)?;
-    let participant = db.persons().by_receipt_id(&eventable.id)?;
+fn on_receipt_created(db: &impl Db, receipt: Receipt) -> Result<Meta> {
+    let account = db.accounts().by_receipt_id(&receipt.id)?;
+    let participant = db.persons().by_receipt_id(&receipt.id)?;
+    let eventable = db.eventables().create(Eventable::File(receipt))?;
 
-    Ok((eventable.id, account.id, participant.id))
+    Ok((eventable.id(), account.id, participant.id))
 }
