@@ -23,6 +23,17 @@ pub enum Eventable {
     Candidacy(Candidacy),
 }
 
+impl Eventable {
+    pub fn id(&self) -> EventableId {
+        match self {
+            Self::File(inner) => inner.id,
+            Self::Rent(inner) => inner.id,
+            Self::Payment(inner) => inner.id,
+            Self::Candidacy(inner) => inner.id,
+        }
+    }
+}
+
 impl From<EventableRow> for Eventable {
     fn from(item: EventableRow) -> Self {
         None.or_else(|| item.1.clone().map(Self::File))
