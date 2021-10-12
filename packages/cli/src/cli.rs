@@ -58,6 +58,7 @@ async fn seed() {
                 country: None,
                 line2: None,
             }),
+            phone_number: None,
             skip_create_customer: Some(true),
         })
         .await
