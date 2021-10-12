@@ -109,7 +109,7 @@ async fn seed() {
                 apl: None,
                 birthdate: Some(Utc::now().date().naive_utc().into()),
                 birthplace: None,
-                email: author.email,
+                email: "tenant@piteo.dev".into(),
                 first_name: "Tenant".into(),
                 last_name: "PITEO".into(),
                 note: None,
