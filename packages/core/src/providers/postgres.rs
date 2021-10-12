@@ -53,6 +53,7 @@ use piteo_data::DiscussionItemRow;
 use piteo_data::Event;
 use piteo_data::EventId;
 use piteo_data::EventWithEventable;
+use piteo_data::Eventable;
 use piteo_data::EventableRow;
 use piteo_data::ExternalId;
 use piteo_data::File;
@@ -171,6 +172,10 @@ impl Db for Pg {
         Box::new(EventStore(&self.0))
     }
 
+    fn eventables(&self) -> Box<dyn database::EventableStore + '_> {
+        Box::new(EventableStore(&self.0))
+    }
+
     fn reports(&self) -> Box<dyn database::ReportStore + '_> {
         Box::new(ReportStore(&self.0))
     }
@@ -187,6 +192,8 @@ impl Db for Pg {
 pub struct AccountStore<'a>(pub &'a PgPool);
 
 pub struct EventStore<'a>(pub &'a PgPool);
+
+pub struct EventableStore<'a>(pub &'a PgPool);
 
 pub struct PersonStore<'a>(pub &'a PgPool);
 
@@ -860,6 +867,26 @@ impl database::EventStore for EventStore<'_> {
         Ok(insert_into(events::table)
             .values(data)
             .get_result(&self.0.get()?)?)
+    }
+}
+
+impl database::EventableStore for EventableStore<'_> {
+    fn create(&mut self, data: Eventable) -> Result<Eventable> {
+        match &data {
+            Eventable::File(file) => insert_into(eventables::table)
+                .values(eventables::file_id.eq(file.id))
+                .execute(&self.0.get()?)?,
+            Eventable::Rent(rent) => insert_into(eventables::table)
+                .values(eventables::rent_id.eq(rent.id))
+                .execute(&self.0.get()?)?,
+            Eventable::Payment(payment) => insert_into(eventables::table)
+                .values(eventables::payment_id.eq(payment.id))
+                .execute(&self.0.get()?)?,
+            Eventable::Candidacy(candidacy) => insert_into(eventables::table)
+                .values(eventables::candidacy_id.eq(candidacy.id))
+                .execute(&self.0.get()?)?,
+        };
+        Ok(data)
     }
 }
 
