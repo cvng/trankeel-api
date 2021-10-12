@@ -18,6 +18,7 @@ use piteo_data::DiscussionItem;
 use piteo_data::Event;
 use piteo_data::EventId;
 use piteo_data::EventWithEventable;
+use piteo_data::Eventable;
 use piteo_data::ExternalId;
 use piteo_data::File;
 use piteo_data::FileData;
@@ -73,6 +74,7 @@ pub trait Db {
     fn payments(&self) -> Box<dyn PaymentStore + '_>;
     fn plans(&self) -> Box<dyn PlanStore + '_>;
     fn events(&self) -> Box<dyn EventStore + '_>;
+    fn eventables(&self) -> Box<dyn EventableStore + '_>;
     fn reports(&self) -> Box<dyn ReportStore + '_>;
     fn discussions(&self) -> Box<dyn DiscussionStore + '_>;
     fn messages(&self) -> Box<dyn MessageStore + '_>;
@@ -205,6 +207,10 @@ pub trait EventStore {
     fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>>;
     fn create(&mut self, data: Event) -> Result<Event>;
+}
+
+pub trait EventableStore {
+    fn create(&mut self, data: Eventable) -> Result<Eventable>;
 }
 
 pub trait ReportStore {
