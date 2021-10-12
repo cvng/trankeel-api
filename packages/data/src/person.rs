@@ -42,6 +42,7 @@ pub struct PersonData {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub address: Option<Address>,
+    pub phone_number: Option<PhoneNumber>,
 }
 
 // # Impls

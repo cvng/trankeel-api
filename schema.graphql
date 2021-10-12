@@ -867,6 +867,7 @@ input UserWithAccountInput {
 	email: String!
 	firstName: String!
 	lastName: String!
+	phoneNumber: String
 	skipCreateCustomer: Boolean
 }
 type Warrant {

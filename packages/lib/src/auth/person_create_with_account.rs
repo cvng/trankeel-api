@@ -36,6 +36,7 @@ pub struct CreateUserWithAccountInput {
     pub email: String, // Email,
     pub first_name: String,
     pub last_name: String,
+    pub phone_number: Option<String>,
     pub skip_create_customer: Option<bool>,
 }
 
@@ -72,7 +73,7 @@ pub async fn create_user_with_account(
         address: input.address.map(Into::into),
         photo_url: None,
         role: PersonRole::User,
-        phone_number: None,
+        phone_number: input.phone_number.map(Into::into),
         account_id: account.id,
     })?;
 
