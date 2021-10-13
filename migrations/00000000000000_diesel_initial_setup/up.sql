@@ -39,12 +39,13 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION app_set_id() RETURNS trigger AS $$
 DECLARE
-    _cols TEXT[] := ARRAY(
-        SELECT column_name
-        FROM information_schema.columns
-        WHERE table_name = TG_TABLE_NAME
-    );
+    _cols TEXT[];
 BEGIN
+    SELECT array_agg(column_name::TEXT)
+    FROM information_schema.columns
+    WHERE table_name = TG_TABLE_NAME
+    INTO _cols;
+
     EXECUTE format('SELECT coalesce(%s)
                     FROM (SELECT $1.*) AS NEW', array_to_string(_cols, ','))
     USING NEW
