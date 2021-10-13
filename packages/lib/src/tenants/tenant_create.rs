@@ -196,8 +196,9 @@ fn start_discussion_with_lender(
     // In the context of a candidacy, the recipient is the account owner.
     let recipient = db
         .persons()
-        .by_account_id(&account.id)
-        .map(|persons| persons.first().cloned())?
+        .by_account_id(&account.id)?
+        .first()
+        .cloned()
         .ok_or_else(|| Error::msg("recipient not found"))?;
 
     create_discussion_unauthenticated(
