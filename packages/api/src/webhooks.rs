@@ -86,8 +86,9 @@ async fn on_notice_created(client: &piteo::Client, notice: &Notice) {
     let user = client
         .persons()
         .by_account_id(&lease.account_id)
-        .map(|users| users.first().cloned())
         .unwrap()
+        .first()
+        .cloned()
         .unwrap();
     let auth_id = user.auth_id.unwrap();
 
