@@ -22,7 +22,8 @@ pub fn push_message(db: &impl Db, input: PushMessageInput) -> Result<Message> {
         updated_at: Default::default(),
         discussion_id: input.discussion_id,
         sender_id: input.sender_id,
-        content: input.message,
+        content: Some(input.message),
+        event_id: None,
     })?;
 
     db.discussions().touch(input.discussion_id)?; // Touch updated_at.

@@ -1,15 +1,14 @@
 use super::Message;
 use super::Person;
-use crate::unions::DiscussionSubject;
+use crate::unions::DiscussionItem;
 use async_graphql::Context;
 use async_graphql::Result;
 use piteo::AccountId;
 use piteo::Client;
 use piteo::DateTime;
 use piteo::DiscussionId;
-use piteo::DiscussionType;
+use piteo::DiscussionStatus;
 use piteo::PersonId;
-use piteo::SubjectId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -19,8 +18,7 @@ pub struct Discussion {
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
     pub initiator_id: PersonId,
-    pub subject_id: Option<SubjectId>,
-    pub type_: DiscussionType,
+    pub status: DiscussionStatus,
 }
 
 #[async_graphql::ComplexObject]
@@ -33,12 +31,14 @@ impl Discussion {
             .into())
     }
 
-    async fn subject(&self, ctx: &Context<'_>) -> Result<Option<DiscussionSubject>> {
+    async fn items(&self, ctx: &Context<'_>) -> Result<Vec<DiscussionItem>> {
         Ok(ctx
             .data_unchecked::<Client>()
             .discussions()
-            .related_subject(&self.id)?
-            .map(Into::into))
+            .related_items(&self.id)?
+            .into_iter()
+            .map(Into::into)
+            .collect())
     }
 
     async fn snippet(&self, ctx: &Context<'_>) -> Result<Option<Message>> {
@@ -70,8 +70,7 @@ impl From<piteo::Discussion> for Discussion {
             updated_at: item.updated_at,
             account_id: item.account_id,
             initiator_id: item.initiator_id,
-            subject_id: item.subject_id,
-            type_: item.type_,
+            status: item.status,
         }
     }
 }

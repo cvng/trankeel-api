@@ -6,7 +6,6 @@ use crate::DateTime;
 use crate::Email;
 use crate::Id;
 use crate::Name;
-use crate::PersonRole;
 use crate::PhoneNumber;
 use crate::Url;
 use std::fmt;
@@ -15,6 +14,23 @@ use std::fmt::Display;
 // # Types
 
 pub type PersonId = Id;
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[graphql(name = "UserRole")]
+#[DieselType = "Personrole"]
+pub enum PersonRole {
+    Admin,
+    Tenant,
+    User,
+    Viewer,
+    Warrant,
+}
+
+impl Default for PersonRole {
+    fn default() -> Self {
+        Self::Viewer
+    }
+}
 
 #[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Person {

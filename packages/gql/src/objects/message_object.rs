@@ -1,9 +1,11 @@
+use super::Event;
 use super::Person;
 use async_graphql::Context;
 use async_graphql::Result;
 use piteo::Client;
 use piteo::DateTime;
 use piteo::DiscussionId;
+use piteo::EventId;
 use piteo::MessageId;
 use piteo::PersonId;
 
@@ -15,7 +17,8 @@ pub struct Message {
     pub updated_at: Option<DateTime>,
     pub discussion_id: DiscussionId,
     pub sender_id: PersonId,
-    pub content: String,
+    pub content: Option<String>,
+    pub event_id: Option<EventId>,
 }
 
 #[async_graphql::ComplexObject]
@@ -26,6 +29,18 @@ impl Message {
             .persons()
             .by_id(&self.sender_id)?
             .into())
+    }
+
+    async fn event(&self, ctx: &Context<'_>) -> Result<Option<Event>> {
+        Ok(self
+            .event_id
+            .map(|event_id| {
+                ctx.data_unchecked::<Client>()
+                    .events()
+                    .by_id(&event_id)
+                    .ok()
+            })
+            .and_then(|event| event.map(Into::into)))
     }
 }
 
@@ -38,6 +53,7 @@ impl From<piteo::Message> for Message {
             discussion_id: item.discussion_id,
             sender_id: item.sender_id,
             content: item.content,
+            event_id: item.event_id,
         }
     }
 }

@@ -1,5 +1,6 @@
 use crate::objects::Candidacy;
 use crate::objects::Company;
+use crate::objects::File;
 use crate::objects::FurnishedLeaseDetails;
 use crate::objects::Payment;
 use crate::objects::Person;
@@ -7,29 +8,33 @@ use crate::objects::ProfessionalWarrant;
 use crate::objects::Rent;
 
 #[derive(Union)]
-pub enum DiscussionSubject {
+pub enum DiscussionItem {
     Candidacy(Candidacy),
 }
 
-impl From<piteo::DiscussionSubject> for DiscussionSubject {
-    fn from(item: piteo::DiscussionSubject) -> Self {
+impl From<piteo::DiscussionItem> for DiscussionItem {
+    fn from(item: piteo::DiscussionItem) -> Self {
         match item {
-            piteo::DiscussionSubject::Candidacy(inner) => Self::Candidacy(inner.into()),
+            piteo::DiscussionItem::Candidacy(inner) => Self::Candidacy(inner.into()),
         }
     }
 }
 
 #[derive(Union)]
 pub enum Eventable {
+    File(File),
     Rent(Rent),
     Payment(Payment),
+    Candidacy(Candidacy),
 }
 
 impl From<piteo::Eventable> for Eventable {
     fn from(item: piteo::Eventable) -> Self {
         match item {
+            piteo::Eventable::File(inner) => Self::File(inner.into()),
             piteo::Eventable::Rent(inner) => Self::Rent(inner.into()),
             piteo::Eventable::Payment(inner) => Self::Payment(inner.into()),
+            piteo::Eventable::Candidacy(inner) => Self::Candidacy(inner.into()),
         }
     }
 }

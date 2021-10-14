@@ -1,12 +1,16 @@
 use crate::candidacies::CreateWarrantInput;
 use crate::error::Error;
 use crate::error::Result;
+use crate::messaging::create_discussion_unauthenticated;
 use crate::AuthId;
+use crate::CreateDiscussionInput;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
+use piteo_data::Account;
 use piteo_data::AccountId;
+use piteo_data::Discussion;
 use piteo_data::Person;
 use piteo_data::PersonId;
 use piteo_data::PersonRole;
@@ -46,20 +50,20 @@ pub fn create_tenant(
     db: &impl Db,
     auth_id: &AuthId,
     input: CreateTenantInput,
-    account_id: Option<AccountId>,
+    account: Option<Account>,
 ) -> Result<Tenant> {
     input.validate()?;
 
-    let account_id = match account_id {
-        Some(account_id) => account_id,
-        None => db.accounts().by_auth_id(auth_id)?.id,
+    let account = match account {
+        Some(account) => account,
+        None => db.accounts().by_auth_id(auth_id)?,
     };
 
     let person = db.persons().create(Person {
         id: PersonId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
-        account_id,
+        account_id: account.id,
         auth_id: None, // Not authenticable when created.
         email: input.email.clone().into(),
         first_name: input.first_name.clone(),
@@ -74,7 +78,7 @@ pub fn create_tenant(
         id: TenantId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
-        account_id,
+        account_id: account.id,
         person_id: person.id,
         apl: input.apl,
         birthdate: input.birthdate,
@@ -90,8 +94,10 @@ pub fn create_tenant(
     })?;
 
     if let Some(warrant_inputs) = input.warrants {
-        add_tenant_warrants(db, &tenant.id, &account_id, warrant_inputs)?;
+        add_tenant_warrants(db, &tenant.id, &account.id, warrant_inputs)?;
     }
+
+    start_discussion_with_lender(db, &account, &person)?;
 
     Ok(tenant)
 }
@@ -180,4 +186,27 @@ fn add_tenant_warrants(
     }
 
     Ok(warrants)
+}
+
+fn start_discussion_with_lender(
+    db: &impl Db,
+    account: &Account,
+    initiator: &Person,
+) -> Result<Discussion> {
+    // In the context of a candidacy, the recipient is the account owner.
+    let recipient = db
+        .persons()
+        .by_account_id(&account.id)?
+        .first()
+        .cloned()
+        .ok_or_else(|| Error::msg("recipient not found"))?;
+
+    create_discussion_unauthenticated(
+        db,
+        CreateDiscussionInput {
+            initiator_id: initiator.id,
+            recipient_id: recipient.id,
+            message: None,
+        },
+    )
 }

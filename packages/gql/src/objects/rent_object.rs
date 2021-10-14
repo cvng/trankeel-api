@@ -7,7 +7,7 @@ use piteo::Amount;
 use piteo::Client;
 use piteo::DateTime;
 use piteo::LeaseId;
-use piteo::PaymentNoticeId;
+use piteo::NoticeId;
 use piteo::ReceiptId;
 use piteo::RentId;
 
@@ -43,7 +43,7 @@ pub struct Rent {
     pub status: RentStatus,
     pub lease_id: LeaseId,
     pub receipt_id: Option<ReceiptId>,
-    pub notice_id: Option<PaymentNoticeId>,
+    pub notice_id: Option<NoticeId>,
     //
     pub delay: i64,
 }
@@ -70,16 +70,15 @@ impl Rent {
     }
 
     async fn receipt(&self, ctx: &Context<'_>) -> Result<Option<File>> {
-        if let Some(receipt_id) = self.receipt_id {
-            Ok(ctx
-                .data_unchecked::<Client>()
-                .files()
-                .by_id(&receipt_id)
-                .ok()
-                .map(Into::into))
-        } else {
-            Ok(None)
-        }
+        Ok(self
+            .receipt_id
+            .map(|receipt_id| {
+                ctx.data_unchecked::<Client>()
+                    .files()
+                    .by_id(&receipt_id)
+                    .ok()
+            })
+            .and_then(|receipt| receipt.map(Into::into)))
     }
 }
 

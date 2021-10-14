@@ -5,7 +5,6 @@ use crate::Amount;
 use crate::DateTime;
 use crate::Id;
 use crate::LenderId;
-use crate::PropertyStatus;
 
 // # Types
 
@@ -70,6 +69,22 @@ pub enum PropertyHabitationUsageType {
 pub enum PropertyUsageType {
     Collective,
     Individual,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[DieselType = "Propertystatus"]
+pub enum PropertyStatus {
+    ForSale,
+    Inactive,
+    Rented,
+    UnderConstruction,
+    Unrented,
+}
+
+impl Default for PropertyStatus {
+    fn default() -> Self {
+        Self::Unrented
+    }
 }
 
 #[derive(Clone, Debug, Insertable, Queryable)]

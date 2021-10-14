@@ -1,5 +1,4 @@
 use crate::schema::accounts;
-use crate::AccountStatus;
 use crate::CustomerId;
 use crate::DateTime;
 use crate::Id;
@@ -9,6 +8,26 @@ use crate::SubscriptionId;
 // # Types
 
 pub type AccountId = Id;
+
+/// https://stripe.com/docs/billing/subscriptions/overview
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[graphql(name = "SubscriptionStatus")]
+#[DieselType = "Accountstatus"]
+pub enum AccountStatus {
+    Active,
+    Canceled,
+    Incomplete,
+    IncompleteExpired,
+    PastDue,
+    Trialing,
+    Unpaid,
+}
+
+impl Default for AccountStatus {
+    fn default() -> Self {
+        Self::Trialing
+    }
+}
 
 #[derive(Clone, Insertable, Queryable)]
 pub struct Account {

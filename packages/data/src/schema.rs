@@ -85,9 +85,21 @@ table! {
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
         initiator_id -> Uuid,
-        subject_id -> Nullable<Uuid>,
-        #[sql_name = "type"]
-        type_ -> Text,
+        status -> Discussionstatus,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    #[allow(unused_imports)]
+    use crate::sql_types::*;
+
+    eventables (id) {
+        id -> Uuid,
+        file_id -> Nullable<Uuid>,
+        rent_id -> Nullable<Uuid>,
+        payment_id -> Nullable<Uuid>,
+        candidacy_id -> Nullable<Uuid>,
     }
 }
 
@@ -101,10 +113,10 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
+        participant_id -> Uuid,
         eventable_id -> Uuid,
-        eventable_type -> Text,
         #[sql_name = "type"]
-        type_ -> Text,
+        type_ -> Eventtype,
     }
 }
 
@@ -179,7 +191,8 @@ table! {
         updated_at -> Nullable<Timestamptz>,
         discussion_id -> Uuid,
         sender_id -> Uuid,
-        content -> Text,
+        content -> Nullable<Text>,
+        event_id -> Nullable<Uuid>,
     }
 }
 
@@ -354,7 +367,13 @@ joinable!(candidacies -> advertisements (advertisement_id));
 joinable!(candidacies -> tenants (tenant_id));
 joinable!(discussions -> accounts (account_id));
 joinable!(discussions -> persons (initiator_id));
+joinable!(eventables -> candidacies (candidacy_id));
+joinable!(eventables -> files (file_id));
+joinable!(eventables -> payments (payment_id));
+joinable!(eventables -> rents (rent_id));
 joinable!(events -> accounts (account_id));
+joinable!(events -> eventables (eventable_id));
+joinable!(events -> persons (participant_id));
 joinable!(leases -> accounts (account_id));
 joinable!(leases -> files (lease_id));
 joinable!(leases -> properties (property_id));
@@ -362,6 +381,7 @@ joinable!(lenders -> accounts (account_id));
 joinable!(lenders -> companies (company_id));
 joinable!(lenders -> persons (individual_id));
 joinable!(messages -> discussions (discussion_id));
+joinable!(messages -> events (event_id));
 joinable!(messages -> persons (sender_id));
 joinable!(payments -> rents (rent_id));
 joinable!(persons -> accounts (account_id));
@@ -381,6 +401,7 @@ allow_tables_to_appear_in_same_query!(
     candidacies,
     companies,
     discussions,
+    eventables,
     events,
     files,
     leases,

@@ -19,7 +19,7 @@ pub enum TransactionType {
     Rent,
 }
 
-#[derive(Clone, Insertable, Queryable)]
+#[derive(Clone, Insertable, Queryable, SimpleObject)]
 pub struct Payment {
     pub id: PaymentId,
     pub created_at: Option<DateTime>,

@@ -1,14 +1,14 @@
 use crate::auth::CreatePersonInput;
 use crate::error::Result;
 use crate::files::CreateFileInput;
-use crate::messaging::create_discussion_unauthenticated;
+use crate::messaging::push_message;
 use crate::tenants::create_tenant;
 use crate::tenants::CreateTenantInput;
-use crate::CreateDiscussionInput;
+use crate::PushMessageInput;
 use async_graphql::InputObject;
+use piteo_core::activity::trace;
+use piteo_core::activity::Trace;
 use piteo_core::database::Db;
-use piteo_core::error::Error;
-use piteo_data::Account;
 use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
@@ -16,7 +16,8 @@ use piteo_data::CandidacyId;
 use piteo_data::CandidacyStatus;
 use piteo_data::Date;
 use piteo_data::DateTime;
-use piteo_data::Discussion;
+use piteo_data::DiscussionData;
+use piteo_data::DiscussionStatus;
 use piteo_data::PhoneNumber;
 use piteo_data::TenantData;
 use piteo_data::TenantStatus;
@@ -60,11 +61,11 @@ pub fn create_candidacy(db: &impl Db, input: CreateCandidacyInput) -> Result<Can
     input.validate()?;
 
     let account = db.accounts().by_advertisement_id(&input.advertisement_id)?;
-    let no_auth_id = &AuthId::new("".into()); // No auth_id on this endpoint.
+    let no_auth_id = AuthId::new("".into()); // No auth_id on this endpoint.
 
     let tenant = create_tenant(
         db,
-        no_auth_id,
+        &no_auth_id,
         CreateTenantInput {
             apl: None,
             birthdate: Some(input.birthdate),
@@ -77,7 +78,7 @@ pub fn create_candidacy(db: &impl Db, input: CreateCandidacyInput) -> Result<Can
             is_student: Some(input.is_student),
             warrants: input.warrants,
         },
-        Some(account.id),
+        Some(account),
     )?;
 
     db.tenants().update(TenantData {
@@ -94,36 +95,27 @@ pub fn create_candidacy(db: &impl Db, input: CreateCandidacyInput) -> Result<Can
         advertisement_id: input.advertisement_id,
         tenant_id: tenant.id,
         move_in_date: input.move_in_date,
-        description: input.description.clone(),
+        description: input.description,
     })?;
 
-    start_discussion_with_lender(db, &account, &candidacy, input.description)?;
+    trace(db, Trace::CandidacyCreated(candidacy.clone())).ok();
+
+    let discussion = db.discussions().by_initiator_id(&tenant.person_id)?;
+
+    let discussion = db.discussions().update(DiscussionData {
+        id: discussion.id,
+        status: Some(DiscussionStatus::Candidacy),
+        ..Default::default()
+    })?;
+
+    push_message(
+        db,
+        PushMessageInput {
+            discussion_id: discussion.id,
+            sender_id: tenant.person_id,
+            message: candidacy.description.clone(),
+        },
+    )?;
 
     Ok(candidacy)
-}
-
-fn start_discussion_with_lender(
-    db: &impl Db,
-    account: &Account,
-    candidacy: &Candidacy,
-    message: String,
-) -> Result<Discussion> {
-    let initiator = db.persons().by_candidacy_id(&candidacy.id)?;
-
-    // In the context of a candidacy, the recipient is the account owner.
-    let recipient = db
-        .persons()
-        .by_account_id(&account.id)
-        .map(|persons| persons.first().cloned())?
-        .ok_or_else(|| Error::msg("recipient not found"))?;
-
-    create_discussion_unauthenticated(
-        db,
-        CreateDiscussionInput {
-            initiator_id: initiator.id,
-            recipient_id: recipient.id,
-            subject_id: Some(candidacy.id),
-            message,
-        },
-    )
 }

@@ -146,17 +146,16 @@ type Discussion {
 	updatedAt: DateTime
 	accountId: ID!
 	initiatorId: ID!
-	subjectId: ID
-	type: DiscussionType!
+	status: DiscussionStatus!
 	initiator: Person!
-	subject: DiscussionSubject
+	items: [DiscussionItem!]!
 	snippet: Message
 	messages: [Message!]!
 }
-union DiscussionSubject = | Candidacy
-enum DiscussionType {
+union DiscussionItem = | Candidacy
+enum DiscussionStatus {
+	ACTIVE
 	CANDIDACY
-	NORMAL
 }
 scalar Email
 type Error {
@@ -168,22 +167,18 @@ type Event {
 	updatedAt: DateTime
 	accountId: ID!
 	eventableId: ID!
-	eventableType: EventableType!
 	type: EventType!
 	object: Eventable!
 }
 enum EventType {
+	CANDIDACY_CREATED
 	PAYMENT_NOTICE_CREATED
 	PAYMENT_NOTICE_SENT
 	RENT_RECEIPT_CREATED
 	RENT_RECEIPT_SENT
 	TRANSACTION_CREATED
 }
-union Eventable = | Rent | Transaction
-enum EventableType {
-	RENT
-	PAYMENT
-}
+union Eventable = | File | Rent | Transaction | Candidacy
 type Feature {
 	available: Boolean!
 	title: String!
@@ -427,8 +422,10 @@ type Message {
 	updatedAt: DateTime
 	discussionId: ID!
 	senderId: ID!
-	content: String!
+	content: String
+	eventId: ID
 	sender: Person!
+	event: Event
 }
 type Mutation {
 	userCreateWithAccount(input: UserWithAccountInput!): Person!
@@ -458,7 +455,7 @@ type Mutation {
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime

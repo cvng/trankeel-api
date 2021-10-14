@@ -7,7 +7,6 @@ use piteo::DateTime;
 use piteo::EventId;
 use piteo::EventType;
 use piteo::EventableId;
-use piteo::EventableType;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -17,7 +16,6 @@ pub struct Event {
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
     pub eventable_id: EventableId,
-    pub eventable_type: EventableType,
     pub type_: EventType,
 }
 
@@ -41,7 +39,6 @@ impl From<piteo::Event> for Event {
             updated_at: item.updated_at,
             account_id: item.account_id,
             eventable_id: item.eventable_id,
-            eventable_type: item.eventable_type,
             type_: item.type_,
         }
     }
