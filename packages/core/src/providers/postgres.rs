@@ -978,6 +978,7 @@ impl database::MessageStore for MessageStore<'_> {
     fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Vec<Message>> {
         Ok(messages::table
             .filter(messages::discussion_id.eq(discussion_id))
+            .order(messages::created_at.desc())
             .load(&self.0.get()?)?)
     }
 
