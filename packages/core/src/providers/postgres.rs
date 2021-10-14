@@ -959,7 +959,10 @@ impl database::DiscussionStore for DiscussionStore<'_> {
             .filter(discussions::id.eq(id))
             .load::<DiscussionItemRow>(&self.0.get()?)?
             .into_iter()
-            .map(Into::into)
+            .filter_map(|row| match row {
+                (Some(candidacy),) => Some(candidacy.into()),
+                _ => None,
+            })
             .collect())
     }
 
