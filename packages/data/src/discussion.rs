@@ -29,10 +29,9 @@ pub enum DiscussionItem {
     Candidacy(Candidacy),
 }
 
-impl From<DiscussionItemRow> for DiscussionItem {
-    fn from(item: DiscussionItemRow) -> Self {
-        None.or_else(|| item.0.clone().map(Self::Candidacy))
-            .unwrap()
+impl From<Candidacy> for DiscussionItem {
+    fn from(item: Candidacy) -> Self {
+        Self::Candidacy(item)
     }
 }
 
