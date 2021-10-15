@@ -1,1 +1,2 @@
 DROP TABLE IF EXISTS plans;
+DROP TYPE IF EXISTS plancode;

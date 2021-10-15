@@ -11,7 +11,8 @@ pub type WarrantId = Id;
 
 pub type WarrantWithIdentity = (Warrant, WarrantIdentity);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
+#[DieselType = "Warranttype"]
 pub enum WarrantType {
     Person,
     Visale,

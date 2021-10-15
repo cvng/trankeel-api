@@ -10,7 +10,8 @@ use crate::LenderId;
 
 pub type PropertyId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[DieselType = "Propertyroomtype"]
 pub enum PropertyRoomType {
     Other,
     T1,
@@ -22,16 +23,23 @@ pub enum PropertyRoomType {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[DieselType = "Propertybuildperiodtype"]
 pub enum PropertyBuildPeriodType {
-    BeforeY1949,
-    FromY1949_Y1974,
-    FromY1975_Y1989,
-    FromY1990_Y2005,
-    FromY2005,
+    #[graphql(name = "BEFORE_Y1949")]
+    Before_1949,
+    #[graphql(name = "FROM_Y1949_Y1974")]
+    From_1949_1974,
+    #[graphql(name = "FROM_Y1975_Y1989")]
+    From_1975_1989,
+    #[graphql(name = "FROM_Y1990_Y2005")]
+    From_1990_2005,
+    #[graphql(name = "FROM_Y2005")]
+    From_2005,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[DieselType = "Propertyenergyclass"]
 pub enum PropertyEnergyClass {
     A,
     B,
@@ -42,7 +50,8 @@ pub enum PropertyEnergyClass {
     G,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[DieselType = "Propertygasemission"]
 pub enum PropertyGasEmission {
     A,
     B,
@@ -53,19 +62,22 @@ pub enum PropertyGasEmission {
     G,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[DieselType = "Propertybuildinglegalstatus"]
 pub enum PropertyBuildingLegalStatus {
     Copro,
     Mono,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[DieselType = "Propertyhabitationusagetype"]
 pub enum PropertyHabitationUsageType {
     Habitation,
     Mixte,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[DieselType = "Propertyusagetype"]
 pub enum PropertyUsageType {
     Collective,
     Individual,

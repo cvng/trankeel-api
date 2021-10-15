@@ -1,4 +1,8 @@
-CREATE TYPE rentstatus AS ENUM ('open', 'paid', 'partially_paid');
+CREATE TYPE rentstatus AS ENUM (
+    'open',
+    'paid',
+    'partially_paid'
+);
 
 CREATE TABLE rents (
     id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,

@@ -1,4 +1,10 @@
-CREATE TYPE personrole AS ENUM ('admin', 'user', 'viewer', 'tenant', 'warrant');
+CREATE TYPE personrole AS ENUM (
+    'admin',
+    'user',
+    'viewer',
+    'tenant',
+    'warrant'
+);
 
 CREATE TABLE persons (
     id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,

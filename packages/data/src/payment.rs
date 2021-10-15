@@ -8,7 +8,8 @@ use crate::RentId;
 
 pub type PaymentId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[DieselType = "Transactiontype"]
 pub enum TransactionType {
     InsuranceHab,
     InsurancePno,

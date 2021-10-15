@@ -1,2 +1,9 @@
 DROP TABLE IF EXISTS properties;
+DROP TYPE IF EXISTS propertyusagetype;
+DROP TYPE IF EXISTS propertyhabitationusagetype;
+DROP TYPE IF EXISTS propertybuildinglegalstatus;
+DROP TYPE IF EXISTS propertygasemission;
+DROP TYPE IF EXISTS propertyenergyclass;
+DROP TYPE IF EXISTS propertybuildperiodtype;
+DROP TYPE IF EXISTS propertyroomtype;
 DROP TYPE IF EXISTS propertystatus;

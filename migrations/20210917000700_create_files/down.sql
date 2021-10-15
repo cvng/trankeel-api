@@ -1,1 +1,3 @@
 DROP TABLE IF EXISTS files;
+DROP TYPE IF EXISTS filetype;
+DROP TYPE IF EXISTS filestatus;

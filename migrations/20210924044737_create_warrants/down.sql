@@ -1,1 +1,2 @@
 DROP TABLE IF EXISTS warrants;
+DROP TYPE IF EXISTS warranttype;

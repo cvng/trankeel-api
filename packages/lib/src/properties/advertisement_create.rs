@@ -6,9 +6,9 @@ use piteo_data::AdvertisementId;
 use piteo_data::Amount;
 use piteo_data::AuthId;
 use piteo_data::DateTime;
+use piteo_data::EntryFlexibility;
 use piteo_data::LeaseId;
 use piteo_data::LeaseType;
-use piteo_data::LenderFlexibility;
 use piteo_data::PropertyId;
 use validator::Validate;
 
@@ -22,7 +22,7 @@ pub struct CreateAdvertisementInput {
     pub rent_charges_amount: Option<Amount>,
     pub deposit_amount: Option<Amount>,
     pub effect_date: DateTime,
-    pub flexibility: Option<LenderFlexibility>,
+    pub flexibility: Option<EntryFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: PropertyId,
     pub title: String,

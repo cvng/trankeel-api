@@ -1,1 +1,3 @@
 DROP TABLE IF EXISTS leases;
+DROP TYPE IF EXISTS leaseduration;
+DROP TYPE IF EXISTS leasetype;

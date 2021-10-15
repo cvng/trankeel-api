@@ -4,12 +4,20 @@ use crate::DateTime;
 use crate::Id;
 use crate::LeaseId;
 use crate::LeaseType;
-use crate::LenderFlexibility;
 use crate::PropertyId;
 
 // # Types
 
 pub type AdvertisementId = Id;
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[DieselType = "Entryflexibility"]
+#[graphql(name = "LenderFlexibility")]
+pub enum EntryFlexibility {
+    OneDay,
+    ThreeDays,
+    SevenDays,
+}
 
 #[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Advertisement {
@@ -22,7 +30,7 @@ pub struct Advertisement {
     pub rent_charges_amount: Option<Amount>,
     pub deposit_amount: Option<Amount>,
     pub effect_date: DateTime,
-    pub flexibility: Option<LenderFlexibility>,
+    pub flexibility: Option<EntryFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: PropertyId,
     pub title: String,
@@ -39,7 +47,7 @@ pub struct AdvertisementData {
     pub rent_charges_amount: Option<Amount>,
     pub deposit_amount: Option<Amount>,
     pub effect_date: Option<DateTime>,
-    pub flexibility: Option<LenderFlexibility>,
+    pub flexibility: Option<EntryFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: Option<PropertyId>,
     pub title: Option<String>,
