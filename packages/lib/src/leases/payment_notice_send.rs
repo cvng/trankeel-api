@@ -1,5 +1,5 @@
-use crate::documents::NoticeDocument;
 use crate::error::Result;
+use crate::templates::NoticeDocument;
 use async_graphql::InputObject;
 use chrono::Utc;
 use piteo_core::activity::trace;

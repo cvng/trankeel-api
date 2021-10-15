@@ -7,3 +7,5 @@ edition = "2018"
 
 [dependencies]
 chrono = { version = "0.4.19", default-features = false }
+serde = "1.0"
+toml = "0.5.8"

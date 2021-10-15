@@ -11,10 +11,11 @@ use piteo_data::Receipt;
 use piteo_data::Rent;
 use piteo_data::Tenant;
 use piteo_data::Url;
+use piteo_kit::config::config;
 use piteo_kit::locale;
 use serde::Serialize;
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct ReceiptMail {
     is_receipt: bool,
 
@@ -84,7 +85,11 @@ impl ReceiptMail {
 
 impl IntoMail for ReceiptMail {
     fn template_id(&self) -> u32 {
-        1 // https://my.sendinblue.com/camp/template/1/message-setup
+        config()
+            .templates("receipt_mail")
+            .unwrap()
+            .parse::<u32>()
+            .unwrap()
     }
 
     fn subject(&self) -> String {
@@ -99,5 +104,36 @@ impl IntoMail for ReceiptMail {
 
     fn recipients(&self) -> Vec<Contact> {
         self._recipients.clone()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::templates::parse_template;
+
+    #[test]
+    fn test_receipt_mail() {
+        let text = include_str!("../../../../templates/receipt_mail.html");
+        let mail = ReceiptMail::default();
+
+        parse_template(text)
+            .unwrap()
+            .render(&liquid::object!({
+                "params": {
+                    "is_receipt": mail.is_receipt,
+                    "name": mail.name,
+                    "amount": mail.amount,
+                    "charges_amount": mail.charges_amount,
+                    "full_amount": mail.full_amount,
+                    "period_month": mail.period_month,
+                    "period_start": mail.period_start,
+                    "period_end": mail.period_end,
+                    "download_url": mail.download_url,
+                    "file_id": mail.file_id,
+                    "date": mail.date,
+                },
+            }))
+            .unwrap();
     }
 }
