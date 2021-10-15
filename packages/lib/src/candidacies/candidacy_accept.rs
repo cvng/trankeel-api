@@ -29,7 +29,12 @@ pub fn accept_candidacy(
     let advertisement = db.advertisements().by_candidacy_id(&input.id)?;
 
     // Reject other candidacies.
-    let other_candidacies = db.candidacies().by_advertisement_id(&advertisement.id)?;
+    let other_candidacies = db
+        .candidacies()
+        .by_advertisement_id(&advertisement.id)?
+        .into_iter()
+        .filter(|candidacy| candidacy.id != input.id)
+        .collect::<Vec<Candidacy>>();
 
     for candidacy in other_candidacies {
         reject_candidacy(db, auth_id, RejectCandidacyInput { id: candidacy.id })?;
