@@ -19,6 +19,7 @@ type Meta = (EventableId, AccountId, PersonId);
 #[derive(Clone)]
 pub enum Trace {
     CandidacyCreated(Candidacy),
+    CandidacyRejected(Candidacy),
     PaymentCreated(Payment),
     NoticeCreated(File),
     NoticeSent(File),
@@ -30,6 +31,7 @@ impl From<Trace> for EventType {
     fn from(item: Trace) -> Self {
         match item {
             Trace::CandidacyCreated(_) => Self::CandidacyCreated,
+            Trace::CandidacyRejected(_) => Self::CandidacyRejected,
             Trace::PaymentCreated(_) => Self::PaymentCreated,
             Trace::NoticeCreated(_) => Self::NoticeCreated,
             Trace::NoticeSent(_) => Self::NoticeSent,
@@ -42,6 +44,7 @@ impl From<Trace> for EventType {
 pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
     let (eventable_id, account_id, participant_id) = match &trace {
         Trace::CandidacyCreated(candidacy) => on_candidacy_created(db, candidacy.clone())?,
+        Trace::CandidacyRejected(candidacy) => on_candidacy_created(db, candidacy.clone())?,
         Trace::PaymentCreated(payment) => on_payment_created(db, payment.clone())?,
         Trace::NoticeCreated(notice) => on_notice_created(db, notice.clone())?,
         Trace::NoticeSent(notice) => on_notice_created(db, notice.clone())?,

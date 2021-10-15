@@ -1,5 +1,6 @@
 CREATE TYPE eventtype AS ENUM (
     'candidacy_created',
+    'candidacy_rejected',
     'notice_created',
     'notice_sent',
     'receipt_created',
