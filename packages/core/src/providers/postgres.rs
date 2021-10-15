@@ -599,6 +599,19 @@ impl database::CandidacyStore for CandidacyStore<'_> {
             .load(&self.0.get()?)?)
     }
 
+    fn by_advertisement_id(
+        &mut self,
+        advertisement_id: &AdvertisementId,
+    ) -> Result<Vec<Candidacy>> {
+        Ok(candidacies::table
+            .select(candidacies::all_columns)
+            .left_join(
+                advertisements::table.on(advertisements::id.eq(candidacies::advertisement_id)),
+            )
+            .filter(advertisements::id.eq(advertisement_id))
+            .load(&self.0.get()?)?)
+    }
+
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Candidacy>> {
         Ok(candidacies::table
             .select(candidacies::all_columns)
@@ -618,18 +631,6 @@ impl database::CandidacyStore for CandidacyStore<'_> {
 
     fn update(&mut self, data: CandidacyData) -> Result<Candidacy> {
         Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
-    }
-
-    fn update_by_advertisement_id(
-        &mut self,
-        advertisement_id: &AdvertisementId,
-        data: CandidacyData,
-    ) -> Result<Vec<Candidacy>> {
-        Ok(
-            update(candidacies::table.filter(candidacies::advertisement_id.eq(advertisement_id)))
-                .set(&data)
-                .get_results(&self.0.get()?)?,
-        )
     }
 }
 

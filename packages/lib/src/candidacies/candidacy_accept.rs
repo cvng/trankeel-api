@@ -1,3 +1,5 @@
+use super::reject_candidacy;
+use super::RejectCandidacyInput;
 use crate::error::Result;
 use async_graphql::InputObject;
 use piteo_core::database::Db;
@@ -12,14 +14,14 @@ use validator::Validate;
 
 #[derive(InputObject, Validate)]
 pub struct AcceptCandidacyInput {
-    id: CandidacyId,
+    pub id: CandidacyId,
 }
 
 // # Operation
 
 pub fn accept_candidacy(
     db: &impl Db,
-    _auth_id: &AuthId,
+    auth_id: &AuthId,
     input: AcceptCandidacyInput,
 ) -> Result<Candidacy> {
     input.validate()?;
@@ -27,13 +29,16 @@ pub fn accept_candidacy(
     let advertisement = db.advertisements().by_candidacy_id(&input.id)?;
 
     // Reject other candidacies.
-    db.candidacies().update_by_advertisement_id(
-        &advertisement.id,
-        CandidacyData {
-            status: Some(CandidacyStatus::Rejected),
-            ..Default::default()
-        },
-    )?;
+    let other_candidacies = db
+        .candidacies()
+        .by_advertisement_id(&advertisement.id)?
+        .into_iter()
+        .filter(|candidacy| candidacy.id != input.id)
+        .collect::<Vec<Candidacy>>();
+
+    for candidacy in other_candidacies {
+        reject_candidacy(db, auth_id, RejectCandidacyInput { id: candidacy.id })?;
+    }
 
     // Accept given candidacy.
     let candidacy = db.candidacies().update(CandidacyData {

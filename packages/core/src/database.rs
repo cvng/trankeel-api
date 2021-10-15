@@ -128,14 +128,11 @@ pub trait AdvertisementStore {
 pub trait CandidacyStore {
     fn by_id(&mut self, id: &CandidacyId) -> Result<Candidacy>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>>;
+    fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId)
+        -> Result<Vec<Candidacy>>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Candidacy>>;
     fn create(&mut self, data: Candidacy) -> Result<Candidacy>;
     fn update(&mut self, data: CandidacyData) -> Result<Candidacy>;
-    fn update_by_advertisement_id(
-        &mut self,
-        advertisement_id: &AdvertisementId,
-        data: CandidacyData,
-    ) -> Result<Vec<Candidacy>>;
 }
 
 pub trait PropertyStore {
