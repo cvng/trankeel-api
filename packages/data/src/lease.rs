@@ -106,7 +106,11 @@ impl Lease {
             amount: rent.2[0].into(),
             charges_amount: Some(rent.2[1].into()),
             full_amount: rent.2[2].into(),
-            status: RentStatus::default(),
+            status: if rent.0 < Utc::now() {
+                RentStatus::Paid
+            } else {
+                RentStatus::Open
+            },
             lease_id: self.id,
             receipt_id: None,
             notice_id: None,
