@@ -2405,7 +2405,7 @@ checksum = "213701ba3370744dcd1a12960caa4843b3d68b4d1c0a5d575e0d65b2ee9d16c0"
 [[package]]
 name = "stripe-rust"
 version = "0.13.0-dev"
-source = "git+https://github.com/wyyerd/stripe-rs#13f15c29b8ef1bba70c3fd504d64ba9370402bc6"
+source = "git+https://github.com/wyyerd/stripe-rs#efdd5ad00451f2296e875a1e6ade36bbe9523eef"
 dependencies = [
  "chrono",
  "futures-util",
