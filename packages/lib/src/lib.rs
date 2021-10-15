@@ -9,16 +9,15 @@ mod billing;
 mod candidacies;
 mod client;
 mod companies;
-mod documents;
 mod error;
 mod files;
 mod imports;
 mod leases;
 mod messaging;
-mod notifications;
 mod owners;
 mod properties;
 mod reports;
+mod templates;
 mod tenants;
 
 pub use crate::auth::AccountActivatePlanInput;

@@ -10,12 +10,13 @@ use crate::Rent;
 use crate::Tenant;
 use piteo_core::pdfmaker::IntoDocument;
 use piteo_data::Receipt;
+use piteo_kit::config::config;
 use serde::Serialize;
 
 pub type NoticeDocument = ReceiptDocument; // alias for a ReceiptDocument
 
 /// Receipt or notice document. https://dashboard.pdfmonkey.io/templates/8269e571-7ece-4f0d-bc37-854d77999e0d
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct ReceiptDocument {
     is_receipt: bool,
 
@@ -106,10 +107,48 @@ impl ReceiptDocument {
 
 impl IntoDocument for ReceiptDocument {
     fn template_id(&self) -> String {
-        "8269E571-7ECE-4F0D-BC37-854D77999E0D".into()
+        config()
+            .templates("receipt_document")
+            .unwrap()
+            .into()
     }
 
     fn filename(&self) -> String {
         self._filename.clone()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::templates::parse_template;
+
+    #[test]
+    fn test_receipt_document() {
+        let text = include_str!("../../../../templates/receipt_document.html");
+        let document = ReceiptDocument::default();
+
+        parse_template(text)
+            .unwrap()
+            .render(&liquid::object!({
+                "is_receipt": document.is_receipt,
+                "lender_name": document.lender_name,
+                "lender_address_city": document.lender_address_city,
+                "lender_address_line1": document.lender_address_line1,
+                "lender_address_line2": document.lender_address_line2,
+                "lender_address_postal_code": document.lender_address_postal_code,
+                "tenant_name": document.tenant_name,
+                "property_address_city": document.property_address_city,
+                "property_address_line1": document.property_address_line1,
+                "property_address_line2": document.property_address_line2,
+                "property_address_postal_code": document.property_address_postal_code,
+                "rent_amount": document.rent_amount,
+                "rent_charges_amount": document.rent_charges_amount,
+                "rent_full_amount": document.rent_full_amount,
+                "period_start": document.period_start,
+                "period_end": document.period_end,
+                "date": document.date,
+            }))
+            .unwrap();
     }
 }
