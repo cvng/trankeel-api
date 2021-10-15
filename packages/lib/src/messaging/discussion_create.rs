@@ -31,6 +31,8 @@ pub fn create_discussion_unauthenticated(
         status: Default::default(),
     })?;
 
+    db.discussions().touch(discussion.id)?; // Touch updated_at.
+
     if let Some(message) = input.message {
         push_message(
             db,

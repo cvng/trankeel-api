@@ -913,6 +913,7 @@ impl database::DiscussionStore for DiscussionStore<'_> {
             .select(discussions::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(discussions::account_id)))
             .filter(persons::auth_id.eq(auth_id.inner()))
+            .order(discussions::updated_at.desc())
             .load(&self.0.get()?)?)
     }
 
