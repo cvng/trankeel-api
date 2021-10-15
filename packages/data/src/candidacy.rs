@@ -8,7 +8,8 @@ use crate::TenantId;
 
 pub type CandidacyId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
+#[DieselType = "Candidacystatus"]
 pub enum CandidacyStatus {
     Pending,
     Rejected,

@@ -8,7 +8,8 @@ use crate::PhoneNumber;
 
 pub type CompanyId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[DieselType = "Legalentitytype"]
 pub enum LegalEntityType {
     Eurl,
     Other,

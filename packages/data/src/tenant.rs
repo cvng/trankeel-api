@@ -13,7 +13,8 @@ use crate::PhoneNumber;
 
 pub type TenantId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
+#[DieselType = "Tenantstatus"]
 pub enum TenantStatus {
     Candidate,
     Gone,

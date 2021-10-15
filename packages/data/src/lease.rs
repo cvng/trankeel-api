@@ -16,13 +16,14 @@ use piteo_kit::locale;
 
 pub type LeaseId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 pub enum LeaseStatus {
     Active,
     Ended,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
+#[DieselType = "Leasetype"]
 pub enum LeaseType {
     Furnished,
     Naked,

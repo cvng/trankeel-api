@@ -1,6 +1,7 @@
+#![allow(unused_imports)]
+
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     accounts (id) {
@@ -17,7 +18,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     advertisements (id) {
@@ -25,12 +25,12 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         published -> Bool,
-        lease_type -> Text,
+        lease_type -> Leasetype,
         rent_amount -> Numeric,
         rent_charges_amount -> Nullable<Numeric>,
         deposit_amount -> Nullable<Numeric>,
         effect_date -> Timestamptz,
-        flexibility -> Nullable<Text>,
+        flexibility -> Nullable<Entryflexibility>,
         referral_lease_id -> Nullable<Uuid>,
         property_id -> Uuid,
         title -> Text,
@@ -40,14 +40,13 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     candidacies (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
-        status -> Text,
+        status -> Candidacystatus,
         advertisement_id -> Uuid,
         tenant_id -> Uuid,
         move_in_date -> Timestamptz,
@@ -57,7 +56,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     companies (id) {
@@ -68,7 +66,7 @@ table! {
         email -> Text,
         legal_entity -> Text,
         legal_entity_identifier -> Nullable<Text>,
-        legal_entity_type -> Nullable<Text>,
+        legal_entity_type -> Nullable<Legalentitytype>,
         legal_entity_type_other -> Nullable<Text>,
         phone_number -> Nullable<Text>,
     }
@@ -76,7 +74,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     discussions (id) {
@@ -91,7 +88,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     eventables (id) {
@@ -105,7 +101,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     events (id) {
@@ -122,7 +117,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     files (id) {
@@ -133,15 +127,14 @@ table! {
         external_id -> Nullable<Text>,
         filename -> Nullable<Text>,
         preview_url -> Nullable<Text>,
-        status -> Nullable<Text>,
+        status -> Nullable<Filestatus>,
         #[sql_name = "type"]
-        type_ -> Text,
+        type_ -> Filetype,
     }
 }
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     leases (id) {
@@ -155,19 +148,18 @@ table! {
         rent_amount -> Numeric,
         rent_charges_amount -> Nullable<Numeric>,
         #[sql_name = "type"]
-        type_ -> Text,
+        type_ -> Leasetype,
         lease_id -> Nullable<Uuid>,
         property_id -> Uuid,
         details -> Nullable<Jsonb>,
         expired_at -> Nullable<Timestamptz>,
         renew_date -> Nullable<Timestamptz>,
-        duration -> Text,
+        duration -> Leaseduration,
     }
 }
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     lenders (id) {
@@ -182,7 +174,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     messages (id) {
@@ -198,7 +189,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     payments (id) {
@@ -209,14 +199,13 @@ table! {
         amount -> Numeric,
         date -> Timestamptz,
         #[sql_name = "type"]
-        type_ -> Text,
+        type_ -> Transactiontype,
         label -> Nullable<Text>,
     }
 }
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     persons (id) {
@@ -237,12 +226,11 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     plans (id) {
         id -> Uuid,
-        code -> Text,
+        code -> Plancode,
         price -> Nullable<Numeric>,
         subtitle -> Nullable<Text>,
         title -> Nullable<Text>,
@@ -251,7 +239,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     professional_warrants (id) {
@@ -265,7 +252,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     properties (id) {
@@ -274,32 +260,31 @@ table! {
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
         address -> Jsonb,
-        build_period -> Nullable<Text>,
-        building_legal_status -> Nullable<Text>,
+        build_period -> Nullable<Propertybuildperiodtype>,
+        building_legal_status -> Nullable<Propertybuildinglegalstatus>,
         common_spaces -> Nullable<Text>,
-        energy_class -> Nullable<Text>,
+        energy_class -> Nullable<Propertyenergyclass>,
         equipments -> Nullable<Text>,
-        gas_emission -> Nullable<Text>,
-        heating_method -> Nullable<Text>,
-        housing_type -> Nullable<Text>,
+        gas_emission -> Nullable<Propertygasemission>,
+        heating_method -> Nullable<Propertyusagetype>,
+        housing_type -> Nullable<Propertyusagetype>,
         name -> Text,
         note -> Nullable<Text>,
         ntic_equipments -> Nullable<Text>,
         other_spaces -> Nullable<Text>,
         tax -> Nullable<Numeric>,
-        room_count -> Text,
+        room_count -> Propertyroomtype,
         status -> Propertystatus,
         surface -> Float4,
         tenant_private_spaces -> Nullable<Text>,
-        usage_type -> Nullable<Text>,
-        water_heating_method -> Nullable<Text>,
+        usage_type -> Nullable<Propertyhabitationusagetype>,
+        water_heating_method -> Nullable<Propertyusagetype>,
         lender_id -> Uuid,
     }
 }
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     rents (id) {
@@ -320,7 +305,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     tenants (id) {
@@ -337,7 +321,7 @@ table! {
         last_name -> Text,
         note -> Nullable<Text>,
         phone_number -> Nullable<Text>,
-        status -> Text,
+        status -> Tenantstatus,
         lease_id -> Nullable<Uuid>,
         is_student -> Nullable<Bool>,
     }
@@ -345,7 +329,6 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    #[allow(unused_imports)]
     use crate::sql_types::*;
 
     warrants (id) {
@@ -353,7 +336,7 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         #[sql_name = "type"]
-        type_ -> Text,
+        type_ -> Warranttype,
         tenant_id -> Uuid,
         individual_id -> Nullable<Uuid>,
         professional_id -> Nullable<Uuid>,

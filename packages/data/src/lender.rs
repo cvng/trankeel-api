@@ -12,13 +12,6 @@ pub type LenderId = Id;
 
 pub type LenderWithIdentity = (Lender, LegalIdentity);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
-pub enum LenderFlexibility {
-    OneDay,
-    ThreeDays,
-    SevenDays,
-}
-
 #[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Lender {
     pub id: LenderId,

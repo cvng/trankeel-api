@@ -5,7 +5,8 @@ use crate::Id;
 
 pub type PlanId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[DieselType = "Plancode"]
 pub enum PlanCode {
     Solo,
 }

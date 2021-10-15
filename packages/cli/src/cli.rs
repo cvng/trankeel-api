@@ -11,8 +11,8 @@ use piteo::CreateFurnishedLeaseInput;
 use piteo::CreatePropertyInput;
 use piteo::CreateTenantInput;
 use piteo::CreateUserWithAccountInput;
+use piteo::EntryFlexibility;
 use piteo::LeaseType;
-use piteo::LenderFlexibility;
 use piteo::PropertyBuildPeriodType;
 use piteo::PropertyBuildingLegalStatus;
 use piteo::PropertyHabitationUsageType;
@@ -77,7 +77,7 @@ async fn seed() {
                     postal_code: "16000".into(),
                     country: Default::default(),
                 },
-                build_period: PropertyBuildPeriodType::BeforeY1949,
+                build_period: PropertyBuildPeriodType::From_1949_1974,
                 building_legal_status: PropertyBuildingLegalStatus::Copro,
                 common_spaces: None,
                 energy_class: None,
@@ -148,7 +148,7 @@ async fn seed() {
                 rent_charges_amount: Some(Amount::new(9000)),
                 deposit_amount: None,
                 effect_date: Utc::now().into(),
-                flexibility: Some(LenderFlexibility::OneDay),
+                flexibility: Some(EntryFlexibility::OneDay),
                 referral_lease_id: Some(lease.id),
                 property_id: property.id,
                 title: "Title".into(),

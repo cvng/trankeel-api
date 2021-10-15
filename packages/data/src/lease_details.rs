@@ -3,7 +3,8 @@ use crate::DateTime;
 
 // # Types
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
+#[DieselType = "Leaseduration"]
 #[graphql(name = "LeaseFurnishedDuration")]
 pub enum FurnishedLeaseDuration {
     NineMonths,
@@ -25,7 +26,8 @@ impl Default for FurnishedLeaseDuration {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
+#[DieselType = "Nakedleaseduration"]
 #[graphql(name = "LeaseNakedDuration")]
 pub enum NakedLeaseDuration {
     ThreeYears,
@@ -33,9 +35,11 @@ pub enum NakedLeaseDuration {
 }
 
 /// https://www.service-public.fr/particuliers/vosdroits/F13723
+#[allow(non_camel_case_types)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 pub enum LeaseRentReferenceIrl {
-    AprilFirstSemesterY2021,
+    #[graphql(name = "APRIL_FIRST_SEMESTER_Y2021")]
+    AprilFirstSemester_2021,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]

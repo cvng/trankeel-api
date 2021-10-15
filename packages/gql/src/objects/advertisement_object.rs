@@ -5,9 +5,9 @@ use piteo::AdvertisementId;
 use piteo::Amount;
 use piteo::Client;
 use piteo::DateTime;
+use piteo::EntryFlexibility;
 use piteo::LeaseId;
 use piteo::LeaseType;
-use piteo::LenderFlexibility;
 use piteo::PropertyId;
 
 #[derive(SimpleObject)]
@@ -22,7 +22,7 @@ pub struct Advertisement {
     pub rent_charges_amount: Option<Amount>,
     pub deposit_amount: Option<Amount>,
     pub effect_date: DateTime,
-    pub flexibility: Option<LenderFlexibility>,
+    pub flexibility: Option<EntryFlexibility>,
     pub referral_lease_id: Option<LeaseId>,
     pub property_id: PropertyId,
     pub title: String,

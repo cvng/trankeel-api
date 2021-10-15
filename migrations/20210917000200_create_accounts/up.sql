@@ -1,4 +1,12 @@
-CREATE TYPE accountstatus AS ENUM ('active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'trialing', 'unpaid');
+CREATE TYPE accountstatus AS ENUM (
+    'active',
+    'canceled',
+    'incomplete',
+    'incomplete_expired',
+    'past_due',
+    'trialing',
+    'unpaid'
+);
 
 CREATE TABLE accounts (
     id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,

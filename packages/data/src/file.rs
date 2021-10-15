@@ -13,7 +13,8 @@ pub type FileId = Id;
 pub type AttachableId = Id;
 
 /// https://www.pdfmonkey.io/fr/doc/api/generer-un-document
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
+#[DieselType = "Filestatus"]
 #[serde(rename_all = "snake_case")]
 pub enum FileStatus {
     Draft,
@@ -23,7 +24,8 @@ pub enum FileStatus {
     Success,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DieselEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
+#[DieselType = "Filetype"]
 pub enum FileType {
     LeaseDocument,
     PaymentNotice,

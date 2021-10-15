@@ -7,8 +7,6 @@ extern crate diesel_as_jsonb;
 #[macro_use]
 extern crate diesel_derive_enum;
 #[macro_use]
-extern crate diesel_enum_derive;
-#[macro_use]
 extern crate diesel_derive_newtype;
 #[allow(unused_imports)]
 #[macro_use]
