@@ -6,5 +6,5 @@ candidacy_accepted_mail = { id = "3", path = "templates/candidacy_accepted_mail.
 candidacy_rejected_text = { id = "", path = "templates/candidacy_rejected_text.html" }
 
 [routes]
-candidacy_url = "/candidacies/:id"
+candidacy_url = "/candidacy/:id"
 invite_url = "/register?invite=:token"
