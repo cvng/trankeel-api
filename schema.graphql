@@ -172,6 +172,7 @@ type Event {
 }
 enum EventType {
 	CANDIDACY_CREATED
+	CANDIDACY_ACCEPTED
 	CANDIDACY_REJECTED
 	PAYMENT_NOTICE_CREATED
 	PAYMENT_NOTICE_SENT
@@ -222,6 +223,7 @@ input ImportInput {
 enum ImportSource {
 	RENTILA
 }
+scalar InviteToken
 type Invoice {
 	id: ID!
 	number: Int!
@@ -430,6 +432,7 @@ type Message {
 }
 type Mutation {
 	userCreateWithAccount(input: UserWithAccountInput!): Person!
+	signupUserFromInvite(input: SignupUserFromInviteInput!): Person!
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
 	tenantCreate(input: TenantInput!): Tenant!
@@ -701,6 +704,10 @@ enum RentStatus {
 input SendPaymentNoticeInput {
 	rentIds: [ID!]!
 	date: DateTime
+}
+input SignupUserFromInviteInput {
+	authId: AuthenticationID!
+	inviteToken: InviteToken!
 }
 """
 https://stripe.com/docs/billing/subscriptions/overview

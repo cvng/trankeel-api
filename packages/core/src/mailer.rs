@@ -1,6 +1,8 @@
 use crate::error::Error;
 use async_trait::async_trait;
 use piteo_data::Email;
+use piteo_data::Name;
+use piteo_data::Person;
 use serde::Serialize;
 use std::fmt::Debug;
 
@@ -22,6 +24,15 @@ pub trait IntoMail: Serialize + Clone + Debug + Send {
 pub struct Contact {
     pub name: String,
     pub email: Email,
+}
+
+impl From<Person> for Contact {
+    fn from(item: Person) -> Self {
+        Self {
+            name: item.display_name(),
+            email: item.email,
+        }
+    }
 }
 
 pub struct Mail {

@@ -14,6 +14,7 @@ use diesel::sql_query;
 use diesel::sql_types::Text;
 use diesel::update;
 use diesel::PgConnection;
+use piteo_data::InviteData;
 use piteo_data::schema::accounts;
 use piteo_data::schema::advertisements;
 use piteo_data::schema::candidacies;
@@ -22,6 +23,7 @@ use piteo_data::schema::discussions;
 use piteo_data::schema::eventables;
 use piteo_data::schema::events;
 use piteo_data::schema::files;
+use piteo_data::schema::invites;
 use piteo_data::schema::leases;
 use piteo_data::schema::lenders;
 use piteo_data::schema::messages;
@@ -59,6 +61,8 @@ use piteo_data::ExternalId;
 use piteo_data::File;
 use piteo_data::FileData;
 use piteo_data::FileId;
+use piteo_data::Invite;
+use piteo_data::InviteToken;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
 use piteo_data::LeaseId;
@@ -187,6 +191,10 @@ impl Db for Pg {
     fn messages(&self) -> Box<dyn database::MessageStore + '_> {
         Box::new(MessageStore(&self.0))
     }
+
+    fn invites(&self) -> Box<dyn database::InviteStore + '_> {
+        Box::new(InviteStore(&self.0))
+    }
 }
 
 pub struct AccountStore<'a>(pub &'a PgPool);
@@ -228,6 +236,8 @@ pub struct ReportStore<'a>(pub &'a PgPool);
 pub struct DiscussionStore<'a>(pub &'a PgPool);
 
 pub struct MessageStore<'a>(pub &'a PgPool);
+
+pub struct InviteStore<'a>(pub &'a PgPool);
 
 impl database::AccountStore for AccountStore<'_> {
     fn by_id(&mut self, id: &AccountId) -> Result<Account> {
@@ -988,5 +998,23 @@ impl database::MessageStore for MessageStore<'_> {
         Ok(insert_into(messages::table)
             .values(data)
             .get_result(&self.0.get()?)?)
+    }
+}
+
+impl database::InviteStore for InviteStore<'_> {
+    fn by_token(&mut self, token: &InviteToken) -> Result<Invite> {
+        Ok(invites::table
+            .filter(invites::token.eq(token))
+            .first(&self.0.get()?)?)
+    }
+
+    fn create(&mut self, data: Invite) -> Result<Invite> {
+        Ok(insert_into(invites::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
+    }
+
+    fn update(&mut self, data: InviteData) -> Result<Invite> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
     }
 }

@@ -107,10 +107,7 @@ impl ReceiptDocument {
 
 impl IntoDocument for ReceiptDocument {
     fn template_id(&self) -> String {
-        config()
-            .templates("receipt_document")
-            .unwrap()
-            .into()
+        config().templates("receipt_document").unwrap().id
     }
 
     fn filename(&self) -> String {
@@ -125,10 +122,14 @@ mod tests {
 
     #[test]
     fn test_receipt_document() {
-        let text = include_str!("../../../../templates/receipt_document.html");
         let document = ReceiptDocument::default();
+        let text = config()
+            .templates("receipt_document")
+            .unwrap()
+            .as_string()
+            .unwrap();
 
-        parse_template(text)
+        parse_template(&text)
             .unwrap()
             .render(&liquid::object!({
                 "is_receipt": document.is_receipt,

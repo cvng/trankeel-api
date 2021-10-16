@@ -1,3 +1,5 @@
+use std::env;
+
 pub type ExternalId = String; // ID of an external service
 
 pub trait Name {
@@ -40,6 +42,18 @@ pub trait Inline {
         .join(", ")
         .trim()
         .to_string()
+    }
+}
+
+pub trait AsUrl {
+    fn web_route(&self) -> String;
+    fn as_url(&self) -> Url {
+        format!(
+            "{}{}",
+            env::var("WEB_URL").expect("WEB_URL"),
+            self.web_route(),
+        )
+        .into()
     }
 }
 

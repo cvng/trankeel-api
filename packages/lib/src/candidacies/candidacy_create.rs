@@ -2,6 +2,7 @@ use crate::auth::CreatePersonInput;
 use crate::error::Result;
 use crate::files::CreateFileInput;
 use crate::messaging::push_message;
+use crate::templates::CandidacyCreatedMail;
 use crate::tenants::create_tenant;
 use crate::tenants::CreateTenantInput;
 use crate::PushMessageInput;
@@ -9,6 +10,7 @@ use async_graphql::InputObject;
 use piteo_core::activity::trace;
 use piteo_core::activity::Trace;
 use piteo_core::database::Db;
+use piteo_core::mailer::Mailer;
 use piteo_data::AdvertisementId;
 use piteo_data::AuthId;
 use piteo_data::Candidacy;
@@ -57,7 +59,11 @@ pub struct CreateCandidacyInput {
 
 // # Operation
 
-pub fn create_candidacy(db: &impl Db, input: CreateCandidacyInput) -> Result<Candidacy> {
+pub async fn create_candidacy(
+    db: &impl Db,
+    mailer: &impl Mailer,
+    input: CreateCandidacyInput,
+) -> Result<Candidacy> {
     input.validate()?;
 
     let account = db.accounts().by_advertisement_id(&input.advertisement_id)?;
@@ -116,6 +122,12 @@ pub fn create_candidacy(db: &impl Db, input: CreateCandidacyInput) -> Result<Can
             message: candidacy.description.clone(),
         },
     )?;
+
+    let candidate = db.persons().by_id(&tenant.person_id)?;
+
+    mailer
+        .batch(vec![CandidacyCreatedMail::try_new(&candidacy, &candidate)?])
+        .await?;
 
     Ok(candidacy)
 }

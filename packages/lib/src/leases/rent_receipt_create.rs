@@ -1,6 +1,6 @@
 use crate::error::Result;
+use crate::templates::ReceiptCreatedMail;
 use crate::templates::ReceiptDocument;
-use crate::templates::ReceiptMail;
 use async_graphql::InputObject;
 use chrono::Utc;
 use piteo_core::activity::trace;
@@ -84,8 +84,14 @@ pub async fn send_receipts(
         };
         receipts.push(receipt.clone());
 
-        let mail = ReceiptMail::try_new(&receipt, &rent, tenants, Utc::now().into())?;
-        mailer.batch(vec![mail]).await?;
+        mailer
+            .batch(vec![ReceiptCreatedMail::try_new(
+                &receipt,
+                &rent,
+                tenants,
+                Utc::now().into(),
+            )?])
+            .await?;
 
         match receipt.type_ {
             FileType::RentReceipt => trace(db, Trace::ReceiptSent(receipt)).ok(),

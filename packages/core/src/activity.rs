@@ -1,5 +1,6 @@
 use crate::database::Db;
 use crate::error::Result;
+use diesel::result::Error::NotFound;
 use piteo_data::AccountId;
 use piteo_data::Candidacy;
 use piteo_data::EventId;
@@ -14,11 +15,12 @@ use piteo_data::Payment;
 use piteo_data::PersonId;
 use piteo_data::Receipt;
 
-type Meta = (EventableId, AccountId, PersonId);
+type Meta = (EventableId, AccountId, PersonId, PersonId);
 
 #[derive(Clone)]
 pub enum Trace {
     CandidacyCreated(Candidacy),
+    CandidacyAccepted(Candidacy),
     CandidacyRejected(Candidacy),
     PaymentCreated(Payment),
     NoticeCreated(File),
@@ -31,6 +33,7 @@ impl From<Trace> for EventType {
     fn from(item: Trace) -> Self {
         match item {
             Trace::CandidacyCreated(_) => Self::CandidacyCreated,
+            Trace::CandidacyAccepted(_) => Self::CandidacyAccepted,
             Trace::CandidacyRejected(_) => Self::CandidacyRejected,
             Trace::PaymentCreated(_) => Self::PaymentCreated,
             Trace::NoticeCreated(_) => Self::NoticeCreated,
@@ -42,9 +45,10 @@ impl From<Trace> for EventType {
 }
 
 pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
-    let (eventable_id, account_id, participant_id) = match &trace {
+    let (eventable_id, account_id, sender_id, participant_id) = match &trace {
         Trace::CandidacyCreated(candidacy) => on_candidacy_created(db, candidacy.clone())?,
-        Trace::CandidacyRejected(candidacy) => on_candidacy_created(db, candidacy.clone())?,
+        Trace::CandidacyAccepted(candidacy) => on_candidacy_accepted(db, candidacy.clone())?,
+        Trace::CandidacyRejected(candidacy) => on_candidacy_accepted(db, candidacy.clone())?,
         Trace::PaymentCreated(payment) => on_payment_created(db, payment.clone())?,
         Trace::NoticeCreated(notice) => on_notice_created(db, notice.clone())?,
         Trace::NoticeSent(notice) => on_notice_created(db, notice.clone())?,
@@ -69,7 +73,7 @@ pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
         created_at: Default::default(),
         updated_at: Default::default(),
         discussion_id: discussion.id,
-        sender_id: participant_id,
+        sender_id,
         content: None,
         event_id: Some(event.id),
     })?;
@@ -82,7 +86,21 @@ fn on_candidacy_created(db: &impl Db, candidacy: Candidacy) -> Result<Meta> {
     let participant = db.persons().by_candidacy_id(&candidacy.id)?;
     let eventable = db.eventables().create(Eventable::Candidacy(candidacy))?;
 
-    Ok((eventable.id(), account.id, participant.id))
+    Ok((eventable.id(), account.id, participant.id, participant.id))
+}
+
+fn on_candidacy_accepted(db: &impl Db, candidacy: Candidacy) -> Result<Meta> {
+    let account = db.accounts().by_candidacy_id(&candidacy.id)?;
+    let participant = db.persons().by_candidacy_id(&candidacy.id)?;
+    let sender = db
+        .persons()
+        .by_account_id(&account.id)?
+        .first()
+        .cloned()
+        .ok_or(NotFound)?;
+    let eventable = db.eventables().create(Eventable::Candidacy(candidacy))?;
+
+    Ok((eventable.id(), account.id, sender.id, participant.id))
 }
 
 fn on_payment_created(db: &impl Db, payment: Payment) -> Result<Meta> {
@@ -90,7 +108,7 @@ fn on_payment_created(db: &impl Db, payment: Payment) -> Result<Meta> {
     let participant = db.persons().by_payment_id(&payment.id)?;
     let eventable = db.eventables().create(Eventable::Payment(payment))?;
 
-    Ok((eventable.id(), account.id, participant.id))
+    Ok((eventable.id(), account.id, participant.id, participant.id))
 }
 
 fn on_notice_created(db: &impl Db, notice: Notice) -> Result<Meta> {
@@ -98,7 +116,7 @@ fn on_notice_created(db: &impl Db, notice: Notice) -> Result<Meta> {
     let participant = db.persons().by_notice_id(&notice.id)?;
     let eventable = db.eventables().create(Eventable::File(notice))?;
 
-    Ok((eventable.id(), account.id, participant.id))
+    Ok((eventable.id(), account.id, participant.id, participant.id))
 }
 
 fn on_receipt_created(db: &impl Db, receipt: Receipt) -> Result<Meta> {
@@ -106,5 +124,5 @@ fn on_receipt_created(db: &impl Db, receipt: Receipt) -> Result<Meta> {
     let participant = db.persons().by_receipt_id(&receipt.id)?;
     let eventable = db.eventables().create(Eventable::File(receipt))?;
 
-    Ok((eventable.id(), account.id, participant.id))
+    Ok((eventable.id(), account.id, participant.id, participant.id))
 }

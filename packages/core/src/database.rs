@@ -23,6 +23,9 @@ use piteo_data::ExternalId;
 use piteo_data::File;
 use piteo_data::FileData;
 use piteo_data::FileId;
+use piteo_data::Invite;
+use piteo_data::InviteData;
+use piteo_data::InviteToken;
 use piteo_data::Lease;
 use piteo_data::LeaseData;
 use piteo_data::LeaseId;
@@ -78,6 +81,7 @@ pub trait Db {
     fn reports(&self) -> Box<dyn ReportStore + '_>;
     fn discussions(&self) -> Box<dyn DiscussionStore + '_>;
     fn messages(&self) -> Box<dyn MessageStore + '_>;
+    fn invites(&self) -> Box<dyn InviteStore + '_>;
 }
 
 pub trait AccountStore {
@@ -229,4 +233,10 @@ pub trait DiscussionStore {
 pub trait MessageStore {
     fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Vec<Message>>;
     fn create(&mut self, data: Message) -> Result<Message>;
+}
+
+pub trait InviteStore {
+    fn by_token(&mut self, token: &InviteToken) -> Result<Invite>;
+    fn create(&mut self, data: Invite) -> Result<Invite>;
+    fn update(&mut self, data: InviteData) -> Result<Invite>;
 }

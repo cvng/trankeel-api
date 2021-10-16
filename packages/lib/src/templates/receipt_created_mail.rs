@@ -16,7 +16,7 @@ use piteo_kit::locale;
 use serde::Serialize;
 
 #[derive(Clone, Debug, Default, Serialize)]
-pub struct ReceiptMail {
+pub struct ReceiptCreatedMail {
     is_receipt: bool,
 
     name: String,
@@ -36,7 +36,7 @@ pub struct ReceiptMail {
     _recipients: Vec<Contact>,
 }
 
-impl ReceiptMail {
+impl ReceiptCreatedMail {
     pub fn try_new(
         receipt: &Receipt,
         rent: &Rent,
@@ -83,22 +83,21 @@ impl ReceiptMail {
     }
 }
 
-impl IntoMail for ReceiptMail {
+impl IntoMail for ReceiptCreatedMail {
     fn template_id(&self) -> u32 {
         config()
-            .templates("receipt_mail")
+            .templates("receipt_created_mail")
             .unwrap()
+            .id
             .parse::<u32>()
             .unwrap()
     }
 
     fn subject(&self) -> String {
         if self.is_receipt {
-            // "Votre quittance de loyer est arrivée !"
-            locale::text("receipt_mail_subject")
+            locale::text("receipt_created_mail.subject")
         } else {
-            // "Votre avis d'échéance est arrivé !"
-            locale::text("notice_mail_subject")
+            locale::text("notice_created_mail.subject")
         }
     }
 
@@ -113,11 +112,15 @@ mod tests {
     use crate::templates::parse_template;
 
     #[test]
-    fn test_receipt_mail() {
-        let text = include_str!("../../../../templates/receipt_mail.html");
-        let mail = ReceiptMail::default();
+    fn test_receipt_created_mail() {
+        let mail = ReceiptCreatedMail::default();
+        let text = config()
+            .templates("receipt_created_mail")
+            .unwrap()
+            .as_string()
+            .unwrap();
 
-        parse_template(text)
+        parse_template(&text)
             .unwrap()
             .render(&liquid::object!({
                 "params": {
