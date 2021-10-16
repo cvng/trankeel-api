@@ -23,13 +23,13 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           load: true
-          tags: registry.heroku.com/piteo-rs/web
+          tags: registry.heroku.com/trankeel-rs/web
 
       # https://devcenter.heroku.com/articles/container-registry-and-runtime#pushing-an-existing-image
-      - run: docker push registry.heroku.com/piteo-rs/web
+      - run: docker push registry.heroku.com/trankeel-rs/web
 
       # https://devcenter.heroku.com/articles/container-registry-and-runtime#releasing-an-image
-      - run: heroku container:release web --app piteo-rs
+      - run: heroku container:release web --app trankeel-rs
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
