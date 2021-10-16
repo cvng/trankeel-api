@@ -1,11 +1,17 @@
+mod candidacy_accepted_mail;
+mod candidacy_created_mail;
+mod candidacy_rejected_text;
+mod receipt_created_mail;
 mod receipt_document;
-mod receipt_mail;
 
+pub use candidacy_accepted_mail::*;
+pub use candidacy_created_mail::*;
+pub use candidacy_rejected_text::*;
+pub use receipt_created_mail::*;
 pub use receipt_document::*;
-pub use receipt_mail::*;
 
 #[allow(dead_code)]
-fn parse_template(text: &str) -> Result<liquid::Template, liquid::Error> {
+pub(crate) fn parse_template(text: &str) -> Result<liquid::Template, liquid::Error> {
     liquid::ParserBuilder::with_stdlib()
         .build()
         .unwrap()

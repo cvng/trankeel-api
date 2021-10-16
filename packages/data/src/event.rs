@@ -14,6 +14,7 @@ pub type EventWithEventable = (Event, Eventable);
 #[DieselType = "Eventtype"]
 pub enum EventType {
     CandidacyCreated,
+    CandidacyAccepted,
     CandidacyRejected,
     #[graphql(name = "PAYMENT_NOTICE_CREATED")]
     NoticeCreated,

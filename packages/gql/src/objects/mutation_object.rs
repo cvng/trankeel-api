@@ -40,6 +40,7 @@ use piteo::LeaseId;
 use piteo::PaymentId;
 use piteo::PropertyId;
 use piteo::PushMessageInput;
+use piteo::SignupUserFromInviteInput;
 use piteo::TenantId;
 use piteo::TransactionInput;
 use piteo::UpdateAdvertisementInput;
@@ -60,6 +61,18 @@ impl Mutation {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_user_with_account(input)
+            .await?
+            .into())
+    }
+
+    async fn signup_user_from_invite(
+        &self,
+        ctx: &Context<'_>,
+        input: SignupUserFromInviteInput,
+    ) -> Result<Person> {
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .signup_user_from_invite(input)
             .await?
             .into())
     }
@@ -199,7 +212,8 @@ impl Mutation {
     ) -> Result<Candidacy> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .create_candidacy(input)?
+            .create_candidacy(input)
+            .await?
             .into())
     }
 
@@ -210,7 +224,8 @@ impl Mutation {
     ) -> Result<Candidacy> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .accept_candidacy(ctx.data::<AuthId>()?, input)?
+            .accept_candidacy(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 

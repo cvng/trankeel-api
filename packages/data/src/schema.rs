@@ -137,6 +137,22 @@ table! {
     use diesel::sql_types::*;
     use crate::sql_types::*;
 
+    invites (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        account_id -> Nullable<Uuid>,
+        invitee_id -> Uuid,
+        token -> Text,
+        status -> Invitestatus,
+        reason -> Invitereason,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     leases (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -357,6 +373,8 @@ joinable!(eventables -> rents (rent_id));
 joinable!(events -> accounts (account_id));
 joinable!(events -> eventables (eventable_id));
 joinable!(events -> persons (participant_id));
+joinable!(invites -> accounts (account_id));
+joinable!(invites -> persons (invitee_id));
 joinable!(leases -> accounts (account_id));
 joinable!(leases -> files (lease_id));
 joinable!(leases -> properties (property_id));
@@ -387,6 +405,7 @@ allow_tables_to_appear_in_same_query!(
     eventables,
     events,
     files,
+    invites,
     leases,
     lenders,
     messages,

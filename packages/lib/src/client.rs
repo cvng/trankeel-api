@@ -1,4 +1,5 @@
 use crate::auth::CreateUserWithAccountInput;
+use crate::auth::SignupUserFromInviteInput;
 use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacyInput;
 use crate::error::Result;
@@ -148,16 +149,23 @@ impl<'a> Client {
         crate::auth::create_user_with_account(&self.0, &self.3, input).await
     }
 
-    pub fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
-        crate::candidacies::create_candidacy(&self.0, input)
+    pub async fn signup_user_from_invite(
+        &self,
+        input: SignupUserFromInviteInput,
+    ) -> Result<Person> {
+        crate::auth::signup_user_from_invite(&self.0, input).await
     }
 
-    pub fn accept_candidacy(
+    pub async fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
+        crate::candidacies::create_candidacy(&self.0, &self.2, input).await
+    }
+
+    pub async fn accept_candidacy(
         &self,
         auth_id: &AuthId,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        crate::candidacies::accept_candidacy(&self.0, auth_id, input)
+        crate::candidacies::accept_candidacy(&self.0, &self.2, auth_id, input).await
     }
 
     pub fn create_tenant(&self, auth_id: &AuthId, input: CreateTenantInput) -> Result<Tenant> {

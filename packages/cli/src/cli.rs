@@ -109,7 +109,7 @@ async fn seed() {
                 apl: None,
                 birthdate: Some(Utc::now().date().naive_utc().into()),
                 birthplace: None,
-                email: "tenant@piteo.dev".into(),
+                email: author.email.clone(),
                 first_name: "Tenant".into(),
                 last_name: "PITEO".into(),
                 note: None,
@@ -164,13 +164,14 @@ async fn seed() {
             first_name: "Candidate".into(),
             last_name: "PITEO".into(),
             birthdate: Utc::now().date().naive_utc().into(),
-            email: "candidate@piteo.dev".into(),
+            email: author.email,
             phone_number: "+33633123456".to_string().into(),
             move_in_date: Utc::now().into(),
             description: "Hello, Lender!".into(),
             files: None,
             warrants: None,
         })
+        .await
         .unwrap();
 
     println!(

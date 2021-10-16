@@ -1,4 +1,7 @@
 use crate::error::Result;
+use crate::messaging::push_message;
+use crate::templates::CandidacyRejectedText;
+use crate::PushMessageInput;
 use async_graphql::InputObject;
 use piteo_core::activity::trace;
 use piteo_core::activity::Trace;
@@ -21,9 +24,9 @@ pub struct RejectCandidacyInput {
 
 // # Operation
 
-pub fn reject_candidacy(
+pub async fn reject_candidacy(
     db: &impl Db,
-    _auth_id: &AuthId,
+    auth_id: &AuthId,
     input: RejectCandidacyInput,
 ) -> Result<Candidacy> {
     input.validate()?;
@@ -45,6 +48,19 @@ pub fn reject_candidacy(
         status: Some(DiscussionStatus::default()),
         ..Default::default()
     })?;
+
+    let sender = db.persons().by_auth_id(auth_id)?;
+
+    let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
+
+    push_message(
+        db,
+        PushMessageInput {
+            discussion_id: discussion.id,
+            sender_id: sender.id,
+            message: CandidacyRejectedText::new(&candidate).to_string(),
+        },
+    )?;
 
     Ok(candidacy)
 }

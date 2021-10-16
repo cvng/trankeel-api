@@ -7,6 +7,8 @@ pub use crate::Entryflexibility;
 pub use crate::Eventtype;
 pub use crate::Filestatus;
 pub use crate::Filetype;
+pub use crate::Invitereason;
+pub use crate::Invitestatus;
 pub use crate::Leaseduration;
 pub use crate::Leasetype;
 pub use crate::Legalentitytype;

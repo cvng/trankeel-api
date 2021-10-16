@@ -1,8 +1,10 @@
 use crate::schema::candidacies;
 use crate::AdvertisementId;
+use crate::AsUrl;
 use crate::DateTime;
 use crate::Id;
 use crate::TenantId;
+use piteo_kit::config::config;
 
 // # Types
 
@@ -33,6 +35,15 @@ pub struct Candidacy {
     pub tenant_id: TenantId,
     pub move_in_date: DateTime,
     pub description: String,
+}
+
+impl AsUrl for Candidacy {
+    fn web_route(&self) -> String {
+        config()
+            .web_routes("candidacy_url")
+            .unwrap()
+            .replace(":id", &self.id.to_string())
+    }
 }
 
 #[derive(Default, AsChangeset, Identifiable, Insertable)]
