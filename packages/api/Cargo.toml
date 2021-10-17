@@ -14,4 +14,5 @@ trankeel = { path = "../lib" }
 trankeel-graphql = { path = "../gql" }
 rocket = { version = "0.5.0-rc.1", default-features = false, features = ["json"] }
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master", default-features = false }
+sentry = "0.23.0"
 serde = "1.0"
