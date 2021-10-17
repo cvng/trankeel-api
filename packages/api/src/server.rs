@@ -1,10 +1,10 @@
 use crate::routes::graphql_playground;
 use crate::routes::graphql_request;
 use crate::webhooks::pdfmonkey_request;
-use crate::Result;
 use rocket::routes;
 use rocket::Build;
 use rocket::Rocket;
+use trankeel::Result;
 
 /// Build Trankeel Web server. https://rocket.rs
 pub fn server() -> Result<Rocket<Build>> {
