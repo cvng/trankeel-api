@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/cvng/trankeel-api/workflows/ci/badge.svg?branch=main&event=push)](https://github.com/cvng/trankeel-api/actions)
 
-<img align="right" src="https://d2fvtsadwxhue9.cloudfront.net/versioned/trankeel/trankeel/logos/trankeelremovebgpreview.png" height="150px">
+<img align="right" src="https://d2fvtsadwxhue9.cloudfront.net/versioned/trankeel/TRANKEEL-removebg-preview.png" height="150px">
 
 Trankeel is a _simple_, _modern_, and _featured_ lease management application for
 **individual** and **professional** lender that uses GraphQL and is built in
