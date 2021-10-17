@@ -1,6 +1,6 @@
 use async_graphql::InputObject;
-use piteo_data::AccountId;
-use piteo_data::PlanCode;
+use trankeel_data::AccountId;
+use trankeel_data::PlanCode;
 
 #[derive(InputObject)]
 pub struct AccountActivatePlanInput {

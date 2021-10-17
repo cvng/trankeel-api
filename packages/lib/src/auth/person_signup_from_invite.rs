@@ -1,17 +1,17 @@
 use crate::error::Result;
 use async_graphql::InputObject;
-use piteo_core::database::Db;
-use piteo_core::error::Error;
-use piteo_data::Account;
-use piteo_data::AccountId;
-use piteo_data::AccountStatus;
-use piteo_data::AuthId;
-use piteo_data::InviteData;
-use piteo_data::InviteReason;
-use piteo_data::InviteStatus;
-use piteo_data::InviteToken;
-use piteo_data::Person;
-use piteo_data::PersonData;
+use trankeel_core::database::Db;
+use trankeel_core::error::Error;
+use trankeel_data::Account;
+use trankeel_data::AccountId;
+use trankeel_data::AccountStatus;
+use trankeel_data::AuthId;
+use trankeel_data::InviteData;
+use trankeel_data::InviteReason;
+use trankeel_data::InviteStatus;
+use trankeel_data::InviteToken;
+use trankeel_data::Person;
+use trankeel_data::PersonData;
 use validator::Validate;
 
 #[derive(Clone, InputObject, Validate)]

@@ -1,9 +1,9 @@
 use crate::Result;
-use piteo_core::database::Db;
-use piteo_data::DiscussionId;
-use piteo_data::Message;
-use piteo_data::MessageId;
-use piteo_data::PersonId;
+use trankeel_core::database::Db;
+use trankeel_data::DiscussionId;
+use trankeel_data::Message;
+use trankeel_data::MessageId;
+use trankeel_data::PersonId;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]

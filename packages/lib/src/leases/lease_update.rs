@@ -3,10 +3,10 @@ use crate::error::Result;
 use crate::files::CreateFileInput;
 use crate::AuthId;
 use async_graphql::InputObject;
-use piteo_core::database::Db;
-use piteo_data::Lease;
-use piteo_data::LeaseData;
-use piteo_data::LeaseId;
+use trankeel_core::database::Db;
+use trankeel_data::Lease;
+use trankeel_data::LeaseData;
+use trankeel_data::LeaseId;
 use validator::Validate;
 
 // # Input

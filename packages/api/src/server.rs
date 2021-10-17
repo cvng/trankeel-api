@@ -6,11 +6,11 @@ use rocket::routes;
 use rocket::Build;
 use rocket::Rocket;
 
-/// Build Piteo Web server. https://rocket.rs
+/// Build Trankeel Web server. https://rocket.rs
 pub fn server() -> Result<Rocket<Build>> {
     let cors = rocket_cors::CorsOptions::default().to_cors()?;
 
-    let schema = piteo_graphql::build_schema()?;
+    let schema = trankeel_graphql::build_schema()?;
 
     let server = rocket::build()
         .manage(schema)

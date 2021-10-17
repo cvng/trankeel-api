@@ -1,10 +1,10 @@
 use super::push_message;
 use crate::PushMessageInput;
 use crate::Result;
-use piteo_core::database::Db;
-use piteo_data::Discussion;
-use piteo_data::DiscussionId;
-use piteo_data::PersonId;
+use trankeel_core::database::Db;
+use trankeel_data::Discussion;
+use trankeel_data::DiscussionId;
+use trankeel_data::PersonId;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]

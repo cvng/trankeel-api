@@ -6,16 +6,16 @@ use super::Rent;
 use super::Tenant;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::AccountId;
-use piteo::Amount;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::FileId;
-use piteo::FurnishedLeaseDuration;
-use piteo::LeaseId;
-use piteo::LeaseStatus;
-use piteo::LeaseType;
-use piteo::PropertyId;
+use trankeel::AccountId;
+use trankeel::Amount;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::FileId;
+use trankeel::FurnishedLeaseDuration;
+use trankeel::LeaseId;
+use trankeel::LeaseStatus;
+use trankeel::LeaseType;
+use trankeel::PropertyId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -81,8 +81,8 @@ impl Lease {
     }
 }
 
-impl From<piteo::Lease> for Lease {
-    fn from(item: piteo::Lease) -> Self {
+impl From<trankeel::Lease> for Lease {
+    fn from(item: trankeel::Lease) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

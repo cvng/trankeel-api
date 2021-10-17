@@ -3,8 +3,8 @@ pub struct Error {
     message: String,
 }
 
-impl From<piteo::Error> for Error {
-    fn from(item: piteo::Error) -> Self {
+impl From<trankeel::Error> for Error {
+    fn from(item: trankeel::Error) -> Self {
         Self {
             message: item.to_string(),
         }

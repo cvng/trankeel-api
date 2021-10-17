@@ -1,10 +1,10 @@
 use super::Plan;
-use piteo::AccountId;
-use piteo::AccountStatus;
-use piteo::CustomerId;
-use piteo::DateTime;
-use piteo::PlanId;
-use piteo::SubscriptionId;
+use trankeel::AccountId;
+use trankeel::AccountStatus;
+use trankeel::CustomerId;
+use trankeel::DateTime;
+use trankeel::PlanId;
+use trankeel::SubscriptionId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -26,8 +26,8 @@ impl Account {
     }
 }
 
-impl From<piteo::Account> for Account {
-    fn from(item: piteo::Account) -> Self {
+impl From<trankeel::Account> for Account {
+    fn from(item: trankeel::Account) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

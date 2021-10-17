@@ -1,10 +1,10 @@
 use crate::error::Error;
 use async_trait::async_trait;
-use piteo_data::Email;
-use piteo_data::Name;
-use piteo_data::Person;
 use serde::Serialize;
 use std::fmt::Debug;
+use trankeel_data::Email;
+use trankeel_data::Name;
+use trankeel_data::Person;
 
 #[async_trait]
 pub trait Mailer {

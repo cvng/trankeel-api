@@ -12,7 +12,7 @@ use crate::Rent;
 use crate::RentId;
 use crate::RentStatus;
 use chrono::Utc;
-use piteo_kit::locale;
+use trankeel_kit::locale;
 
 pub type LeaseId = Id;
 

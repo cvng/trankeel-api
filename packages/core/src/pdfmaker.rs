@@ -1,9 +1,9 @@
 use crate::error::Error;
 use async_trait::async_trait;
-use piteo_data::Document;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Debug;
+use trankeel_data::Document;
 
 #[async_trait]
 pub trait Pdfmaker {

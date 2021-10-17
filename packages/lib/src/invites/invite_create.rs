@@ -1,11 +1,11 @@
 use crate::error::Result;
-use piteo_core::database::Db;
-use piteo_data::Invite;
-use piteo_data::InviteId;
-use piteo_data::InviteReason;
-use piteo_data::InviteStatus;
-use piteo_data::InviteToken;
-use piteo_data::PersonId;
+use trankeel_core::database::Db;
+use trankeel_data::Invite;
+use trankeel_data::InviteId;
+use trankeel_data::InviteReason;
+use trankeel_data::InviteStatus;
+use trankeel_data::InviteToken;
+use trankeel_data::PersonId;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]

@@ -5,16 +5,16 @@ use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
 use crate::templates::CandidacyAcceptedMail;
 use async_graphql::InputObject;
-use piteo_core::activity::trace;
-use piteo_core::activity::Trace;
-use piteo_core::database::Db;
-use piteo_core::mailer::Mailer;
-use piteo_data::AuthId;
-use piteo_data::Candidacy;
-use piteo_data::CandidacyData;
-use piteo_data::CandidacyId;
-use piteo_data::CandidacyStatus;
-use piteo_data::InviteReason;
+use trankeel_core::activity::trace;
+use trankeel_core::activity::Trace;
+use trankeel_core::database::Db;
+use trankeel_core::mailer::Mailer;
+use trankeel_data::AuthId;
+use trankeel_data::Candidacy;
+use trankeel_data::CandidacyData;
+use trankeel_data::CandidacyId;
+use trankeel_data::CandidacyStatus;
+use trankeel_data::InviteReason;
 use validator::Validate;
 
 // # Input

@@ -9,9 +9,9 @@ use std::env;
 use tokio::runtime::Runtime;
 use tokio::spawn;
 
-const DEFAULT_SENDER_NAME: &str = "Piteo";
+const DEFAULT_SENDER_NAME: &str = "Trankeel";
 
-const DEFAULT_SENDER_EMAIL: &str = "support@piteo.fr";
+const DEFAULT_SENDER_EMAIL: &str = "support@trankeel.com";
 
 pub struct Sendinblue(sendinblue::Sendinblue);
 

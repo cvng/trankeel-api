@@ -1,12 +1,12 @@
 use crate::unions::Eventable;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::AccountId;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::EventId;
-use piteo::EventType;
-use piteo::EventableId;
+use trankeel::AccountId;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::EventId;
+use trankeel::EventType;
+use trankeel::EventableId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -31,8 +31,8 @@ impl Event {
     }
 }
 
-impl From<piteo::Event> for Event {
-    fn from(item: piteo::Event) -> Self {
+impl From<trankeel::Event> for Event {
+    fn from(item: trankeel::Event) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,
@@ -44,8 +44,8 @@ impl From<piteo::Event> for Event {
     }
 }
 
-impl From<piteo::EventWithEventable> for Event {
-    fn from(item: piteo::EventWithEventable) -> Self {
+impl From<trankeel::EventWithEventable> for Event {
+    fn from(item: trankeel::EventWithEventable) -> Self {
         item.0.into()
     }
 }

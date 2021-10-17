@@ -2,23 +2,23 @@ mod seed_util;
 
 use crate::seed_util::author;
 use chrono::Utc;
-use piteo::AddressInput;
-use piteo::Amount;
-use piteo::AuthId;
-use piteo::CreateAdvertisementInput;
-use piteo::CreateCandidacyInput;
-use piteo::CreateFurnishedLeaseInput;
-use piteo::CreatePropertyInput;
-use piteo::CreateTenantInput;
-use piteo::CreateUserWithAccountInput;
-use piteo::EntryFlexibility;
-use piteo::LeaseType;
-use piteo::PropertyBuildPeriodType;
-use piteo::PropertyBuildingLegalStatus;
-use piteo::PropertyHabitationUsageType;
-use piteo::PropertyRoomType;
-use piteo::PropertyUsageType;
 use std::env;
+use trankeel::AddressInput;
+use trankeel::Amount;
+use trankeel::AuthId;
+use trankeel::CreateAdvertisementInput;
+use trankeel::CreateCandidacyInput;
+use trankeel::CreateFurnishedLeaseInput;
+use trankeel::CreatePropertyInput;
+use trankeel::CreateTenantInput;
+use trankeel::CreateUserWithAccountInput;
+use trankeel::EntryFlexibility;
+use trankeel::LeaseType;
+use trankeel::PropertyBuildPeriodType;
+use trankeel::PropertyBuildingLegalStatus;
+use trankeel::PropertyHabitationUsageType;
+use trankeel::PropertyRoomType;
+use trankeel::PropertyUsageType;
 
 #[tokio::main]
 async fn main() {
@@ -35,12 +35,12 @@ async fn main() {
 }
 
 async fn write_schema() {
-    piteo_graphql::write_schema("schema.graphql").ok();
+    trankeel_graphql::write_schema("schema.graphql").ok();
     println!("💫 GraphQL schema printed.");
 }
 
 async fn seed() {
-    let client = piteo::init().unwrap();
+    let client = trankeel::init().unwrap();
 
     let auth_id = AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
     let author = author(env::var("AUTHOR").unwrap()).unwrap();
@@ -111,7 +111,7 @@ async fn seed() {
                 birthplace: None,
                 email: author.email.clone(),
                 first_name: "Tenant".into(),
-                last_name: "PITEO".into(),
+                last_name: "TRANKEEL".into(),
                 note: None,
                 phone_number: None,
                 is_student: Some(false),
@@ -162,7 +162,7 @@ async fn seed() {
             advertisement_id: advertisement.id,
             is_student: true,
             first_name: "Candidate".into(),
-            last_name: "PITEO".into(),
+            last_name: "TRANKEEL".into(),
             birthdate: Utc::now().date().naive_utc().into(),
             email: author.email,
             phone_number: "+33633123456".to_string().into(),

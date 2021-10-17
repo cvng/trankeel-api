@@ -1,16 +1,16 @@
-use piteo::Document;
-use piteo::FileData;
-use piteo::FileStatus;
-use piteo::FileType;
-use piteo::Notice;
-use piteo::Receipt;
-use piteo::SendReceiptsInput;
 use rocket::http::Status;
 use rocket::info;
 use rocket::post;
 use rocket::serde::json::Json;
 use rocket::serde::Deserialize;
 use rocket::warn;
+use trankeel::Document;
+use trankeel::FileData;
+use trankeel::FileStatus;
+use trankeel::FileType;
+use trankeel::Notice;
+use trankeel::Receipt;
+use trankeel::SendReceiptsInput;
 
 /// https://www.pdfmonkey.io/fr/doc/api/webhooks
 #[derive(Debug, Deserialize)]
@@ -22,7 +22,7 @@ pub struct PdfmonkeyPayload {
 pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
     info!("Received pdfmonkey request: {:?}", request);
 
-    let client = piteo::init().unwrap();
+    let client = trankeel::init().unwrap();
 
     let document = request.document.clone();
 
@@ -57,7 +57,7 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
 // # Handlers
 
-async fn on_receipt_created(client: &piteo::Client, receipt: &Receipt) {
+async fn on_receipt_created(client: &trankeel::Client, receipt: &Receipt) {
     let rent = client.rents().by_receipt_id(&receipt.id).unwrap();
     let input = SendReceiptsInput {
         rent_ids: vec![rent.id],
@@ -75,7 +75,7 @@ async fn on_receipt_created(client: &piteo::Client, receipt: &Receipt) {
     client.send_receipts(&auth_id, input).await.ok();
 }
 
-async fn on_notice_created(client: &piteo::Client, notice: &Notice) {
+async fn on_notice_created(client: &trankeel::Client, notice: &Notice) {
     let rent = client.rents().by_notice_id(&notice.id).unwrap();
     let input = SendReceiptsInput {
         rent_ids: vec![rent.id],

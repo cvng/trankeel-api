@@ -1,6 +1,6 @@
-use piteo::AccountId;
-use piteo::Amount;
-use piteo::DateTime;
+use trankeel::AccountId;
+use trankeel::Amount;
+use trankeel::DateTime;
 
 #[derive(SimpleObject)]
 pub struct Summary {
@@ -35,8 +35,8 @@ pub struct Summary {
     pub occupation_rate: f64,
 }
 
-impl From<piteo::Summary> for Summary {
-    fn from(item: piteo::Summary) -> Self {
+impl From<trankeel::Summary> for Summary {
+    fn from(item: trankeel::Summary) -> Self {
         Self {
             account_id: item.account_id,
             created_at: item.created_at,

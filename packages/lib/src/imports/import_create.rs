@@ -1,6 +1,6 @@
 use crate::files::CreateFileInput;
 use async_graphql::InputObject;
-use piteo_data::ImportSource;
+use trankeel_data::ImportSource;
 
 #[derive(InputObject)]
 pub struct ImportInput {

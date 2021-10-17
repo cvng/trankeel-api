@@ -3,12 +3,12 @@ use super::Person;
 use crate::unions::DiscussionItem;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::AccountId;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::DiscussionId;
-use piteo::DiscussionStatus;
-use piteo::PersonId;
+use trankeel::AccountId;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::DiscussionId;
+use trankeel::DiscussionStatus;
+use trankeel::PersonId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -62,8 +62,8 @@ impl Discussion {
     }
 }
 
-impl From<piteo::Discussion> for Discussion {
-    fn from(item: piteo::Discussion) -> Self {
+impl From<trankeel::Discussion> for Discussion {
+    fn from(item: trankeel::Discussion) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

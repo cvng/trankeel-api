@@ -1,6 +1,6 @@
 use async_graphql::InputObject;
-use piteo_data::AttachableId;
-use piteo_data::FileType;
+use trankeel_data::AttachableId;
+use trankeel_data::FileType;
 
 #[derive(InputObject)]
 pub struct DocumentGenerateInput {

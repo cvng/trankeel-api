@@ -1,12 +1,12 @@
 use crate::unions::LegalIdentity;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::AccountId;
-use piteo::Client;
-use piteo::CompanyId;
-use piteo::DateTime;
-use piteo::LenderId;
-use piteo::PersonId;
+use trankeel::AccountId;
+use trankeel::Client;
+use trankeel::CompanyId;
+use trankeel::DateTime;
+use trankeel::LenderId;
+use trankeel::PersonId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -39,8 +39,8 @@ impl Lender {
     }
 }
 
-impl From<piteo::Lender> for Lender {
-    fn from(item: piteo::Lender) -> Self {
+impl From<trankeel::Lender> for Lender {
+    fn from(item: trankeel::Lender) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,
@@ -52,8 +52,8 @@ impl From<piteo::Lender> for Lender {
     }
 }
 
-impl From<piteo::LenderWithIdentity> for Lender {
-    fn from(item: piteo::LenderWithIdentity) -> Self {
+impl From<trankeel::LenderWithIdentity> for Lender {
+    fn from(item: trankeel::LenderWithIdentity) -> Self {
         item.0.into()
     }
 }

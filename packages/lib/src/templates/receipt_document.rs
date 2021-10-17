@@ -8,10 +8,10 @@ use crate::Name;
 use crate::Property;
 use crate::Rent;
 use crate::Tenant;
-use piteo_core::pdfmaker::IntoDocument;
-use piteo_data::Receipt;
-use piteo_kit::config::config;
 use serde::Serialize;
+use trankeel_core::pdfmaker::IntoDocument;
+use trankeel_data::Receipt;
+use trankeel_kit::config::config;
 
 pub type NoticeDocument = ReceiptDocument; // alias for a ReceiptDocument
 

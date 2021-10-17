@@ -54,4 +54,4 @@ pub use crate::properties::UpdatePropertyInput;
 pub use crate::tenants::CreateTenantInput;
 pub use crate::tenants::DeleteTenantInput;
 pub use crate::tenants::UpdateTenantInput;
-pub use piteo_data::*;
+pub use trankeel_data::*;

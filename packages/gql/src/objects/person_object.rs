@@ -2,16 +2,16 @@ use super::Account;
 use super::Address;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::AccountId;
-use piteo::AuthId;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::Email;
-use piteo::Name;
-use piteo::PersonId;
-use piteo::PersonRole;
-use piteo::PhoneNumber;
-use piteo::Url;
+use trankeel::AccountId;
+use trankeel::AuthId;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::Email;
+use trankeel::Name;
+use trankeel::PersonId;
+use trankeel::PersonRole;
+use trankeel::PhoneNumber;
+use trankeel::Url;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -48,8 +48,8 @@ impl Person {
     }
 }
 
-impl From<piteo::Person> for Person {
-    fn from(item: piteo::Person) -> Self {
+impl From<trankeel::Person> for Person {
+    fn from(item: trankeel::Person) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

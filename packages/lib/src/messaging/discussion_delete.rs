@@ -1,7 +1,7 @@
 use crate::Result;
-use piteo_core::database::Db;
-use piteo_data::AuthId;
-use piteo_data::DiscussionId;
+use trankeel_core::database::Db;
+use trankeel_data::AuthId;
+use trankeel_data::DiscussionId;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]

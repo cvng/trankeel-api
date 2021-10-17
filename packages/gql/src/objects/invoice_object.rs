@@ -1,7 +1,7 @@
-use piteo::Amount;
-use piteo::DateTime;
-use piteo::InvoiceId;
-use piteo::PlanCode;
+use trankeel::Amount;
+use trankeel::DateTime;
+use trankeel::InvoiceId;
+use trankeel::PlanCode;
 
 #[derive(SimpleObject)]
 pub struct Invoice {

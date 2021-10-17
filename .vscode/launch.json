@@ -7,15 +7,15 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug executable 'piteo-api'",
+      "name": "Debug executable 'trankeel-api'",
       "cargo": {
         "args": [
           "build",
-          "--bin=piteo-api",
-          "--package=piteo-api"
+          "--bin=trankeel-api",
+          "--package=trankeel-api"
         ],
         "filter": {
-          "name": "piteo-api",
+          "name": "trankeel-api",
           "kind": "bin"
         }
       },

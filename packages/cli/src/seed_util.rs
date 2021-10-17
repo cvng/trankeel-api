@@ -9,7 +9,9 @@ pub struct Author {
 pub fn author(text: String) -> Result<Author, regex::Error> {
     let caps = Regex::new(r"(?P<first_name>\w+) (?P<last_name>\w+) <(?P<email>.*)>")?
         .captures(&text)
-        .ok_or_else(|| regex::Error::Syntax("format: \"Dev PITEO <hello@piteo.dev>\"".into()))?;
+        .ok_or_else(|| {
+            regex::Error::Syntax("format: \"Dev TRANKEEL <hello@trankeel.dev>\"".into())
+        })?;
 
     Ok(Author {
         first_name: caps["first_name"].into(),

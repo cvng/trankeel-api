@@ -1,5 +1,5 @@
 [package]
-name = "piteo"
+name = "trankeel"
 version = "0.1.1"
 edition = "2018"
 
@@ -13,9 +13,9 @@ async-graphql = { version = "2.9.10", git = "https://github.com/async-graphql/as
 chrono = "0.4.19"
 liquid = "0.23.0"
 log = "0.4.14"
-piteo-core = { path = "../core" }
-piteo-data = { path = "../data" }
-piteo-kit = { path = "../kit" }
+trankeel-core = { path = "../core" }
+trankeel-data = { path = "../data" }
+trankeel-kit = { path = "../kit" }
 serde = "1.0"
 serde_json = "1.0"
 validator = { version = "0.14.0", features = ["derive"] }

@@ -4,7 +4,7 @@ use std::env;
 use std::fs;
 use std::io;
 
-const CONFIG: &str = include_str!("../../../piteo.toml");
+const CONFIG: &str = include_str!("../../../trankeel.toml");
 
 #[derive(Deserialize)]
 pub struct Config {

@@ -4,7 +4,7 @@ use crate::AsUrl;
 use crate::DateTime;
 use crate::Id;
 use crate::TenantId;
-use piteo_kit::config::config;
+use trankeel_kit::config::config;
 
 // # Types
 

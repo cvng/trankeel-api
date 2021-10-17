@@ -1,4 +1,3 @@
-use piteo::AuthId;
 use rocket::http::Status;
 use rocket::request::FromRequest;
 use rocket::request::Outcome;
@@ -6,6 +5,7 @@ use rocket::Request;
 use serde::Deserialize;
 use serde::Serialize;
 use std::env;
+use trankeel::AuthId;
 
 const AUTH_ID_KEY: &str = "DEBUG_AUTH_ID";
 

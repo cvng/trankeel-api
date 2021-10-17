@@ -1,12 +1,12 @@
 use super::Lease;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::Amount;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::PaymentId;
-use piteo::RentId;
-use piteo::TransactionType;
+use trankeel::Amount;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::PaymentId;
+use trankeel::RentId;
+use trankeel::TransactionType;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -33,8 +33,8 @@ impl Payment {
     }
 }
 
-impl From<piteo::Payment> for Payment {
-    fn from(item: piteo::Payment) -> Self {
+impl From<trankeel::Payment> for Payment {
+    fn from(item: trankeel::Payment) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

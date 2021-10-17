@@ -1,5 +1,4 @@
 {
-  "name": "piteo",
   "private": "true",
   "scripts": {
     "start": "cargo watch --ignore schema.graphql --exec run --clear",
@@ -9,8 +8,8 @@
     "test": "cargo test",
     "fmt": "cargo fmt",
     "migrate": "diesel migration run",
-    "generate": "cargo run --bin piteo-cli -- generate",
-    "seed": "cargo run --bin piteo-cli -- seed",
+    "generate": "cargo run --bin trankeel-cli -- generate",
+    "seed": "cargo run --bin trankeel-cli -- seed",
     "postmigrate": "npm run seed"
   }
 }

@@ -1622,109 +1622,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
-name = "piteo"
-version = "0.1.1"
-dependencies = [
- "async-graphql",
- "chrono",
- "liquid",
- "log",
- "piteo-core",
- "piteo-data",
- "piteo-kit",
- "serde",
- "serde_json",
- "validator",
-]
-
-[[package]]
-name = "piteo-api"
-version = "0.1.1"
-dependencies = [
- "async-graphql-rocket",
- "color-eyre",
- "dotenv",
- "jsonwebtoken",
- "piteo",
- "piteo-graphql",
- "rocket",
- "rocket_cors",
- "serde",
-]
-
-[[package]]
-name = "piteo-cli"
-version = "0.1.1"
-dependencies = [
- "chrono",
- "dotenv",
- "piteo",
- "piteo-graphql",
- "regex",
- "tokio 1.10.0",
-]
-
-[[package]]
-name = "piteo-core"
-version = "0.1.1"
-dependencies = [
- "async-trait",
- "diesel",
- "erased-serde",
- "eyre",
- "piteo-data",
- "reqwest 0.11.5",
- "sendinblue",
- "serde",
- "serde_json",
- "stripe-rust",
- "tokio 0.2.25",
-]
-
-[[package]]
-name = "piteo-data"
-version = "0.1.1"
-dependencies = [
- "async-graphql",
- "chrono",
- "chronoutil",
- "diesel",
- "diesel-derive-enum",
- "diesel-derive-newtype",
- "diesel_as_jsonb",
- "eyre",
- "piteo-kit",
- "rust_decimal",
- "rust_decimal_macros",
- "serde",
- "serde_json",
- "stripe-rust",
- "uuid",
-]
-
-[[package]]
-name = "piteo-graphql"
-version = "0.1.1"
-dependencies = [
- "async-graphql",
- "piteo",
- "serde",
-]
-
-[[package]]
-name = "piteo-kit"
-version = "0.1.1"
-dependencies = [
- "chrono",
- "serde",
- "toml",
-]
-
-[[package]]
-name = "piteo-web"
-version = "0.1.1"
-
-[[package]]
 name = "pkg-config"
 version = "0.3.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2865,6 +2762,105 @@ dependencies = [
  "sharded-slab",
  "thread_local",
  "tracing-core",
+]
+
+[[package]]
+name = "trankeel"
+version = "0.1.1"
+dependencies = [
+ "async-graphql",
+ "chrono",
+ "liquid",
+ "log",
+ "serde",
+ "serde_json",
+ "trankeel-core",
+ "trankeel-data",
+ "trankeel-kit",
+ "validator",
+]
+
+[[package]]
+name = "trankeel-api"
+version = "0.1.1"
+dependencies = [
+ "async-graphql-rocket",
+ "color-eyre",
+ "dotenv",
+ "jsonwebtoken",
+ "rocket",
+ "rocket_cors",
+ "serde",
+ "trankeel",
+ "trankeel-graphql",
+]
+
+[[package]]
+name = "trankeel-cli"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "dotenv",
+ "regex",
+ "tokio 1.10.0",
+ "trankeel",
+ "trankeel-graphql",
+]
+
+[[package]]
+name = "trankeel-core"
+version = "0.1.1"
+dependencies = [
+ "async-trait",
+ "diesel",
+ "erased-serde",
+ "eyre",
+ "reqwest 0.11.5",
+ "sendinblue",
+ "serde",
+ "serde_json",
+ "stripe-rust",
+ "tokio 0.2.25",
+ "trankeel-data",
+]
+
+[[package]]
+name = "trankeel-data"
+version = "0.1.1"
+dependencies = [
+ "async-graphql",
+ "chrono",
+ "chronoutil",
+ "diesel",
+ "diesel-derive-enum",
+ "diesel-derive-newtype",
+ "diesel_as_jsonb",
+ "eyre",
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "serde_json",
+ "stripe-rust",
+ "trankeel-kit",
+ "uuid",
+]
+
+[[package]]
+name = "trankeel-graphql"
+version = "0.1.1"
+dependencies = [
+ "async-graphql",
+ "serde",
+ "trankeel",
+]
+
+[[package]]
+name = "trankeel-kit"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "serde",
+ "toml",
 ]
 
 [[package]]

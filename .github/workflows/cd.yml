@@ -23,13 +23,13 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           load: true
-          tags: registry.heroku.com/trankeel-rs/web
+          tags: registry.heroku.com/trankeel-api/web
 
       # https://devcenter.heroku.com/articles/container-registry-and-runtime#pushing-an-existing-image
-      - run: docker push registry.heroku.com/trankeel-rs/web
+      - run: docker push registry.heroku.com/trankeel-api/web
 
       # https://devcenter.heroku.com/articles/container-registry-and-runtime#releasing-an-image
-      - run: heroku container:release web --app trankeel-rs
+      - run: heroku container:release web --app trankeel-api
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 

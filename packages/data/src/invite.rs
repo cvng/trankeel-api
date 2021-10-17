@@ -5,7 +5,7 @@ use crate::DateTime;
 use crate::Id;
 use crate::InviteToken;
 use crate::PersonId;
-use piteo_kit::config::config;
+use trankeel_kit::config::config;
 
 pub type InviteId = Id;
 

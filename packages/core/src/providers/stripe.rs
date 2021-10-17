@@ -2,9 +2,9 @@ use crate::error::Context;
 use crate::error::Error;
 use crate::payment::PaymentProvider;
 use async_trait::async_trait;
-use piteo_data::Email;
-use piteo_data::Subscription;
 use std::env;
+use trankeel_data::Email;
+use trankeel_data::Subscription;
 
 // # Provider
 

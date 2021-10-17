@@ -3,13 +3,13 @@ use super::Lease;
 use super::Payment;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::Amount;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::LeaseId;
-use piteo::NoticeId;
-use piteo::ReceiptId;
-use piteo::RentId;
+use trankeel::Amount;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::LeaseId;
+use trankeel::NoticeId;
+use trankeel::ReceiptId;
+use trankeel::RentId;
 
 #[derive(Copy, Clone, Eq, PartialEq, Enum)]
 #[graphql(name = "RentStatus")]
@@ -19,12 +19,12 @@ pub enum RentStatus {
     Settled,
 }
 
-impl From<piteo::RentStatus> for RentStatus {
-    fn from(item: piteo::RentStatus) -> Self {
+impl From<trankeel::RentStatus> for RentStatus {
+    fn from(item: trankeel::RentStatus) -> Self {
         match item {
-            piteo::RentStatus::Open => Self::Pending,
-            piteo::RentStatus::Paid => Self::Settled,
-            piteo::RentStatus::PartiallyPaid => Self::Partial,
+            trankeel::RentStatus::Open => Self::Pending,
+            trankeel::RentStatus::Paid => Self::Settled,
+            trankeel::RentStatus::PartiallyPaid => Self::Partial,
         }
     }
 }
@@ -82,8 +82,8 @@ impl Rent {
     }
 }
 
-impl From<piteo::Rent> for Rent {
-    fn from(item: piteo::Rent) -> Self {
+impl From<trankeel::Rent> for Rent {
+    fn from(item: trankeel::Rent) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

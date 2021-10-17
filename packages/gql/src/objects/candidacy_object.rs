@@ -2,12 +2,12 @@ use super::Discussion;
 use super::Tenant;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::AdvertisementId;
-use piteo::CandidacyId;
-use piteo::CandidacyStatus;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::TenantId;
+use trankeel::AdvertisementId;
+use trankeel::CandidacyId;
+use trankeel::CandidacyStatus;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::TenantId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -41,8 +41,8 @@ impl Candidacy {
     }
 }
 
-impl From<piteo::Candidacy> for Candidacy {
-    fn from(item: piteo::Candidacy) -> Self {
+impl From<trankeel::Candidacy> for Candidacy {
+    fn from(item: trankeel::Candidacy) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,
