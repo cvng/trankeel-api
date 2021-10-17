@@ -198,7 +198,7 @@ CREATE TABLE plans (
 
 CREATE TABLE accounts (
     id                     UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at             TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at             TIMESTAMPTZ DEFAULT now(),
     updated_at             TIMESTAMPTZ,
     plan_id                UUID REFERENCES plans(id),
     status                 ACCOUNTSTATUS NOT NULL,
@@ -209,7 +209,7 @@ CREATE TABLE accounts (
 
 CREATE TABLE persons (
     id           UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at   TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at   TIMESTAMPTZ DEFAULT now(),
     updated_at   TIMESTAMPTZ,
     account_id   UUID NOT NULL REFERENCES accounts(id),
     auth_id      TEXT UNIQUE,
@@ -224,7 +224,7 @@ CREATE TABLE persons (
 
 CREATE TABLE companies (
     id                      UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at              TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at              TIMESTAMPTZ DEFAULT now(),
     updated_at              TIMESTAMPTZ,
     address                 JSONB,
     email                   TEXT NOT NULL,
@@ -237,7 +237,7 @@ CREATE TABLE companies (
 
 CREATE TABLE lenders (
     id            UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at    TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at    TIMESTAMPTZ DEFAULT now(),
     updated_at    TIMESTAMPTZ,
     account_id    UUID NOT NULL REFERENCES accounts(id),
     individual_id UUID REFERENCES persons(id),
@@ -246,7 +246,7 @@ CREATE TABLE lenders (
 
 CREATE TABLE properties (
     id                    UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at            TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at            TIMESTAMPTZ DEFAULT now(),
     updated_at            TIMESTAMPTZ,
     account_id            UUID NOT NULL REFERENCES accounts(id),
     address               JSONB NOT NULL,
@@ -274,7 +274,7 @@ CREATE TABLE properties (
 
 CREATE TABLE files (
     id           UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at   TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at   TIMESTAMPTZ DEFAULT now(),
     updated_at   TIMESTAMPTZ,
     download_url TEXT,
     external_id  TEXT,
@@ -286,7 +286,7 @@ CREATE TABLE files (
 
 CREATE TABLE leases (
     id                  UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at          TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at          TIMESTAMPTZ DEFAULT now(),
     updated_at          TIMESTAMPTZ,
     account_id          UUID NOT NULL REFERENCES accounts(id),
     deposit_amount      NUMERIC,
@@ -305,7 +305,7 @@ CREATE TABLE leases (
 
 CREATE TABLE rents (
     id             UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at     TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at     TIMESTAMPTZ DEFAULT now(),
     updated_at     TIMESTAMPTZ,
     period_end     TIMESTAMPTZ NOT NULL,
     period_start   TIMESTAMPTZ NOT NULL,
@@ -320,7 +320,7 @@ CREATE TABLE rents (
 
 CREATE TABLE tenants (
     id           UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at   TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at   TIMESTAMPTZ DEFAULT now(),
     updated_at   TIMESTAMPTZ,
     account_id   UUID NOT NULL REFERENCES accounts(id),
     person_id    UUID NOT NULL REFERENCES persons(id),
@@ -339,7 +339,7 @@ CREATE TABLE tenants (
 
 CREATE TABLE payments (
     id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ,
     rent_id UUID NOT NULL REFERENCES rents(id),
     amount NUMERIC NOT NULL,
@@ -350,7 +350,7 @@ CREATE TABLE payments (
 
 CREATE TABLE advertisements (
     id                  UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at          TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at          TIMESTAMPTZ DEFAULT now(),
     updated_at          TIMESTAMPTZ,
     published           BOOLEAN NOT NULL,
     lease_type          LEASETYPE NOT NULL,
@@ -367,7 +367,7 @@ CREATE TABLE advertisements (
 
 CREATE TABLE candidacies (
     id               UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at       TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at       TIMESTAMPTZ DEFAULT now(),
     updated_at       TIMESTAMPTZ,
     status           CANDIDACYSTATUS NOT NULL,
     advertisement_id UUID NOT NULL REFERENCES advertisements(id),
@@ -378,7 +378,7 @@ CREATE TABLE candidacies (
 
 CREATE TABLE professional_warrants (
     id         UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ,
     name       TEXT NOT NULL,
     identifier TEXT NOT NULL
@@ -386,7 +386,7 @@ CREATE TABLE professional_warrants (
 
 CREATE TABLE warrants (
     id              UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at      TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at      TIMESTAMPTZ DEFAULT now(),
     updated_at      TIMESTAMPTZ,
     type            WARRANTTYPE NOT NULL,
     tenant_id       UUID NOT NULL REFERENCES tenants(id),
@@ -406,7 +406,7 @@ CREATE TABLE eventables (
 
 CREATE TABLE events (
     id             UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at     TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at     TIMESTAMPTZ DEFAULT now(),
     updated_at     TIMESTAMPTZ,
     account_id     UUID NOT NULL REFERENCES accounts(id),
     participant_id UUID NOT NULL REFERENCES persons(id),
@@ -416,7 +416,7 @@ CREATE TABLE events (
 
 CREATE TABLE discussions (
     id           UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at   TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at   TIMESTAMPTZ DEFAULT now(),
     updated_at   TIMESTAMPTZ,
     account_id   UUID NOT NULL REFERENCES accounts(id),
     initiator_id UUID NOT NULL REFERENCES persons(id),
@@ -425,7 +425,7 @@ CREATE TABLE discussions (
 
 CREATE TABLE messages (
     id            UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at    TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at    TIMESTAMPTZ DEFAULT now(),
     updated_at    TIMESTAMPTZ,
     discussion_id UUID NOT NULL REFERENCES discussions(id) ON DELETE CASCADE,
     sender_id     UUID NOT NULL REFERENCES persons(id),
@@ -437,7 +437,7 @@ CREATE TABLE messages (
 
 CREATE TABLE invites (
     id         UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ,
     account_id UUID REFERENCES accounts(id),
     invitee_id UUID NOT NULL REFERENCES persons(id),
