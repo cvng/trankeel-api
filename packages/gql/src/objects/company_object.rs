@@ -1,9 +1,9 @@
 use super::Address;
-use piteo::CompanyId;
-use piteo::DateTime;
-use piteo::Email;
-use piteo::LegalEntityType;
-use piteo::PhoneNumber;
+use trankeel::CompanyId;
+use trankeel::DateTime;
+use trankeel::Email;
+use trankeel::LegalEntityType;
+use trankeel::PhoneNumber;
 
 #[derive(SimpleObject)]
 pub struct Company {
@@ -21,8 +21,8 @@ pub struct Company {
     pub display_name: String,
 }
 
-impl From<piteo::Company> for Company {
-    fn from(item: piteo::Company) -> Self {
+impl From<trankeel::Company> for Company {
+    fn from(item: trankeel::Company) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

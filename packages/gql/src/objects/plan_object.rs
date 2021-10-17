@@ -1,8 +1,8 @@
 use super::Feature;
 use async_graphql::Result;
-use piteo::Amount;
-use piteo::PlanCode;
-use piteo::PlanId;
+use trankeel::Amount;
+use trankeel::PlanCode;
+use trankeel::PlanId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]

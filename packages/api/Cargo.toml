@@ -1,8 +1,8 @@
 [package]
-name = "piteo-api"
+name = "trankeel-api"
 version = "0.1.1"
 edition = "2018"
-default-run = "piteo-api"
+default-run = "trankeel-api"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -11,8 +11,8 @@ async-graphql-rocket = { version = "2.0.8", git = "https://github.com/async-grap
 dotenv = "0.15.0"
 color-eyre = "0.5.11"
 jsonwebtoken = "7.2.0"
-piteo = { path = "../lib" }
-piteo-graphql = { path = "../gql" }
+trankeel = { path = "../lib" }
+trankeel-graphql = { path = "../gql" }
 rocket = { version = "0.5.0-rc.1", default-features = false, features = ["json"] }
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master", default-features = false }
 serde = "1.0"

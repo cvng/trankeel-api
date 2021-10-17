@@ -1,5 +1,5 @@
-use piteo::DateTime;
-use piteo::ProfessionalWarrantId;
+use trankeel::DateTime;
+use trankeel::ProfessionalWarrantId;
 
 #[derive(SimpleObject)]
 pub struct ProfessionalWarrant {
@@ -10,8 +10,8 @@ pub struct ProfessionalWarrant {
     pub identifier: String,
 }
 
-impl From<piteo::ProfessionalWarrant> for ProfessionalWarrant {
-    fn from(item: piteo::ProfessionalWarrant) -> Self {
+impl From<trankeel::ProfessionalWarrant> for ProfessionalWarrant {
+    fn from(item: trankeel::ProfessionalWarrant) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

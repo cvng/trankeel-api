@@ -1,5 +1,5 @@
 [package]
-name = "piteo-graphql"
+name = "trankeel-graphql"
 version = "0.1.1"
 edition = "2018"
 
@@ -10,5 +10,5 @@ doctest = false
 
 [dependencies]
 async-graphql = { version = "2.9.10", git = "https://github.com/async-graphql/async-graphql", features = ["apollo_tracing"] }
-piteo = { path = "../lib" }
+trankeel = { path = "../lib" }
 serde = "1.0"

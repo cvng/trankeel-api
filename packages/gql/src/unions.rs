@@ -12,10 +12,10 @@ pub enum DiscussionItem {
     Candidacy(Candidacy),
 }
 
-impl From<piteo::DiscussionItem> for DiscussionItem {
-    fn from(item: piteo::DiscussionItem) -> Self {
+impl From<trankeel::DiscussionItem> for DiscussionItem {
+    fn from(item: trankeel::DiscussionItem) -> Self {
         match item {
-            piteo::DiscussionItem::Candidacy(inner) => Self::Candidacy(inner.into()),
+            trankeel::DiscussionItem::Candidacy(inner) => Self::Candidacy(inner.into()),
         }
     }
 }
@@ -28,19 +28,19 @@ pub enum Eventable {
     Candidacy(Candidacy),
 }
 
-impl From<piteo::Eventable> for Eventable {
-    fn from(item: piteo::Eventable) -> Self {
+impl From<trankeel::Eventable> for Eventable {
+    fn from(item: trankeel::Eventable) -> Self {
         match item {
-            piteo::Eventable::File(inner) => Self::File(inner.into()),
-            piteo::Eventable::Rent(inner) => Self::Rent(inner.into()),
-            piteo::Eventable::Payment(inner) => Self::Payment(inner.into()),
-            piteo::Eventable::Candidacy(inner) => Self::Candidacy(inner.into()),
+            trankeel::Eventable::File(inner) => Self::File(inner.into()),
+            trankeel::Eventable::Rent(inner) => Self::Rent(inner.into()),
+            trankeel::Eventable::Payment(inner) => Self::Payment(inner.into()),
+            trankeel::Eventable::Candidacy(inner) => Self::Candidacy(inner.into()),
         }
     }
 }
 
-impl From<piteo::EventWithEventable> for Eventable {
-    fn from(item: piteo::EventWithEventable) -> Self {
+impl From<trankeel::EventWithEventable> for Eventable {
+    fn from(item: trankeel::EventWithEventable) -> Self {
         item.1.into()
     }
 }
@@ -50,10 +50,10 @@ pub enum LeaseDetails {
     FurnishedLeaseDetails(FurnishedLeaseDetails),
 }
 
-impl From<piteo::LeaseDetails> for LeaseDetails {
-    fn from(item: piteo::LeaseDetails) -> Self {
+impl From<trankeel::LeaseDetails> for LeaseDetails {
+    fn from(item: trankeel::LeaseDetails) -> Self {
         match item {
-            piteo::LeaseDetails::FurnishedLeaseDetails(inner) => {
+            trankeel::LeaseDetails::FurnishedLeaseDetails(inner) => {
                 Self::FurnishedLeaseDetails(inner.into())
             }
         }
@@ -66,17 +66,17 @@ pub enum LegalIdentity {
     Company(Company),
 }
 
-impl From<piteo::LegalIdentity> for LegalIdentity {
-    fn from(item: piteo::LegalIdentity) -> Self {
+impl From<trankeel::LegalIdentity> for LegalIdentity {
+    fn from(item: trankeel::LegalIdentity) -> Self {
         match item {
-            piteo::LegalIdentity::Individual(inner) => Self::Individual(inner.into()),
-            piteo::LegalIdentity::Company(inner) => Self::Company(inner.into()),
+            trankeel::LegalIdentity::Individual(inner) => Self::Individual(inner.into()),
+            trankeel::LegalIdentity::Company(inner) => Self::Company(inner.into()),
         }
     }
 }
 
-impl From<piteo::LenderWithIdentity> for LegalIdentity {
-    fn from(item: piteo::LenderWithIdentity) -> Self {
+impl From<trankeel::LenderWithIdentity> for LegalIdentity {
+    fn from(item: trankeel::LenderWithIdentity) -> Self {
         item.1.into()
     }
 }
@@ -87,17 +87,17 @@ pub enum WarrantIdentity {
     Professional(ProfessionalWarrant),
 }
 
-impl From<piteo::WarrantIdentity> for WarrantIdentity {
-    fn from(item: piteo::WarrantIdentity) -> Self {
+impl From<trankeel::WarrantIdentity> for WarrantIdentity {
+    fn from(item: trankeel::WarrantIdentity) -> Self {
         match item {
-            piteo::WarrantIdentity::Individual(inner) => Self::Individual(inner.into()),
-            piteo::WarrantIdentity::Professional(inner) => Self::Professional(inner.into()),
+            trankeel::WarrantIdentity::Individual(inner) => Self::Individual(inner.into()),
+            trankeel::WarrantIdentity::Professional(inner) => Self::Professional(inner.into()),
         }
     }
 }
 
-impl From<piteo::WarrantWithIdentity> for WarrantIdentity {
-    fn from(item: piteo::WarrantWithIdentity) -> Self {
+impl From<trankeel::WarrantWithIdentity> for WarrantIdentity {
+    fn from(item: trankeel::WarrantWithIdentity) -> Self {
         item.1.into()
     }
 }

@@ -4,10 +4,10 @@ use crate::AuthId;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
-use piteo_core::database::Db;
-use piteo_data::PhoneNumber;
-use piteo_data::TenantData;
-use piteo_data::TenantId;
+use trankeel_core::database::Db;
+use trankeel_data::PhoneNumber;
+use trankeel_data::TenantData;
+use trankeel_data::TenantId;
 use validator::Validate;
 
 // # Input

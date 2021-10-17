@@ -1,6 +1,6 @@
 use async_graphql::InputObject;
-use piteo_data::FileType;
-use piteo_data::Url;
+use trankeel_data::FileType;
+use trankeel_data::Url;
 
 #[derive(InputObject)]
 #[graphql(name = "FileInput")]

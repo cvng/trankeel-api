@@ -1,14 +1,14 @@
 use super::Property;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::AdvertisementId;
-use piteo::Amount;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::EntryFlexibility;
-use piteo::LeaseId;
-use piteo::LeaseType;
-use piteo::PropertyId;
+use trankeel::AdvertisementId;
+use trankeel::Amount;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::EntryFlexibility;
+use trankeel::LeaseId;
+use trankeel::LeaseType;
+use trankeel::PropertyId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -40,8 +40,8 @@ impl Advertisement {
     }
 }
 
-impl From<piteo::Advertisement> for Advertisement {
-    fn from(item: piteo::Advertisement) -> Self {
+impl From<trankeel::Advertisement> for Advertisement {
+    fn from(item: trankeel::Advertisement) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

@@ -1,19 +1,19 @@
 use crate::database::Db;
 use crate::error::Result;
 use diesel::result::Error::NotFound;
-use piteo_data::AccountId;
-use piteo_data::Candidacy;
-use piteo_data::EventId;
-use piteo_data::EventType;
-use piteo_data::Eventable;
-use piteo_data::EventableId;
-use piteo_data::File;
-use piteo_data::Message;
-use piteo_data::MessageId;
-use piteo_data::Notice;
-use piteo_data::Payment;
-use piteo_data::PersonId;
-use piteo_data::Receipt;
+use trankeel_data::AccountId;
+use trankeel_data::Candidacy;
+use trankeel_data::EventId;
+use trankeel_data::EventType;
+use trankeel_data::Eventable;
+use trankeel_data::EventableId;
+use trankeel_data::File;
+use trankeel_data::Message;
+use trankeel_data::MessageId;
+use trankeel_data::Notice;
+use trankeel_data::Payment;
+use trankeel_data::PersonId;
+use trankeel_data::Receipt;
 
 type Meta = (EventableId, AccountId, PersonId, PersonId);
 
@@ -56,7 +56,7 @@ pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
         Trace::ReceiptSent(receipt) => on_receipt_created(db, receipt.clone())?,
     };
 
-    let event = db.events().create(piteo_data::Event {
+    let event = db.events().create(trankeel_data::Event {
         id: EventId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),

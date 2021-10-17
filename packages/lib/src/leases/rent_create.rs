@@ -1,7 +1,7 @@
 use async_graphql::InputObject;
-use piteo_data::Amount;
-use piteo_data::DateTime;
-use piteo_data::LeaseId;
+use trankeel_data::Amount;
+use trankeel_data::DateTime;
+use trankeel_data::LeaseId;
 
 #[derive(InputObject)]
 pub struct RentInput {

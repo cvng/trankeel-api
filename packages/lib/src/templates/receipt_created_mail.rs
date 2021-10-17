@@ -1,19 +1,19 @@
 use crate::error::no;
 use crate::error::Result;
-use piteo_core::mailer::Contact;
-use piteo_core::mailer::IntoMail;
-use piteo_data::Amount;
-use piteo_data::DateTime;
-use piteo_data::FileId;
-use piteo_data::FileType;
-use piteo_data::Name;
-use piteo_data::Receipt;
-use piteo_data::Rent;
-use piteo_data::Tenant;
-use piteo_data::Url;
-use piteo_kit::config::config;
-use piteo_kit::locale;
 use serde::Serialize;
+use trankeel_core::mailer::Contact;
+use trankeel_core::mailer::IntoMail;
+use trankeel_data::Amount;
+use trankeel_data::DateTime;
+use trankeel_data::FileId;
+use trankeel_data::FileType;
+use trankeel_data::Name;
+use trankeel_data::Receipt;
+use trankeel_data::Rent;
+use trankeel_data::Tenant;
+use trankeel_data::Url;
+use trankeel_kit::config::config;
+use trankeel_kit::locale;
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct ReceiptCreatedMail {

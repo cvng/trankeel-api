@@ -1,9 +1,9 @@
-use piteo::DateTime;
-use piteo::ExternalId;
-use piteo::FileId;
-use piteo::FileStatus;
-use piteo::FileType;
-use piteo::Url;
+use trankeel::DateTime;
+use trankeel::ExternalId;
+use trankeel::FileId;
+use trankeel::FileStatus;
+use trankeel::FileType;
+use trankeel::Url;
 
 #[derive(SimpleObject)]
 pub struct File {
@@ -18,8 +18,8 @@ pub struct File {
     pub type_: FileType,
 }
 
-impl From<piteo::File> for File {
-    fn from(item: piteo::File) -> Self {
+impl From<trankeel::File> for File {
+    fn from(item: trankeel::File) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

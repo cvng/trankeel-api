@@ -1,7 +1,7 @@
 use crate::objects::Error;
 use crate::objects::File;
 use crate::objects::Message;
-use piteo::DiscussionId;
+use trankeel::DiscussionId;
 
 #[derive(SimpleObject)]
 pub struct CreateNoticesPayload {
@@ -9,8 +9,8 @@ pub struct CreateNoticesPayload {
     notices: Option<Vec<File>>,
 }
 
-impl From<piteo::Result<Vec<piteo::Notice>>> for CreateNoticesPayload {
-    fn from(item: piteo::Result<Vec<piteo::Notice>>) -> Self {
+impl From<trankeel::Result<Vec<trankeel::Notice>>> for CreateNoticesPayload {
+    fn from(item: trankeel::Result<Vec<trankeel::Notice>>) -> Self {
         match item {
             Ok(res) => Self {
                 errors: None,
@@ -31,8 +31,8 @@ pub struct CreateReceiptsPayload {
     receipts: Option<Vec<File>>,
 }
 
-impl From<piteo::Result<Vec<piteo::Receipt>>> for CreateReceiptsPayload {
-    fn from(item: piteo::Result<Vec<piteo::Receipt>>) -> Self {
+impl From<trankeel::Result<Vec<trankeel::Receipt>>> for CreateReceiptsPayload {
+    fn from(item: trankeel::Result<Vec<trankeel::Receipt>>) -> Self {
         match item {
             Ok(res) => Self {
                 errors: None,
@@ -52,8 +52,8 @@ pub struct DeleteDiscussionPayload {
     id: Option<DiscussionId>,
 }
 
-impl From<piteo::Result<piteo::DiscussionId>> for DeleteDiscussionPayload {
-    fn from(item: piteo::Result<piteo::DiscussionId>) -> Self {
+impl From<trankeel::Result<trankeel::DiscussionId>> for DeleteDiscussionPayload {
+    fn from(item: trankeel::Result<trankeel::DiscussionId>) -> Self {
         match item {
             Ok(res) => Self {
                 errors: None,
@@ -73,8 +73,8 @@ pub struct PushMessagePayload {
     message: Option<Message>,
 }
 
-impl From<piteo::Result<piteo::Message>> for PushMessagePayload {
-    fn from(item: piteo::Result<piteo::Message>) -> Self {
+impl From<trankeel::Result<trankeel::Message>> for PushMessagePayload {
+    fn from(item: trankeel::Result<trankeel::Message>) -> Self {
         match item {
             Ok(res) => Self {
                 errors: None,

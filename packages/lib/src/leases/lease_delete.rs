@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::AuthId;
-use piteo_core::database::Db;
-use piteo_data::LeaseId;
+use trankeel_core::database::Db;
+use trankeel_data::LeaseId;
 use validator::Validate;
 
 // # Input

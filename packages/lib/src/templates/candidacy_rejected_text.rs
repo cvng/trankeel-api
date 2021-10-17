@@ -1,10 +1,10 @@
 use crate::templates::parse_template;
-use piteo_data::Name;
-use piteo_data::Person;
-use piteo_kit::config::config;
 use serde::Serialize;
 use std::fmt;
 use std::fmt::Display;
+use trankeel_data::Name;
+use trankeel_data::Person;
+use trankeel_kit::config::config;
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct CandidacyRejectedText {

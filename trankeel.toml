@@ -1,0 +1,10 @@
+[templates]
+receipt_document = { id = "8269E571-7ECE-4F0D-BC37-854D77999E0D", path = "templates/fr/receipt_document.html" }
+receipt_created_mail = { id = "1", path = "templates/fr/receipt_created_mail.html" }
+candidacy_created_mail = { id = "2", path = "templates/fr/candidacy_created_mail.html" }
+candidacy_accepted_mail = { id = "3", path = "templates/fr/candidacy_accepted_mail.html" }
+candidacy_rejected_text = { id = "", path = "templates/fr/candidacy_rejected_text.html" }
+
+[routes]
+candidacy_url = "/candidacy/:id"
+invite_url = "/register?invite=:token"

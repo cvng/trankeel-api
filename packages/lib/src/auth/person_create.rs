@@ -1,7 +1,7 @@
 use super::AddressInput;
 use async_graphql::InputObject;
-use piteo_data::Email;
-use piteo_data::PhoneNumber;
+use trankeel_data::Email;
+use trankeel_data::PhoneNumber;
 
 #[derive(InputObject)]
 pub struct CreatePersonInput {

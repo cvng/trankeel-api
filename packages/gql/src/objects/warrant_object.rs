@@ -1,13 +1,13 @@
 use crate::unions::WarrantIdentity;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::PersonId;
-use piteo::ProfessionalWarrantId;
-use piteo::TenantId;
-use piteo::WarrantId;
-use piteo::WarrantType;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::PersonId;
+use trankeel::ProfessionalWarrantId;
+use trankeel::TenantId;
+use trankeel::WarrantId;
+use trankeel::WarrantType;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -32,8 +32,8 @@ impl Warrant {
     }
 }
 
-impl From<piteo::Warrant> for Warrant {
-    fn from(item: piteo::Warrant) -> Self {
+impl From<trankeel::Warrant> for Warrant {
+    fn from(item: trankeel::Warrant) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,
@@ -46,8 +46,8 @@ impl From<piteo::Warrant> for Warrant {
     }
 }
 
-impl From<piteo::WarrantWithIdentity> for Warrant {
-    fn from(item: piteo::WarrantWithIdentity) -> Self {
+impl From<trankeel::WarrantWithIdentity> for Warrant {
+    fn from(item: trankeel::WarrantWithIdentity) -> Self {
         item.0.into()
     }
 }

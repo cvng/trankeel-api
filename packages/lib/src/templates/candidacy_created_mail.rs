@@ -1,13 +1,13 @@
 use crate::error::Result;
-use piteo_core::mailer::Contact;
-use piteo_core::mailer::IntoMail;
-use piteo_data::AsUrl;
-use piteo_data::Candidacy;
-use piteo_data::Person;
-use piteo_data::Url;
-use piteo_kit::config::config;
-use piteo_kit::locale;
 use serde::Serialize;
+use trankeel_core::mailer::Contact;
+use trankeel_core::mailer::IntoMail;
+use trankeel_data::AsUrl;
+use trankeel_data::Candidacy;
+use trankeel_data::Person;
+use trankeel_data::Url;
+use trankeel_kit::config::config;
+use trankeel_kit::locale;
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct CandidacyCreatedMail {

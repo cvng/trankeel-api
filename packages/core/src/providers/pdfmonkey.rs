@@ -8,7 +8,7 @@ use crate::error::Error;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
 use async_trait::async_trait;
-use piteo_data::Document;
+use trankeel_data::Document;
 
 pub struct Pdfmonkey(pdfmonkey::Pdfmonkey);
 

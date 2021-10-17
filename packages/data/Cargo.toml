@@ -1,5 +1,5 @@
 [package]
-name = "piteo-data"
+name = "trankeel-data"
 version = "0.1.1"
 edition = "2018"
 
@@ -17,7 +17,7 @@ diesel_as_jsonb = "0.1.2"
 diesel-derive-enum = { version = "1.1.1", features = ["postgres"] }
 diesel-derive-newtype = "0.1.2"
 eyre = "0.6.5"
-piteo-kit = { path = "../kit" }
+trankeel-kit = { path = "../kit" }
 rust_decimal = { version = "1.16.0", features = ["db-diesel-postgres"] }
 rust_decimal_macros = "1.16.0"
 serde = "1.0"

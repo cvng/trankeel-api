@@ -1,4 +1,4 @@
-use piteo::Inline;
+use trankeel::Inline;
 
 #[derive(SimpleObject)]
 pub struct Address {
@@ -11,8 +11,8 @@ pub struct Address {
     pub inline: String,
 }
 
-impl From<piteo::Address> for Address {
-    fn from(item: piteo::Address) -> Self {
+impl From<trankeel::Address> for Address {
+    fn from(item: trankeel::Address) -> Self {
         Self {
             city: item.city.clone(),
             country: item.country.clone(),

@@ -1,12 +1,10 @@
-# Piteo
+# Trankeel
 
-[![ci](https://github.com/piteo-team/piteo/workflows/ci/badge.svg?branch=main&event=push)](https://github.com/piteo-team/piteo/actions)
-[![codecov](https://codecov.io/gh/piteo-team/piteo/branch/main/graph/badge.svg?token=1EC07KNEFJ)](https://codecov.io/gh/piteo-team/piteo)
-[![storybook](https://raw.githubusercontent.com/storybookjs/brand/master/badge/badge-storybook.svg)](https://main--5f3a2a460ab9350022c1e244.chromatic.com)
+[![ci](https://github.com/cvng/trankeel-api/workflows/ci/badge.svg?branch=main&event=push)](https://github.com/cvng/trankeel-api/actions)
 
-<img align="right" src="https://avatars.githubusercontent.com/u/64363572?s=200&v=4" height="150px">
+<img align="right" src="https://d2fvtsadwxhue9.cloudfront.net/versioned/trankeel/trankeel/logos/trankeelremovebgpreview.png" height="150px">
 
-Piteo is a _simple_, _modern_, and _featured_ lease management application for
+Trankeel is a _simple_, _modern_, and _featured_ lease management application for
 **individual** and **professional** lender that uses GraphQL and is built in
 Rust.
 
@@ -21,46 +19,28 @@ Rust.
 HTTPS (Git):
 
 ```sh
-git clone https://github.com/piteo-team/piteo.git
+git clone https://github.com/cvng/trankeel-api.git
 ```
 
 SSH (Git):
 
 ```sh
-git clone git@github.com:piteo-team/piteo.git
+git clone git@github.com:cvng/trankeel-api.git
 ```
 
 [GitHub CLI](https://cli.github.com):
 
 ```sh
-gh repo clone piteo-team/piteo
+gh repo clone cvng/trankeel-api
 ```
 
 ### Getting started
 
-Try running the web application:
-
-```sh
-cargo run --bin piteo-web
-```
-
-And the API server:
+Run the API server:
 
 ```sh
 cargo run
 ```
 
-You can find a deeper introduction, examples, and environment setup guides in
-each individual package:
-
-- [`piteo-api`](https://github.com/piteo-team/piteo/blob/main/packages/api/README.md)
-- [`piteo-web`](https://github.com/piteo-team/piteo/blob/main/packages/web/README.md)
-
 The complete GraphQL API reference is available at the online
-[playground](https://piteo-api.herokuapp.com/graphql).
-
-### Contributing
-
-We appreciate your help!
-
-To contribute, please read our [contribution](https://github.com/piteo-team/piteo/blob/main/CONTRIBUTING.md) guide.
+[playground](https://trankeel-api.herokuapp.com/graphql).

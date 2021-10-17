@@ -1,11 +1,11 @@
-use piteo::Amount;
-use piteo::DateTime;
-use piteo::FurnishedLeaseDuration;
-use piteo::LeaseRentPeriodicity;
-use piteo::LeaseRentReferenceIrl;
-use piteo::NakedLeaseDuration;
-use piteo::RentChargesRecuperationMode;
-use piteo::RentPaymentMethod;
+use trankeel::Amount;
+use trankeel::DateTime;
+use trankeel::FurnishedLeaseDuration;
+use trankeel::LeaseRentPeriodicity;
+use trankeel::LeaseRentReferenceIrl;
+use trankeel::NakedLeaseDuration;
+use trankeel::RentChargesRecuperationMode;
+use trankeel::RentPaymentMethod;
 
 #[derive(SimpleObject)]
 #[graphql(name = "LeaseFurnishedData")]
@@ -49,8 +49,8 @@ pub struct FurnishedLeaseDetails {
     pub works_rent_increase_lender: Option<String>,
 }
 
-impl From<piteo::FurnishedLeaseDetails> for FurnishedLeaseDetails {
-    fn from(item: piteo::FurnishedLeaseDetails) -> Self {
+impl From<trankeel::FurnishedLeaseDetails> for FurnishedLeaseDetails {
+    fn from(item: trankeel::FurnishedLeaseDetails) -> Self {
         Self {
             charges_recuperation_mode: item.charges_recuperation_mode,
             charges_revision_method: item.charges_revision_method,

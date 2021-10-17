@@ -6,18 +6,18 @@ use super::Property;
 use super::Warrant;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::AccountId;
-use piteo::Amount;
-use piteo::Client;
-use piteo::Date;
-use piteo::DateTime;
-use piteo::Email;
-use piteo::LeaseId;
-use piteo::Name;
-use piteo::PersonId;
-use piteo::PhoneNumber;
-use piteo::TenantId;
-use piteo::TenantStatus;
+use trankeel::AccountId;
+use trankeel::Amount;
+use trankeel::Client;
+use trankeel::Date;
+use trankeel::DateTime;
+use trankeel::Email;
+use trankeel::LeaseId;
+use trankeel::Name;
+use trankeel::PersonId;
+use trankeel::PhoneNumber;
+use trankeel::TenantId;
+use trankeel::TenantStatus;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -65,8 +65,8 @@ impl Tenant {
     }
 }
 
-impl From<piteo::Tenant> for Tenant {
-    fn from(item: piteo::Tenant) -> Self {
+impl From<trankeel::Tenant> for Tenant {
+    fn from(item: trankeel::Tenant) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

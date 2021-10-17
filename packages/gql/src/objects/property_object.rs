@@ -4,20 +4,20 @@ use super::Lease;
 use super::Lender;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::AccountId;
-use piteo::Amount;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::LenderId;
-use piteo::PropertyBuildPeriodType;
-use piteo::PropertyBuildingLegalStatus;
-use piteo::PropertyEnergyClass;
-use piteo::PropertyGasEmission;
-use piteo::PropertyHabitationUsageType;
-use piteo::PropertyId;
-use piteo::PropertyRoomType;
-use piteo::PropertyStatus;
-use piteo::PropertyUsageType;
+use trankeel::AccountId;
+use trankeel::Amount;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::LenderId;
+use trankeel::PropertyBuildPeriodType;
+use trankeel::PropertyBuildingLegalStatus;
+use trankeel::PropertyEnergyClass;
+use trankeel::PropertyGasEmission;
+use trankeel::PropertyHabitationUsageType;
+use trankeel::PropertyId;
+use trankeel::PropertyRoomType;
+use trankeel::PropertyStatus;
+use trankeel::PropertyUsageType;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -88,8 +88,8 @@ impl Property {
     }
 }
 
-impl From<piteo::Property> for Property {
-    fn from(item: piteo::Property) -> Self {
+impl From<trankeel::Property> for Property {
+    fn from(item: trankeel::Property) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,

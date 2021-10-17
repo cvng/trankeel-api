@@ -8,13 +8,13 @@ use std::fs::File;
 use std::io::Write;
 use std::result;
 
-pub type Result<T> = result::Result<T, piteo::Error>;
+pub type Result<T> = result::Result<T, trankeel::Error>;
 
 pub type Schema = async_graphql::Schema<Query, Mutation, EmptySubscription>;
 
 /// Build the GraphQL schema. https://async-graphql.github.io
 pub fn build_schema() -> Result<Schema> {
-    let client = piteo::init()?;
+    let client = trankeel::init()?;
 
     let schema = async_graphql::Schema::build(Query, Mutation, EmptySubscription)
         .register_type::<PersonInterface>()

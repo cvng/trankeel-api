@@ -1,7 +1,7 @@
 use crate::error::Error;
 use async_trait::async_trait;
-use piteo_data::Email;
-use piteo_data::Subscription;
+use trankeel_data::Email;
+use trankeel_data::Subscription;
 
 #[async_trait]
 pub trait PaymentProvider {

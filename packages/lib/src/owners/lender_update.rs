@@ -3,12 +3,12 @@ use crate::companies::UpdateCompanyInput;
 use crate::error::Error;
 use crate::error::Result;
 use async_graphql::InputObject;
-use piteo_core::database::Db;
-use piteo_data::AuthId;
-use piteo_data::LegalIdentity;
-use piteo_data::Lender;
-use piteo_data::LenderId;
-use piteo_data::PersonData;
+use trankeel_core::database::Db;
+use trankeel_data::AuthId;
+use trankeel_data::LegalIdentity;
+use trankeel_data::Lender;
+use trankeel_data::LenderId;
+use trankeel_data::PersonData;
 use validator::Validate;
 
 // # Input

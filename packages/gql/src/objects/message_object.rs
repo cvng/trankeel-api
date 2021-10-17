@@ -2,12 +2,12 @@ use super::Event;
 use super::Person;
 use async_graphql::Context;
 use async_graphql::Result;
-use piteo::Client;
-use piteo::DateTime;
-use piteo::DiscussionId;
-use piteo::EventId;
-use piteo::MessageId;
-use piteo::PersonId;
+use trankeel::Client;
+use trankeel::DateTime;
+use trankeel::DiscussionId;
+use trankeel::EventId;
+use trankeel::MessageId;
+use trankeel::PersonId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -44,8 +44,8 @@ impl Message {
     }
 }
 
-impl From<piteo::Message> for Message {
-    fn from(item: piteo::Message) -> Self {
+impl From<trankeel::Message> for Message {
+    fn from(item: trankeel::Message) -> Self {
         Self {
             id: item.id,
             created_at: item.created_at,
