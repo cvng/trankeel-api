@@ -1,6 +1,6 @@
 [package]
 name = "trankeel-api"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2018"
 default-run = "trankeel-api"
 
@@ -9,7 +9,6 @@ default-run = "trankeel-api"
 [dependencies]
 async-graphql-rocket = { version = "2.0.8", git = "https://github.com/async-graphql/async-graphql" }
 dotenv = "0.15.0"
-color-eyre = "0.5.11"
 jsonwebtoken = "7.2.0"
 trankeel = { path = "../lib" }
 trankeel-graphql = { path = "../gql" }

@@ -5,12 +5,10 @@ mod routes;
 mod server;
 mod webhooks;
 
-use color_eyre::Result;
 use rocket::launch;
 
 #[launch]
 fn rocket() -> _ {
-    color_eyre::install().ok();
     dotenv::dotenv().ok();
     trankeel_graphql::write_schema("schema.graphql").ok();
     server::server().unwrap()
