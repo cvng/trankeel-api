@@ -7,4 +7,4 @@ candidacy_rejected_text = { id = "", path = "templates/fr/candidacy_rejected_tex
 
 [routes]
 candidacy_url = "/candidacy/:id"
-invite_url = "/register?email=:email&invite=:token"
+invite_url = "/invite?email=:email&invite=:token"
