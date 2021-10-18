@@ -1,9 +1,9 @@
 use crate::schema::candidacies;
 use crate::AdvertisementId;
-use crate::AsUrl;
 use crate::DateTime;
 use crate::Id;
 use crate::TenantId;
+use crate::Url;
 use trankeel_kit::config::config;
 
 // # Types
@@ -37,12 +37,13 @@ pub struct Candidacy {
     pub description: String,
 }
 
-impl AsUrl for Candidacy {
-    fn web_route(&self) -> String {
+impl Candidacy {
+    pub fn as_url(&self) -> Url {
         config()
-            .web_routes("candidacy_url")
+            .routes("candidacy_url")
             .unwrap()
             .replace(":id", &self.id.to_string())
+            .into()
     }
 }
 

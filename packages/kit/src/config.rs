@@ -17,8 +17,11 @@ impl Config {
         self.templates.get(key).cloned()
     }
 
-    pub fn web_routes(&self, key: &str) -> Option<String> {
-        self.routes.get(key).cloned()
+    pub fn routes(&self, key: &str) -> Option<String> {
+        self.routes
+            .get(key)
+            .cloned()
+            .map(|route| format!("{}{}", env::var("WEB_URL").expect("WEB_URL"), route))
     }
 }
 
