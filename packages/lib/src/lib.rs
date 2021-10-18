@@ -55,3 +55,11 @@ pub use crate::tenants::CreateTenantInput;
 pub use crate::tenants::DeleteTenantInput;
 pub use crate::tenants::UpdateTenantInput;
 pub use trankeel_data::*;
+
+trait Command {
+    type Input;
+    type State;
+    type Output;
+
+    fn run(state: Self::State, input: Self::Input) -> crate::error::Result<Self::Output>;
+}

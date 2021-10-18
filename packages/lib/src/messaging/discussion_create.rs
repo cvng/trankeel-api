@@ -1,9 +1,14 @@
-use super::push_message;
+use crate::messaging::message_push;
+use crate::Command;
 use crate::PushMessageInput;
 use crate::Result;
-use trankeel_core::database::Db;
+use chrono::Utc;
+use message_push::PushMessageCommand;
+use trankeel_data::Account;
+use trankeel_data::DateTime;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
+use trankeel_data::DiscussionWithMessages;
 use trankeel_data::PersonId;
 use validator::Validate;
 
@@ -14,35 +19,57 @@ pub struct CreateDiscussionInput {
     pub message: Option<String>,
 }
 
-pub fn create_discussion_unauthenticated(
-    db: &impl Db,
-    input: CreateDiscussionInput,
-) -> Result<Discussion> {
-    input.validate()?;
+pub struct State {
+    pub account: Account,
+}
 
-    let account = db.accounts().by_person_id(&input.recipient_id)?;
+pub struct Output {
+    pub discussion: DiscussionWithMessages,
+}
 
-    let discussion = db.discussions().create(Discussion {
-        id: DiscussionId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        account_id: account.id,
-        initiator_id: input.initiator_id,
-        status: Default::default(),
-    })?;
+pub(crate) struct CreateDiscussionCommand;
 
-    db.discussions().touch(discussion.id)?; // Touch updated_at.
+impl Command for CreateDiscussionCommand {
+    type Input = CreateDiscussionInput;
+    type State = State;
+    type Output = Output;
 
-    if let Some(message) = input.message {
-        push_message(
-            db,
-            PushMessageInput {
-                discussion_id: discussion.id,
-                sender_id: input.initiator_id,
-                message,
-            },
-        )?;
+    fn run(state: Self::State, input: Self::Input) -> Result<Self::Output> {
+        input.validate()?;
+
+        let account = state.account;
+
+        let mut discussion = Discussion {
+            id: DiscussionId::new(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            account_id: account.id,
+            initiator_id: input.initiator_id,
+            status: Default::default(),
+        };
+
+        discussion.updated_at = Some(DateTime(Utc::now())); // Touch updated_at.
+
+        let mut messages = vec![];
+
+        if let Some(message) = input.message {
+            messages.push(
+                PushMessageCommand::run(
+                    message_push::State {
+                        discussion: discussion.clone(),
+                    },
+                    PushMessageInput {
+                        discussion_id: discussion.id,
+                        sender_id: input.initiator_id,
+                        message,
+                    },
+                )?
+                .message,
+            );
+        }
+
+        Ok(Output {
+            discussion: (discussion, messages),
+        })
     }
-
-    Ok(discussion)
 }
