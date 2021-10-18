@@ -2,7 +2,6 @@ use crate::error::Result;
 use serde::Serialize;
 use trankeel_core::mailer::Contact;
 use trankeel_core::mailer::IntoMail;
-use trankeel_data::AsUrl;
 use trankeel_data::Candidacy;
 use trankeel_data::Invite;
 use trankeel_data::Person;
@@ -19,7 +18,7 @@ pub struct CandidacyAcceptedMail {
 impl CandidacyAcceptedMail {
     pub fn try_new(_candidacy: &Candidacy, candidate: &Person, invite: &Invite) -> Result<Self> {
         Ok(Self {
-            invite_url: invite.as_url(),
+            invite_url: invite.as_url(candidate.email.clone()),
             _recipients: vec![candidate.clone().into()],
         })
     }
