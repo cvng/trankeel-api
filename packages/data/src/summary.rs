@@ -1,40 +1,14 @@
 use crate::AccountId;
 use crate::Amount;
 use crate::DateTime;
+use crate::Id;
 
-table! {
-    reports (id) {
-        id -> Uuid,
-        account_id -> Uuid,
-        created_at -> Timestamptz,
-        amount_expected -> Numeric,
-        amount_received -> Numeric,
-        amount_settled -> Numeric,
-        amount_partial -> Numeric,
-        amount_pending -> Numeric,
-        n_expected -> Int4,
-        n_received -> Int4,
-        n_settled -> Int4,
-        n_partial -> Int4,
-        n_pending -> Int4,
-        ratio_expected -> Float8,
-        ratio_received -> Float8,
-        ratio_settled -> Float8,
-        ratio_partial -> Float8,
-        ratio_pending -> Float8,
-        variation_expected -> Float8,
-        variation_received -> Float8,
-        variation_settled -> Float8,
-        variation_partial -> Float8,
-        variation_pending -> Float8,
-        payment_rate -> Float8,
-        occupation_rate -> Float8,
-    }
-}
+pub type SummaryId = Id;
 
-#[derive(Clone, Debug, QueryableByName)]
+#[derive(Clone, Debug, Queryable, Identifiable, SimpleObject)]
 #[table_name = "reports"]
 pub struct Summary {
+    pub id: SummaryId,
     pub account_id: AccountId,
     pub created_at: DateTime,
 
@@ -69,6 +43,7 @@ pub struct Summary {
 impl Default for Summary {
     fn default() -> Self {
         Self {
+            id: Default::default(),
             account_id: Default::default(),
             created_at: DateTime::default(),
             amount_expected: Default::default(),
@@ -94,5 +69,35 @@ impl Default for Summary {
             payment_rate: Default::default(),
             occupation_rate: Default::default(),
         }
+    }
+}
+
+table! {
+    reports (id) {
+        id -> Uuid,
+        account_id -> Uuid,
+        created_at -> Timestamptz,
+        amount_expected -> Numeric,
+        amount_received -> Numeric,
+        amount_settled -> Numeric,
+        amount_partial -> Numeric,
+        amount_pending -> Numeric,
+        n_expected -> Int4,
+        n_received -> Int4,
+        n_settled -> Int4,
+        n_partial -> Int4,
+        n_pending -> Int4,
+        ratio_expected -> Float8,
+        ratio_received -> Float8,
+        ratio_settled -> Float8,
+        ratio_partial -> Float8,
+        ratio_pending -> Float8,
+        variation_expected -> Float8,
+        variation_received -> Float8,
+        variation_settled -> Float8,
+        variation_partial -> Float8,
+        variation_pending -> Float8,
+        payment_rate -> Float8,
+        occupation_rate -> Float8,
     }
 }

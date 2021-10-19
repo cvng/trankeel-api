@@ -95,7 +95,7 @@ pub enum PropertyStatus {
 
 impl Default for PropertyStatus {
     fn default() -> Self {
-        Self::Unrented
+        Self::Rented
     }
 }
 

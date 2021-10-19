@@ -11,7 +11,6 @@ use super::Person;
 use super::Plan;
 use super::Property;
 use super::Rent;
-use super::Summary;
 use super::Tenant;
 use crate::wip;
 use async_graphql::Context;
@@ -26,6 +25,7 @@ use trankeel::LeaseId;
 use trankeel::LenderId;
 use trankeel::PaymentId;
 use trankeel::PropertyId;
+use trankeel::Summary;
 use trankeel::TenantId;
 use trankeel::TenantStatus;
 
@@ -189,11 +189,12 @@ impl Query {
         _since: DateTime,
         _until: DateTime,
     ) -> Result<Summary> {
-        Ok(ctx
-            .data_unchecked::<Client>()
-            .reports()
-            .by_auth_id(ctx.data::<AuthId>()?)?
-            .into())
+        Ok(ctx.data_unchecked::<Client>().reports().by_account_id(
+            &ctx.data_unchecked::<Client>()
+                .accounts()
+                .by_auth_id(ctx.data::<AuthId>()?)?
+                .id,
+        )?)
     }
 
     async fn events(&self, ctx: &Context<'_>) -> Result<Vec<Event>> {

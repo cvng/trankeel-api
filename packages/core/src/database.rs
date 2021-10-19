@@ -215,7 +215,7 @@ pub trait EventableStore {
 }
 
 pub trait ReportStore {
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Summary>;
+    fn by_account_id(&mut self, account_id: &AccountId) -> Result<Summary>;
 }
 
 pub trait DiscussionStore {
