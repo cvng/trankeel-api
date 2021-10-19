@@ -10,11 +10,10 @@ use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::result::Error::NotFound;
-use diesel::sql_query;
-use diesel::sql_types::Text;
 use diesel::update;
 use diesel::PgConnection;
 use std::env;
+use trankeel_data::reports;
 use trankeel_data::schema::accounts;
 use trankeel_data::schema::advertisements;
 use trankeel_data::schema::candidacies;
@@ -902,15 +901,10 @@ impl database::EventableStore for EventableStore<'_> {
 }
 
 impl database::ReportStore for ReportStore<'_> {
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Summary> {
-        Ok(sql_query(
-            "
-            SELECT * FROM reports
-            LEFT JOIN persons ON persons.account_id = reports.account_id
-            WHERE persons.auth_id = $1;",
-        )
-        .bind::<Text, _>(auth_id)
-        .get_result(&self.0.get()?)?)
+    fn by_account_id(&mut self, account_id: &AccountId) -> Result<Summary> {
+        Ok(reports::table
+            .filter(reports::account_id.eq(account_id))
+            .first(&self.0.get()?)?)
     }
 }
 

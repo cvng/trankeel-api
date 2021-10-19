@@ -74,7 +74,7 @@ pub struct LeaseData {
 
 impl Lease {
     pub fn rent_full_amount(&self) -> Amount {
-        self.rent_amount + self.rent_charges_amount.unwrap_or_default()
+        (self.rent_amount.inner() + self.rent_charges_amount.unwrap_or_default().inner()).into()
     }
 
     pub fn status(&self) -> LeaseStatus {

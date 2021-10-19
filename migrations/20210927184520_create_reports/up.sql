@@ -13,6 +13,7 @@ CREATE TYPE expected_rents AS (
 );
 
 CREATE TYPE summary_reports AS (
+    id UUID,
     account_id UUID,
     created_at TIMESTAMPTZ,
     amount_expected NUMERIC,
@@ -47,9 +48,9 @@ BEGIN
         SELECT
             accounts.id AS account_id,
 
-            sum(full_amount) AS amount_expected,
-            sum(full_amount) FILTER (WHERE rents.status = 'paid') AS amount_settled,
-            sum(full_amount) FILTER (WHERE rents.status = 'partially_paid') AS amount_partial,
+            coalesce(sum(full_amount), 0) AS amount_expected,
+            coalesce(sum(full_amount) FILTER (WHERE rents.status = 'paid'), 0) AS amount_settled,
+            coalesce(sum(full_amount) FILTER (WHERE rents.status = 'partially_paid'), 0) AS amount_partial,
 
             count(rents.id) AS n_expected,
             count(rents.id) FILTER (WHERE rents.status = 'paid') AS n_settled,
@@ -132,14 +133,15 @@ BEGIN
         LEFT JOIN LATERAL (SELECT * FROM expected_rents_last_month) last_month ON TRUE
     )
     SELECT
-        account_id,
+        account_id AS id,
+        account_id AS account_id,
         current_month AS created_at,
 
-        coalesce(amount_expected, 0)::NUMERIC amount_expected,
-        coalesce(amount_received, 0)::NUMERIC amount_received,
-        coalesce(amount_settled, 0)::NUMERIC amount_settled,
-        coalesce(amount_partial, 0)::NUMERIC amount_partial,
-        coalesce(amount_pending, 0)::NUMERIC amount_pending,
+        coalesce(amount_expected, 0)::NUMERIC AS amount_expected,
+        coalesce(amount_received, 0)::NUMERIC AS amount_received,
+        coalesce(amount_settled, 0)::NUMERIC AS amount_settled,
+        coalesce(amount_partial, 0)::NUMERIC AS amount_partial,
+        coalesce(amount_pending, 0)::NUMERIC AS amount_pending,
 
         coalesce(n_expected, 0)::INTEGER AS n_expected,
         coalesce(n_received, 0)::INTEGER AS n_received,
@@ -161,7 +163,7 @@ BEGIN
 
         coalesce(payment_rate, 0)::FLOAT AS payment_rate,
         coalesce(occupation_rate, 0)::FLOAT AS occupation_rate
-    FROM expected_rents, rented_properties, ratio_and_variations;
+    FROM expected_rents, ratio_and_variations;
 END;
 $$ LANGUAGE plpgsql;
 

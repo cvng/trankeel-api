@@ -459,7 +459,7 @@ type Mutation {
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -722,6 +722,7 @@ enum SubscriptionStatus {
 	UNPAID
 }
 type Summary {
+	id: ID!
 	accountId: ID!
 	createdAt: DateTime!
 	amountExpected: Decimal!
