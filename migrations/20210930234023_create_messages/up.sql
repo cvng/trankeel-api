@@ -8,7 +8,4 @@ CREATE TABLE messages (
     event_id UUID REFERENCES events(id)
 );
 
-ALTER TABLE messages ADD CONSTRAINT content_or_event_id_check
-CHECK (num_nonnulls(content, event_id) = 1);
-
 SELECT manage_updated_at('messages');

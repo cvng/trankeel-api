@@ -44,7 +44,7 @@ type Advertisement {
 	leaseType: LeaseType!
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
-	depositAmount: Decimal
+	depositAmount: Decimal!
 	effectDate: DateTime!
 	flexibility: LenderFlexibility
 	referralLeaseId: ID
@@ -65,6 +65,7 @@ type Candidacy {
 	description: String!
 	tenant: Tenant!
 	discussion: Discussion!
+	workflow: Workflow
 }
 enum CandidacyStatus {
 	PENDING
@@ -84,12 +85,19 @@ type Company implements LegalIdentityInterface {
 	phoneNumber: PhoneNumber
 	displayName: String!
 }
+input CompleteStepInput {
+	id: ID!
+}
+type CompleteStepPayload {
+	errors: [Error!]
+	step: Step
+}
 input CreateAdvertisementInput {
 	published: Boolean!
 	leaseType: LeaseType!
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
-	depositAmount: Decimal
+	depositAmount: Decimal!
 	effectDate: DateTime!
 	flexibility: LenderFlexibility
 	referralLeaseId: ID
@@ -174,13 +182,15 @@ enum EventType {
 	CANDIDACY_CREATED
 	CANDIDACY_ACCEPTED
 	CANDIDACY_REJECTED
+	LEASE_CREATED
 	PAYMENT_NOTICE_CREATED
 	PAYMENT_NOTICE_SENT
 	RENT_RECEIPT_CREATED
 	RENT_RECEIPT_SENT
 	TRANSACTION_CREATED
+	STEP_COMPLETED
 }
-union Eventable = | File | Rent | Transaction | Candidacy
+union Eventable = | File | Rent | Step | Lease | Transaction | Candidacy
 type Feature {
 	available: Boolean!
 	title: String!
@@ -238,7 +248,7 @@ type Lease {
 	createdAt: DateTime
 	updatedAt: DateTime
 	accountId: ID!
-	depositAmount: Decimal
+	depositAmount: Decimal!
 	effectDate: DateTime!
 	signatureDate: DateTime
 	rentAmount: Decimal!
@@ -342,7 +352,7 @@ enum LeaseFurnishedDuration {
 }
 input LeaseFurnishedInput {
 	data: LeaseFurnishedDataInput
-	depositAmount: Decimal
+	depositAmount: Decimal!
 	effectDate: DateTime!
 	renewDate: DateTime
 	file: FileInput
@@ -378,6 +388,7 @@ enum LeaseRentReferenceIrl {
 	APRIL_FIRST_SEMESTER_Y2021
 }
 enum LeaseStatus {
+	UNSIGNED
 	ACTIVE
 	ENDED
 }
@@ -458,6 +469,7 @@ type Mutation {
 	sendPaymentNotice(input: SendPaymentNoticeInput!): CreateNoticesPayload!
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
+	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
 type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
@@ -709,6 +721,12 @@ input SignupUserFromInviteInput {
 	authId: AuthenticationID!
 	inviteToken: InviteToken!
 }
+type Step {
+	id: ID!
+	label: String!
+	completed: Boolean!
+	completedAt: DateTime
+}
 """
 https://stripe.com/docs/billing/subscriptions/overview
 """
@@ -891,6 +909,14 @@ enum WarrantType {
 	PERSON
 	VISALE
 	COMPANY
+}
+type Workflow {
+	id: ID!
+	type: WorkflowType!
+	steps: [Step!]!
+}
+enum WorkflowType {
+	CANDIDACY
 }
 schema {
 	query: Query

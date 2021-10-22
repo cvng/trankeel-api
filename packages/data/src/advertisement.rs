@@ -28,7 +28,7 @@ pub struct Advertisement {
     pub lease_type: LeaseType,
     pub rent_amount: Amount,
     pub rent_charges_amount: Option<Amount>,
-    pub deposit_amount: Option<Amount>,
+    pub deposit_amount: Amount,
     pub effect_date: DateTime,
     pub flexibility: Option<EntryFlexibility>,
     pub referral_lease_id: Option<LeaseId>,

@@ -1,20 +1,35 @@
 use super::reject_candidacy;
 use super::RejectCandidacyInput;
+use crate::error::no;
 use crate::error::Result;
 use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
+use crate::leases::create_lease_from_advertisement;
 use crate::templates::CandidacyAcceptedMail;
+use crate::templates::LeaseDocument;
+use crate::workflows::complete_step;
+use crate::workflows::create_workflow;
+use crate::workflows::CreateWorkflowInput;
+use crate::CompleteStepInput;
 use async_graphql::InputObject;
+use chrono::Utc;
 use trankeel_core::activity::trace;
 use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
 use trankeel_core::mailer::Mailer;
+use trankeel_core::pdfmaker::Pdfmaker;
+use trankeel_data::lease_filename;
 use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyData;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
+use trankeel_data::FileType;
 use trankeel_data::InviteReason;
+use trankeel_data::LeaseData;
+use trankeel_data::LeaseFile;
+use trankeel_data::LeaseFileId;
+use trankeel_data::WorkflowType;
 use validator::Validate;
 
 // # Input
@@ -28,6 +43,7 @@ pub struct AcceptCandidacyInput {
 
 pub async fn accept_candidacy(
     db: &impl Db,
+    pdfmaker: &impl Pdfmaker,
     mailer: &impl Mailer,
     auth_id: &AuthId,
     input: AcceptCandidacyInput,
@@ -57,13 +73,74 @@ pub async fn accept_candidacy(
 
     trace(db, Trace::CandidacyAccepted(candidacy.clone())).ok();
 
+    // Send invite to candidate.
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
 
     let invite = create_invite(
         db,
         CreateInviteInput {
-            id: candidate.id,
+            invitee_id: candidate.id,
             reason: InviteReason::CandidacyAccepted,
+        },
+    )?;
+
+    // Create unsigned lease.
+    let advertisement = db.advertisements().by_id(&candidacy.advertisement_id)?;
+    let tenant = db.tenants().by_person_id(&candidate.id)?;
+
+    let lease = create_lease_from_advertisement(db, auth_id, &advertisement, vec![tenant])?;
+
+    // Init new lease file.
+    let lease_file_id = LeaseFileId::new();
+    let mut lease_file = LeaseFile {
+        id: lease_file_id,
+        type_: FileType::LeaseDocument,
+        filename: Some(lease_filename(&lease_file_id, &lease)),
+        status: None,
+        external_id: None,
+        download_url: None,
+        preview_url: None,
+        created_at: None,
+        updated_at: None,
+    };
+
+    // Try to generate lease document (PDF).
+    let document = LeaseDocument::try_new(lease.clone(), lease_file.clone(), Utc::now().into())?;
+    let document = pdfmaker.generate(document).await?;
+
+    // Assign lease file external ID.
+    lease_file.external_id = Some(document.id);
+    lease_file.status = Some(document.status);
+
+    // Create lease file.
+    let lease_file = match db.files().create(lease_file) {
+        Ok(lease_file) => lease_file,
+        Err(err) => return Err(err),
+    };
+
+    // Link lease file with lease.
+    db.leases().update(LeaseData {
+        id: lease.id,
+        lease_id: Some(lease_file.id),
+        ..Default::default()
+    })?;
+
+    // Init candidacy workflow.
+    let workflow = create_workflow(
+        db,
+        CreateWorkflowInput {
+            type_: WorkflowType::Candidacy,
+            workflowable_id: candidacy.id,
+        },
+    )?;
+
+    // Mark first step as completed (candidacy_accepted)
+    let steps = db.steps().by_workflow_id(&workflow.id)?;
+
+    complete_step(
+        db,
+        CompleteStepInput {
+            id: steps.first().ok_or_else(|| no("workflow.first_step"))?.id,
         },
     )?;
 

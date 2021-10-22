@@ -28,7 +28,7 @@ table! {
         lease_type -> Leasetype,
         rent_amount -> Numeric,
         rent_charges_amount -> Nullable<Numeric>,
-        deposit_amount -> Nullable<Numeric>,
+        deposit_amount -> Numeric,
         effect_date -> Timestamptz,
         flexibility -> Nullable<Entryflexibility>,
         referral_lease_id -> Nullable<Uuid>,
@@ -94,6 +94,8 @@ table! {
         id -> Uuid,
         file_id -> Nullable<Uuid>,
         rent_id -> Nullable<Uuid>,
+        step_id -> Nullable<Uuid>,
+        lease_id -> Nullable<Uuid>,
         payment_id -> Nullable<Uuid>,
         candidacy_id -> Nullable<Uuid>,
     }
@@ -158,7 +160,7 @@ table! {
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
         account_id -> Uuid,
-        deposit_amount -> Nullable<Numeric>,
+        deposit_amount -> Numeric,
         effect_date -> Timestamptz,
         signature_date -> Nullable<Timestamptz>,
         rent_amount -> Numeric,
@@ -323,6 +325,21 @@ table! {
     use diesel::sql_types::*;
     use crate::sql_types::*;
 
+    steps (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        workflow_id -> Uuid,
+        label -> Text,
+        completed -> Bool,
+        confirmation -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     tenants (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -359,6 +376,31 @@ table! {
     }
 }
 
+table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
+    workflowables (id) {
+        id -> Uuid,
+        candidacy_id -> Nullable<Uuid>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
+    workflows (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        workflowable_id -> Uuid,
+        #[sql_name = "type"]
+        type_ -> Workflowtype,
+        completed -> Bool,
+    }
+}
+
 joinable!(accounts -> plans (plan_id));
 joinable!(advertisements -> leases (referral_lease_id));
 joinable!(advertisements -> properties (property_id));
@@ -368,8 +410,10 @@ joinable!(discussions -> accounts (account_id));
 joinable!(discussions -> persons (initiator_id));
 joinable!(eventables -> candidacies (candidacy_id));
 joinable!(eventables -> files (file_id));
+joinable!(eventables -> leases (lease_id));
 joinable!(eventables -> payments (payment_id));
 joinable!(eventables -> rents (rent_id));
+joinable!(eventables -> steps (step_id));
 joinable!(events -> accounts (account_id));
 joinable!(events -> eventables (eventable_id));
 joinable!(events -> persons (participant_id));
@@ -389,12 +433,15 @@ joinable!(persons -> accounts (account_id));
 joinable!(properties -> accounts (account_id));
 joinable!(properties -> lenders (lender_id));
 joinable!(rents -> leases (lease_id));
+joinable!(steps -> workflows (workflow_id));
 joinable!(tenants -> accounts (account_id));
 joinable!(tenants -> leases (lease_id));
 joinable!(tenants -> persons (person_id));
 joinable!(warrants -> persons (individual_id));
 joinable!(warrants -> professional_warrants (professional_id));
 joinable!(warrants -> tenants (tenant_id));
+joinable!(workflowables -> candidacies (candidacy_id));
+joinable!(workflows -> workflowables (workflowable_id));
 
 allow_tables_to_appear_in_same_query!(
     accounts,
@@ -415,6 +462,9 @@ allow_tables_to_appear_in_same_query!(
     professional_warrants,
     properties,
     rents,
+    steps,
     tenants,
     warrants,
+    workflowables,
+    workflows,
 );

@@ -1,0 +1,45 @@
+[[steps]]
+label = "Acceptation de la candidature"
+confirmation = """
+Bonjour {{ tenant_name }},
+Votre candidature a été retenue, vous allez recevoir un mail pour créer votre espace membre sur trankeel.com et un deuxième mail pour procéder à la signature électronique du bail.
+Vous pouvez d'ores et déjà nous faire parvenir votre attestation d'assurance.
+Cordialement."""
+
+[[steps]]
+label = "Signature du contrat de location"
+confirmation = """
+Bonjour,
+Merci d'avoir procéder à la signature du bail,
+Pouvez-vous nous faire parvenir votre attestation d'assurance (si ce n'est pas déjà fait) et procéder au règlement du dépôt de garantie dans les meilleurs délais ?
+Pour rappel le montant du dépôt de garantie est de {{ deposit_amount }}, vous pouvez effectuer le règlement par virement (vous trouverez les coordonnées bancaires dans le bail que vous avez signé).
+Cordialement."""
+
+[[steps]]
+label = "Récupération de l'attestation d'assurance"
+confirmation = """
+Merci, nous avons bien reçu votre attestation d'assurance.
+Cordialement."""
+
+[[steps]]
+label = "Encaissement du dépôt de garantie"
+confirmation = """
+Merci, nous avons bien encaissé {{ deposit_amount }} pour règlement de votre dépôt de garantie.
+Cordialement."""
+
+[[steps]]
+label = "Confirmation de la date de remise des clés"
+confirmation = """
+Merci, nous vous confirmons que l'état des lieux ainsi que la remise des clés aura lieu le {{ move_in_date }}.
+Cordialement."""
+
+[[steps]]
+label = "Réalisation de l'état des lieux"
+confirmation = """
+Bonjour,
+Merci pour votre confiance,
+Nous vous demandons de bien vouloir mettre en place un virement automatique en début de mois pour le règlement du loyer.
+Vous retrouverez toutes vos quittances et documents sur votre espace sur trankeel.com.
+C'est le mode de communication à privilégier pour toutes demandes et besoins concernant votre location.
+Bon séjour.
+Cordialement."""

@@ -125,7 +125,7 @@ async fn seed() {
             &auth_id,
             CreateFurnishedLeaseInput {
                 details: None,
-                deposit_amount: None,
+                deposit_amount: Amount::new(36000),
                 effect_date: Utc::now().into(),
                 renew_date: None,
                 file: None,
@@ -146,7 +146,7 @@ async fn seed() {
                 lease_type: LeaseType::Furnished,
                 rent_amount: Amount::new(36000),
                 rent_charges_amount: Some(Amount::new(9000)),
-                deposit_amount: None,
+                deposit_amount: Amount::new(36000),
                 effect_date: Utc::now().into(),
                 flexibility: Some(EntryFlexibility::OneDay),
                 referral_lease_id: Some(lease.id),

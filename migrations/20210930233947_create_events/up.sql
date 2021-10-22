@@ -2,11 +2,13 @@ CREATE TYPE eventtype AS ENUM (
     'candidacy_created',
     'candidacy_accepted',
     'candidacy_rejected',
+    'lease_created',
     'notice_created',
     'notice_sent',
     'receipt_created',
     'receipt_sent',
-    'payment_created'
+    'payment_created',
+    'step_completed'
 );
 
 CREATE TABLE events (

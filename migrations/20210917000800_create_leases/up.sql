@@ -13,7 +13,7 @@ CREATE TABLE leases (
     created_at TIMESTAMPTZ DEFAULT current_timestamp,
     updated_at TIMESTAMPTZ,
     account_id UUID NOT NULL REFERENCES accounts(id),
-    deposit_amount NUMERIC,
+    deposit_amount NUMERIC NOT NULL,
     effect_date TIMESTAMPTZ NOT NULL,
     signature_date TIMESTAMPTZ,
     rent_amount NUMERIC NOT NULL,

@@ -2,10 +2,12 @@ use crate::objects::Candidacy;
 use crate::objects::Company;
 use crate::objects::File;
 use crate::objects::FurnishedLeaseDetails;
+use crate::objects::Lease;
 use crate::objects::Payment;
 use crate::objects::Person;
 use crate::objects::ProfessionalWarrant;
 use crate::objects::Rent;
+use crate::objects::Step;
 
 #[derive(Union)]
 pub enum DiscussionItem {
@@ -20,10 +22,13 @@ impl From<trankeel::DiscussionItem> for DiscussionItem {
     }
 }
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Union)]
 pub enum Eventable {
     File(File),
     Rent(Rent),
+    Step(Step),
+    Lease(Lease),
     Payment(Payment),
     Candidacy(Candidacy),
 }
@@ -33,6 +38,8 @@ impl From<trankeel::Eventable> for Eventable {
         match item {
             trankeel::Eventable::File(inner) => Self::File(inner.into()),
             trankeel::Eventable::Rent(inner) => Self::Rent(inner.into()),
+            trankeel::Eventable::Step(inner) => Self::Step(inner.into()),
+            trankeel::Eventable::Lease(inner) => Self::Lease(inner.into()),
             trankeel::Eventable::Payment(inner) => Self::Payment(inner.into()),
             trankeel::Eventable::Candidacy(inner) => Self::Candidacy(inner.into()),
         }

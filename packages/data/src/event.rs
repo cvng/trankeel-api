@@ -16,6 +16,7 @@ pub enum EventType {
     CandidacyCreated,
     CandidacyAccepted,
     CandidacyRejected,
+    LeaseCreated,
     #[graphql(name = "PAYMENT_NOTICE_CREATED")]
     NoticeCreated,
     #[graphql(name = "PAYMENT_NOTICE_SENT")]
@@ -26,6 +27,7 @@ pub enum EventType {
     ReceiptSent,
     #[graphql(name = "TRANSACTION_CREATED")]
     PaymentCreated,
+    StepCompleted,
 }
 
 #[derive(Clone, Debug, Insertable, Queryable)]

@@ -1,6 +1,9 @@
 use crate::error::Result;
 use crate::files::CreateFileInput;
+use trankeel_core::activity::trace;
+use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
+use trankeel_data::Advertisement;
 use trankeel_data::Amount;
 use trankeel_data::AuthId;
 use trankeel_data::DateTime;
@@ -71,7 +74,7 @@ pub struct CreateFurnishedLeaseDetailsInput {
 pub struct CreateFurnishedLeaseInput {
     #[graphql(name = "data")]
     pub details: Option<CreateFurnishedLeaseDetailsInput>,
-    pub deposit_amount: Option<Amount>,
+    pub deposit_amount: Amount,
     pub effect_date: DateTime,
     pub renew_date: Option<DateTime>,
     pub file: Option<CreateFileInput>,
@@ -140,10 +143,36 @@ pub fn create_furnished_lease(
     // Affect created lease to existing tenants.
     add_lease_tenants(db, lease.id, input.tenant_ids)?;
 
+    trace(db, Trace::LeaseCreated(lease.clone())).ok();
+
     Ok(lease)
 }
 
 // # Utils
+
+pub(crate) fn create_lease_from_advertisement(
+    db: &impl Db,
+    auth_id: &AuthId,
+    advertisement: &Advertisement,
+    tenants: Vec<Tenant>,
+) -> Result<Lease> {
+    create_furnished_lease(
+        db,
+        auth_id,
+        CreateFurnishedLeaseInput {
+            details: None,
+            deposit_amount: advertisement.deposit_amount,
+            effect_date: advertisement.effect_date,
+            renew_date: None,
+            file: None,
+            property_id: advertisement.property_id,
+            rent_amount: advertisement.rent_amount,
+            rent_charges_amount: advertisement.rent_charges_amount,
+            signature_date: None,
+            tenant_ids: tenants.into_iter().map(|tenant| tenant.id).collect(),
+        },
+    )
+}
 
 fn add_lease_rents(db: &impl Db, lease: &Lease) -> Result<Vec<Rent>> {
     db.rents().create_many(lease.rents())

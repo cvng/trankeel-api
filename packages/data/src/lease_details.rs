@@ -61,7 +61,7 @@ pub enum RentPaymentMethod {
     Before,
 }
 
-#[derive(Clone, Default, Debug, Serialize, Deserialize, AsJsonb)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, AsJsonb, SimpleObject)]
 #[serde(rename_all = "camelCase")]
 pub struct FurnishedLeaseDetails {
     pub charges_recuperation_mode: Option<RentChargesRecuperationMode>,

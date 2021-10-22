@@ -1,5 +1,6 @@
 use super::Discussion;
 use super::Tenant;
+use super::Workflow;
 use async_graphql::Context;
 use async_graphql::Result;
 use trankeel::AdvertisementId;
@@ -38,6 +39,14 @@ impl Candidacy {
             .discussions()
             .by_candidacy_id(&self.id)?
             .into())
+    }
+
+    async fn workflow(&self, ctx: &Context<'_>) -> Result<Option<Workflow>> {
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .workflows()
+            .by_workflowable_id(&self.id)?
+            .map(Into::into))
     }
 }
 

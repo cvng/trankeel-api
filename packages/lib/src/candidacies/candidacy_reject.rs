@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::messaging::push_message;
-use crate::templates::CandidacyRejectedText;
+use crate::templates::CandidacyRejectedMail;
 use crate::PushMessageInput;
 use async_graphql::InputObject;
 use trankeel_core::activity::trace;
@@ -58,7 +58,7 @@ pub async fn reject_candidacy(
         PushMessageInput {
             discussion_id: discussion.id,
             sender_id: sender.id,
-            message: CandidacyRejectedText::new(&candidate).to_string(),
+            message: CandidacyRejectedMail::try_new(&candidate)?.to_string(),
         },
     )?;
 

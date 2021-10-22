@@ -32,8 +32,11 @@ use trankeel_data::schema::plans;
 use trankeel_data::schema::professional_warrants;
 use trankeel_data::schema::properties;
 use trankeel_data::schema::rents;
+use trankeel_data::schema::steps;
 use trankeel_data::schema::tenants;
 use trankeel_data::schema::warrants;
+use trankeel_data::schema::workflowables;
+use trankeel_data::schema::workflows;
 use trankeel_data::Account;
 use trankeel_data::AccountData;
 use trankeel_data::AccountId;
@@ -65,6 +68,7 @@ use trankeel_data::InviteData;
 use trankeel_data::InviteToken;
 use trankeel_data::Lease;
 use trankeel_data::LeaseData;
+use trankeel_data::LeaseFileId;
 use trankeel_data::LeaseId;
 use trankeel_data::LegalIdentity;
 use trankeel_data::Lender;
@@ -88,6 +92,9 @@ use trankeel_data::ReceiptId;
 use trankeel_data::Rent;
 use trankeel_data::RentData;
 use trankeel_data::RentId;
+use trankeel_data::Step;
+use trankeel_data::StepData;
+use trankeel_data::StepId;
 use trankeel_data::Summary;
 use trankeel_data::Tenant;
 use trankeel_data::TenantData;
@@ -97,6 +104,11 @@ use trankeel_data::WarrantId;
 use trankeel_data::WarrantIdentity;
 use trankeel_data::WarrantType;
 use trankeel_data::WarrantWithIdentity;
+use trankeel_data::Workflow;
+use trankeel_data::WorkflowId;
+use trankeel_data::WorkflowWithSteps;
+use trankeel_data::Workflowable;
+use trankeel_data::WorkflowableId;
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 
@@ -194,6 +206,18 @@ impl Db for Pg {
     fn invites(&self) -> Box<dyn database::InviteStore + '_> {
         Box::new(InviteStore(&self.0))
     }
+
+    fn workflowables(&self) -> Box<dyn database::WorkflowableStore + '_> {
+        Box::new(WorkflowableStore(&self.0))
+    }
+
+    fn workflows(&self) -> Box<dyn database::WorkflowStore + '_> {
+        Box::new(WorkflowStore(&self.0))
+    }
+
+    fn steps(&self) -> Box<dyn database::StepStore + '_> {
+        Box::new(StepStore(&self.0))
+    }
 }
 
 pub struct AccountStore<'a>(pub &'a PgPool);
@@ -237,6 +261,12 @@ pub struct DiscussionStore<'a>(pub &'a PgPool);
 pub struct MessageStore<'a>(pub &'a PgPool);
 
 pub struct InviteStore<'a>(pub &'a PgPool);
+
+pub struct WorkflowableStore<'a>(pub &'a PgPool);
+
+pub struct WorkflowStore<'a>(pub &'a PgPool);
+
+pub struct StepStore<'a>(pub &'a PgPool);
 
 impl database::AccountStore for AccountStore<'_> {
     fn by_id(&mut self, id: &AccountId) -> Result<Account> {
@@ -304,6 +334,25 @@ impl database::AccountStore for AccountStore<'_> {
             .select(accounts::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
             .filter(persons::id.eq(person_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(leases::table.on(leases::account_id.eq(accounts::id)))
+            .filter(leases::id.eq(lease_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_step_id(&mut self, step_id: &StepId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(tenants::table.on(tenants::account_id.eq(accounts::id)))
+            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .left_join(workflows::table.on(workflows::workflowable_id.eq(candidacies::id))) // TODO: match workflowable
+            .left_join(steps::table.on(steps::workflow_id.eq(workflows::id)))
+            .filter(steps::id.eq(step_id))
             .first(&self.0.get()?)?)
     }
 
@@ -377,6 +426,26 @@ impl database::PersonStore for PersonStore<'_> {
             .first(&self.0.get()?)?)
     }
 
+    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Person> {
+        Ok(persons::table
+            .select(persons::all_columns)
+            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
+            .left_join(leases::table.on(leases::id.nullable().eq(tenants::lease_id)))
+            .filter(leases::id.eq(lease_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_step_id(&mut self, step_id: &StepId) -> Result<Person> {
+        Ok(persons::table
+            .select(persons::all_columns)
+            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
+            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .left_join(workflows::table.on(workflows::workflowable_id.eq(candidacies::id))) // TODO: match workflowable
+            .left_join(steps::table.on(steps::workflow_id.eq(workflows::id)))
+            .filter(steps::id.eq(step_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn create(&mut self, data: Person) -> Result<Person> {
         Ok(insert_into(persons::table)
             .values(data)
@@ -405,6 +474,12 @@ impl database::TenantStore for TenantStore<'_> {
         Ok(tenants::table
             .filter(tenants::lease_id.eq(lease_id))
             .load(&self.0.get()?)?)
+    }
+
+    fn by_person_id(&mut self, person_id: &PersonId) -> Result<Tenant> {
+        Ok(tenants::table
+            .filter(tenants::person_id.eq(person_id))
+            .first(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Tenant) -> Result<Tenant> {
@@ -632,6 +707,14 @@ impl database::CandidacyStore for CandidacyStore<'_> {
             .load(&self.0.get()?)?)
     }
 
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Candidacy> {
+        Ok(candidacies::table
+            .select(candidacies::all_columns)
+            .left_join(tenants::table.on(tenants::id.eq(candidacies::tenant_id)))
+            .filter(tenants::id.eq(tenant_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn create(&mut self, data: Candidacy) -> Result<Candidacy> {
         Ok(insert_into(candidacies::table)
             .values(data)
@@ -692,6 +775,12 @@ impl database::LeaseStore for LeaseStore<'_> {
             .load(&self.0.get()?)?)
     }
 
+    fn by_lease_file_id(&mut self, lease_file_id: &LeaseFileId) -> Result<Lease> {
+        Ok(leases::table
+            .filter(leases::lease_id.eq(lease_file_id))
+            .first(&self.0.get()?)?)
+    }
+
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Lease> {
         Ok(leases::table
             .select(leases::all_columns)
@@ -713,6 +802,23 @@ impl database::LeaseStore for LeaseStore<'_> {
             .select(leases::all_columns)
             .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
             .filter(rents::id.eq(rent_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Lease> {
+        Ok(leases::table
+            .select(leases::all_columns)
+            .left_join(tenants::table.on(tenants::lease_id.eq(leases::id.nullable())))
+            .filter(tenants::id.eq(tenant_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_person_id(&mut self, person_id: &PersonId) -> Result<Lease> {
+        Ok(leases::table
+            .select(leases::all_columns)
+            .left_join(tenants::table.on(tenants::lease_id.eq(leases::id.nullable())))
+            .left_join(persons::table.on(persons::id.eq(tenants::person_id)))
+            .filter(persons::id.eq(person_id))
             .first(&self.0.get()?)?)
     }
 
@@ -773,16 +879,10 @@ impl database::RentStore for RentStore<'_> {
             .load(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Rent) -> Result<Rent> {
+    fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>> {
         Ok(insert_into(rents::table)
             .values(data)
-            .get_result(&self.0.get()?)?)
-    }
-
-    fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>> {
-        data.into_iter()
-            .map(|item| self.create(item))
-            .collect::<Result<Vec<_>>>()
+            .get_results(&self.0.get()?)?)
     }
 
     fn update(&mut self, data: RentData) -> Result<Rent> {
@@ -846,6 +946,8 @@ impl database::EventStore for EventStore<'_> {
             .left_join(eventables::table.on(eventables::id.eq(events::eventable_id)))
             .left_join(files::table.on(files::id.nullable().eq(eventables::file_id)))
             .left_join(rents::table.on(rents::id.nullable().eq(eventables::rent_id)))
+            .left_join(steps::table.on(steps::id.nullable().eq(eventables::step_id)))
+            .left_join(leases::table.on(leases::id.nullable().eq(eventables::lease_id)))
             .left_join(payments::table.on(payments::id.nullable().eq(eventables::payment_id)))
             .left_join(
                 candidacies::table.on(candidacies::id.nullable().eq(eventables::candidacy_id)),
@@ -854,6 +956,8 @@ impl database::EventStore for EventStore<'_> {
                 events::all_columns,
                 files::all_columns.nullable(),
                 rents::all_columns.nullable(),
+                steps::all_columns.nullable(),
+                leases::all_columns.nullable(),
                 payments::all_columns.nullable(),
                 candidacies::all_columns.nullable(),
             ))
@@ -883,17 +987,23 @@ impl database::EventStore for EventStore<'_> {
 impl database::EventableStore for EventableStore<'_> {
     fn create(&mut self, data: Eventable) -> Result<Eventable> {
         match &data {
-            Eventable::File(file) => insert_into(eventables::table)
-                .values(eventables::file_id.eq(file.id))
+            Eventable::File(inner) => insert_into(eventables::table)
+                .values(eventables::file_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
-            Eventable::Rent(rent) => insert_into(eventables::table)
-                .values(eventables::rent_id.eq(rent.id))
+            Eventable::Rent(inner) => insert_into(eventables::table)
+                .values(eventables::rent_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
-            Eventable::Payment(payment) => insert_into(eventables::table)
-                .values(eventables::payment_id.eq(payment.id))
+            Eventable::Step(inner) => insert_into(eventables::table)
+                .values(eventables::step_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
-            Eventable::Candidacy(candidacy) => insert_into(eventables::table)
-                .values(eventables::candidacy_id.eq(candidacy.id))
+            Eventable::Lease(inner) => insert_into(eventables::table)
+                .values(eventables::lease_id.eq(inner.id))
+                .execute(&self.0.get()?)?,
+            Eventable::Payment(inner) => insert_into(eventables::table)
+                .values(eventables::payment_id.eq(inner.id))
+                .execute(&self.0.get()?)?,
+            Eventable::Candidacy(inner) => insert_into(eventables::table)
+                .values(eventables::candidacy_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
         };
         Ok(data)
@@ -1009,6 +1119,67 @@ impl database::InviteStore for InviteStore<'_> {
     }
 
     fn update(&mut self, data: InviteData) -> Result<Invite> {
+        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    }
+}
+
+impl database::WorkflowableStore for WorkflowableStore<'_> {
+    fn create(&mut self, data: Workflowable) -> Result<Workflowable> {
+        match &data {
+            Workflowable::Candidacy(candidacy) => insert_into(workflowables::table)
+                .values(workflowables::candidacy_id.eq(candidacy.id))
+                .execute(&self.0.get()?)?,
+        };
+        Ok(data)
+    }
+}
+
+impl database::WorkflowStore for WorkflowStore<'_> {
+    fn by_workflowable_id(
+        &mut self,
+        workflowable_id: &WorkflowableId,
+    ) -> Result<Option<WorkflowWithSteps>> {
+        let workflow = workflows::table
+            .select(workflows::all_columns)
+            .filter(workflows::workflowable_id.eq(workflowable_id))
+            .first::<Workflow>(&self.0.get()?)
+            .optional()?;
+
+        let workflow = match workflow {
+            Some(workflow) => workflow,
+            None => return Ok(None),
+        };
+
+        let steps = Step::belonging_to(&workflow).load(&self.0.get()?)?;
+        Ok(Some((workflow, steps)))
+    }
+
+    fn create(&mut self, data: Workflow) -> Result<Workflow> {
+        Ok(insert_into(workflows::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
+    }
+}
+
+impl database::StepStore for StepStore<'_> {
+    fn by_id(&mut self, id: &StepId) -> Result<Step> {
+        Ok(steps::table.find(id).first(&self.0.get()?)?)
+    }
+
+    fn by_workflow_id(&mut self, workflow_id: &WorkflowId) -> Result<Vec<Step>> {
+        Ok(steps::table
+            .filter(steps::workflow_id.eq(workflow_id))
+            .order(steps::created_at.asc())
+            .load(&self.0.get()?)?)
+    }
+
+    fn create_many(&mut self, data: Vec<Step>) -> Result<Vec<Step>> {
+        Ok(insert_into(steps::table)
+            .values(data)
+            .get_results(&self.0.get()?)?)
+    }
+
+    fn update(&mut self, data: StepData) -> Result<Step> {
         Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
     }
 }

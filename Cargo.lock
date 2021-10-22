@@ -2851,6 +2851,7 @@ name = "trankeel-core"
 version = "0.2.0"
 dependencies = [
  "async-trait",
+ "chrono",
  "diesel",
  "erased-serde",
  "eyre",
@@ -2861,6 +2862,7 @@ dependencies = [
  "stripe-rust",
  "tokio 0.2.25",
  "trankeel-data",
+ "trankeel-kit",
 ]
 
 [[package]]

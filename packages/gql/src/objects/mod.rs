@@ -24,6 +24,7 @@ mod rent_object;
 mod task_object;
 mod tenant_object;
 mod warrant_object;
+mod workflow_object;
 
 pub use account_object::*;
 pub use address_object::*;
@@ -51,3 +52,4 @@ pub use rent_object::*;
 pub use task_object::*;
 pub use tenant_object::*;
 pub use warrant_object::*;
+pub use workflow_object::*;

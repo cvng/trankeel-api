@@ -4,10 +4,13 @@ use rocket::post;
 use rocket::serde::json::Json;
 use rocket::serde::Deserialize;
 use rocket::warn;
+use trankeel::Client;
 use trankeel::Document;
 use trankeel::FileData;
 use trankeel::FileStatus;
 use trankeel::FileType;
+use trankeel::LeaseCreatedMail;
+use trankeel::LeaseFile;
 use trankeel::Notice;
 use trankeel::Receipt;
 use trankeel::SendReceiptsInput;
@@ -47,9 +50,9 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
     // Specific processing by document type.
     match file.type_ {
+        FileType::LeaseDocument => on_lease_created(&client, &file).await,
         FileType::RentReceipt => on_receipt_created(&client, &file).await,
         FileType::PaymentNotice => on_notice_created(&client, &file).await,
-        _ => panic!(),
     }
 
     Status::Ok
@@ -57,7 +60,19 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
 // # Handlers
 
-async fn on_receipt_created(client: &trankeel::Client, receipt: &Receipt) {
+async fn on_lease_created(client: &Client, lease_file: &LeaseFile) {
+    let lease = client.leases().by_lease_file_id(&lease_file.id).unwrap();
+    let tenants = client.tenants().by_lease_id(&lease.id).unwrap();
+
+    client
+        .batch_mails(vec![
+            LeaseCreatedMail::try_new(&lease, lease_file, tenants).unwrap()
+        ])
+        .await
+        .unwrap();
+}
+
+async fn on_receipt_created(client: &Client, receipt: &Receipt) {
     let rent = client.rents().by_receipt_id(&receipt.id).unwrap();
     let input = SendReceiptsInput {
         rent_ids: vec![rent.id],
@@ -68,14 +83,16 @@ async fn on_receipt_created(client: &trankeel::Client, receipt: &Receipt) {
     let user = client
         .persons()
         .by_account_id(&lease.account_id)
-        .map(|mut users| users.remove(0))
+        .unwrap()
+        .first()
+        .cloned()
         .unwrap();
     let auth_id = user.auth_id.unwrap();
 
-    client.send_receipts(&auth_id, input).await.ok();
+    client.send_receipts(&auth_id, input).await.unwrap();
 }
 
-async fn on_notice_created(client: &trankeel::Client, notice: &Notice) {
+async fn on_notice_created(client: &Client, notice: &Notice) {
     let rent = client.rents().by_notice_id(&notice.id).unwrap();
     let input = SendReceiptsInput {
         rent_ids: vec![rent.id],
@@ -92,5 +109,5 @@ async fn on_notice_created(client: &trankeel::Client, notice: &Notice) {
         .unwrap();
     let auth_id = user.auth_id.unwrap();
 
-    client.send_receipts(&auth_id, input).await.ok();
+    client.send_receipts(&auth_id, input).await.unwrap();
 }
