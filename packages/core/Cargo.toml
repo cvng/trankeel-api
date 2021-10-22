@@ -10,13 +10,15 @@ doctest = false
 
 [dependencies]
 async-trait = "0.1.51"
+chrono = { version = "0.4.19", features = ["serde"] }
 diesel = { version = "1.4.8", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }
 erased-serde = "0.3"
 eyre = "0.6.5"
-trankeel-data = { path = "../data" }
 reqwest = { version = "0.11.5", features = ["json"] }
 sendinblue = "0.2.1"
 serde = "1.0"
 serde_json = "1.0"
 stripe-rust = { version = "0.13.0-dev", git = "https://github.com/wyyerd/stripe-rs", default-features = false, features = ["default-tls", "billing"] }
 tokio = { version = "0.2", features = ["rt-core"] }
+trankeel-data = { path = "../data" }
+trankeel-kit = { path = "../kit" }

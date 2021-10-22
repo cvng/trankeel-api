@@ -27,3 +27,4 @@ pub use crate::Rentstatus;
 pub use crate::Tenantstatus;
 pub use crate::Transactiontype;
 pub use crate::Warranttype;
+pub use crate::Workflowtype;

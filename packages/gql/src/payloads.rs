@@ -1,7 +1,29 @@
 use crate::objects::Error;
 use crate::objects::File;
 use crate::objects::Message;
+use crate::objects::Step;
 use trankeel::DiscussionId;
+
+#[derive(SimpleObject)]
+pub struct CompleteStepPayload {
+    errors: Option<Vec<Error>>,
+    step: Option<Step>,
+}
+
+impl From<trankeel::Result<trankeel::Step>> for CompleteStepPayload {
+    fn from(item: trankeel::Result<trankeel::Step>) -> Self {
+        match item {
+            Ok(res) => Self {
+                errors: None,
+                step: Some(res.into()),
+            },
+            Err(err) => Self {
+                errors: Some(vec![err.into()]),
+                step: None,
+            },
+        }
+    }
+}
 
 #[derive(SimpleObject)]
 pub struct CreateNoticesPayload {

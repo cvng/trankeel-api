@@ -72,13 +72,7 @@ impl ReceiptCreatedMail {
             file_id: receipt.id,
 
             date,
-            _recipients: tenants
-                .iter()
-                .map(|tenant| Contact {
-                    name: tenant.display_name(),
-                    email: tenant.email.clone(),
-                })
-                .collect(),
+            _recipients: tenants.into_iter().map(Into::into).collect(),
         })
     }
 }

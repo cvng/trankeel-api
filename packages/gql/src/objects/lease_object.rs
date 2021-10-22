@@ -24,7 +24,7 @@ pub struct Lease {
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
-    pub deposit_amount: Option<Amount>,
+    pub deposit_amount: Amount,
     pub effect_date: DateTime,
     pub signature_date: Option<DateTime>,
     pub rent_amount: Amount,

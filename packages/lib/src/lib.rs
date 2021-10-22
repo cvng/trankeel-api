@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate async_graphql;
+#[macro_use]
+extern crate serde;
 #[allow(unused_imports)]
 #[macro_use]
 extern crate validator;
@@ -20,6 +22,7 @@ mod properties;
 mod reports;
 mod templates;
 mod tenants;
+mod workflows;
 
 pub use crate::auth::AccountActivatePlanInput;
 pub use crate::auth::AccountUpdateInput;
@@ -51,7 +54,9 @@ pub use crate::properties::CreatePropertyInput;
 pub use crate::properties::DeletePropertyInput;
 pub use crate::properties::UpdateAdvertisementInput;
 pub use crate::properties::UpdatePropertyInput;
+pub use crate::templates::LeaseCreatedMail;
 pub use crate::tenants::CreateTenantInput;
 pub use crate::tenants::DeleteTenantInput;
 pub use crate::tenants::UpdateTenantInput;
+pub use crate::workflows::CompleteStepInput;
 pub use trankeel_data::*;

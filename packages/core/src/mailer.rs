@@ -5,6 +5,7 @@ use std::fmt::Debug;
 use trankeel_data::Email;
 use trankeel_data::Name;
 use trankeel_data::Person;
+use trankeel_data::Tenant;
 
 #[async_trait]
 pub trait Mailer {
@@ -28,6 +29,15 @@ pub struct Contact {
 
 impl From<Person> for Contact {
     fn from(item: Person) -> Self {
+        Self {
+            name: item.display_name(),
+            email: item.email,
+        }
+    }
+}
+
+impl From<Tenant> for Contact {
+    fn from(item: Tenant) -> Self {
         Self {
             name: item.display_name(),
             email: item.email,

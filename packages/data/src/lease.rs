@@ -3,6 +3,7 @@ use crate::schema::leases;
 use crate::AccountId;
 use crate::Amount;
 use crate::DateTime;
+use crate::File;
 use crate::FileId;
 use crate::FurnishedLeaseDetails;
 use crate::FurnishedLeaseDuration;
@@ -16,10 +17,22 @@ use trankeel_kit::locale;
 
 pub type LeaseId = Id;
 
+pub type LeaseFile = File; // alias for a File
+
+pub type LeaseFileId = FileId; // alias for a FileId
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 pub enum LeaseStatus {
+    Unsigned,
     Active,
-    Ended,
+    #[graphql(name = "ENDED")]
+    Expired,
+}
+
+impl Default for LeaseStatus {
+    fn default() -> Self {
+        Self::Unsigned
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
@@ -33,13 +46,13 @@ pub enum LeaseDetails {
     FurnishedLeaseDetails(FurnishedLeaseDetails),
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable, SimpleObject)]
 pub struct Lease {
     pub id: LeaseId,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
-    pub deposit_amount: Option<Amount>,
+    pub deposit_amount: Amount,
     pub effect_date: DateTime,
     pub signature_date: Option<DateTime>,
     pub rent_amount: Amount,
@@ -53,7 +66,7 @@ pub struct Lease {
     pub duration: FurnishedLeaseDuration,
 }
 
-#[derive(AsChangeset, Identifiable, Insertable)]
+#[derive(Default, AsChangeset, Identifiable, Insertable)]
 #[table_name = "leases"]
 pub struct LeaseData {
     pub id: LeaseId,
@@ -78,9 +91,16 @@ impl Lease {
     }
 
     pub fn status(&self) -> LeaseStatus {
-        match self.expired_at {
-            Some(expired_at) if expired_at.inner() < Utc::now() => LeaseStatus::Ended,
-            _ => LeaseStatus::Active,
+        match self {
+            Self {
+                expired_at: Some(expired_at),
+                ..
+            } if expired_at.inner() < Utc::now() => LeaseStatus::Expired,
+            Self {
+                signature_date: Some(_),
+                ..
+            } => LeaseStatus::Active,
+            _ => LeaseStatus::default(),
         }
     }
 

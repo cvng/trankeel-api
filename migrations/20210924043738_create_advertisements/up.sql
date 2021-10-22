@@ -12,7 +12,7 @@ CREATE TABLE advertisements (
     lease_type LEASETYPE NOT NULL,
     rent_amount NUMERIC NOT NULL,
     rent_charges_amount NUMERIC,
-    deposit_amount NUMERIC,
+    deposit_amount NUMERIC NOT NULL,
     effect_date TIMESTAMPTZ NOT NULL,
     flexibility ENTRYFLEXIBILITY,
     referral_lease_id UUID REFERENCES leases(id),

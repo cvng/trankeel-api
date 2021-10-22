@@ -1,7 +1,7 @@
 {
   "private": "true",
   "scripts": {
-    "start": "cargo watch --ignore schema.graphql --exec run --clear",
+    "start": "cargo watch --exec run --ignore schema.graphql --clear",
     "build": "cargo build",
     "check": "cargo check",
     "lint": "cargo clippy",

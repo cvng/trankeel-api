@@ -9,6 +9,7 @@ use super::Person;
 use super::Property;
 use super::Task;
 use super::Tenant;
+use crate::payloads::CompleteStepPayload;
 use crate::payloads::CreateNoticesPayload;
 use crate::payloads::CreateReceiptsPayload;
 use crate::payloads::DeleteDiscussionPayload;
@@ -21,6 +22,7 @@ use trankeel::AccountActivatePlanInput;
 use trankeel::AccountUpdateInput;
 use trankeel::AuthId;
 use trankeel::Client;
+use trankeel::CompleteStepInput;
 use trankeel::CreateAdvertisementInput;
 use trankeel::CreateCandidacyInput;
 use trankeel::CreateFileInput;
@@ -288,5 +290,13 @@ impl Mutation {
             .data_unchecked::<Client>()
             .delete_discussion(ctx.data::<AuthId>()?, input)
             .into())
+    }
+
+    async fn complete_step(
+        &self,
+        ctx: &Context<'_>,
+        input: CompleteStepInput,
+    ) -> Result<CompleteStepPayload> {
+        Ok(ctx.data_unchecked::<Client>().complete_step(input).into())
     }
 }

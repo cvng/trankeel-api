@@ -20,6 +20,7 @@ use crate::properties::UpdatePropertyInput;
 use crate::tenants::CreateTenantInput;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenantInput;
+use crate::workflows::CompleteStepInput;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
 use trankeel_core::database::CandidacyStore;
@@ -39,6 +40,10 @@ use trankeel_core::database::RentStore;
 use trankeel_core::database::ReportStore;
 use trankeel_core::database::TenantStore;
 use trankeel_core::database::WarrantStore;
+use trankeel_core::database::WorkflowStore;
+use trankeel_core::mailer::IntoMail;
+use trankeel_core::mailer::Mail;
+use trankeel_core::mailer::Mailer;
 use trankeel_core::providers::Pdfmonkey;
 use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
@@ -56,6 +61,7 @@ use trankeel_data::Person;
 use trankeel_data::Property;
 use trankeel_data::PropertyId;
 use trankeel_data::Receipt;
+use trankeel_data::Step;
 use trankeel_data::Tenant;
 use trankeel_data::TenantId;
 
@@ -140,6 +146,10 @@ impl<'a> Client {
         self.0.messages()
     }
 
+    pub fn workflows(&self) -> Box<dyn WorkflowStore + '_> {
+        self.0.workflows()
+    }
+
     // Operations
 
     pub async fn create_user_with_account(
@@ -165,7 +175,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        crate::candidacies::accept_candidacy(&self.0, &self.2, auth_id, input).await
+        crate::candidacies::accept_candidacy(&self.0, &self.1, &self.2, auth_id, input).await
     }
 
     pub fn create_tenant(&self, auth_id: &AuthId, input: CreateTenantInput) -> Result<Tenant> {
@@ -282,6 +292,14 @@ impl<'a> Client {
 
     pub fn push_message(&self, input: PushMessageInput) -> Result<Message> {
         crate::messaging::push_message(&self.0, input)
+    }
+
+    pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
+        crate::workflows::complete_step(&self.0, input)
+    }
+
+    pub async fn batch_mails(&self, mails: Vec<impl IntoMail>) -> Result<Vec<Mail>> {
+        self.2.batch(mails).await
     }
 }
 

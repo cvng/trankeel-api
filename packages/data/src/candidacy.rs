@@ -51,8 +51,6 @@ impl Candidacy {
 #[table_name = "candidacies"]
 pub struct CandidacyData {
     pub id: CandidacyId,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
     pub status: Option<CandidacyStatus>,
     pub advertisement_id: Option<AdvertisementId>,
     pub tenant_id: Option<TenantId>,

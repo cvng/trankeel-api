@@ -28,6 +28,7 @@ use trankeel_data::InviteData;
 use trankeel_data::InviteToken;
 use trankeel_data::Lease;
 use trankeel_data::LeaseData;
+use trankeel_data::LeaseFileId;
 use trankeel_data::LeaseId;
 use trankeel_data::Lender;
 use trankeel_data::LenderData;
@@ -49,6 +50,9 @@ use trankeel_data::ReceiptId;
 use trankeel_data::Rent;
 use trankeel_data::RentData;
 use trankeel_data::RentId;
+use trankeel_data::Step;
+use trankeel_data::StepData;
+use trankeel_data::StepId;
 use trankeel_data::Summary;
 use trankeel_data::Tenant;
 use trankeel_data::TenantData;
@@ -56,6 +60,11 @@ use trankeel_data::TenantId;
 use trankeel_data::Warrant;
 use trankeel_data::WarrantId;
 use trankeel_data::WarrantWithIdentity;
+use trankeel_data::Workflow;
+use trankeel_data::WorkflowId;
+use trankeel_data::WorkflowWithSteps;
+use trankeel_data::Workflowable;
+use trankeel_data::WorkflowableId;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -82,6 +91,9 @@ pub trait Db {
     fn discussions(&self) -> Box<dyn DiscussionStore + '_>;
     fn messages(&self) -> Box<dyn MessageStore + '_>;
     fn invites(&self) -> Box<dyn InviteStore + '_>;
+    fn workflowables(&self) -> Box<dyn WorkflowableStore + '_>;
+    fn workflows(&self) -> Box<dyn WorkflowStore + '_>;
+    fn steps(&self) -> Box<dyn StepStore + '_>;
 }
 
 pub trait AccountStore {
@@ -93,6 +105,8 @@ pub trait AccountStore {
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Account>;
     fn by_payment_id(&mut self, payment_id: &PaymentId) -> Result<Account>;
     fn by_person_id(&mut self, person_id: &PersonId) -> Result<Account>;
+    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Account>;
+    fn by_step_id(&mut self, step_id: &StepId) -> Result<Account>;
     fn create(&mut self, data: Account) -> Result<Account>;
     fn update(&mut self, data: AccountData) -> Result<Account>;
 }
@@ -105,6 +119,8 @@ pub trait PersonStore {
     fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Person>;
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Person>;
     fn by_payment_id(&mut self, payment_id: &PaymentId) -> Result<Person>;
+    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Person>;
+    fn by_step_id(&mut self, step_id: &StepId) -> Result<Person>;
     fn create(&mut self, data: Person) -> Result<Person>;
     fn update(&mut self, data: PersonData) -> Result<Person>;
 }
@@ -135,6 +151,7 @@ pub trait CandidacyStore {
     fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId)
         -> Result<Vec<Candidacy>>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Candidacy>>;
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Candidacy>;
     fn create(&mut self, data: Candidacy) -> Result<Candidacy>;
     fn update(&mut self, data: CandidacyData) -> Result<Candidacy>;
 }
@@ -152,6 +169,7 @@ pub trait TenantStore {
     fn by_id(&mut self, id: &TenantId) -> Result<Tenant>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Tenant>>;
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Tenant>>;
+    fn by_person_id(&mut self, person_id: &PersonId) -> Result<Tenant>;
     fn create(&mut self, data: Tenant) -> Result<Tenant>;
     fn delete(&mut self, data: TenantId) -> Result<Executed>;
     fn update(&mut self, data: TenantData) -> Result<Tenant>;
@@ -167,9 +185,12 @@ pub trait WarrantStore {
 pub trait LeaseStore {
     fn by_id(&mut self, id: &LeaseId) -> Result<Lease>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Lease>>;
+    fn by_lease_file_id(&mut self, lease_file: &LeaseFileId) -> Result<Lease>;
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Lease>;
     fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Lease>;
     fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Lease>;
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Lease>;
+    fn by_person_id(&mut self, person_id: &PersonId) -> Result<Lease>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Lease>>;
     fn create(&mut self, data: Lease) -> Result<Lease>;
     fn delete(&mut self, data: LeaseId) -> Result<Executed>;
@@ -182,7 +203,6 @@ pub trait RentStore {
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Rent>;
     fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Rent>;
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Rent>>;
-    fn create(&mut self, data: Rent) -> Result<Rent>;
     fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>>;
     fn update(&mut self, data: RentData) -> Result<Rent>;
 }
@@ -239,4 +259,23 @@ pub trait InviteStore {
     fn by_token(&mut self, token: &InviteToken) -> Result<Invite>;
     fn create(&mut self, data: Invite) -> Result<Invite>;
     fn update(&mut self, data: InviteData) -> Result<Invite>;
+}
+
+pub trait WorkflowableStore {
+    fn create(&mut self, data: Workflowable) -> Result<Workflowable>;
+}
+
+pub trait WorkflowStore {
+    fn by_workflowable_id(
+        &mut self,
+        workflowable_id: &WorkflowableId,
+    ) -> Result<Option<WorkflowWithSteps>>;
+    fn create(&mut self, data: Workflow) -> Result<Workflow>;
+}
+
+pub trait StepStore {
+    fn by_id(&mut self, id: &StepId) -> Result<Step>;
+    fn by_workflow_id(&mut self, workflow_id: &WorkflowId) -> Result<Vec<Step>>;
+    fn create_many(&mut self, data: Vec<Step>) -> Result<Vec<Step>>;
+    fn update(&mut self, data: StepData) -> Result<Step>;
 }

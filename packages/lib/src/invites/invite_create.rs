@@ -10,14 +10,15 @@ use validator::Validate;
 
 #[derive(InputObject, Validate)]
 pub struct CreateInviteInput {
-    pub id: PersonId,
+    #[graphql(name = "id")]
+    pub invitee_id: PersonId,
     pub reason: InviteReason,
 }
 
 pub fn create_invite(db: &impl Db, input: CreateInviteInput) -> Result<Invite> {
     input.validate()?;
 
-    let invitee = db.persons().by_id(&input.id)?;
+    let invitee = db.persons().by_id(&input.invitee_id)?;
 
     let id = InviteId::new();
     let token = InviteToken::new(id.to_string());
