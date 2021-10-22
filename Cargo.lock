@@ -2805,7 +2805,7 @@ dependencies = [
 
 [[package]]
 name = "trankeel"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "async-graphql",
  "chrono",
@@ -2821,7 +2821,7 @@ dependencies = [
 
 [[package]]
 name = "trankeel-api"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "async-graphql-rocket",
  "dotenv",
@@ -2836,7 +2836,7 @@ dependencies = [
 
 [[package]]
 name = "trankeel-cli"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "chrono",
  "dotenv",
@@ -2848,7 +2848,7 @@ dependencies = [
 
 [[package]]
 name = "trankeel-core"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "async-trait",
  "chrono",
@@ -2867,7 +2867,7 @@ dependencies = [
 
 [[package]]
 name = "trankeel-data"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "async-graphql",
  "chrono",
@@ -2888,7 +2888,7 @@ dependencies = [
 
 [[package]]
 name = "trankeel-graphql"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "async-graphql",
  "serde",
@@ -2897,7 +2897,7 @@ dependencies = [
 
 [[package]]
 name = "trankeel-kit"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "chrono",
  "serde",
