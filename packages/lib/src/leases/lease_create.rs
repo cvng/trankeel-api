@@ -3,6 +3,7 @@ use crate::files::CreateFileInput;
 use trankeel_core::activity::trace;
 use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
+use trankeel_core::error::Error;
 use trankeel_data::Advertisement;
 use trankeel_data::Amount;
 use trankeel_data::AuthId;
@@ -110,6 +111,12 @@ pub fn create_furnished_lease(
     input.validate()?;
 
     let account = db.accounts().by_auth_id(auth_id)?;
+
+    if let Some(signature_date) = input.signature_date {
+        if input.effect_date.inner() > signature_date.inner() {
+            return Err(Error::msg("effect date must be anterior to signature date"));
+        }
+    }
 
     // Compute duration.
     let duration = input
