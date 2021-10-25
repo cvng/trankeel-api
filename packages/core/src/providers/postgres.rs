@@ -1150,7 +1150,9 @@ impl database::WorkflowStore for WorkflowStore<'_> {
             None => return Ok(None),
         };
 
-        let steps = Step::belonging_to(&workflow).load(&self.0.get()?)?;
+        let steps = Step::belonging_to(&workflow)
+            .order(steps::created_at.asc())
+            .load(&self.0.get()?)?;
         Ok(Some((workflow, steps)))
     }
 
@@ -1173,10 +1175,10 @@ impl database::StepStore for StepStore<'_> {
             .load(&self.0.get()?)?)
     }
 
-    fn create_many(&mut self, data: Vec<Step>) -> Result<Vec<Step>> {
+    fn create(&mut self, data: Step) -> Result<Step> {
         Ok(insert_into(steps::table)
             .values(data)
-            .get_results(&self.0.get()?)?)
+            .get_result(&self.0.get()?)?)
     }
 
     fn update(&mut self, data: StepData) -> Result<Step> {
