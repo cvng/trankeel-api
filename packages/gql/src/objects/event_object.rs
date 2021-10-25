@@ -6,7 +6,6 @@ use trankeel::Client;
 use trankeel::DateTime;
 use trankeel::EventId;
 use trankeel::EventType;
-use trankeel::EventableId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -15,7 +14,6 @@ pub struct Event {
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
-    pub eventable_id: EventableId,
     pub type_: EventType,
 }
 
@@ -38,7 +36,6 @@ impl From<trankeel::Event> for Event {
             created_at: item.created_at,
             updated_at: item.updated_at,
             account_id: item.account_id,
-            eventable_id: item.eventable_id,
             type_: item.type_,
         }
     }
