@@ -87,6 +87,7 @@ type Company implements LegalIdentityInterface {
 }
 input CompleteStepInput {
 	id: ID!
+	requirements: [RequirementInput!]
 }
 type CompleteStepPayload {
 	errors: [Error!]
@@ -715,6 +716,10 @@ enum RentStatus {
 type Requirement {
 	name: String!
 	type: RequirementType!
+}
+input RequirementInput {
+	name: String!
+	value: String!
 }
 enum RequirementType {
 	DATE

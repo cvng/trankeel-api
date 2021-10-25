@@ -10,6 +10,13 @@ use validator::Validate;
 #[derive(InputObject, Validate)]
 pub struct CompleteStepInput {
     pub id: StepId,
+    pub requirements: Option<Vec<RequirementInput>>,
+}
+
+#[derive(InputObject, Validate)]
+pub struct RequirementInput {
+    pub name: String,
+    pub value: String,
 }
 
 pub fn complete_step(db: &impl Db, input: CompleteStepInput) -> Result<Step> {

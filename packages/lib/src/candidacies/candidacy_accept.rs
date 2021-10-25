@@ -141,6 +141,7 @@ pub async fn accept_candidacy(
         db,
         CompleteStepInput {
             id: steps.first().ok_or_else(|| no("workflow.first_step"))?.id,
+            requirements: None,
         },
     )?;
 
