@@ -70,6 +70,13 @@ pub struct StepOuter {
 pub struct Step {
     pub label: String,
     pub confirmation: String,
+    pub requirements: Option<Vec<Requirement>>,
+}
+
+#[derive(Clone, Deserialize)]
+pub struct Requirement {
+    pub name: String,
+    pub type_: String,
 }
 
 pub fn config() -> Config {

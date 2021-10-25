@@ -712,6 +712,13 @@ enum RentStatus {
 	PENDING
 	SETTLED
 }
+type Requirement {
+	name: String!
+	type: RequirementType!
+}
+enum RequirementType {
+	DATE
+}
 input SendPaymentNoticeInput {
 	rentIds: [ID!]!
 	date: DateTime
@@ -723,6 +730,7 @@ input SignupUserFromInviteInput {
 type Step {
 	id: ID!
 	label: String!
+	requirements: [Requirement!]
 	completed: Boolean!
 	completedAt: DateTime
 }

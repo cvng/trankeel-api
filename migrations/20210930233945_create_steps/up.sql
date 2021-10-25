@@ -5,7 +5,8 @@ CREATE TABLE steps (
     workflow_id UUID NOT NULL REFERENCES workflows(id),
     label TEXT NOT NULL,
     completed BOOLEAN NOT NULL,
-    confirmation TEXT
+    confirmation TEXT,
+    requirements JSONB
 );
 
 SELECT manage_updated_at('steps');

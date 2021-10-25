@@ -43,6 +43,7 @@ impl Workflow {
                 label: step.label,
                 completed: Default::default(),
                 confirmation: Some(step.confirmation),
+                requirements: step.requirements.map(Into::into),
             })
             .collect()
     }
