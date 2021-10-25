@@ -1,8 +1,15 @@
-use serde_json::from_str;
-
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Enum)]
 pub enum RequirementType {
     Date,
+}
+
+impl From<String> for RequirementType {
+    fn from(item: String) -> Self {
+        match item.as_str() {
+            "date" => Self::Date,
+            _ => unimplemented!(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, AsJsonb, SimpleObject)]
@@ -20,7 +27,7 @@ impl From<trankeel_kit::config::Requirement> for Requirement {
     fn from(item: trankeel_kit::config::Requirement) -> Self {
         Self {
             name: item.name,
-            type_: from_str(&item.type_).unwrap(),
+            type_: item.type_.into(),
         }
     }
 }

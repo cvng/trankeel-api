@@ -76,6 +76,7 @@ pub struct Step {
 #[derive(Clone, Deserialize)]
 pub struct Requirement {
     pub name: String,
+    #[serde(rename = "type")]
     pub type_: String,
 }
 
