@@ -50,8 +50,8 @@ checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 
 [[package]]
 name = "async-graphql"
-version = "2.10.3"
-source = "git+https://github.com/async-graphql/async-graphql#d3ea9ced18759b75e3ed1c3597f43fce65b8308d"
+version = "2.10.5"
+source = "git+https://github.com/async-graphql/async-graphql#8b778cc6a5c218f049a518810ac2e31bb5476c4d"
 dependencies = [
  "async-graphql-derive",
  "async-graphql-parser",
@@ -78,8 +78,8 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-derive"
-version = "2.10.3"
-source = "git+https://github.com/async-graphql/async-graphql#d3ea9ced18759b75e3ed1c3597f43fce65b8308d"
+version = "2.10.5"
+source = "git+https://github.com/async-graphql/async-graphql#8b778cc6a5c218f049a518810ac2e31bb5476c4d"
 dependencies = [
  "Inflector",
  "async-graphql-parser",
@@ -93,8 +93,8 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-parser"
-version = "2.10.3"
-source = "git+https://github.com/async-graphql/async-graphql#d3ea9ced18759b75e3ed1c3597f43fce65b8308d"
+version = "2.10.5"
+source = "git+https://github.com/async-graphql/async-graphql#8b778cc6a5c218f049a518810ac2e31bb5476c4d"
 dependencies = [
  "async-graphql-value",
  "pest",
@@ -105,8 +105,8 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-rocket"
-version = "2.10.3"
-source = "git+https://github.com/async-graphql/async-graphql#d3ea9ced18759b75e3ed1c3597f43fce65b8308d"
+version = "2.10.5"
+source = "git+https://github.com/async-graphql/async-graphql#8b778cc6a5c218f049a518810ac2e31bb5476c4d"
 dependencies = [
  "async-graphql",
  "rocket",
@@ -117,8 +117,8 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-value"
-version = "2.10.3"
-source = "git+https://github.com/async-graphql/async-graphql#d3ea9ced18759b75e3ed1c3597f43fce65b8308d"
+version = "2.10.5"
+source = "git+https://github.com/async-graphql/async-graphql#8b778cc6a5c218f049a518810ac2e31bb5476c4d"
 dependencies = [
  "bytes 1.0.1",
  "serde",
