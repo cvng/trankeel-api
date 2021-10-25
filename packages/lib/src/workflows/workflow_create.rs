@@ -30,7 +30,11 @@ pub fn create_workflow(db: &impl Db, input: CreateWorkflowInput) -> Result<Workf
         completed: Default::default(),
     })?;
 
-    db.steps().create_many(workflow.steps())?;
+    workflow
+        .steps()
+        .into_iter()
+        .map(|step| db.steps().create(step))
+        .collect::<Result<Vec<_>>>()?;
 
     Ok(workflow)
 }
