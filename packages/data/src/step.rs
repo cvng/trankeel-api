@@ -28,4 +28,5 @@ pub struct StepData {
     pub label: Option<String>,
     pub completed: Option<bool>,
     pub confirmation: Option<String>,
+    pub requirements: Option<RequirementOuter>,
 }
