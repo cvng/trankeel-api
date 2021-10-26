@@ -21,6 +21,7 @@ pub struct RequirementOuter {
 pub struct Requirement {
     pub name: String,
     pub type_: RequirementType,
+    pub value: Option<String>,
 }
 
 impl From<trankeel_kit::config::Requirement> for Requirement {
@@ -28,6 +29,7 @@ impl From<trankeel_kit::config::Requirement> for Requirement {
         Self {
             name: item.name,
             type_: item.type_.into(),
+            value: None,
         }
     }
 }

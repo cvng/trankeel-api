@@ -716,6 +716,7 @@ enum RentStatus {
 type Requirement {
 	name: String!
 	type: RequirementType!
+	value: String
 }
 input RequirementInput {
 	name: String!
