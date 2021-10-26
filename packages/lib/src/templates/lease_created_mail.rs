@@ -9,7 +9,7 @@ use trankeel_data::Url;
 use trankeel_kit::config::config;
 use trankeel_kit::locale;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct LeaseCreatedMail {
     download_url: Url,
     _recipients: Vec<Contact>,

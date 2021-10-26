@@ -5,7 +5,7 @@ use crate::Id;
 
 pub type SummaryId = Id;
 
-#[derive(Clone, Debug, Queryable, Identifiable, SimpleObject)]
+#[derive(Clone, Debug, Identifiable, Queryable, SimpleObject)]
 #[table_name = "reports"]
 pub struct Summary {
     pub id: SummaryId,

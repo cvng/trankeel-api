@@ -16,7 +16,7 @@ use trankeel_kit::config::config;
 pub type NoticeDocument = ReceiptDocument; // alias for a ReceiptDocument
 
 /// Receipt or notice document. https://dashboard.pdfmonkey.io/templates/8269e571-7ece-4f0d-bc37-854d77999e0d
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Default, Debug, Serialize)]
 pub struct ReceiptDocument {
     is_receipt: bool,
 

@@ -10,13 +10,13 @@ use trankeel_kit::config::config;
 
 pub type InviteId = Id;
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Invitereason"]
 pub enum InviteReason {
     CandidacyAccepted,
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Invitestatus"]
 pub enum InviteStatus {
     Pending,

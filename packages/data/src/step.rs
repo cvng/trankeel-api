@@ -7,7 +7,7 @@ use crate::WorkflowId;
 
 pub type StepId = Id;
 
-#[derive(Clone, Debug, Insertable, Queryable, Identifiable, Associations, SimpleObject)]
+#[derive(Clone, Debug, Associations, Identifiable, Insertable, Queryable, SimpleObject)]
 #[belongs_to(parent = "Workflow")]
 pub struct Step {
     pub id: StepId,
