@@ -39,7 +39,7 @@ pub fn complete_step(db: &impl Db, input: CompleteStepInput) -> Result<Step> {
 
 fn map_requirements(step: Step, input: CompleteStepInput) -> Option<RequirementOuter> {
     let step_requirements = match step.requirements {
-        Some(requirements) => requirements.requirements,
+        Some(step_requirements) => step_requirements.requirements,
         None => return None,
     };
 
