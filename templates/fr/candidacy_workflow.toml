@@ -28,6 +28,7 @@ Cordialement."""
 
 [[steps]]
 label = "Confirmation de la date de remise des clés"
+requirements =  [{ name = "effect_date", type = "date" }]
 confirmation = """
 Merci, nous vous confirmons que l'état des lieux ainsi que la remise des clés aura lieu le {{ move_in_date }}.
 Cordialement."""

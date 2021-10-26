@@ -333,6 +333,7 @@ table! {
         label -> Text,
         completed -> Bool,
         confirmation -> Nullable<Text>,
+        requirements -> Nullable<Jsonb>,
     }
 }
 

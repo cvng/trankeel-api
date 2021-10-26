@@ -1,6 +1,7 @@
 use crate::schema::steps;
 use crate::DateTime;
 use crate::Id;
+use crate::RequirementOuter;
 use crate::Workflow;
 use crate::WorkflowId;
 
@@ -16,6 +17,7 @@ pub struct Step {
     pub label: String,
     pub completed: bool,
     pub confirmation: Option<String>,
+    pub requirements: Option<RequirementOuter>,
 }
 
 #[derive(Default, AsChangeset, Identifiable, Insertable)]
@@ -26,4 +28,5 @@ pub struct StepData {
     pub label: Option<String>,
     pub completed: Option<bool>,
     pub confirmation: Option<String>,
+    pub requirements: Option<RequirementOuter>,
 }
