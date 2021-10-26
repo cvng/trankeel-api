@@ -190,7 +190,6 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
         .cloned()
         .ok_or(NotFound)?;
     let eventable = db.eventables().create(Eventable::Step(step.clone()))?;
-    let message = render_step_message(db, step.clone(), participant.clone())?;
 
     if step.label == LEASE_SIGNED_EVENT_LABEL {
         let lease = db.leases().by_person_id(&participant.id)?;
@@ -202,7 +201,7 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
     }
 
     if step.label == LEASE_STARTED_EVENT_LABEL {
-        let step_requirements = match step.requirements {
+        let step_requirements = match step.clone().requirements {
             Some(step_requirements) => step_requirements.requirements,
             None => vec![],
         };
@@ -221,6 +220,8 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
             })?;
         }
     }
+
+    let message = render_step_message(db, step, participant.clone())?;
 
     Ok((
         eventable.id(),
