@@ -1,5 +1,6 @@
 use crate::database::Db;
 use crate::error::Result;
+use chrono::DateTime;
 use chrono::Utc;
 use diesel::result::Error::NotFound;
 use trankeel_data::AccountId;
@@ -189,7 +190,6 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
         .cloned()
         .ok_or(NotFound)?;
     let eventable = db.eventables().create(Eventable::Step(step.clone()))?;
-    let message = render_step_message(db, step.clone(), participant.clone())?;
 
     if step.label == LEASE_SIGNED_EVENT_LABEL {
         let lease = db.leases().by_person_id(&participant.id)?;
@@ -199,6 +199,29 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
             ..Default::default()
         })?;
     }
+
+    if step.label == LEASE_STARTED_EVENT_LABEL {
+        let step_requirements = match step.clone().requirements {
+            Some(step_requirements) => step_requirements.requirements,
+            None => vec![],
+        };
+
+        let effect_date = step_requirements
+            .into_iter()
+            .find(|sr| sr.name == "effect_date")
+            .and_then(|sr| sr.value);
+
+        if let Some(effect_date) = effect_date {
+            let lease = db.leases().by_person_id(&participant.id)?;
+            db.leases().update(LeaseData {
+                id: lease.id,
+                effect_date: Some(effect_date.parse::<DateTime<Utc>>()?.into()), // TODO: match workflowable
+                ..Default::default()
+            })?;
+        }
+    }
+
+    let message = render_step_message(db, step, participant.clone())?;
 
     Ok((
         eventable.id(),
@@ -213,17 +236,15 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
 
 const LEASE_SIGNED_EVENT_LABEL: &str = "Signature du contrat de location";
 
+const LEASE_STARTED_EVENT_LABEL: &str = "Confirmation de la date de remise des clés";
+
 fn render_step_message(db: &impl Db, step: Step, participant: Person) -> Result<Option<String>> {
     let tenant = db.tenants().by_person_id(&participant.id)?;
-    let lease = db.leases().by_tenant_id(&tenant.id)?;
-    let candidacy = db.candidacies().by_tenant_id(&tenant.id)?; // TODO: match workflowable
+    let lease = db.leases().by_tenant_id(&tenant.id)?; // TODO: match workflowable
     Ok(step.confirmation.map(|message| {
         message
             .replace("{{ tenant_name }}", &participant.display_name())
-            .replace(
-                "{{ move_in_date }}",
-                &candidacy.move_in_date.inner().to_rfc3339(),
-            )
+            .replace("{{ effect_date }}", &lease.effect_date.inner().to_rfc3339())
             .replace(
                 "{{ deposit_amount }}",
                 &format!(
