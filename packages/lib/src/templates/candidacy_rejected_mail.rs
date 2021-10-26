@@ -7,7 +7,7 @@ use trankeel_data::Name;
 use trankeel_data::Person;
 use trankeel_kit::config::config;
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Default, Debug, Serialize)]
 pub struct CandidacyRejectedMail {
     pub candidate_name: String,
 }

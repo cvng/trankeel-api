@@ -1,4 +1,4 @@
-#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 pub enum RequirementType {
     Date,
 }

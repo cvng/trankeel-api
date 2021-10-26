@@ -14,7 +14,7 @@ pub struct CompleteStepInput {
     pub requirements: Option<Vec<RequirementInput>>,
 }
 
-#[derive(InputObject, Validate, Clone)]
+#[derive(Clone, InputObject, Validate)]
 pub struct RequirementInput {
     pub name: String,
     pub value: String,

@@ -11,14 +11,14 @@ pub type WorkflowId = Id;
 
 pub type WorkflowWithSteps = (Workflow, Vec<Step>);
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, DbEnum, Enum, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Workflowtype"]
 #[serde(rename_all = "snake_case")]
 pub enum WorkflowType {
     Candidacy,
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, Identifiable)]
+#[derive(Clone, Debug, Identifiable, Insertable, Queryable)]
 pub struct Workflow {
     pub id: WorkflowId,
     pub created_at: Option<DateTime>,

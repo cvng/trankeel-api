@@ -6,7 +6,7 @@ use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
 use trankeel_kit::config::config;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct LeaseDocument {
     date: DateTime,
     _filename: String,

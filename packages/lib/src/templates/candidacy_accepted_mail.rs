@@ -9,7 +9,7 @@ use trankeel_data::Url;
 use trankeel_kit::config::config;
 use trankeel_kit::locale;
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Default, Debug, Serialize)]
 pub struct CandidacyAcceptedMail {
     invite_url: Url,
     _recipients: Vec<Contact>,

@@ -11,7 +11,7 @@ use trankeel::NoticeId;
 use trankeel::ReceiptId;
 use trankeel::RentId;
 
-#[derive(Copy, Clone, Eq, PartialEq, Enum)]
+#[derive(Copy, Clone, PartialEq, Eq, Enum)]
 #[graphql(name = "RentStatus")]
 pub enum RentStatus {
     Partial,

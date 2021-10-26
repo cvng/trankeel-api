@@ -12,7 +12,7 @@ pub type DiscussionItemRow = (Option<Candidacy>,);
 
 pub type DiscussionWithMessages = (Discussion, Vec<Message>);
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Discussionstatus"]
 pub enum DiscussionStatus {
     Active,

@@ -43,7 +43,7 @@ pub trait Inline {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, DieselNewType)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct Email(String);
 
 impl Email {
@@ -58,7 +58,7 @@ impl From<String> for Email {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, DieselNewType)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct PhoneNumber(String);
 
 impl From<String> for PhoneNumber {
@@ -73,7 +73,7 @@ impl From<PhoneNumber> for String {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, DieselNewType)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct Url(String);
 
 impl From<String> for Url {
