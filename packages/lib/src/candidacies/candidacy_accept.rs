@@ -71,7 +71,7 @@ pub async fn accept_candidacy(
         ..Default::default()
     })?;
 
-    trace(db, Trace::CandidacyAccepted(candidacy.clone())).ok();
+    trace(db, Trace::CandidacyAccepted(candidacy.clone()))?;
 
     // Send invite to candidate.
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;

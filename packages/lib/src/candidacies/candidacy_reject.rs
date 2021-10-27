@@ -39,7 +39,7 @@ pub async fn reject_candidacy(
         ..Default::default()
     })?;
 
-    trace(db, Trace::CandidacyRejected(candidacy.clone())).ok();
+    trace(db, Trace::CandidacyRejected(candidacy.clone()))?;
 
     let discussion = db.discussions().by_candidacy_id(&candidacy.id)?;
 
