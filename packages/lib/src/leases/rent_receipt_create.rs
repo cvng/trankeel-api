@@ -94,8 +94,8 @@ pub async fn send_receipts(
             .await?;
 
         match receipt.type_ {
-            FileType::RentReceipt => trace(db, Trace::ReceiptSent(receipt)).ok(),
-            _ => trace(db, Trace::NoticeSent(receipt)).ok(),
+            FileType::RentReceipt => trace(db, Trace::ReceiptSent(receipt))?,
+            _ => trace(db, Trace::NoticeSent(receipt))?,
         };
     }
 
@@ -127,7 +127,7 @@ fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
 
         rents.push(rent);
 
-        trace(db, Trace::PaymentCreated(payment)).ok();
+        trace(db, Trace::PaymentCreated(payment))?;
     }
 
     Ok(rents)
@@ -191,7 +191,7 @@ async fn generate_receipts(
 
         receipts.push(receipt.clone());
 
-        trace(db, Trace::ReceiptCreated(receipt)).ok();
+        trace(db, Trace::ReceiptCreated(receipt))?;
     }
 
     Ok(receipts)

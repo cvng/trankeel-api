@@ -114,7 +114,7 @@ async fn generate_notices(
 
         notices.push(notice.clone());
 
-        trace(db, Trace::NoticeCreated(notice)).ok();
+        trace(db, Trace::NoticeCreated(notice))?;
     }
 
     Ok(notices)

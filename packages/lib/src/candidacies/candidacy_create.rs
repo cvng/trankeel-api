@@ -104,7 +104,7 @@ pub async fn create_candidacy(
         description: input.description,
     })?;
 
-    trace(db, Trace::CandidacyCreated(candidacy.clone())).ok();
+    trace(db, Trace::CandidacyCreated(candidacy.clone()))?;
 
     let discussion = db.discussions().by_initiator_id(&tenant.person_id)?;
 
