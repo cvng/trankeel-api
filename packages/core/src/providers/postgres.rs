@@ -641,7 +641,10 @@ impl database::LenderStore for LenderStore<'_> {
 
 impl database::AdvertisementStore for AdvertisementStore<'_> {
     fn by_id(&mut self, id: &AdvertisementId) -> Result<Advertisement> {
-        Ok(advertisements::table.find(id).first(&self.0.get()?)?)
+        Ok(advertisements::table
+            .find(id)
+            .filter(advertisements::published.eq(true)) // not found if published=false
+            .first(&self.0.get()?)?)
     }
 
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Advertisement> {
