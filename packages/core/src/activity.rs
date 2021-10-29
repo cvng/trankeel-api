@@ -5,6 +5,8 @@ use chrono::Utc;
 use diesel::result::Error::NotFound;
 use trankeel_data::AccountId;
 use trankeel_data::Candidacy;
+use trankeel_data::DiscussionData;
+use trankeel_data::DiscussionStatus;
 use trankeel_data::EventId;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
@@ -221,6 +223,15 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
         }
     }
 
+    if step.label == LEASE_ACTIVE_EVENT_LABEL {
+        let discussion = db.discussions().by_initiator_id(&participant.id)?;
+        db.discussions().update(DiscussionData {
+            id: discussion.id,
+            status: Some(DiscussionStatus::Active),
+            ..Default::default()
+        })?;
+    }
+
     let message = render_step_message(db, step, participant.clone())?;
 
     Ok((
@@ -237,6 +248,8 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
 const LEASE_SIGNED_EVENT_LABEL: &str = "Signature du contrat de location";
 
 const LEASE_STARTED_EVENT_LABEL: &str = "Confirmation de la date de remise des clés";
+
+const LEASE_ACTIVE_EVENT_LABEL: &str = "Réalisation de l'état des lieux";
 
 fn render_step_message(db: &impl Db, step: Step, participant: Person) -> Result<Option<String>> {
     let tenant = db.tenants().by_person_id(&participant.id)?;
