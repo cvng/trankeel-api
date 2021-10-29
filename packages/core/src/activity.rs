@@ -119,7 +119,7 @@ fn on_candidacy_accepted(db: &impl Db, candidacy: Candidacy) -> Result<Meta> {
         .first()
         .cloned()
         .ok_or(NotFound)?;
-    let eventable = db.eventables().create(Eventable::Candidacy(candidacy))?;
+    let eventable = Eventable::Candidacy(candidacy); // already created in on_candidacy_created
 
     Ok((eventable.id(), account.id, sender.id, participant.id, None))
 }
