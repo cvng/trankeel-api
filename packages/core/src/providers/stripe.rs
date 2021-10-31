@@ -1,6 +1,6 @@
+use crate::billing::BillingProvider;
 use crate::error::Context;
 use crate::error::Error;
-use crate::payment::PaymentProvider;
 use async_trait::async_trait;
 use std::env;
 use trankeel_data::Email;
@@ -18,9 +18,9 @@ impl Stripe {
 }
 
 #[async_trait]
-impl PaymentProvider for Stripe {
+impl BillingProvider for Stripe {
     async fn create_subscription_with_customer(&self, email: Email) -> Result<Subscription, Error> {
-        let plan_id = env::var("STRIPE_DEFAULT_PLAN_ID").context("STRIPE_DEFAULT_PLAN_ID")?;
+        let price_id = env::var("STRIPE_DEFAULT_PRICE_ID").context("STRIPE_DEFAULT_PRICE_ID")?;
 
         // https://stripe.com/docs/api/customers/create
         let customer_params = stripe::CreateCustomer {
@@ -38,6 +38,7 @@ impl PaymentProvider for Stripe {
             payment_method: Default::default(),
             phone: Default::default(),
             preferred_locales: Default::default(),
+            promotion_code: Default::default(),
             shipping: Default::default(),
             source: Default::default(),
             tax_exempt: Default::default(),
@@ -69,8 +70,7 @@ impl PaymentProvider for Stripe {
             items: Some(vec![stripe::CreateSubscriptionItems {
                 billing_thresholds: None,
                 metadata: Default::default(),
-                plan: Some(plan_id), // <-
-                price: None,
+                price: Some(price_id), // <-
                 price_data: None,
                 quantity: None,
                 tax_rates: None,
@@ -79,9 +79,9 @@ impl PaymentProvider for Stripe {
             off_session: Default::default(),
             payment_behavior: Default::default(),
             pending_invoice_item_interval: Default::default(),
-            prorate: Default::default(),
+            promotion_code: Default::default(),
             proration_behavior: Default::default(),
-            tax_percent: Default::default(),
+            transfer_data: Default::default(),
             trial_end: Default::default(),
             trial_from_plan: Some(true), // <-
             trial_period_days: Default::default(),

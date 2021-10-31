@@ -153,6 +153,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-stripe"
+version = "0.13.0-rc3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab0b4196d6fb45057dc4d3be8e645bde98473cf242da6906a3e5a4d689ab27b2"
+dependencies = [
+ "hyper 0.14.11",
+ "hyper-tls 0.5.0",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "serde_qs",
+ "smol_str",
+ "thiserror",
+ "tokio 1.10.0",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.51"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2502,24 +2519,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "213701ba3370744dcd1a12960caa4843b3d68b4d1c0a5d575e0d65b2ee9d16c0"
 
 [[package]]
-name = "stripe-rust"
-version = "0.13.0-dev"
-source = "git+https://github.com/wyyerd/stripe-rs#efdd5ad00451f2296e875a1e6ade36bbe9523eef"
-dependencies = [
- "chrono",
- "futures-util",
- "http",
- "hyper 0.14.11",
- "hyper-tls 0.5.0",
- "serde",
- "serde_derive",
- "serde_json",
- "serde_qs",
- "smol_str",
- "tokio 1.10.0",
-]
-
-[[package]]
 name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2856,6 +2855,7 @@ dependencies = [
 name = "trankeel-core"
 version = "0.3.0"
 dependencies = [
+ "async-stripe",
  "async-trait",
  "chrono",
  "diesel",
@@ -2865,7 +2865,6 @@ dependencies = [
  "sendinblue",
  "serde",
  "serde_json",
- "stripe-rust",
  "tokio 0.2.25",
  "trankeel-data",
  "trankeel-kit",
@@ -2876,6 +2875,7 @@ name = "trankeel-data"
 version = "0.3.0"
 dependencies = [
  "async-graphql",
+ "async-stripe",
  "chrono",
  "chronoutil",
  "diesel",
@@ -2887,7 +2887,6 @@ dependencies = [
  "rust_decimal_macros",
  "serde",
  "serde_json",
- "stripe-rust",
  "trankeel-kit",
  "uuid",
 ]

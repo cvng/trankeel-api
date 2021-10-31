@@ -1,8 +1,8 @@
 use crate::error::Result;
 use async_graphql::InputObject;
 use log::info;
+use trankeel_core::billing::BillingProvider;
 use trankeel_core::database::Db;
-use trankeel_core::payment::PaymentProvider;
 use trankeel_data::Account;
 use trankeel_data::AccountData;
 use trankeel_data::AccountId;
@@ -44,7 +44,7 @@ pub struct CreateUserWithAccountInput {
 
 pub async fn create_user_with_account(
     db: &impl Db,
-    payment_provider: &impl PaymentProvider,
+    billing_provider: &impl BillingProvider,
     input: CreateUserWithAccountInput,
 ) -> Result<Person> {
     input.validate()?;
@@ -92,7 +92,7 @@ pub async fn create_user_with_account(
     }
 
     // Create subscription.
-    let subscription = payment_provider
+    let subscription = billing_provider
         .create_subscription_with_customer(input.email.into())
         .await?;
     info!(
