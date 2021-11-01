@@ -29,6 +29,8 @@ use trankeel_data::InviteReason;
 use trankeel_data::LeaseData;
 use trankeel_data::LeaseFile;
 use trankeel_data::LeaseFileId;
+use trankeel_data::PersonData;
+use trankeel_data::PersonRole;
 use trankeel_data::Tenant;
 use trankeel_data::TenantId;
 use trankeel_data::TenantStatus;
@@ -108,6 +110,11 @@ pub async fn accept_candidacy(
         status: TenantStatus::default(),
         lease_id: None,
         is_student: candidacy.is_student,
+    })?;
+    db.persons().update(PersonData {
+        id: candidate.id,
+        role: Some(PersonRole::Tenant),
+        ..Default::default()
     })?;
 
     let lease = create_lease_from_advertisement(db, auth_id, &advertisement, vec![tenant])?;

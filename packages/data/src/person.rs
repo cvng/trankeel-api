@@ -60,7 +60,7 @@ pub struct PersonData {
     pub last_name: Option<String>,
     pub address: Option<Address>,
     pub photo_url: Option<Url>,
-    pub role: PersonRole,
+    pub role: Option<PersonRole>,
     pub phone_number: Option<PhoneNumber>,
 }
 
