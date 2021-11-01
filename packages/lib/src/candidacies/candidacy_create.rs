@@ -24,7 +24,10 @@ use trankeel_data::Person;
 use trankeel_data::PersonId;
 use trankeel_data::PersonRole;
 use trankeel_data::PhoneNumber;
+use trankeel_data::ProfessionalWarrant;
+use trankeel_data::WarrantIdentity;
 use trankeel_data::WarrantType;
+use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
 // # Input
@@ -147,4 +150,30 @@ fn create_candidate(db: &impl Db, account: &Account, input: CreatePersonInput) -
     start_discussion_with_lender(db, account, &candidate)?;
 
     Ok(candidate)
+}
+
+impl From<WarrantWithIdentity> for CreateWarrantInput {
+    fn from(item: WarrantWithIdentity) -> Self {
+        match item.1 {
+            WarrantIdentity::Individual(person) => Self {
+                type_: item.0.type_,
+                individual: Some(person.into()),
+                company: None,
+            },
+            WarrantIdentity::Professional(professional) => Self {
+                type_: item.0.type_,
+                individual: None,
+                company: Some(professional.into()),
+            },
+        }
+    }
+}
+
+impl From<ProfessionalWarrant> for CreateProfessionalWarrantInput {
+    fn from(item: ProfessionalWarrant) -> Self {
+        Self {
+            name: item.name,
+            identifier: item.identifier,
+        }
+    }
 }

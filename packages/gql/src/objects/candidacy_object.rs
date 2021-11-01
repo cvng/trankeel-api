@@ -1,5 +1,6 @@
 use super::Discussion;
 use super::Person;
+use super::Warrant;
 use super::Workflow;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -44,6 +45,16 @@ impl Candidacy {
             .discussions()
             .by_candidacy_id(&self.id)?
             .into())
+    }
+
+    async fn warrants(&self, ctx: &Context<'_>) -> Result<Vec<Warrant>> {
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .warrants()
+            .by_candidacy_id(&self.id)?
+            .into_iter()
+            .map(Into::into)
+            .collect())
     }
 
     async fn workflow(&self, ctx: &Context<'_>) -> Result<Option<Workflow>> {
