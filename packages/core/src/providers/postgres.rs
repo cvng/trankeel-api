@@ -678,7 +678,10 @@ impl database::CandidacyStore for CandidacyStore<'_> {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>> {
         Ok(candidacies::table
             .select(candidacies::all_columns)
-            .left_join(persons::table.on(persons::id.eq(candidacies::person_id)))
+            .left_join(advertisements::table.on(advertisements::id.eq(candidacies::advertisement_id)))
+            .left_join(properties::table.on(properties::id.eq(advertisements::property_id)))
+            .left_join(accounts::table.on(accounts::id.eq(properties::account_id)))
+            .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
             .filter(persons::auth_id.eq(auth_id.inner()))
             .load(&self.0.get()?)?)
     }
