@@ -87,7 +87,6 @@ pub async fn accept_candidacy(
         db,
         auth_id,
         CreateTenantInput {
-            apl: candidacy.apl,
             birthdate: candidacy.birthdate,
             birthplace: candidacy.birthplace.clone(),
             email: candidate.email.inner().to_string(),

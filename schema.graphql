@@ -63,7 +63,6 @@ type Candidacy {
 	personId: ID!
 	moveInDate: DateTime!
 	description: String!
-	apl: Boolean
 	birthdate: Date
 	birthplace: String
 	isStudent: Boolean
@@ -119,7 +118,6 @@ input CreateCandidacyInput {
 	phoneNumber: PhoneNumber!
 	moveInDate: DateTime!
 	description: String!
-	apl: Boolean
 	birthdate: Date!
 	birthplace: String
 	isStudent: Boolean!
@@ -478,7 +476,7 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -797,7 +795,6 @@ type Tenant implements PersonInterface {
 	updatedAt: DateTime
 	accountId: ID!
 	personId: ID!
-	apl: Boolean
 	birthdate: Date
 	birthplace: String
 	email: Email!
@@ -822,7 +819,6 @@ type Tenant implements PersonInterface {
 	warrants: [Warrant!]!
 }
 input TenantInput {
-	apl: Boolean
 	birthdate: Date
 	birthplace: String
 	email: String!
@@ -842,7 +838,6 @@ enum TenantStatus {
 	UPTODATE
 }
 input TenantUpdateInput {
-	apl: Boolean
 	birthdate: Date
 	birthplace: String
 	email: String

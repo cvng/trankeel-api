@@ -15,7 +15,6 @@ use validator::Validate;
 #[derive(InputObject, Validate)]
 #[graphql(name = "TenantUpdateInput")]
 pub struct UpdateTenantInput {
-    pub apl: Option<bool>,
     pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
     #[validate(email)]
@@ -38,7 +37,6 @@ pub fn update_tenant(db: &impl Db, _auth_id: &AuthId, input: UpdateTenantInput) 
         id: input.id,
         account_id: Default::default(),
         person_id: Default::default(),
-        apl: input.apl,
         birthdate: input.birthdate,
         birthplace: input.birthplace,
         email: input.email.map(Into::into),

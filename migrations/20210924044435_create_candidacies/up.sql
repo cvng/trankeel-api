@@ -13,7 +13,6 @@ CREATE TABLE candidacies (
     person_id UUID NOT NULL REFERENCES persons(id),
     move_in_date TIMESTAMPTZ NOT NULL,
     description TEXT NOT NULL,
-    apl BOOLEAN,
     birthdate DATE,
     birthplace TEXT,
     is_student BOOLEAN

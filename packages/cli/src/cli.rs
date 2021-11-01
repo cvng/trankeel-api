@@ -109,7 +109,6 @@ async fn seed() {
         .create_tenant(
             &auth_id,
             CreateTenantInput {
-                apl: None,
                 birthdate: Some(Utc::now().date().naive_utc().into()),
                 birthplace: None,
                 email: author.email.clone(),
@@ -170,7 +169,6 @@ async fn seed() {
             phone_number: "+33633123456".to_string().into(),
             move_in_date: Utc::now().into(),
             description: "Hello, Lender!".into(),
-            apl: Some(true),
             birthdate: Utc::now().date().naive_utc().into(),
             birthplace: None,
             is_student: true,

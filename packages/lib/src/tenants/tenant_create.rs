@@ -32,7 +32,6 @@ use validator::Validate;
 #[derive(InputObject, Validate)]
 #[graphql(name = "TenantInput")]
 pub struct CreateTenantInput {
-    pub apl: Option<bool>,
     pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
     #[validate(email)]
@@ -90,7 +89,6 @@ pub fn create_tenant(
         updated_at: Default::default(),
         account_id: account.id,
         person_id: person.id,
-        apl: input.apl,
         birthdate: input.birthdate,
         birthplace: input.birthplace,
         email: input.email.into(),
