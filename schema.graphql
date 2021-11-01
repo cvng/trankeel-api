@@ -69,6 +69,7 @@ type Candidacy {
 	isStudent: Boolean
 	candidate: Person!
 	discussion: Discussion!
+	warrants: [Warrant!]!
 	workflow: Workflow
 }
 enum CandidacyStatus {

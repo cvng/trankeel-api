@@ -9,9 +9,11 @@ use trankeel::AuthId;
 use trankeel::CreateAdvertisementInput;
 use trankeel::CreateCandidacyInput;
 use trankeel::CreateFurnishedLeaseInput;
+use trankeel::CreateProfessionalWarrantInput;
 use trankeel::CreatePropertyInput;
 use trankeel::CreateTenantInput;
 use trankeel::CreateUserWithAccountInput;
+use trankeel::CreateWarrantInput;
 use trankeel::EntryFlexibility;
 use trankeel::LeaseType;
 use trankeel::PropertyBuildPeriodType;
@@ -19,6 +21,7 @@ use trankeel::PropertyBuildingLegalStatus;
 use trankeel::PropertyHabitationUsageType;
 use trankeel::PropertyRoomType;
 use trankeel::PropertyUsageType;
+use trankeel::WarrantType;
 
 #[tokio::main]
 async fn main() {
@@ -172,7 +175,14 @@ async fn seed() {
             birthplace: None,
             is_student: true,
             files: None,
-            warrants: None,
+            warrants: Some(vec![CreateWarrantInput {
+                type_: WarrantType::Visale,
+                individual: None,
+                company: Some(CreateProfessionalWarrantInput {
+                    name: "ABC".into(),
+                    identifier: "001".into(),
+                }),
+            }]),
         })
         .await
         .unwrap();
