@@ -71,7 +71,7 @@ pub async fn create_candidacy(
 
     let account = db.accounts().by_advertisement_id(&input.advertisement_id)?;
 
-    let person = create_candidate(
+    let candidate = create_candidate(
         db,
         &account,
         CreatePersonInput {
@@ -89,7 +89,7 @@ pub async fn create_candidacy(
         updated_at: Default::default(),
         status: CandidacyStatus::default(),
         advertisement_id: input.advertisement_id,
-        person_id: person.id,
+        person_id: candidate.id,
         move_in_date: input.move_in_date,
         description: input.description,
         apl: input.apl,
@@ -104,7 +104,7 @@ pub async fn create_candidacy(
 
     trace(db, Trace::CandidacyCreated(candidacy.clone()))?;
 
-    let discussion = db.discussions().by_initiator_id(&person.id)?;
+    let discussion = db.discussions().by_initiator_id(&candidate.id)?;
 
     let discussion = db.discussions().update(DiscussionData {
         id: discussion.id,
@@ -116,12 +116,10 @@ pub async fn create_candidacy(
         db,
         PushMessageInput {
             discussion_id: discussion.id,
-            sender_id: person.id,
+            sender_id: candidate.id,
             message: candidacy.description.clone(),
         },
     )?;
-
-    let candidate = db.persons().by_id(&person.id)?;
 
     mailer
         .batch(vec![CandidacyCreatedMail::try_new(&candidacy, &candidate)?])
@@ -131,7 +129,7 @@ pub async fn create_candidacy(
 }
 
 fn create_candidate(db: &impl Db, account: &Account, input: CreatePersonInput) -> Result<Person> {
-    let person = db.persons().create(Person {
+    let candidate = db.persons().create(Person {
         id: PersonId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -146,7 +144,7 @@ fn create_candidate(db: &impl Db, account: &Account, input: CreatePersonInput) -
         phone_number: input.phone_number,
     })?;
 
-    start_discussion_with_lender(db, account, &person)?;
+    start_discussion_with_lender(db, account, &candidate)?;
 
-    Ok(person)
+    Ok(candidate)
 }
