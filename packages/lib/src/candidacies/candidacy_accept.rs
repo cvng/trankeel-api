@@ -29,6 +29,11 @@ use trankeel_data::InviteReason;
 use trankeel_data::LeaseData;
 use trankeel_data::LeaseFile;
 use trankeel_data::LeaseFileId;
+use trankeel_data::PersonData;
+use trankeel_data::PersonRole;
+use trankeel_data::Tenant;
+use trankeel_data::TenantId;
+use trankeel_data::TenantStatus;
 use trankeel_data::WorkflowType;
 use validator::Validate;
 
@@ -49,6 +54,8 @@ pub async fn accept_candidacy(
     input: AcceptCandidacyInput,
 ) -> Result<Candidacy> {
     input.validate()?;
+
+    let account = db.accounts().by_auth_id(auth_id)?;
 
     let advertisement = db.advertisements().by_candidacy_id(&input.id)?;
 
@@ -86,7 +93,29 @@ pub async fn accept_candidacy(
 
     // Create unsigned lease.
     let advertisement = db.advertisements().by_id(&candidacy.advertisement_id)?;
-    let tenant = db.tenants().by_person_id(&candidate.id)?;
+    let tenant = db.tenants().create(Tenant {
+        id: TenantId::new(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
+        account_id: account.id,
+        person_id: candidate.id,
+        apl: candidacy.apl,
+        birthdate: candidacy.birthdate,
+        birthplace: candidacy.birthplace.clone(),
+        email: candidate.email.clone(),
+        first_name: candidate.first_name.clone(),
+        last_name: candidate.last_name.clone(),
+        note: None,
+        phone_number: candidate.phone_number.clone(),
+        status: TenantStatus::default(),
+        lease_id: None,
+        is_student: candidacy.is_student,
+    })?;
+    db.persons().update(PersonData {
+        id: candidate.id,
+        role: Some(PersonRole::Tenant),
+        ..Default::default()
+    })?;
 
     let lease = create_lease_from_advertisement(db, auth_id, &advertisement, vec![tenant])?;
 

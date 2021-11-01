@@ -48,9 +48,13 @@ table! {
         updated_at -> Nullable<Timestamptz>,
         status -> Candidacystatus,
         advertisement_id -> Uuid,
-        tenant_id -> Uuid,
+        person_id -> Uuid,
         move_in_date -> Timestamptz,
         description -> Text,
+        apl -> Nullable<Bool>,
+        birthdate -> Nullable<Date>,
+        birthplace -> Nullable<Text>,
+        is_student -> Nullable<Bool>,
     }
 }
 
@@ -371,9 +375,10 @@ table! {
         updated_at -> Nullable<Timestamptz>,
         #[sql_name = "type"]
         type_ -> Warranttype,
-        tenant_id -> Uuid,
+        tenant_id -> Nullable<Uuid>,
         individual_id -> Nullable<Uuid>,
         professional_id -> Nullable<Uuid>,
+        candidacy_id -> Nullable<Uuid>,
     }
 }
 
@@ -406,7 +411,7 @@ joinable!(accounts -> plans (plan_id));
 joinable!(advertisements -> leases (referral_lease_id));
 joinable!(advertisements -> properties (property_id));
 joinable!(candidacies -> advertisements (advertisement_id));
-joinable!(candidacies -> tenants (tenant_id));
+joinable!(candidacies -> persons (person_id));
 joinable!(discussions -> accounts (account_id));
 joinable!(discussions -> persons (initiator_id));
 joinable!(eventables -> candidacies (candidacy_id));
@@ -438,6 +443,7 @@ joinable!(steps -> workflows (workflow_id));
 joinable!(tenants -> accounts (account_id));
 joinable!(tenants -> leases (lease_id));
 joinable!(tenants -> persons (person_id));
+joinable!(warrants -> candidacies (candidacy_id));
 joinable!(warrants -> persons (individual_id));
 joinable!(warrants -> professional_warrants (professional_id));
 joinable!(warrants -> tenants (tenant_id));

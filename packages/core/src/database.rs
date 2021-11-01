@@ -151,7 +151,7 @@ pub trait CandidacyStore {
     fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId)
         -> Result<Vec<Candidacy>>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Candidacy>>;
-    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Candidacy>;
+    fn by_person_id(&mut self, person_id: &PersonId) -> Result<Candidacy>;
     fn create(&mut self, data: Candidacy) -> Result<Candidacy>;
     fn update(&mut self, data: CandidacyData) -> Result<Candidacy>;
 }

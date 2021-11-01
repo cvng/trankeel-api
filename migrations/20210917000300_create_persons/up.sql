@@ -1,5 +1,6 @@
 CREATE TYPE personrole AS ENUM (
     'admin',
+    'candidate',
     'user',
     'viewer',
     'tenant',

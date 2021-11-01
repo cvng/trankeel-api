@@ -116,6 +116,7 @@ async fn seed() {
                 phone_number: None,
                 is_student: Some(false),
                 warrants: None,
+                person_id: None,
             },
         )
         .unwrap();
@@ -160,14 +161,16 @@ async fn seed() {
     let candidacy = client
         .create_candidacy(CreateCandidacyInput {
             advertisement_id: advertisement.id,
-            is_student: true,
+            email: author.email,
             first_name: "Candidate".into(),
             last_name: "TRANKEEL".into(),
-            birthdate: Utc::now().date().naive_utc().into(),
-            email: author.email,
             phone_number: "+33633123456".to_string().into(),
             move_in_date: Utc::now().into(),
             description: "Hello, Lender!".into(),
+            apl: Some(true),
+            birthdate: Utc::now().date().naive_utc().into(),
+            birthplace: None,
+            is_student: true,
             files: None,
             warrants: None,
         })

@@ -1,4 +1,5 @@
 use crate::schema::warrants;
+use crate::CandidacyId;
 use crate::DateTime;
 use crate::Id;
 use crate::Person;
@@ -31,7 +32,8 @@ pub struct Warrant {
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub type_: WarrantType,
-    pub tenant_id: TenantId,
+    pub tenant_id: Option<TenantId>,
     pub individual_id: Option<PersonId>,
     pub professional_id: Option<ProfessionalWarrantId>,
+    pub candidacy_id: Option<CandidacyId>,
 }

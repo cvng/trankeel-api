@@ -1,5 +1,5 @@
 use super::Discussion;
-use super::Tenant;
+use super::Person;
 use super::Workflow;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -7,8 +7,9 @@ use trankeel::AdvertisementId;
 use trankeel::CandidacyId;
 use trankeel::CandidacyStatus;
 use trankeel::Client;
+use trankeel::Date;
 use trankeel::DateTime;
-use trankeel::TenantId;
+use trankeel::PersonId;
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -18,18 +19,22 @@ pub struct Candidacy {
     pub updated_at: Option<DateTime>,
     pub status: CandidacyStatus,
     pub advertisement_id: AdvertisementId,
-    pub tenant_id: TenantId,
+    pub person_id: PersonId,
     pub move_in_date: DateTime,
     pub description: String,
+    pub apl: Option<bool>,
+    pub birthdate: Option<Date>,
+    pub birthplace: Option<String>,
+    pub is_student: Option<bool>,
 }
 
 #[async_graphql::ComplexObject]
 impl Candidacy {
-    async fn tenant(&self, ctx: &Context<'_>) -> Result<Tenant> {
+    async fn candidate(&self, ctx: &Context<'_>) -> Result<Person> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .tenants()
-            .by_id(&self.tenant_id)?
+            .persons()
+            .by_id(&self.person_id)?
             .into())
     }
 
@@ -58,9 +63,13 @@ impl From<trankeel::Candidacy> for Candidacy {
             updated_at: item.updated_at,
             status: item.status,
             advertisement_id: item.advertisement_id,
-            tenant_id: item.tenant_id,
+            person_id: item.person_id,
             move_in_date: item.move_in_date,
             description: item.description,
+            apl: item.apl,
+            birthdate: item.birthdate,
+            birthplace: item.birthplace,
+            is_student: item.is_student,
         }
     }
 }

@@ -25,7 +25,6 @@ pub struct Person {
     pub first_name: String,
     pub last_name: String,
     pub address: Option<Address>,
-    #[graphql(name = "photoURL")]
     pub photo_url: Option<Url>,
     pub role: PersonRole,
     pub phone_number: Option<PhoneNumber>,
