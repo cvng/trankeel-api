@@ -293,8 +293,8 @@ impl database::AccountStore for AccountStore<'_> {
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Account> {
         Ok(accounts::table
             .select(accounts::all_columns)
-            .left_join(tenants::table.on(tenants::account_id.eq(accounts::id)))
-            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
+            .left_join(candidacies::table.on(candidacies::person_id.eq(persons::id)))
             .filter(candidacies::id.eq(candidacy_id))
             .first(&self.0.get()?)?)
     }
@@ -348,8 +348,8 @@ impl database::AccountStore for AccountStore<'_> {
     fn by_step_id(&mut self, step_id: &StepId) -> Result<Account> {
         Ok(accounts::table
             .select(accounts::all_columns)
-            .left_join(tenants::table.on(tenants::account_id.eq(accounts::id)))
-            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
+            .left_join(candidacies::table.on(candidacies::person_id.eq(persons::id)))
             .left_join(workflows::table.on(workflows::workflowable_id.eq(candidacies::id))) // TODO: match workflowable
             .left_join(steps::table.on(steps::workflow_id.eq(workflows::id)))
             .filter(steps::id.eq(step_id))
@@ -387,8 +387,7 @@ impl database::PersonStore for PersonStore<'_> {
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Person> {
         Ok(persons::table
             .select(persons::all_columns)
-            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
-            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .left_join(candidacies::table.on(candidacies::person_id.eq(persons::id)))
             .filter(candidacies::id.eq(candidacy_id))
             .first(&self.0.get()?)?)
     }
@@ -438,8 +437,7 @@ impl database::PersonStore for PersonStore<'_> {
     fn by_step_id(&mut self, step_id: &StepId) -> Result<Person> {
         Ok(persons::table
             .select(persons::all_columns)
-            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
-            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .left_join(candidacies::table.on(candidacies::person_id.eq(persons::id)))
             .left_join(workflows::table.on(workflows::workflowable_id.eq(candidacies::id))) // TODO: match workflowable
             .left_join(steps::table.on(steps::workflow_id.eq(workflows::id)))
             .filter(steps::id.eq(step_id))
@@ -680,8 +678,7 @@ impl database::CandidacyStore for CandidacyStore<'_> {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>> {
         Ok(candidacies::table
             .select(candidacies::all_columns)
-            .left_join(tenants::table.on(tenants::id.eq(candidacies::tenant_id)))
-            .left_join(persons::table.on(persons::account_id.eq(tenants::account_id)))
+            .left_join(persons::table.on(persons::id.eq(candidacies::person_id)))
             .filter(persons::auth_id.eq(auth_id.inner()))
             .load(&self.0.get()?)?)
     }
@@ -710,11 +707,11 @@ impl database::CandidacyStore for CandidacyStore<'_> {
             .load(&self.0.get()?)?)
     }
 
-    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Candidacy> {
+    fn by_person_id(&mut self, person_id: &PersonId) -> Result<Candidacy> {
         Ok(candidacies::table
             .select(candidacies::all_columns)
-            .left_join(tenants::table.on(tenants::id.eq(candidacies::tenant_id)))
-            .filter(tenants::id.eq(tenant_id))
+            .left_join(persons::table.on(persons::id.eq(candidacies::person_id)))
+            .filter(persons::id.eq(person_id))
             .first(&self.0.get()?)?)
     }
 
@@ -1047,8 +1044,7 @@ impl database::DiscussionStore for DiscussionStore<'_> {
         Ok(discussions::table
             .select(discussions::all_columns)
             .left_join(persons::table.on(persons::id.eq(discussions::initiator_id)))
-            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
-            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .left_join(candidacies::table.on(candidacies::person_id.eq(persons::id)))
             .filter(candidacies::id.eq(candidacy_id))
             .first(&self.0.get()?)?)
     }
@@ -1073,7 +1069,7 @@ impl database::DiscussionStore for DiscussionStore<'_> {
         Ok(discussions::table
             .left_join(persons::table.on(persons::id.eq(discussions::initiator_id)))
             .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
-            .left_join(candidacies::table.on(candidacies::tenant_id.eq(tenants::id)))
+            .left_join(candidacies::table.on(candidacies::person_id.eq(persons::id)))
             .select((candidacies::all_columns.nullable(),))
             .filter(discussions::id.eq(id))
             .load::<DiscussionItemRow>(&self.0.get()?)?

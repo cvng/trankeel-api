@@ -8,6 +8,6 @@ pub struct CreatePersonInput {
     pub email: Email,
     pub first_name: String,
     pub last_name: String,
-    pub address: AddressInput,
+    pub address: Option<AddressInput>,
     pub phone_number: Option<PhoneNumber>,
 }

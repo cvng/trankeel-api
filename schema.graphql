@@ -60,10 +60,14 @@ type Candidacy {
 	updatedAt: DateTime
 	status: CandidacyStatus!
 	advertisementId: ID!
-	tenantId: ID!
+	personId: ID!
 	moveInDate: DateTime!
 	description: String!
-	tenant: Tenant!
+	apl: Boolean
+	birthdate: Date
+	birthplace: String
+	isStudent: Boolean
+	tenant: Person!
 	discussion: Discussion!
 	workflow: Workflow
 }
@@ -108,14 +112,16 @@ input CreateAdvertisementInput {
 }
 input CreateCandidacyInput {
 	advertisementId: ID!
-	isStudent: Boolean!
+	email: String!
 	firstName: String!
 	lastName: String!
-	birthdate: Date!
-	email: String!
 	phoneNumber: PhoneNumber!
 	moveInDate: DateTime!
 	description: String!
+	apl: Boolean
+	birthdate: Date!
+	birthplace: String
+	isStudent: Boolean!
 	files: [FileInput!]
 	warrants: [CreateWarrantInput!]
 }
@@ -127,7 +133,7 @@ input CreatePersonInput {
 	email: Email!
 	firstName: String!
 	lastName: String!
-	address: AddressInput!
+	address: AddressInput
 	phoneNumber: PhoneNumber
 }
 input CreateProfessionalWarrantInput {
@@ -471,7 +477,7 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -481,7 +487,7 @@ type Person implements LegalIdentityInterface & PersonInterface {
 	firstName: String!
 	lastName: String!
 	address: Address
-	photoURL: URL
+	photoUrl: URL
 	role: UserRole!
 	phoneNumber: PhoneNumber
 	displayName: String!
@@ -825,6 +831,7 @@ input TenantInput {
 	phoneNumber: PhoneNumber
 	isStudent: Boolean
 	warrants: [CreateWarrantInput!]
+	personId: ID
 }
 enum TenantStatus {
 	CANDIDATE
@@ -888,6 +895,7 @@ input UpdateAdvertisementInput {
 }
 enum UserRole {
 	ADMIN
+	CANDIDATE
 	TENANT
 	USER
 	VIEWER
@@ -912,9 +920,10 @@ type Warrant {
 	createdAt: DateTime
 	updatedAt: DateTime
 	type: WarrantType!
-	tenantId: ID!
+	tenantId: ID
 	individualId: ID
 	professionalId: ID
+	candidacyId: ID
 	identity: WarrantIdentity!
 }
 union WarrantIdentity = | Person | ProfessionalWarrant

@@ -1,6 +1,7 @@
 use crate::unions::WarrantIdentity;
 use async_graphql::Context;
 use async_graphql::Result;
+use trankeel::CandidacyId;
 use trankeel::Client;
 use trankeel::DateTime;
 use trankeel::PersonId;
@@ -16,9 +17,10 @@ pub struct Warrant {
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub type_: WarrantType,
-    pub tenant_id: TenantId,
+    pub tenant_id: Option<TenantId>,
     pub individual_id: Option<PersonId>,
     pub professional_id: Option<ProfessionalWarrantId>,
+    pub candidacy_id: Option<CandidacyId>,
 }
 
 #[async_graphql::ComplexObject]
@@ -42,6 +44,7 @@ impl From<trankeel::Warrant> for Warrant {
             tenant_id: item.tenant_id,
             individual_id: item.individual_id,
             professional_id: item.professional_id,
+            candidacy_id: item.candidacy_id,
         }
     }
 }

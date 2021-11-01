@@ -10,9 +10,13 @@ CREATE TABLE candidacies (
     updated_at TIMESTAMPTZ,
     status CANDIDACYSTATUS NOT NULL,
     advertisement_id UUID NOT NULL REFERENCES advertisements(id),
-    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    person_id UUID NOT NULL REFERENCES persons(id),
     move_in_date TIMESTAMPTZ NOT NULL,
-    description TEXT NOT NULL
+    description TEXT NOT NULL,
+    apl BOOLEAN,
+    birthdate DATE,
+    birthplace TEXT,
+    is_student BOOLEAN
 );
 
 SELECT manage_updated_at('candidacies');

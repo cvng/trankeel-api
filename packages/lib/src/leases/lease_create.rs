@@ -197,17 +197,7 @@ fn add_lease_tenants(
                 id: tenant_id,
                 lease_id: Some(lease_id),
                 status: Some(TenantStatus::Uptodate),
-                account_id: Default::default(),
-                person_id: Default::default(),
-                apl: Default::default(),
-                birthdate: Default::default(),
-                birthplace: Default::default(),
-                email: Default::default(),
-                first_name: Default::default(),
-                last_name: Default::default(),
-                note: Default::default(),
-                phone_number: Default::default(),
-                is_student: Default::default(),
+                ..Default::default()
             })
         })
         .collect()

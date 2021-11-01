@@ -10,6 +10,7 @@ use async_graphql::InputObject;
 use trankeel_core::database::Db;
 use trankeel_data::Account;
 use trankeel_data::AccountId;
+use trankeel_data::CandidacyId;
 use trankeel_data::Discussion;
 use trankeel_data::Person;
 use trankeel_data::PersonId;
@@ -42,6 +43,7 @@ pub struct CreateTenantInput {
     pub phone_number: Option<PhoneNumber>,
     pub is_student: Option<bool>,
     pub warrants: Option<Vec<CreateWarrantInput>>,
+    pub person_id: Option<PersonId>,
 }
 
 // # Operation
@@ -59,20 +61,28 @@ pub fn create_tenant(
         None => db.accounts().by_auth_id(auth_id)?,
     };
 
-    let person = db.persons().create(Person {
-        id: PersonId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        account_id: account.id,
-        auth_id: None, // Not authenticable when created.
-        email: input.email.clone().into(),
-        first_name: input.first_name.clone(),
-        last_name: input.last_name.clone(),
-        address: None,
-        photo_url: None,
-        role: PersonRole::Tenant,
-        phone_number: input.phone_number.clone(),
-    })?;
+    let person = if let Some(person_id) = input.person_id {
+        db.persons().by_id(&person_id)?
+    } else {
+        let person = db.persons().create(Person {
+            id: PersonId::new(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            account_id: account.id,
+            auth_id: None, // Not authenticable when created.
+            email: input.email.clone().into(),
+            first_name: input.first_name.clone(),
+            last_name: input.last_name.clone(),
+            address: None,
+            photo_url: None,
+            role: PersonRole::Tenant,
+            phone_number: input.phone_number.clone(),
+        })?;
+
+        start_discussion_with_lender(db, &account, &person)?;
+
+        person
+    };
 
     let tenant = db.tenants().create(Tenant {
         id: TenantId::new(),
@@ -94,20 +104,19 @@ pub fn create_tenant(
     })?;
 
     if let Some(warrant_inputs) = input.warrants {
-        add_tenant_warrants(db, &tenant.id, &account.id, warrant_inputs)?;
+        add_warrants(db, &account.id, Some(tenant.id), None, warrant_inputs)?;
     }
-
-    start_discussion_with_lender(db, &account, &person)?;
 
     Ok(tenant)
 }
 
 // # Utils
 
-fn add_tenant_warrants(
+pub fn add_warrants(
     db: &impl Db,
-    tenant_id: &TenantId,
     account_id: &AccountId,
+    tenant_id: Option<TenantId>,
+    candidacy_id: Option<CandidacyId>,
     warrant_inputs: Vec<CreateWarrantInput>,
 ) -> Result<Vec<WarrantWithIdentity>> {
     let mut warrants = vec![];
@@ -124,9 +133,10 @@ fn add_tenant_warrants(
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     type_: WarrantType::Person,
-                    tenant_id: *tenant_id,
+                    tenant_id,
                     individual_id: Default::default(),
                     professional_id: None,
+                    candidacy_id,
                 },
                 WarrantIdentity::Individual(Person {
                     id: PersonId::new(),
@@ -137,10 +147,10 @@ fn add_tenant_warrants(
                     email: person_input.email,
                     first_name: person_input.first_name,
                     last_name: person_input.last_name,
-                    address: Some(person_input.address.into()),
-                    phone_number: person_input.phone_number,
+                    address: person_input.address.map(Into::into),
                     photo_url: None,
                     role: PersonRole::Warrant,
+                    phone_number: person_input.phone_number,
                 }),
             ))?,
             (WarrantType::Visale, _, Some(company_input)) => db.warrants().create((
@@ -149,9 +159,10 @@ fn add_tenant_warrants(
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     type_: WarrantType::Visale,
-                    tenant_id: *tenant_id,
+                    tenant_id,
                     individual_id: None,
                     professional_id: Default::default(),
+                    candidacy_id,
                 },
                 WarrantIdentity::Professional(ProfessionalWarrant {
                     id: ProfessionalWarrantId::new(),
@@ -167,9 +178,10 @@ fn add_tenant_warrants(
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     type_: WarrantType::Company,
-                    tenant_id: *tenant_id,
+                    tenant_id,
                     individual_id: None,
                     professional_id: Default::default(),
+                    candidacy_id,
                 },
                 WarrantIdentity::Professional(ProfessionalWarrant {
                     id: ProfessionalWarrantId::new(),
@@ -188,7 +200,7 @@ fn add_tenant_warrants(
     Ok(warrants)
 }
 
-fn start_discussion_with_lender(
+pub fn start_discussion_with_lender(
     db: &impl Db,
     account: &Account,
     initiator: &Person,

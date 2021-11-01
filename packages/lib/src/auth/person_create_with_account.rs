@@ -66,6 +66,7 @@ pub async fn create_user_with_account(
         id: PersonId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
+        account_id: account.id,
         auth_id: Some(input.auth_id),
         email: input.email.clone().into(),
         first_name: input.first_name,
@@ -74,7 +75,6 @@ pub async fn create_user_with_account(
         photo_url: None,
         role: PersonRole::User,
         phone_number: input.phone_number.map(Into::into),
-        account_id: account.id,
     })?;
 
     // Create lender.

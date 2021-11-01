@@ -20,6 +20,7 @@ pub type PersonId = Id;
 #[DieselType = "Personrole"]
 pub enum PersonRole {
     Admin,
+    Candidate,
     Tenant,
     User,
     Viewer,
@@ -58,6 +59,8 @@ pub struct PersonData {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub address: Option<Address>,
+    pub photo_url: Option<Url>,
+    pub role: PersonRole,
     pub phone_number: Option<PhoneNumber>,
 }
 
@@ -91,7 +94,7 @@ mod tests {
                 id: PersonId::new(),
                 created_at: Default::default(),
                 updated_at: Default::default(),
-                phone_number: Default::default(),
+                account_id: Default::default(),
                 auth_id: Default::default(),
                 email: Default::default(),
                 first_name: Default::default(),
@@ -99,7 +102,7 @@ mod tests {
                 address: Default::default(),
                 photo_url: Default::default(),
                 role: Default::default(),
-                account_id: Default::default(),
+                phone_number: Default::default(),
             }
         }
     }
