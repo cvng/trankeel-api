@@ -67,7 +67,7 @@ type Candidacy {
 	birthdate: Date
 	birthplace: String
 	isStudent: Boolean
-	tenant: Person!
+	candidate: Person!
 	discussion: Discussion!
 	workflow: Workflow
 }

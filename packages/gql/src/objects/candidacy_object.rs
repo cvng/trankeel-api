@@ -30,7 +30,7 @@ pub struct Candidacy {
 
 #[async_graphql::ComplexObject]
 impl Candidacy {
-    async fn tenant(&self, ctx: &Context<'_>) -> Result<Person> {
+    async fn candidate(&self, ctx: &Context<'_>) -> Result<Person> {
         Ok(ctx
             .data_unchecked::<Client>()
             .persons()
