@@ -530,6 +530,15 @@ impl database::WarrantStore for WarrantStore<'_> {
         self.with_identity(warrants::table.find(id).first(&self.0.get()?)?)
     }
 
+    fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Vec<WarrantWithIdentity>> {
+        warrants::table
+            .filter(warrants::candidacy_id.eq(candidacy_id))
+            .load::<Warrant>(&self.0.get()?)?
+            .into_iter()
+            .map(|warrant| self.with_identity(warrant))
+            .collect()
+    }
+
     fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Vec<WarrantWithIdentity>> {
         warrants::table
             .filter(warrants::tenant_id.eq(tenant_id))

@@ -126,3 +126,15 @@ impl From<AddressInput> for Address {
         }
     }
 }
+
+impl From<Address> for AddressInput {
+    fn from(item: Address) -> Self {
+        Self {
+            city: item.city,
+            country: item.country,
+            line1: item.line1,
+            line2: item.line2,
+            postal_code: item.postal_code,
+        }
+    }
+}

@@ -7,10 +7,12 @@ use crate::invites::CreateInviteInput;
 use crate::leases::create_lease_from_advertisement;
 use crate::templates::CandidacyAcceptedMail;
 use crate::templates::LeaseDocument;
+use crate::tenants::create_tenant;
 use crate::workflows::complete_step;
 use crate::workflows::create_workflow;
 use crate::workflows::CreateWorkflowInput;
 use crate::CompleteStepInput;
+use crate::CreateTenantInput;
 use async_graphql::InputObject;
 use chrono::Utc;
 use trankeel_core::activity::trace;
@@ -31,9 +33,6 @@ use trankeel_data::LeaseFile;
 use trankeel_data::LeaseFileId;
 use trankeel_data::PersonData;
 use trankeel_data::PersonRole;
-use trankeel_data::Tenant;
-use trankeel_data::TenantId;
-use trankeel_data::TenantStatus;
 use trankeel_data::WorkflowType;
 use validator::Validate;
 
@@ -80,9 +79,35 @@ pub async fn accept_candidacy(
 
     trace(db, Trace::CandidacyAccepted(candidacy.clone()))?;
 
-    // Send invite to candidate.
+    // Create tenant profile.
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
+    let candidacy_warrants = db.warrants().by_candidacy_id(&candidacy.id)?;
 
+    let tenant = create_tenant(
+        db,
+        auth_id,
+        CreateTenantInput {
+            apl: candidacy.apl,
+            birthdate: candidacy.birthdate,
+            birthplace: candidacy.birthplace.clone(),
+            email: candidate.email.inner().to_string(),
+            first_name: candidate.first_name.clone(),
+            last_name: candidate.last_name.clone(),
+            note: None,
+            phone_number: candidate.phone_number.clone(),
+            is_student: candidacy.is_student,
+            warrants: Some(candidacy_warrants.into_iter().map(Into::into).collect()),
+            person_id: Some(candidate.id),
+        },
+        Some(account),
+    )?;
+    db.persons().update(PersonData {
+        id: candidate.id,
+        role: Some(PersonRole::Tenant),
+        ..Default::default()
+    })?;
+
+    // Send invite to candidate.
     let invite = create_invite(
         db,
         CreateInviteInput {
@@ -93,30 +118,6 @@ pub async fn accept_candidacy(
 
     // Create unsigned lease.
     let advertisement = db.advertisements().by_id(&candidacy.advertisement_id)?;
-    let tenant = db.tenants().create(Tenant {
-        id: TenantId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        account_id: account.id,
-        person_id: candidate.id,
-        apl: candidacy.apl,
-        birthdate: candidacy.birthdate,
-        birthplace: candidacy.birthplace.clone(),
-        email: candidate.email.clone(),
-        first_name: candidate.first_name.clone(),
-        last_name: candidate.last_name.clone(),
-        note: None,
-        phone_number: candidate.phone_number.clone(),
-        status: TenantStatus::default(),
-        lease_id: None,
-        is_student: candidacy.is_student,
-    })?;
-    db.persons().update(PersonData {
-        id: candidate.id,
-        role: Some(PersonRole::Tenant),
-        ..Default::default()
-    })?;
-
     let lease = create_lease_from_advertisement(db, auth_id, &advertisement, vec![tenant])?;
 
     // Init new lease file.

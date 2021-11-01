@@ -31,6 +31,8 @@ pub use crate::auth::CreateUserWithAccountInput;
 pub use crate::auth::SignupUserFromInviteInput;
 pub use crate::candidacies::AcceptCandidacyInput;
 pub use crate::candidacies::CreateCandidacyInput;
+pub use crate::candidacies::CreateProfessionalWarrantInput;
+pub use crate::candidacies::CreateWarrantInput;
 pub use crate::client::init;
 pub use crate::client::Client;
 pub use crate::error::Error;
