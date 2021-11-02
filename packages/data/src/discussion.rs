@@ -3,12 +3,13 @@ use crate::AccountId;
 use crate::Candidacy;
 use crate::DateTime;
 use crate::Id;
+use crate::Lease;
 use crate::Message;
 use crate::PersonId;
 
 pub type DiscussionId = Id;
 
-pub type DiscussionItemRow = (Option<Candidacy>,);
+pub type DiscussionItemRow = (Option<Candidacy>, Option<Lease>);
 
 pub type DiscussionWithMessages = (Discussion, Vec<Message>);
 
@@ -25,14 +26,11 @@ impl Default for DiscussionStatus {
     }
 }
 
+#[allow(clippy::large_enum_variant)]
+#[derive(Union)]
 pub enum DiscussionItem {
     Candidacy(Candidacy),
-}
-
-impl From<Candidacy> for DiscussionItem {
-    fn from(item: Candidacy) -> Self {
-        Self::Candidacy(item)
-    }
+    Lease(Lease),
 }
 
 #[derive(Clone, Debug, Insertable, Queryable)]

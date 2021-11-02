@@ -9,19 +9,6 @@ use crate::objects::ProfessionalWarrant;
 use crate::objects::Rent;
 use crate::objects::Step;
 
-#[derive(Union)]
-pub enum DiscussionItem {
-    Candidacy(Candidacy),
-}
-
-impl From<trankeel::DiscussionItem> for DiscussionItem {
-    fn from(item: trankeel::DiscussionItem) -> Self {
-        match item {
-            trankeel::DiscussionItem::Candidacy(inner) => Self::Candidacy(inner.into()),
-        }
-    }
-}
-
 #[allow(clippy::large_enum_variant)]
 #[derive(Union)]
 pub enum Eventable {
