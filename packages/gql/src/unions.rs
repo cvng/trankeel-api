@@ -39,6 +39,22 @@ impl From<trankeel::EventWithEventable> for Eventable {
     }
 }
 
+#[allow(clippy::large_enum_variant)]
+#[derive(Union)]
+pub enum DiscussionItem {
+    Candidacy(Candidacy),
+    Lease(Lease),
+}
+
+impl From<trankeel::DiscussionItem> for DiscussionItem {
+    fn from(item: trankeel::DiscussionItem) -> Self {
+        match item {
+            trankeel::DiscussionItem::Candidacy(inner) => Self::Candidacy(inner.into()),
+            trankeel::DiscussionItem::Lease(inner) => Self::Lease(inner.into()),
+        }
+    }
+}
+
 #[derive(Union)]
 pub enum LeaseDetails {
     FurnishedLeaseDetails(FurnishedLeaseDetails),
