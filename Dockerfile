@@ -1,4 +1,4 @@
-FROM rust:1.56.0
+FROM rust:1.56.1
 
 WORKDIR /api
 
