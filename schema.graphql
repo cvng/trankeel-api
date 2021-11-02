@@ -166,7 +166,7 @@ type Discussion {
 	snippet: Message
 	messages: [Message!]!
 }
-union DiscussionItem = | Candidacy
+union DiscussionItem = | Candidacy | Lease
 enum DiscussionStatus {
 	ACTIVE
 	CANDIDACY

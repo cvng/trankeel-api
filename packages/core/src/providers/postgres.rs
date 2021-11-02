@@ -687,7 +687,9 @@ impl database::CandidacyStore for CandidacyStore<'_> {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Candidacy>> {
         Ok(candidacies::table
             .select(candidacies::all_columns)
-            .left_join(advertisements::table.on(advertisements::id.eq(candidacies::advertisement_id)))
+            .left_join(
+                advertisements::table.on(advertisements::id.eq(candidacies::advertisement_id)),
+            )
             .left_join(properties::table.on(properties::id.eq(advertisements::property_id)))
             .left_join(accounts::table.on(accounts::id.eq(properties::account_id)))
             .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
@@ -1082,12 +1084,17 @@ impl database::DiscussionStore for DiscussionStore<'_> {
             .left_join(persons::table.on(persons::id.eq(discussions::initiator_id)))
             .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
             .left_join(candidacies::table.on(candidacies::person_id.eq(persons::id)))
-            .select((candidacies::all_columns.nullable(),))
+            .left_join(leases::table.on(leases::id.nullable().eq(tenants::lease_id)))
+            .select((
+                candidacies::all_columns.nullable(),
+                leases::all_columns.nullable(),
+            ))
             .filter(discussions::id.eq(id))
             .load::<DiscussionItemRow>(&self.0.get()?)?
             .into_iter()
             .filter_map(|row| match row {
-                (Some(candidacy),) => Some(candidacy.into()),
+                (Some(candidacy), _) => Some(candidacy.into()),
+                (_, Some(lease)) => Some(lease.into()),
                 _ => None,
             })
             .collect())

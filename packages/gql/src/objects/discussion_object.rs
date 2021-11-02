@@ -1,12 +1,12 @@
 use super::Message;
 use super::Person;
-use crate::unions::DiscussionItem;
 use async_graphql::Context;
 use async_graphql::Result;
 use trankeel::AccountId;
 use trankeel::Client;
 use trankeel::DateTime;
 use trankeel::DiscussionId;
+use trankeel::DiscussionItem;
 use trankeel::DiscussionStatus;
 use trankeel::PersonId;
 
