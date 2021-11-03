@@ -9,7 +9,7 @@ use trankeel_data::Account;
 use trankeel_data::DateTime;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
-use trankeel_data::Message;
+use trankeel_data::DiscussionWithMessages;
 use trankeel_data::PersonId;
 use validator::Validate;
 
@@ -25,8 +25,7 @@ pub struct CreateDiscussionState {
 }
 
 pub struct CreateDiscussionPayload {
-    pub discussion: Discussion,
-    pub messages: Vec<Message>,
+    pub discussion: DiscussionWithMessages,
 }
 
 pub fn create_discussion(
@@ -58,13 +57,11 @@ pub fn create_discussion(
         )?;
 
         Ok(CreateDiscussionPayload {
-            discussion,
-            messages: vec![message],
+            discussion: (discussion, vec![message]),
         })
     } else {
         Ok(CreateDiscussionPayload {
-            discussion,
-            messages: vec![],
+            discussion: (discussion, vec![]),
         })
     }
 }
