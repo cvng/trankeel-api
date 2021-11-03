@@ -4,6 +4,7 @@ pub use crate::Accountstatus;
 pub use crate::Candidacystatus;
 pub use crate::Discussionstatus;
 pub use crate::Entryflexibility;
+pub use crate::Eventabletype;
 pub use crate::Eventtype;
 pub use crate::Filestatus;
 pub use crate::Filetype;

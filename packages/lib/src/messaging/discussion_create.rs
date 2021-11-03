@@ -1,9 +1,15 @@
 use super::push_message;
+use super::PushMessagePayload;
+use crate::messaging::message_push;
 use crate::PushMessageInput;
 use crate::Result;
-use trankeel_core::database::Db;
+use chrono::Utc;
+use message_push::PushMessageState;
+use trankeel_data::Account;
+use trankeel_data::DateTime;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
+use trankeel_data::Message;
 use trankeel_data::PersonId;
 use validator::Validate;
 
@@ -14,35 +20,51 @@ pub struct CreateDiscussionInput {
     pub message: Option<String>,
 }
 
-pub fn create_discussion_unauthenticated(
-    db: &impl Db,
+pub struct CreateDiscussionState {
+    pub account: Account,
+}
+
+pub struct CreateDiscussionPayload {
+    pub discussion: Discussion,
+    pub messages: Vec<Message>,
+}
+
+pub fn create_discussion(
     input: CreateDiscussionInput,
-) -> Result<Discussion> {
+    state: CreateDiscussionState,
+) -> Result<CreateDiscussionPayload> {
     input.validate()?;
 
-    let account = db.accounts().by_person_id(&input.recipient_id)?;
-
-    let discussion = db.discussions().create(Discussion {
+    let discussion = Discussion {
         id: DiscussionId::new(),
         created_at: Default::default(),
-        updated_at: Default::default(),
-        account_id: account.id,
+        updated_at: Some(DateTime(Utc::now())),
+        account_id: state.account.id,
         initiator_id: input.initiator_id,
         status: Default::default(),
-    })?;
-
-    db.discussions().touch(discussion.id)?; // Touch updated_at.
+    };
 
     if let Some(message) = input.message {
-        push_message(
-            db,
+        let PushMessagePayload {
+            discussion,
+            message,
+        } = push_message(
             PushMessageInput {
                 discussion_id: discussion.id,
                 sender_id: input.initiator_id,
                 message,
             },
+            PushMessageState { discussion },
         )?;
-    }
 
-    Ok(discussion)
+        Ok(CreateDiscussionPayload {
+            discussion,
+            messages: vec![message],
+        })
+    } else {
+        Ok(CreateDiscussionPayload {
+            discussion,
+            messages: vec![],
+        })
+    }
 }

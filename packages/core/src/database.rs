@@ -17,8 +17,6 @@ use trankeel_data::DiscussionId;
 use trankeel_data::DiscussionItem;
 use trankeel_data::Event;
 use trankeel_data::EventId;
-use trankeel_data::EventWithEventable;
-use trankeel_data::Eventable;
 use trankeel_data::ExternalId;
 use trankeel_data::File;
 use trankeel_data::FileData;
@@ -35,6 +33,7 @@ use trankeel_data::LenderData;
 use trankeel_data::LenderId;
 use trankeel_data::LenderWithIdentity;
 use trankeel_data::Message;
+use trankeel_data::MessageId;
 use trankeel_data::NoticeId;
 use trankeel_data::Payment;
 use trankeel_data::PaymentId;
@@ -46,6 +45,7 @@ use trankeel_data::PlanId;
 use trankeel_data::Property;
 use trankeel_data::PropertyData;
 use trankeel_data::PropertyId;
+use trankeel_data::PublicEvent;
 use trankeel_data::ReceiptId;
 use trankeel_data::Rent;
 use trankeel_data::RentData;
@@ -86,7 +86,7 @@ pub trait Db {
     fn payments(&self) -> Box<dyn PaymentStore + '_>;
     fn plans(&self) -> Box<dyn PlanStore + '_>;
     fn events(&self) -> Box<dyn EventStore + '_>;
-    fn eventables(&self) -> Box<dyn EventableStore + '_>;
+    fn public_events(&self) -> Box<dyn PublicEventStore + '_>;
     fn reports(&self) -> Box<dyn ReportStore + '_>;
     fn discussions(&self) -> Box<dyn DiscussionStore + '_>;
     fn messages(&self) -> Box<dyn MessageStore + '_>;
@@ -101,12 +101,16 @@ pub trait AccountStore {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Account>;
     fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId) -> Result<Account>;
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Account>;
-    fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Account>;
-    fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Account>;
+    fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Account>;
+    fn by_file_id(&mut self, file_id: &FileId) -> Result<Account>;
+    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Account>;
+    fn by_message_id(&mut self, message_id: &MessageId) -> Result<Account>;
     fn by_payment_id(&mut self, payment_id: &PaymentId) -> Result<Account>;
     fn by_person_id(&mut self, person_id: &PersonId) -> Result<Account>;
-    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Account>;
+    fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Account>;
     fn by_step_id(&mut self, step_id: &StepId) -> Result<Account>;
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Account>;
+    fn by_warrant_id(&mut self, warrant_id: &WarrantId) -> Result<Account>;
     fn create(&mut self, data: Account) -> Result<Account>;
     fn update(&mut self, data: AccountData) -> Result<Account>;
 }
@@ -225,13 +229,14 @@ pub trait PlanStore {
 }
 
 pub trait EventStore {
-    fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable>;
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>>;
+    fn by_id(&mut self, id: &EventId) -> Result<Event>;
     fn create(&mut self, data: Event) -> Result<Event>;
 }
 
-pub trait EventableStore {
-    fn create(&mut self, data: Eventable) -> Result<Eventable>;
+pub trait PublicEventStore {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<PublicEvent>>;
+    fn by_message_id(&mut self, message_id: &MessageId) -> Result<PublicEvent>;
+    fn create(&mut self, data: PublicEvent) -> Result<PublicEvent>;
 }
 
 pub trait ReportStore {
@@ -253,6 +258,7 @@ pub trait DiscussionStore {
 pub trait MessageStore {
     fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Vec<Message>>;
     fn create(&mut self, data: Message) -> Result<Message>;
+    fn create_many(&mut self, data: Vec<Message>) -> Result<Vec<Message>>;
 }
 
 pub trait InviteStore {

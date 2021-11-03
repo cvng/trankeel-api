@@ -90,30 +90,12 @@ table! {
     use diesel::sql_types::*;
     use crate::sql_types::*;
 
-    eventables (id) {
-        id -> Uuid,
-        file_id -> Nullable<Uuid>,
-        rent_id -> Nullable<Uuid>,
-        step_id -> Nullable<Uuid>,
-        lease_id -> Nullable<Uuid>,
-        payment_id -> Nullable<Uuid>,
-        candidacy_id -> Nullable<Uuid>,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::sql_types::*;
-
     events (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
-        updated_at -> Nullable<Timestamptz>,
-        account_id -> Uuid,
-        participant_id -> Uuid,
-        eventable_id -> Uuid,
         #[sql_name = "type"]
         type_ -> Eventtype,
+        payload -> Jsonb,
     }
 }
 
@@ -125,6 +107,7 @@ table! {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
+        account_id -> Uuid,
         download_url -> Nullable<Text>,
         external_id -> Nullable<Text>,
         filename -> Nullable<Text>,
@@ -305,6 +288,22 @@ table! {
     use diesel::sql_types::*;
     use crate::sql_types::*;
 
+    public_events (id) {
+        id -> Uuid,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+        account_id -> Uuid,
+        event_id -> Uuid,
+        event_type -> Eventtype,
+        eventable_type -> Eventabletype,
+        eventable -> Jsonb,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::sql_types::*;
+
     rents (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
@@ -409,15 +408,7 @@ joinable!(candidacies -> advertisements (advertisement_id));
 joinable!(candidacies -> tenants (tenant_id));
 joinable!(discussions -> accounts (account_id));
 joinable!(discussions -> persons (initiator_id));
-joinable!(eventables -> candidacies (candidacy_id));
-joinable!(eventables -> files (file_id));
-joinable!(eventables -> leases (lease_id));
-joinable!(eventables -> payments (payment_id));
-joinable!(eventables -> rents (rent_id));
-joinable!(eventables -> steps (step_id));
-joinable!(events -> accounts (account_id));
-joinable!(events -> eventables (eventable_id));
-joinable!(events -> persons (participant_id));
+joinable!(files -> accounts (account_id));
 joinable!(invites -> accounts (account_id));
 joinable!(invites -> persons (invitee_id));
 joinable!(leases -> accounts (account_id));
@@ -433,6 +424,8 @@ joinable!(payments -> rents (rent_id));
 joinable!(persons -> accounts (account_id));
 joinable!(properties -> accounts (account_id));
 joinable!(properties -> lenders (lender_id));
+joinable!(public_events -> accounts (account_id));
+joinable!(public_events -> events (event_id));
 joinable!(rents -> leases (lease_id));
 joinable!(steps -> workflows (workflow_id));
 joinable!(tenants -> accounts (account_id));
@@ -450,7 +443,6 @@ allow_tables_to_appear_in_same_query!(
     candidacies,
     companies,
     discussions,
-    eventables,
     events,
     files,
     invites,
@@ -462,6 +454,7 @@ allow_tables_to_appear_in_same_query!(
     plans,
     professional_warrants,
     properties,
+    public_events,
     rents,
     steps,
     tenants,

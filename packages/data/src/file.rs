@@ -1,4 +1,5 @@
 use crate::schema::files;
+use crate::AccountId;
 use crate::DateTime;
 use crate::ExternalId;
 use crate::Id;
@@ -32,11 +33,12 @@ pub enum FileType {
     RentReceipt,
 }
 
-#[derive(Clone, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Serialize, Deserialize, Insertable, Queryable, SimpleObject)]
 pub struct File {
     pub id: FileId,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
+    pub account_id: AccountId,
     pub download_url: Option<Url>,
     pub external_id: Option<ExternalId>,
     pub filename: Option<String>,

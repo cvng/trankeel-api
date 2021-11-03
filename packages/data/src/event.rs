@@ -1,14 +1,18 @@
 use crate::schema::events;
-use crate::AccountId;
 use crate::DateTime;
-use crate::Eventable;
-use crate::EventableId;
 use crate::Id;
-use crate::PersonId;
+use serde_json::Value;
 
 pub type EventId = Id;
 
-pub type EventWithEventable = (Event, Eventable);
+#[derive(Clone, Default, Debug, Serialize, Deserialize, DieselNewType)]
+pub struct EventPayload(Value);
+
+impl From<Value> for EventPayload {
+    fn from(item: Value) -> Self {
+        Self(item)
+    }
+}
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Eventtype"]
@@ -16,27 +20,24 @@ pub enum EventType {
     CandidacyCreated,
     CandidacyAccepted,
     CandidacyRejected,
+    DiscussionCreated,
+    DiscussionUpdated,
     LeaseCreated,
-    #[graphql(name = "PAYMENT_NOTICE_CREATED")]
+    MessageCreated,
     NoticeCreated,
-    #[graphql(name = "PAYMENT_NOTICE_SENT")]
     NoticeSent,
-    #[graphql(name = "RENT_RECEIPT_CREATED")]
-    ReceiptCreated,
-    #[graphql(name = "RENT_RECEIPT_SENT")]
-    ReceiptSent,
-    #[graphql(name = "TRANSACTION_CREATED")]
     PaymentCreated,
+    ReceiptCreated,
+    ReceiptSent,
     StepCompleted,
+    TenantCreated,
+    WarrantCreated,
 }
 
 #[derive(Clone, Debug, Insertable, Queryable)]
 pub struct Event {
     pub id: EventId,
     pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
-    pub account_id: AccountId,
-    pub participant_id: PersonId,
-    pub eventable_id: EventableId,
     pub type_: EventType,
+    pub payload: EventPayload,
 }

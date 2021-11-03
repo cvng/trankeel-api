@@ -27,7 +27,6 @@ use trankeel_core::database::CandidacyStore;
 use trankeel_core::database::CompanyStore;
 use trankeel_core::database::Db;
 use trankeel_core::database::DiscussionStore;
-use trankeel_core::database::EventStore;
 use trankeel_core::database::FileStore;
 use trankeel_core::database::LeaseStore;
 use trankeel_core::database::LenderStore;
@@ -36,6 +35,7 @@ use trankeel_core::database::PaymentStore;
 use trankeel_core::database::PersonStore;
 use trankeel_core::database::PlanStore;
 use trankeel_core::database::PropertyStore;
+use trankeel_core::database::PublicEventStore;
 use trankeel_core::database::RentStore;
 use trankeel_core::database::ReportStore;
 use trankeel_core::database::TenantStore;
@@ -130,8 +130,8 @@ impl<'a> Client {
         self.0.plans()
     }
 
-    pub fn events(&self) -> Box<dyn EventStore + '_> {
-        self.0.events()
+    pub fn events(&self) -> Box<dyn PublicEventStore + '_> {
+        self.0.public_events()
     }
 
     pub fn reports(&self) -> Box<dyn ReportStore + '_> {
@@ -179,7 +179,7 @@ impl<'a> Client {
     }
 
     pub fn create_tenant(&self, auth_id: &AuthId, input: CreateTenantInput) -> Result<Tenant> {
-        crate::tenants::create_tenant(&self.0, auth_id, input, None)
+        crate::tenants::run_create_tenant(&self.0, auth_id, input, None)
     }
 
     pub fn update_tenant(&self, auth_id: &AuthId, input: UpdateTenantInput) -> Result<Tenant> {
@@ -291,7 +291,7 @@ impl<'a> Client {
     }
 
     pub fn push_message(&self, input: PushMessageInput) -> Result<Message> {
-        crate::messaging::push_message(&self.0, input)
+        crate::messaging::run_push_message(&self.0, input)
     }
 
     pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {

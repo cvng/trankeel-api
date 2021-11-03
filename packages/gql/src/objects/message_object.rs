@@ -37,7 +37,7 @@ impl Message {
             .map(|event_id| {
                 ctx.data_unchecked::<Client>()
                     .events()
-                    .by_id(&event_id)
+                    .by_message_id(&event_id)
                     .ok()
             })
             .and_then(|event| event.map(Into::into)))

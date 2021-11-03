@@ -12,7 +12,7 @@ use chrono::Utc;
 
 pub type RentId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
 #[DieselType = "Rentstatus"]
 pub enum RentStatus {
     Open,
@@ -26,7 +26,7 @@ impl Default for RentStatus {
     }
 }
 
-#[derive(Clone, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Deserialize, Insertable, Queryable, SimpleObject)]
 pub struct Rent {
     pub id: RentId,
     pub created_at: Option<DateTime>,

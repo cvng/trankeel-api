@@ -150,7 +150,7 @@ pub fn create_furnished_lease(
     // Affect created lease to existing tenants.
     add_lease_tenants(db, lease.id, input.tenant_ids)?;
 
-    trace(db, Trace::LeaseCreated(lease.clone())).ok();
+    trace(vec![Trace::LeaseCreated(lease.clone())]).ok();
 
     Ok(lease)
 }

@@ -7,7 +7,7 @@ use crate::PersonId;
 
 pub type MessageId = Id;
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Queryable)]
 pub struct Message {
     pub id: MessageId,
     pub created_at: Option<DateTime>,

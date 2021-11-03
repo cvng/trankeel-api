@@ -8,7 +8,7 @@ use crate::RentId;
 
 pub type PaymentId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Transactiontype"]
 pub enum TransactionType {
     InsuranceHab,
@@ -20,7 +20,7 @@ pub enum TransactionType {
     Rent,
 }
 
-#[derive(Clone, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Serialize, Deserialize, Insertable, Queryable, SimpleObject)]
 pub struct Payment {
     pub id: PaymentId,
     pub created_at: Option<DateTime>,

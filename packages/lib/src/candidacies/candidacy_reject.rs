@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::messaging::push_message;
+use crate::messaging::run_push_message;
 use crate::templates::CandidacyRejectedMail;
 use crate::PushMessageInput;
 use async_graphql::InputObject;
@@ -39,7 +39,7 @@ pub async fn reject_candidacy(
         ..Default::default()
     })?;
 
-    trace(db, Trace::CandidacyRejected(candidacy.clone())).ok();
+    trace(vec![Trace::CandidacyRejected(candidacy.clone())]).ok();
 
     let discussion = db.discussions().by_candidacy_id(&candidacy.id)?;
 
@@ -53,7 +53,7 @@ pub async fn reject_candidacy(
 
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
 
-    push_message(
+    run_push_message(
         db,
         PushMessageInput {
             discussion_id: discussion.id,

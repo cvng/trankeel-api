@@ -12,7 +12,7 @@ pub type DiscussionItemRow = (Option<Candidacy>,);
 
 pub type DiscussionWithMessages = (Discussion, Vec<Message>);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Discussionstatus"]
 pub enum DiscussionStatus {
     Active,
@@ -35,7 +35,7 @@ impl From<Candidacy> for DiscussionItem {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, Insertable, Queryable)]
 pub struct Discussion {
     pub id: DiscussionId,
     pub created_at: Option<DateTime>,
@@ -54,4 +54,17 @@ pub struct DiscussionData {
     pub account_id: Option<AccountId>,
     pub initiator_id: Option<PersonId>,
     pub status: Option<DiscussionStatus>,
+}
+
+impl From<Discussion> for DiscussionData {
+    fn from(item: Discussion) -> Self {
+        Self {
+            id: item.id,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            account_id: Some(item.account_id),
+            initiator_id: Some(item.initiator_id),
+            status: Some(item.status),
+        }
+    }
 }

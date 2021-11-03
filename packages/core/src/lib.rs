@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 pub mod activity;
 pub mod database;
 pub mod error;

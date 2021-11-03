@@ -15,7 +15,7 @@ use std::fmt::Display;
 
 pub type PersonId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[graphql(name = "UserRole")]
 #[DieselType = "Personrole"]
 pub enum PersonRole {
@@ -32,7 +32,7 @@ impl Default for PersonRole {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Queryable)]
 pub struct Person {
     pub id: PersonId,
     pub created_at: Option<DateTime>,

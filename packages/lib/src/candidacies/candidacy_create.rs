@@ -1,10 +1,10 @@
-use crate::auth::CreatePersonInput;
 use crate::error::Result;
 use crate::files::CreateFileInput;
-use crate::messaging::push_message;
+use crate::messaging::run_push_message;
 use crate::templates::CandidacyCreatedMail;
-use crate::tenants::create_tenant;
+use crate::tenants::run_create_tenant;
 use crate::tenants::CreateTenantInput;
+use crate::tenants::CreateWarrantInput;
 use crate::PushMessageInput;
 use async_graphql::InputObject;
 use trankeel_core::activity::trace;
@@ -23,22 +23,14 @@ use trankeel_data::DiscussionStatus;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantData;
 use trankeel_data::TenantStatus;
-use trankeel_data::WarrantType;
 use validator::Validate;
 
 // # Input
 
-#[derive(InputObject, Validate)]
+#[derive(Clone, InputObject, Validate)]
 pub struct CreateProfessionalWarrantInput {
     pub name: String,
     pub identifier: String,
-}
-
-#[derive(InputObject, Validate)]
-pub struct CreateWarrantInput {
-    pub type_: WarrantType,
-    pub individual: Option<CreatePersonInput>,
-    pub company: Option<CreateProfessionalWarrantInput>,
 }
 
 #[derive(InputObject, Validate)]
@@ -69,7 +61,7 @@ pub async fn create_candidacy(
     let account = db.accounts().by_advertisement_id(&input.advertisement_id)?;
     let no_auth_id = AuthId::new("".into()); // No auth_id on this endpoint.
 
-    let tenant = create_tenant(
+    let tenant = run_create_tenant(
         db,
         &no_auth_id,
         CreateTenantInput {
@@ -104,7 +96,7 @@ pub async fn create_candidacy(
         description: input.description,
     })?;
 
-    trace(db, Trace::CandidacyCreated(candidacy.clone())).ok();
+    trace(vec![Trace::CandidacyCreated(candidacy.clone())]).ok();
 
     let discussion = db.discussions().by_initiator_id(&tenant.person_id)?;
 
@@ -114,7 +106,7 @@ pub async fn create_candidacy(
         ..Default::default()
     })?;
 
-    push_message(
+    run_push_message(
         db,
         PushMessageInput {
             discussion_id: discussion.id,

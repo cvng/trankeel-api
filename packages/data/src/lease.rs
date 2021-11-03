@@ -46,7 +46,7 @@ pub enum LeaseDetails {
     FurnishedLeaseDetails(FurnishedLeaseDetails),
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Queryable, SimpleObject)]
 pub struct Lease {
     pub id: LeaseId,
     pub created_at: Option<DateTime>,

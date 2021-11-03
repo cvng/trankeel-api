@@ -11,6 +11,7 @@ mod billing;
 mod candidacies;
 mod client;
 mod companies;
+mod cqrs;
 mod error;
 mod files;
 mod imports;

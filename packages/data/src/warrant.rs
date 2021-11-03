@@ -19,13 +19,13 @@ pub enum WarrantType {
     Company,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub enum WarrantIdentity {
     Individual(Person),
     Professional(ProfessionalWarrant),
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Queryable)]
 pub struct Warrant {
     pub id: WarrantId,
     pub created_at: Option<DateTime>,

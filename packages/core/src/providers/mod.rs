@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 mod pdfmonkey;
 mod postgres;
 mod sendinblue;

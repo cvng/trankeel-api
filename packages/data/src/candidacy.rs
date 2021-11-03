@@ -24,7 +24,7 @@ impl Default for CandidacyStatus {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Queryable, SimpleObject)]
 #[table_name = "candidacies"]
 pub struct Candidacy {
     pub id: CandidacyId,

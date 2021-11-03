@@ -32,7 +32,7 @@ pub fn complete_step(db: &impl Db, input: CompleteStepInput) -> Result<Step> {
         ..Default::default()
     })?;
 
-    trace(db, Trace::StepCompleted(step.clone())).ok();
+    trace(vec![Trace::StepCompleted(step.clone())]).ok();
 
     Ok(step)
 }

@@ -50,6 +50,8 @@ pub async fn accept_candidacy(
 ) -> Result<Candidacy> {
     input.validate()?;
 
+    let account = db.accounts().by_auth_id(auth_id)?;
+
     let advertisement = db.advertisements().by_candidacy_id(&input.id)?;
 
     // Reject other candidacies.
@@ -71,7 +73,7 @@ pub async fn accept_candidacy(
         ..Default::default()
     })?;
 
-    trace(db, Trace::CandidacyAccepted(candidacy.clone())).ok();
+    trace(vec![Trace::CandidacyAccepted(candidacy.clone())]).ok();
 
     // Send invite to candidate.
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
@@ -94,6 +96,7 @@ pub async fn accept_candidacy(
     let lease_file_id = LeaseFileId::new();
     let mut lease_file = LeaseFile {
         id: lease_file_id,
+        account_id: account.id,
         type_: FileType::LeaseDocument,
         filename: Some(lease_filename(&lease_file_id, &lease)),
         status: None,

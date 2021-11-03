@@ -1,28 +1,30 @@
-use crate::candidacies::CreateWarrantInput;
+use super::CreateWarrantInput;
 use crate::error::Error;
 use crate::error::Result;
-use crate::messaging::create_discussion_unauthenticated;
+use crate::messaging::discussion_create;
+use crate::tenants::create_warrant;
+use crate::tenants::CreateWarrantPayload;
+use crate::tenants::CreateWarrantState;
 use crate::AuthId;
 use crate::CreateDiscussionInput;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
+use discussion_create::create_discussion;
+use discussion_create::CreateDiscussionPayload;
+use discussion_create::CreateDiscussionState;
+use trankeel_core::activity::trace;
+use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
 use trankeel_data::Account;
-use trankeel_data::AccountId;
-use trankeel_data::Discussion;
+use trankeel_data::DiscussionWithMessages;
 use trankeel_data::Person;
 use trankeel_data::PersonId;
 use trankeel_data::PersonRole;
 use trankeel_data::PhoneNumber;
-use trankeel_data::ProfessionalWarrant;
-use trankeel_data::ProfessionalWarrantId;
 use trankeel_data::TenantId;
 use trankeel_data::TenantStatus;
-use trankeel_data::Warrant;
-use trankeel_data::WarrantId;
-use trankeel_data::WarrantIdentity;
-use trankeel_data::WarrantType;
+use trankeel_data::TenantWithProfile;
 use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
@@ -44,26 +46,77 @@ pub struct CreateTenantInput {
     pub warrants: Option<Vec<CreateWarrantInput>>,
 }
 
+pub struct CreateTenantState {
+    pub account: Account,
+    pub account_owner: Person,
+}
+
+pub struct CreateTenantPayload {
+    pub tenant: TenantWithProfile,
+    pub warrants: Vec<WarrantWithIdentity>,
+    pub discussion: DiscussionWithMessages,
+}
+
 // # Operation
 
-pub fn create_tenant(
+pub fn run_create_tenant(
     db: &impl Db,
     auth_id: &AuthId,
     input: CreateTenantInput,
     account: Option<Account>,
 ) -> Result<Tenant> {
-    input.validate()?;
-
     let account = match account {
         Some(account) => account,
         None => db.accounts().by_auth_id(auth_id)?,
     };
 
-    let person = db.persons().create(Person {
+    let account_owner = db
+        .persons()
+        .by_account_id(&account.id)?
+        .first()
+        .cloned()
+        .ok_or_else(|| Error::msg("account owner not found"))?;
+
+    let state = CreateTenantState {
+        account,
+        account_owner,
+    };
+
+    let CreateTenantPayload {
+        tenant,
+        warrants,
+        discussion,
+    } = create_tenant(input, state)?;
+
+    trace(
+        vec![
+            Trace::TenantCreated(tenant.clone()),
+            Trace::DiscussionCreated(discussion),
+        ]
+        .into_iter()
+        .chain(
+            warrants
+                .into_iter()
+                .map(Trace::WarrantCreated)
+                .collect::<Vec<_>>(),
+        )
+        .collect(),
+    )?;
+
+    Ok(tenant.0)
+}
+
+pub fn create_tenant(
+    input: CreateTenantInput,
+    state: CreateTenantState,
+) -> Result<CreateTenantPayload> {
+    input.validate()?;
+
+    let profile = Person {
         id: PersonId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
-        account_id: account.id,
+        account_id: state.account.id,
         auth_id: None, // Not authenticable when created.
         email: input.email.clone().into(),
         first_name: input.first_name.clone(),
@@ -72,14 +125,14 @@ pub fn create_tenant(
         photo_url: None,
         role: PersonRole::Tenant,
         phone_number: input.phone_number.clone(),
-    })?;
+    };
 
-    let tenant = db.tenants().create(Tenant {
+    let tenant = Tenant {
         id: TenantId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
-        account_id: account.id,
-        person_id: person.id,
+        account_id: state.account.id,
+        person_id: profile.id,
         apl: input.apl,
         birthdate: input.birthdate,
         birthplace: input.birthplace,
@@ -91,122 +144,41 @@ pub fn create_tenant(
         is_student: input.is_student,
         lease_id: None,
         status: TenantStatus::default(),
-    })?;
+    };
 
-    if let Some(warrant_inputs) = input.warrants {
-        add_tenant_warrants(db, &tenant.id, &account.id, warrant_inputs)?;
-    }
-
-    start_discussion_with_lender(db, &account, &person)?;
-
-    Ok(tenant)
-}
-
-// # Utils
-
-fn add_tenant_warrants(
-    db: &impl Db,
-    tenant_id: &TenantId,
-    account_id: &AccountId,
-    warrant_inputs: Vec<CreateWarrantInput>,
-) -> Result<Vec<WarrantWithIdentity>> {
     let mut warrants = vec![];
 
-    for warrant_input in warrant_inputs {
-        let warrant = match (
-            warrant_input.type_,
-            warrant_input.individual,
-            warrant_input.company,
-        ) {
-            (WarrantType::Person, Some(person_input), _) => db.warrants().create((
-                Warrant {
-                    id: WarrantId::new(),
-                    created_at: Default::default(),
-                    updated_at: Default::default(),
-                    type_: WarrantType::Person,
-                    tenant_id: *tenant_id,
-                    individual_id: Default::default(),
-                    professional_id: None,
+    if let Some(warrants_input) = input.warrants {
+        for input in warrants_input {
+            let CreateWarrantPayload { warrant } = create_warrant(
+                input,
+                CreateWarrantState {
+                    account: state.account.clone(),
+                    tenant: tenant.clone(),
                 },
-                WarrantIdentity::Individual(Person {
-                    id: PersonId::new(),
-                    created_at: Default::default(),
-                    updated_at: Default::default(),
-                    account_id: *account_id,
-                    auth_id: None,
-                    email: person_input.email,
-                    first_name: person_input.first_name,
-                    last_name: person_input.last_name,
-                    address: Some(person_input.address.into()),
-                    phone_number: person_input.phone_number,
-                    photo_url: None,
-                    role: PersonRole::Warrant,
-                }),
-            ))?,
-            (WarrantType::Visale, _, Some(company_input)) => db.warrants().create((
-                Warrant {
-                    id: WarrantId::new(),
-                    created_at: Default::default(),
-                    updated_at: Default::default(),
-                    type_: WarrantType::Visale,
-                    tenant_id: *tenant_id,
-                    individual_id: None,
-                    professional_id: Default::default(),
-                },
-                WarrantIdentity::Professional(ProfessionalWarrant {
-                    id: ProfessionalWarrantId::new(),
-                    created_at: Default::default(),
-                    updated_at: Default::default(),
-                    name: company_input.name,
-                    identifier: company_input.identifier,
-                }),
-            ))?,
-            (WarrantType::Company, _, Some(company_input)) => db.warrants().create((
-                Warrant {
-                    id: WarrantId::new(),
-                    created_at: Default::default(),
-                    updated_at: Default::default(),
-                    type_: WarrantType::Company,
-                    tenant_id: *tenant_id,
-                    individual_id: None,
-                    professional_id: Default::default(),
-                },
-                WarrantIdentity::Professional(ProfessionalWarrant {
-                    id: ProfessionalWarrantId::new(),
-                    created_at: Default::default(),
-                    updated_at: Default::default(),
-                    name: company_input.name,
-                    identifier: company_input.identifier,
-                }),
-            ))?,
-            _ => return Err(Error::msg("individual or company is missing")),
-        };
+            )?;
 
-        warrants.push(warrant);
+            warrants.push(warrant)
+        }
     }
 
-    Ok(warrants)
-}
-
-fn start_discussion_with_lender(
-    db: &impl Db,
-    account: &Account,
-    initiator: &Person,
-) -> Result<Discussion> {
-    // In the context of a candidacy, the recipient is the account owner.
-    let recipient = db
-        .persons()
-        .by_account_id(&account.id)?
-        .first()
-        .cloned()
-        .ok_or_else(|| Error::msg("recipient not found"))?;
-
-    create_discussion_unauthenticated(
-        db,
+    let CreateDiscussionPayload {
+        discussion,
+        messages,
+    } = create_discussion(
         CreateDiscussionInput {
-            initiator_id: initiator.id,
-            recipient_id: recipient.id,
+            initiator_id: profile.id,
+            recipient_id: state.account_owner.id,
             message: None,
         },
-    )
+        CreateDiscussionState {
+            account: state.account,
+        },
+    )?;
+
+    Ok(CreateTenantPayload {
+        tenant: (tenant, profile),
+        warrants,
+        discussion: (discussion, messages),
+    })
 }

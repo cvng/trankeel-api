@@ -2,7 +2,7 @@ use chrono::TimeZone;
 use chrono::Utc;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
-pub struct Date(chrono::NaiveDate);
+pub struct Date(pub chrono::NaiveDate);
 
 impl From<chrono::NaiveDate> for Date {
     fn from(item: chrono::NaiveDate) -> Self {
@@ -11,7 +11,7 @@ impl From<chrono::NaiveDate> for Date {
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
-pub struct DateTime(chrono::DateTime<Utc>);
+pub struct DateTime(pub chrono::DateTime<Utc>);
 
 impl DateTime {
     pub fn new(secs: i64) -> Self {

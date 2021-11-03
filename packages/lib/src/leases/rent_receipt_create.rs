@@ -10,6 +10,7 @@ use trankeel_core::error::Error;
 use trankeel_core::mailer::Mailer;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_data::receipt_filename;
+use trankeel_data::Account;
 use trankeel_data::AuthId;
 use trankeel_data::DateTime;
 use trankeel_data::FileType;
@@ -43,15 +44,17 @@ pub struct SendReceiptsInput {
 
 pub async fn create_receipts(
     db: &impl Db,
-    _auth_id: &AuthId,
+    auth_id: &AuthId,
     pdfmaker: &impl Pdfmaker,
     input: CreateReceiptsInput,
 ) -> Result<Vec<Receipt>> {
     input.validate()?;
 
+    let account = db.accounts().by_auth_id(auth_id)?;
+
     let rents = setlle_rents(db, input.rent_ids)?;
 
-    let receipts = generate_receipts(db, pdfmaker, rents).await?;
+    let receipts = generate_receipts(db, pdfmaker, account, rents).await?;
 
     Ok(receipts)
 }
@@ -94,8 +97,8 @@ pub async fn send_receipts(
             .await?;
 
         match receipt.type_ {
-            FileType::RentReceipt => trace(db, Trace::ReceiptSent(receipt)).ok(),
-            _ => trace(db, Trace::NoticeSent(receipt)).ok(),
+            FileType::RentReceipt => trace(vec![Trace::ReceiptSent(receipt)]).ok(),
+            _ => trace(vec![Trace::NoticeSent(receipt)]).ok(),
         };
     }
 
@@ -127,7 +130,7 @@ fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
 
         rents.push(rent);
 
-        trace(db, Trace::PaymentCreated(payment)).ok();
+        trace(vec![Trace::PaymentCreated(payment)]).ok();
     }
 
     Ok(rents)
@@ -136,6 +139,7 @@ fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
 async fn generate_receipts(
     db: &impl Db,
     pdfmaker: &impl Pdfmaker,
+    account: Account,
     rents: Vec<Rent>,
 ) -> Result<Vec<Receipt>> {
     let mut receipts = vec![];
@@ -151,6 +155,7 @@ async fn generate_receipts(
         let receipt_id = ReceiptId::new();
         let mut receipt = Receipt {
             id: receipt_id,
+            account_id: account.id,
             type_: FileType::RentReceipt,
             filename: Some(receipt_filename(&receipt_id, &rent)),
             status: None,
@@ -191,7 +196,7 @@ async fn generate_receipts(
 
         receipts.push(receipt.clone());
 
-        trace(db, Trace::ReceiptCreated(receipt)).ok();
+        trace(vec![Trace::ReceiptCreated(receipt)]).ok();
     }
 
     Ok(receipts)

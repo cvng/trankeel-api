@@ -182,15 +182,20 @@ enum EventType {
 	CANDIDACY_CREATED
 	CANDIDACY_ACCEPTED
 	CANDIDACY_REJECTED
+	DISCUSSION_CREATED
+	DISCUSSION_UPDATED
 	LEASE_CREATED
-	PAYMENT_NOTICE_CREATED
-	PAYMENT_NOTICE_SENT
-	RENT_RECEIPT_CREATED
-	RENT_RECEIPT_SENT
-	TRANSACTION_CREATED
+	MESSAGE_CREATED
+	NOTICE_CREATED
+	NOTICE_SENT
+	PAYMENT_CREATED
+	RECEIPT_CREATED
+	RECEIPT_SENT
 	STEP_COMPLETED
+	TENANT_CREATED
+	WARRANT_CREATED
 }
-union Eventable = | File | Rent | Step | Lease | Transaction | Candidacy
+union Eventable = | Advertisement | Candidacy | Discussion | File | Lease | Message | Transaction | Person | Rent | Step | Tenant | Warrant
 type Feature {
 	available: Boolean!
 	title: String!

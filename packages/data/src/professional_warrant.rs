@@ -4,7 +4,7 @@ use crate::Id;
 
 pub type ProfessionalWarrantId = Id;
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Insertable, Queryable)]
 pub struct ProfessionalWarrant {
     pub id: ProfessionalWarrantId,
     pub created_at: Option<DateTime>,

@@ -19,7 +19,6 @@ use trankeel_data::schema::advertisements;
 use trankeel_data::schema::candidacies;
 use trankeel_data::schema::companies;
 use trankeel_data::schema::discussions;
-use trankeel_data::schema::eventables;
 use trankeel_data::schema::events;
 use trankeel_data::schema::files;
 use trankeel_data::schema::invites;
@@ -31,6 +30,7 @@ use trankeel_data::schema::persons;
 use trankeel_data::schema::plans;
 use trankeel_data::schema::professional_warrants;
 use trankeel_data::schema::properties;
+use trankeel_data::schema::public_events;
 use trankeel_data::schema::rents;
 use trankeel_data::schema::steps;
 use trankeel_data::schema::tenants;
@@ -56,9 +56,6 @@ use trankeel_data::DiscussionItem;
 use trankeel_data::DiscussionItemRow;
 use trankeel_data::Event;
 use trankeel_data::EventId;
-use trankeel_data::EventWithEventable;
-use trankeel_data::Eventable;
-use trankeel_data::EventableRow;
 use trankeel_data::ExternalId;
 use trankeel_data::File;
 use trankeel_data::FileData;
@@ -76,6 +73,7 @@ use trankeel_data::LenderData;
 use trankeel_data::LenderId;
 use trankeel_data::LenderWithIdentity;
 use trankeel_data::Message;
+use trankeel_data::MessageId;
 use trankeel_data::NoticeId;
 use trankeel_data::Payment;
 use trankeel_data::PaymentId;
@@ -88,6 +86,7 @@ use trankeel_data::ProfessionalWarrant;
 use trankeel_data::Property;
 use trankeel_data::PropertyData;
 use trankeel_data::PropertyId;
+use trankeel_data::PublicEvent;
 use trankeel_data::ReceiptId;
 use trankeel_data::Rent;
 use trankeel_data::RentData;
@@ -187,8 +186,8 @@ impl Db for Pg {
         Box::new(EventStore(&self.0))
     }
 
-    fn eventables(&self) -> Box<dyn database::EventableStore + '_> {
-        Box::new(EventableStore(&self.0))
+    fn public_events(&self) -> Box<dyn database::PublicEventStore + '_> {
+        Box::new(PublicEventStore(&self.0))
     }
 
     fn reports(&self) -> Box<dyn database::ReportStore + '_> {
@@ -224,7 +223,7 @@ pub struct AccountStore<'a>(pub &'a PgPool);
 
 pub struct EventStore<'a>(pub &'a PgPool);
 
-pub struct EventableStore<'a>(pub &'a PgPool);
+pub struct PublicEventStore<'a>(pub &'a PgPool);
 
 pub struct PersonStore<'a>(pub &'a PgPool);
 
@@ -299,23 +298,36 @@ impl database::AccountStore for AccountStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Account> {
+    fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Account> {
         Ok(accounts::table
             .select(accounts::all_columns)
-            .left_join(leases::table.on(leases::account_id.eq(accounts::id)))
-            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
-            .left_join(files::table.on(files::id.nullable().eq(rents::notice_id)))
-            .filter(files::id.eq(notice_id))
+            .left_join(discussions::table.on(discussions::account_id.eq(accounts::id)))
+            .filter(discussions::id.eq(discussion_id))
             .first(&self.0.get()?)?)
     }
 
-    fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Account> {
+    fn by_file_id(&mut self, receipt_id: &ReceiptId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(files::table.on(files::account_id.eq(accounts::id)))
+            .filter(files::id.eq(receipt_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Account> {
         Ok(accounts::table
             .select(accounts::all_columns)
             .left_join(leases::table.on(leases::account_id.eq(accounts::id)))
-            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
-            .left_join(files::table.on(files::id.nullable().eq(rents::receipt_id)))
-            .filter(files::id.eq(receipt_id))
+            .filter(leases::id.eq(lease_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_message_id(&mut self, message_id: &trankeel_data::MessageId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(discussions::table.on(discussions::account_id.eq(accounts::id)))
+            .left_join(messages::table.on(messages::discussion_id.eq(discussions::id)))
+            .filter(messages::id.eq(message_id))
             .first(&self.0.get()?)?)
     }
 
@@ -337,11 +349,12 @@ impl database::AccountStore for AccountStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Account> {
+    fn by_rent_id(&mut self, rent_id: &RentId) -> Result<Account> {
         Ok(accounts::table
             .select(accounts::all_columns)
             .left_join(leases::table.on(leases::account_id.eq(accounts::id)))
-            .filter(leases::id.eq(lease_id))
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .filter(rents::id.eq(rent_id))
             .first(&self.0.get()?)?)
     }
 
@@ -353,6 +366,23 @@ impl database::AccountStore for AccountStore<'_> {
             .left_join(workflows::table.on(workflows::workflowable_id.eq(candidacies::id))) // TODO: match workflowable
             .left_join(steps::table.on(steps::workflow_id.eq(workflows::id)))
             .filter(steps::id.eq(step_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(tenants::table.on(tenants::account_id.eq(accounts::id)))
+            .filter(tenants::id.eq(tenant_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_warrant_id(&mut self, warrant_id: &WarrantId) -> Result<Account> {
+        Ok(accounts::table
+            .select(accounts::all_columns)
+            .left_join(tenants::table.on(tenants::account_id.eq(accounts::id)))
+            .left_join(warrants::table.on(warrants::tenant_id.eq(tenants::id)))
+            .filter(warrants::id.eq(warrant_id))
             .first(&self.0.get()?)?)
     }
 
@@ -941,40 +971,8 @@ impl database::CompanyStore for CompanyStore<'_> {
 }
 
 impl database::EventStore for EventStore<'_> {
-    fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable> {
-        let event = events::table
-            .left_join(eventables::table.on(eventables::id.eq(events::eventable_id)))
-            .left_join(files::table.on(files::id.nullable().eq(eventables::file_id)))
-            .left_join(rents::table.on(rents::id.nullable().eq(eventables::rent_id)))
-            .left_join(steps::table.on(steps::id.nullable().eq(eventables::step_id)))
-            .left_join(leases::table.on(leases::id.nullable().eq(eventables::lease_id)))
-            .left_join(payments::table.on(payments::id.nullable().eq(eventables::payment_id)))
-            .left_join(
-                candidacies::table.on(candidacies::id.nullable().eq(eventables::candidacy_id)),
-            )
-            .select((
-                events::all_columns,
-                files::all_columns.nullable(),
-                rents::all_columns.nullable(),
-                steps::all_columns.nullable(),
-                leases::all_columns.nullable(),
-                payments::all_columns.nullable(),
-                candidacies::all_columns.nullable(),
-            ))
-            .filter(events::id.eq(id))
-            .first::<EventableRow>(&self.0.get()?)?;
-        Ok((event.0.clone(), event.into()))
-    }
-
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>> {
-        events::table
-            .select(events::all_columns)
-            .left_join(persons::table.on(persons::account_id.eq(events::account_id)))
-            .filter(persons::auth_id.eq(auth_id.inner()))
-            .load(&self.0.get()?)?
-            .iter()
-            .map(|event: &Event| self.by_id(&event.id))
-            .collect::<Result<Vec<_>>>()
+    fn by_id(&mut self, id: &EventId) -> Result<Event> {
+        Ok(events::table.find(id).first(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: Event) -> Result<Event> {
@@ -984,29 +982,29 @@ impl database::EventStore for EventStore<'_> {
     }
 }
 
-impl database::EventableStore for EventableStore<'_> {
-    fn create(&mut self, data: Eventable) -> Result<Eventable> {
-        match &data {
-            Eventable::File(inner) => insert_into(eventables::table)
-                .values(eventables::file_id.eq(inner.id))
-                .execute(&self.0.get()?)?,
-            Eventable::Rent(inner) => insert_into(eventables::table)
-                .values(eventables::rent_id.eq(inner.id))
-                .execute(&self.0.get()?)?,
-            Eventable::Step(inner) => insert_into(eventables::table)
-                .values(eventables::step_id.eq(inner.id))
-                .execute(&self.0.get()?)?,
-            Eventable::Lease(inner) => insert_into(eventables::table)
-                .values(eventables::lease_id.eq(inner.id))
-                .execute(&self.0.get()?)?,
-            Eventable::Payment(inner) => insert_into(eventables::table)
-                .values(eventables::payment_id.eq(inner.id))
-                .execute(&self.0.get()?)?,
-            Eventable::Candidacy(inner) => insert_into(eventables::table)
-                .values(eventables::candidacy_id.eq(inner.id))
-                .execute(&self.0.get()?)?,
-        };
-        Ok(data)
+impl database::PublicEventStore for PublicEventStore<'_> {
+    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<PublicEvent>> {
+        Ok(public_events::table
+            .select(public_events::all_columns)
+            .left_join(accounts::table.on(accounts::id.eq(public_events::account_id)))
+            .left_join(persons::table.on(persons::account_id.eq(accounts::id)))
+            .filter(persons::auth_id.eq(auth_id))
+            .load(&self.0.get()?)?)
+    }
+
+    fn by_message_id(&mut self, message_id: &MessageId) -> Result<PublicEvent> {
+        Ok(public_events::table
+            .select(public_events::all_columns)
+            .left_join(events::table.on(events::id.eq(public_events::event_id)))
+            .left_join(messages::table.on(messages::event_id.eq(events::id.nullable())))
+            .filter(messages::id.eq(message_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn create(&mut self, data: PublicEvent) -> Result<PublicEvent> {
+        Ok(insert_into(public_events::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
     }
 }
 
@@ -1102,6 +1100,12 @@ impl database::MessageStore for MessageStore<'_> {
         Ok(insert_into(messages::table)
             .values(data)
             .get_result(&self.0.get()?)?)
+    }
+
+    fn create_many(&mut self, data: Vec<Message>) -> Result<Vec<Message>> {
+        Ok(insert_into(messages::table)
+            .values(data)
+            .get_results(&self.0.get()?)?)
     }
 }
 

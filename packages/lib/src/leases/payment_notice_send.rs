@@ -7,6 +7,7 @@ use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_data::notice_filename;
+use trankeel_data::Account;
 use trankeel_data::AuthId;
 use trankeel_data::DateTime;
 use trankeel_data::FileType;
@@ -36,9 +37,11 @@ pub async fn create_notices(
 ) -> Result<Vec<Notice>> {
     input.validate()?;
 
+    let account = db.accounts().by_auth_id(auth_id)?;
+
     let rents = find_rents(db, auth_id, input.rent_ids)?;
 
-    let notices = generate_notices(db, pdfmaker, rents).await?;
+    let notices = generate_notices(db, pdfmaker, account, rents).await?;
 
     Ok(notices)
 }
@@ -59,6 +62,7 @@ fn find_rents(db: &impl Db, _auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<
 async fn generate_notices(
     db: &impl Db,
     pdfmaker: &impl Pdfmaker,
+    account: Account,
     rents: Vec<Rent>,
 ) -> Result<Vec<Notice>> {
     let mut notices = vec![];
@@ -74,6 +78,7 @@ async fn generate_notices(
         let notice_id = NoticeId::new();
         let mut notice = Notice {
             id: notice_id,
+            account_id: account.id,
             type_: FileType::PaymentNotice,
             filename: Some(notice_filename(&notice_id, &rent)),
             status: None,
@@ -114,7 +119,7 @@ async fn generate_notices(
 
         notices.push(notice.clone());
 
-        trace(db, Trace::NoticeCreated(notice)).ok();
+        trace(vec![Trace::NoticeCreated(notice)]).ok();
     }
 
     Ok(notices)

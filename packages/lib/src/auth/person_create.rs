@@ -3,7 +3,7 @@ use async_graphql::InputObject;
 use trankeel_data::Email;
 use trankeel_data::PhoneNumber;
 
-#[derive(InputObject)]
+#[derive(Clone, InputObject)]
 pub struct CreatePersonInput {
     pub email: Email,
     pub first_name: String,

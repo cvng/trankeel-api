@@ -16,6 +16,7 @@ CREATE TABLE files (
     id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMPTZ DEFAULT current_timestamp,
     updated_at TIMESTAMPTZ,
+    account_id UUID NOT NULL REFERENCES accounts(id),
     download_url TEXT,
     external_id TEXT,
     filename TEXT,

@@ -10,7 +10,7 @@ use crate::PropertyId;
 
 pub type AdvertisementId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Entryflexibility"]
 #[graphql(name = "LenderFlexibility")]
 pub enum EntryFlexibility {
@@ -19,7 +19,7 @@ pub enum EntryFlexibility {
     SevenDays,
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Queryable)]
 pub struct Advertisement {
     pub id: AdvertisementId,
     pub created_at: Option<DateTime>,
