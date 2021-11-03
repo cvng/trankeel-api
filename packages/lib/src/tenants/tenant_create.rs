@@ -146,6 +146,8 @@ pub fn create_tenant(
         status: TenantStatus::default(),
     };
 
+    let tenant = (tenant, profile);
+
     let mut warrants = vec![];
 
     if let Some(warrants_input) = input.warrants {
@@ -154,7 +156,7 @@ pub fn create_tenant(
                 input,
                 CreateWarrantState {
                     account: state.account.clone(),
-                    tenant: tenant.clone(),
+                    tenant: tenant.0.clone(),
                 },
             )?;
 
@@ -162,10 +164,7 @@ pub fn create_tenant(
         }
     }
 
-    let CreateDiscussionPayload {
-        discussion,
-        messages,
-    } = create_discussion(
+    let CreateDiscussionPayload { discussion } = create_discussion(
         CreateDiscussionInput {
             initiator_id: profile.id,
             recipient_id: state.account_owner.id,
@@ -177,8 +176,8 @@ pub fn create_tenant(
     )?;
 
     Ok(CreateTenantPayload {
-        tenant: (tenant, profile),
+        tenant,
         warrants,
-        discussion: (discussion, messages),
+        discussion,
     })
 }
