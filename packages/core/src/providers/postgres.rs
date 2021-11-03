@@ -1093,10 +1093,12 @@ impl database::DiscussionStore for DiscussionStore<'_> {
             .load::<DiscussionItemRow>(&self.0.get()?)?
             .into_iter()
             .filter_map(|row| match row {
-                (Some(candidacy), _) => Some(candidacy.into()),
-                (_, Some(lease)) => Some(lease.into()),
+                (Some(candidacy), Some(lease)) => Some(vec![candidacy.into(), lease.into()]),
+                (Some(candidacy), _) => Some(vec![candidacy.into()]),
+                (_, Some(lease)) => Some(vec![lease.into()]),
                 _ => None,
             })
+            .flatten()
             .collect())
     }
 
