@@ -2,6 +2,7 @@
   "recommendations": [
     "matklad.rust-analyzer",
     "vadimcn.vscode-lldb",
-    "graphql.vscode-graphql"
+    "graphql.vscode-graphql",
+    "alexkrechik.cucumberautocomplete"
   ]
 }

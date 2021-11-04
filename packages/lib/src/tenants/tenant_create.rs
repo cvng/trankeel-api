@@ -30,7 +30,7 @@ use validator::Validate;
 
 // # Input
 
-#[derive(InputObject, Validate)]
+#[derive(Clone, InputObject, Validate)]
 #[graphql(name = "TenantInput")]
 pub struct CreateTenantInput {
     pub apl: Option<bool>,
@@ -46,6 +46,7 @@ pub struct CreateTenantInput {
     pub warrants: Option<Vec<CreateWarrantInput>>,
 }
 
+#[derive(Clone)]
 pub struct CreateTenantState {
     pub account: Account,
     pub account_owner: Person,
@@ -146,7 +147,7 @@ pub fn create_tenant(
         status: TenantStatus::default(),
     };
 
-    let tenant = (tenant, profile);
+    let tenant = (tenant, profile.clone());
 
     let mut warrants = vec![];
 
