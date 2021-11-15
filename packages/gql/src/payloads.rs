@@ -95,17 +95,11 @@ pub struct PushMessagePayload {
     message: Option<Message>,
 }
 
-impl From<trankeel::Result<trankeel::Message>> for PushMessagePayload {
-    fn from(item: trankeel::Result<trankeel::Message>) -> Self {
-        match item {
-            Ok(res) => Self {
-                errors: None,
-                message: Some(res.into()),
-            },
-            Err(err) => Self {
-                errors: Some(vec![err.into()]),
-                message: None,
-            },
+impl From<trankeel::PushMessagePayload> for PushMessagePayload {
+    fn from(item: trankeel::PushMessagePayload) -> Self {
+        Self {
+            errors: Some(vec![]),
+            message: Some(item.message.into()),
         }
     }
 }

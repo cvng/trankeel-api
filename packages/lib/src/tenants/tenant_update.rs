@@ -1,5 +1,5 @@
-use crate::candidacies::CreateWarrantInput;
 use crate::error::Result;
+use crate::warrants::CreateWarrantInput;
 use crate::AuthId;
 use crate::Date;
 use crate::Tenant;

@@ -13,6 +13,7 @@ async-graphql = "2.11.0"
 chrono = "0.4.19"
 liquid = "0.23.0"
 log = "0.4.14"
+thiserror = "1.0.30"
 trankeel-core = { path = "../core" }
 trankeel-data = { path = "../data" }
 trankeel-kit = { path = "../kit" }

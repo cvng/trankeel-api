@@ -1,9 +1,12 @@
 use super::push_message;
+use crate::messaging::PushMessageState;
 use crate::PushMessageInput;
 use crate::Result;
-use trankeel_core::database::Db;
+use chrono::Utc;
+use trankeel_data::Account;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
+use trankeel_data::Message;
 use trankeel_data::PersonId;
 use validator::Validate;
 
@@ -14,35 +17,50 @@ pub struct CreateDiscussionInput {
     pub message: Option<String>,
 }
 
-pub fn create_discussion_unauthenticated(
-    db: &impl Db,
+pub struct CreateDiscussionState {
+    pub account: Account,
+}
+
+pub struct CreateDiscussionPayload {
+    pub discussion: Discussion,
+    pub message: Option<Message>,
+}
+
+pub fn create_discussion(
+    state: CreateDiscussionState,
     input: CreateDiscussionInput,
-) -> Result<Discussion> {
+) -> Result<CreateDiscussionPayload> {
     input.validate()?;
 
-    let account = db.accounts().by_person_id(&input.recipient_id)?;
-
-    let discussion = db.discussions().create(Discussion {
+    let discussion = Discussion {
         id: DiscussionId::new(),
         created_at: Default::default(),
-        updated_at: Default::default(),
-        account_id: account.id,
+        updated_at: Some(Utc::now().into()), // Touch updated_at.
+        account_id: state.account.id,
         initiator_id: input.initiator_id,
         status: Default::default(),
-    })?;
+    };
 
-    db.discussions().touch(discussion.id)?; // Touch updated_at.
-
-    if let Some(message) = input.message {
-        push_message(
-            db,
+    let message = if let Some(message) = input.message {
+        let message = push_message(
+            PushMessageState {
+                discussion: discussion.clone(),
+            },
             PushMessageInput {
                 discussion_id: discussion.id,
                 sender_id: input.initiator_id,
                 message,
             },
-        )?;
-    }
+        )?
+        .message;
 
-    Ok(discussion)
+        Some(message)
+    } else {
+        None
+    };
+
+    Ok(CreateDiscussionPayload {
+        discussion,
+        message,
+    })
 }
