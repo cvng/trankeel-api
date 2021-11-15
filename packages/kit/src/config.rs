@@ -69,6 +69,7 @@ pub struct StepOuter {
 #[derive(Clone, Deserialize)]
 pub struct Step {
     pub label: String,
+    pub event: String,
     pub confirmation: String,
     pub requirements: Option<Vec<Requirement>>,
 }
