@@ -6,7 +6,8 @@ CREATE TABLE steps (
     label TEXT NOT NULL,
     completed BOOLEAN NOT NULL,
     confirmation TEXT,
-    requirements JSONB
+    requirements JSONB,
+    event TEXT
 );
 
 SELECT manage_updated_at('steps');
