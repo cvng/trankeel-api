@@ -1,7 +1,10 @@
 use crate::objects::Error;
 use crate::objects::File;
+use crate::objects::Lease;
 use crate::objects::Message;
+use crate::objects::Property;
 use crate::objects::Step;
+use crate::objects::Tenant;
 use trankeel::DiscussionId;
 
 #[derive(SimpleObject)]
@@ -100,6 +103,23 @@ impl From<trankeel::PushMessagePayload> for PushMessagePayload {
         Self {
             errors: Some(vec![]),
             message: Some(item.message.into()),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct AddExistingLeasePayload {
+    lease: Lease,
+    property: Property,
+    tenants: Vec<Tenant>,
+}
+
+impl From<trankeel::AddExistingLeasePayload> for AddExistingLeasePayload {
+    fn from(item: trankeel::AddExistingLeasePayload) -> Self {
+        Self {
+            lease: item.lease.into(),
+            property: item.property.into(),
+            tenants: item.tenants.into_iter().map(Into::into).collect(),
         }
     }
 }
