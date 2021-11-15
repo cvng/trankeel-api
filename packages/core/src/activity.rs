@@ -23,6 +23,7 @@ use trankeel_data::Person;
 use trankeel_data::PersonId;
 use trankeel_data::Receipt;
 use trankeel_data::Step;
+use trankeel_data::StepEvent;
 use trankeel_kit::locale::DEFAULT_CURRENCY;
 
 type Meta = (EventableId, AccountId, PersonId, PersonId, Option<String>);
@@ -193,43 +194,45 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
         .ok_or(NotFound)?;
     let eventable = db.eventables().create(Eventable::Step(step.clone()))?;
 
-    if step.label == LEASE_SIGNED_EVENT_LABEL {
-        let lease = db.leases().by_person_id(&participant.id)?;
-        db.leases().update(LeaseData {
-            id: lease.id,
-            signature_date: Some(Utc::now().into()), // TODO: match workflowable
-            ..Default::default()
-        })?;
-    }
+    if let Some(step_event) = step.event.clone() {
+        match step_event.into() {
+            StepEvent::LeaseSigned => {
+                let lease = db.leases().by_person_id(&participant.id)?;
+                db.leases().update(LeaseData {
+                    id: lease.id,
+                    signature_date: Some(Utc::now().into()), // TODO: match workflowable
+                    ..Default::default()
+                })?;
+            }
+            StepEvent::LeaseConfirmed => {
+                let step_requirements = match step.clone().requirements {
+                    Some(step_requirements) => step_requirements.requirements,
+                    None => vec![],
+                };
 
-    if step.label == LEASE_STARTED_EVENT_LABEL {
-        let step_requirements = match step.clone().requirements {
-            Some(step_requirements) => step_requirements.requirements,
-            None => vec![],
-        };
+                let effect_date = step_requirements
+                    .into_iter()
+                    .find(|sr| sr.name == "effect_date")
+                    .and_then(|sr| sr.value);
 
-        let effect_date = step_requirements
-            .into_iter()
-            .find(|sr| sr.name == "effect_date")
-            .and_then(|sr| sr.value);
-
-        if let Some(effect_date) = effect_date {
-            let lease = db.leases().by_person_id(&participant.id)?;
-            db.leases().update(LeaseData {
-                id: lease.id,
-                effect_date: Some(effect_date.parse::<DateTime<Utc>>()?.into()), // TODO: match workflowable
-                ..Default::default()
-            })?;
+                if let Some(effect_date) = effect_date {
+                    let lease = db.leases().by_person_id(&participant.id)?;
+                    db.leases().update(LeaseData {
+                        id: lease.id,
+                        effect_date: Some(effect_date.parse::<DateTime<Utc>>()?.into()), // TODO: match workflowable
+                        ..Default::default()
+                    })?;
+                }
+            }
+            StepEvent::LeaseActivated => {
+                let discussion = db.discussions().by_initiator_id(&participant.id)?;
+                db.discussions().update(&Discussion {
+                    id: discussion.id,
+                    status: DiscussionStatus::Active,
+                    ..discussion
+                })?;
+            }
         }
-    }
-
-    if step.label == LEASE_ACTIVE_EVENT_LABEL {
-        let discussion = db.discussions().by_initiator_id(&participant.id)?;
-        db.discussions().update(&Discussion {
-            id: discussion.id,
-            status: DiscussionStatus::Active,
-            ..discussion
-        })?;
     }
 
     let message = render_step_message(db, step, participant.clone())?;
@@ -244,12 +247,6 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
 }
 
 // # Utils
-
-const LEASE_SIGNED_EVENT_LABEL: &str = "Signature du contrat de location";
-
-const LEASE_STARTED_EVENT_LABEL: &str = "Confirmation de la date de remise des clés";
-
-const LEASE_ACTIVE_EVENT_LABEL: &str = "Réalisation de l'état des lieux";
 
 fn render_step_message(db: &impl Db, step: Step, participant: Person) -> Result<Option<String>> {
     let tenant = db.tenants().by_person_id(&participant.id)?;
