@@ -1,17 +1,18 @@
+use crate::client::Actor;
+use crate::client::Context;
 use crate::error::Result;
-use crate::messaging::push_message;
+use crate::ops;
 use crate::templates::CandidacyRejectedMail;
 use crate::PushMessageInput;
 use async_graphql::InputObject;
 use trankeel_core::activity::trace;
 use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
-use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyData;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
-use trankeel_data::DiscussionData;
+use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
 use validator::Validate;
 
@@ -24,11 +25,14 @@ pub struct RejectCandidacyInput {
 
 // # Operation
 
-pub async fn reject_candidacy(
-    db: &impl Db,
-    auth_id: &AuthId,
+pub(crate) async fn reject_candidacy(
+    ctx: &Context,
+    actor: &Actor,
     input: RejectCandidacyInput,
 ) -> Result<Candidacy> {
+    let db = ctx.db();
+    let auth_id = actor.check()?;
+
     input.validate()?;
 
     let candidacy = db.candidacies().by_id(&input.id)?;
@@ -43,18 +47,19 @@ pub async fn reject_candidacy(
 
     let discussion = db.discussions().by_candidacy_id(&candidacy.id)?;
 
-    db.discussions().update(DiscussionData {
+    db.discussions().update(&Discussion {
         id: discussion.id,
-        status: Some(DiscussionStatus::default()),
-        ..Default::default()
+        status: DiscussionStatus::default(),
+        ..discussion
     })?;
 
     let sender = db.persons().by_auth_id(auth_id)?;
 
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
 
-    push_message(
-        db,
+    ops::push_message(
+        ctx,
+        actor,
         PushMessageInput {
             discussion_id: discussion.id,
             sender_id: sender.id,
