@@ -3,6 +3,7 @@ use crate::auth::SignupUserFromInviteInput;
 use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacyInput;
 use crate::error::Result;
+use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateNoticesInput;
 use crate::leases::CreateReceiptsInput;
@@ -23,6 +24,7 @@ use crate::tenants::CreateTenantPayload;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenantInput;
 use crate::workflows::CompleteStepInput;
+use crate::AddExistingLeaseInput;
 use crate::PushMessagePayload;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
@@ -280,6 +282,14 @@ impl<'a> Client {
         input: UpdateAdvertisementInput,
     ) -> Result<Advertisement> {
         crate::properties::update_advertisement(&self.0.db, auth_id, input)
+    }
+
+    pub fn add_existing_lease(
+        &self,
+        auth_id: &AuthId,
+        input: AddExistingLeaseInput,
+    ) -> Result<AddExistingLeasePayload> {
+        ops::add_existing_lease(&self.0, &Actor::new(auth_id), input)
     }
 
     pub fn create_furnished_lease(
