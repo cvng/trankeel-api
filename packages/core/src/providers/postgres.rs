@@ -50,7 +50,6 @@ use trankeel_data::CandidacyId;
 use trankeel_data::Company;
 use trankeel_data::CompanyId;
 use trankeel_data::Discussion;
-use trankeel_data::DiscussionData;
 use trankeel_data::DiscussionId;
 use trankeel_data::DiscussionItem;
 use trankeel_data::DiscussionItemRow;
@@ -123,6 +122,13 @@ impl Pg {
                 .build(manager)
                 .expect("Error connecting to database"),
         )
+    }
+
+    pub fn transaction<T, F>(&self, f: F) -> Result<T>
+    where
+        F: FnOnce() -> Result<T>,
+    {
+        self.0.get()?.transaction(f)
     }
 }
 
@@ -1063,14 +1069,14 @@ impl database::DiscussionStore for DiscussionStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Discussion) -> Result<Discussion> {
+    fn create(&mut self, data: &Discussion) -> Result<Discussion> {
         Ok(insert_into(discussions::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: DiscussionData) -> Result<Discussion> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Discussion) -> Result<Discussion> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 
     fn delete(&mut self, data: DiscussionId) -> Result<Executed> {
