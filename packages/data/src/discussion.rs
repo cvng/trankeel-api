@@ -33,7 +33,7 @@ pub enum DiscussionItem {
     Lease(Lease),
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Discussion {
     pub id: DiscussionId,
     pub created_at: Option<DateTime>,
@@ -41,15 +41,4 @@ pub struct Discussion {
     pub account_id: AccountId,
     pub initiator_id: PersonId,
     pub status: DiscussionStatus,
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "discussions"]
-pub struct DiscussionData {
-    pub id: DiscussionId,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
-    pub account_id: Option<AccountId>,
-    pub initiator_id: Option<PersonId>,
-    pub status: Option<DiscussionStatus>,
 }
