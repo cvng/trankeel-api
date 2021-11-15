@@ -1,15 +1,20 @@
 use crate::auth::CreatePersonInput;
+use crate::client::Actor;
+use crate::client::Context;
 use crate::error::Result;
 use crate::files::CreateFileInput;
-use crate::messaging::push_message;
+use crate::messaging;
+use crate::messaging::CreateDiscussionState;
 use crate::templates::CandidacyCreatedMail;
-use crate::tenants::add_warrants;
-use crate::tenants::start_discussion_with_lender;
-use crate::PushMessageInput;
+use crate::warrants::create_warrant;
+use crate::warrants::CreateWarrantState;
+use crate::CreateDiscussionInput;
+use crate::CreateWarrantInput;
 use async_graphql::InputObject;
 use trankeel_core::activity::trace;
 use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
+use trankeel_core::error::Error;
 use trankeel_core::mailer::Mailer;
 use trankeel_data::Account;
 use trankeel_data::AdvertisementId;
@@ -18,32 +23,16 @@ use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Date;
 use trankeel_data::DateTime;
-use trankeel_data::DiscussionData;
+use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
 use trankeel_data::Person;
 use trankeel_data::PersonId;
 use trankeel_data::PersonRole;
 use trankeel_data::PhoneNumber;
-use trankeel_data::ProfessionalWarrant;
-use trankeel_data::WarrantIdentity;
-use trankeel_data::WarrantType;
 use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
 // # Input
-
-#[derive(InputObject, Validate)]
-pub struct CreateProfessionalWarrantInput {
-    pub name: String,
-    pub identifier: String,
-}
-
-#[derive(InputObject, Validate)]
-pub struct CreateWarrantInput {
-    pub type_: WarrantType,
-    pub individual: Option<CreatePersonInput>,
-    pub company: Option<CreateProfessionalWarrantInput>,
-}
 
 #[derive(InputObject, Validate)]
 pub struct CreateCandidacyInput {
@@ -64,17 +53,20 @@ pub struct CreateCandidacyInput {
 
 // # Operation
 
-pub async fn create_candidacy(
-    db: &impl Db,
-    mailer: &impl Mailer,
+pub(crate) async fn create_candidacy(
+    ctx: &Context,
+    _actor: &Actor,
     input: CreateCandidacyInput,
 ) -> Result<Candidacy> {
+    let db = ctx.db();
+    let mailer = ctx.mailer();
+
     input.validate()?;
 
     let account = db.accounts().by_advertisement_id(&input.advertisement_id)?;
 
     let candidate = create_candidate(
-        db,
+        ctx,
         &account,
         CreatePersonInput {
             email: input.email.into(),
@@ -99,28 +91,19 @@ pub async fn create_candidacy(
         is_student: Some(input.is_student),
     })?;
 
-    if let Some(warrant_inputs) = input.warrants {
-        add_warrants(db, &account.id, None, Some(candidacy.id), warrant_inputs)?;
+    if let Some(warrants_input) = input.warrants {
+        add_warrants(ctx, &account, &candidacy, warrants_input)?;
     }
 
-    trace(db, Trace::CandidacyCreated(candidacy.clone()))?;
+    let discussion = start_discussion_with_lender(ctx, &account, &candidate, &candidacy)?;
 
-    let discussion = db.discussions().by_initiator_id(&candidate.id)?;
-
-    let discussion = db.discussions().update(DiscussionData {
+    db.discussions().update(&Discussion {
         id: discussion.id,
-        status: Some(DiscussionStatus::Candidacy),
-        ..Default::default()
+        status: DiscussionStatus::Candidacy,
+        ..discussion
     })?;
 
-    push_message(
-        db,
-        PushMessageInput {
-            discussion_id: discussion.id,
-            sender_id: candidate.id,
-            message: candidacy.description.clone(),
-        },
-    )?;
+    trace(db, Trace::CandidacyCreated(candidacy.clone()))?;
 
     mailer
         .batch(vec![CandidacyCreatedMail::try_new(&candidacy, &candidate)?])
@@ -129,7 +112,9 @@ pub async fn create_candidacy(
     Ok(candidacy)
 }
 
-fn create_candidate(db: &impl Db, account: &Account, input: CreatePersonInput) -> Result<Person> {
+fn create_candidate(ctx: &Context, account: &Account, input: CreatePersonInput) -> Result<Person> {
+    let db = ctx.db();
+
     let candidate = db.persons().create(Person {
         id: PersonId::new(),
         created_at: Default::default(),
@@ -145,33 +130,67 @@ fn create_candidate(db: &impl Db, account: &Account, input: CreatePersonInput) -
         phone_number: input.phone_number,
     })?;
 
-    start_discussion_with_lender(db, account, &candidate)?;
-
     Ok(candidate)
 }
 
-impl From<WarrantWithIdentity> for CreateWarrantInput {
-    fn from(item: WarrantWithIdentity) -> Self {
-        match item.1 {
-            WarrantIdentity::Individual(person) => Self {
-                type_: item.0.type_,
-                individual: Some(person.into()),
-                company: None,
+fn add_warrants(
+    ctx: &Context,
+    account: &Account,
+    candidacy: &Candidacy,
+    warrants_input: Vec<CreateWarrantInput>,
+) -> Result<Vec<WarrantWithIdentity>> {
+    let db = ctx.db();
+
+    let mut warrants = vec![];
+
+    for warrant_input in warrants_input {
+        let warrant = create_warrant(
+            CreateWarrantState {
+                account: account.clone(),
+                tenant: None,
+                candidacy: Some(candidacy.clone()),
             },
-            WarrantIdentity::Professional(professional) => Self {
-                type_: item.0.type_,
-                individual: None,
-                company: Some(professional.into()),
-            },
-        }
+            warrant_input,
+        )?
+        .warrant;
+        db.warrants().create(warrant.clone())?;
+        warrants.push(warrant);
     }
+
+    Ok(warrants)
 }
 
-impl From<ProfessionalWarrant> for CreateProfessionalWarrantInput {
-    fn from(item: ProfessionalWarrant) -> Self {
-        Self {
-            name: item.name,
-            identifier: item.identifier,
-        }
+fn start_discussion_with_lender(
+    ctx: &Context,
+    account: &Account,
+    candidate: &Person,
+    candidacy: &Candidacy,
+) -> Result<Discussion> {
+    let db = ctx.db();
+
+    // In the context of a candidacy, the recipient is the account owner.
+    let recipient = db
+        .persons()
+        .by_account_id(&account.id)?
+        .first()
+        .cloned()
+        .ok_or_else(|| Error::msg("recipient not found"))?;
+
+    let discussion = messaging::create_discussion(
+        CreateDiscussionState {
+            account: account.clone(),
+        },
+        CreateDiscussionInput {
+            recipient_id: recipient.id,
+            initiator_id: candidate.id,
+            message: Some(candidacy.description.clone()),
+        },
+    )?;
+
+    db.discussions().create(&discussion.discussion)?;
+    if let Some(message) = discussion.message.clone() {
+        ctx.db().messages().create(message)?;
     }
+
+    Ok(discussion.discussion)
 }
