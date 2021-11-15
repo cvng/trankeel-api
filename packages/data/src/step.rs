@@ -7,6 +7,23 @@ use crate::WorkflowId;
 
 pub type StepId = Id;
 
+pub enum StepEvent {
+    LeaseSigned,
+    LeaseConfirmed,
+    LeaseActivated,
+}
+
+impl From<String> for StepEvent {
+    fn from(item: String) -> Self {
+        match item.as_str() {
+            "lease_signed" => Self::LeaseSigned,
+            "lease_confirmed" => Self::LeaseConfirmed,
+            "lease_activated" => Self::LeaseActivated,
+            _ => unimplemented!(),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Associations, Identifiable, Insertable, Queryable, SimpleObject)]
 #[belongs_to(parent = "Workflow")]
 pub struct Step {
@@ -18,6 +35,7 @@ pub struct Step {
     pub completed: bool,
     pub confirmation: Option<String>,
     pub requirements: Option<RequirementOuter>,
+    pub event: Option<String>,
 }
 
 #[derive(Default, AsChangeset, Identifiable, Insertable)]

@@ -1,5 +1,6 @@
 [[steps]]
 label = "Acceptation de la candidature"
+event = ""
 confirmation = """
 Bonjour {{ tenant_name }},
 Votre candidature a été retenue, vous allez recevoir un mail pour créer votre espace membre sur trankeel.com et un deuxième mail pour procéder à la signature électronique du bail.
@@ -7,6 +8,7 @@ Cordialement."""
 
 [[steps]]
 label = "Signature du contrat de location"
+event = "lease_signed"
 confirmation = """
 Bonjour,
 Merci d'avoir procéder à la signature du bail,
@@ -16,18 +18,21 @@ Cordialement."""
 
 [[steps]]
 label = "Récupération de l'attestation d'assurance"
+event = ""
 confirmation = """
 Merci, nous avons bien reçu votre attestation d'assurance.
 Cordialement."""
 
 [[steps]]
 label = "Encaissement du dépôt de garantie"
+event = ""
 confirmation = """
 Merci, nous avons bien encaissé {{ deposit_amount }} pour règlement de votre dépôt de garantie.
 Cordialement."""
 
 [[steps]]
 label = "Confirmation de la date de remise des clés"
+event = "lease_confirmed"
 requirements =  [{ name = "effect_date", type = "date" }]
 confirmation = """
 Merci, nous vous confirmons que l'état des lieux ainsi que la remise des clés aura lieu le {{ effect_date }}.
@@ -35,6 +40,7 @@ Cordialement."""
 
 [[steps]]
 label = "Réalisation de l'état des lieux"
+event = "lease_activated"
 confirmation = """
 Bonjour,
 Merci pour votre confiance,

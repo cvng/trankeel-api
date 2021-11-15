@@ -337,6 +337,7 @@ table! {
         completed -> Bool,
         confirmation -> Nullable<Text>,
         requirements -> Nullable<Jsonb>,
+        event -> Nullable<Text>,
     }
 }
 

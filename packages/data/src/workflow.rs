@@ -41,6 +41,7 @@ impl Workflow {
                 updated_at: Default::default(),
                 workflow_id: self.id,
                 label: step.label,
+                event: Some(step.event),
                 completed: Default::default(),
                 confirmation: Some(step.confirmation),
                 requirements: step.requirements.map(Into::into),
