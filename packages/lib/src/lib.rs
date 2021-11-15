@@ -39,6 +39,8 @@ pub use crate::error::Error;
 pub use crate::error::Result;
 pub use crate::files::CreateFileInput;
 pub use crate::imports::ImportInput;
+pub use crate::leases::AddExistingLeaseInput;
+pub use crate::leases::AddExistingLeasePayload;
 pub use crate::leases::CreateFurnishedLeaseInput;
 pub use crate::leases::CreateNakedLeaseInput;
 pub use crate::leases::CreateNoticesInput;
