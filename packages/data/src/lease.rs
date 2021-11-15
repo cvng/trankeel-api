@@ -46,7 +46,7 @@ pub enum LeaseDetails {
     FurnishedLeaseDetails(FurnishedLeaseDetails),
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Debug, Insertable, Queryable, SimpleObject, AsChangeset, Identifiable)]
 pub struct Lease {
     pub id: LeaseId,
     pub created_at: Option<DateTime>,
@@ -64,25 +64,6 @@ pub struct Lease {
     pub expired_at: Option<DateTime>,
     pub renew_date: Option<DateTime>,
     pub duration: FurnishedLeaseDuration,
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "leases"]
-pub struct LeaseData {
-    pub id: LeaseId,
-    pub account_id: Option<AccountId>,
-    pub deposit_amount: Option<Amount>,
-    pub effect_date: Option<DateTime>,
-    pub signature_date: Option<DateTime>,
-    pub rent_amount: Option<Amount>,
-    pub rent_charges_amount: Option<Amount>,
-    pub type_: Option<LeaseType>,
-    pub lease_id: Option<FileId>,
-    pub property_id: Option<PropertyId>,
-    pub details: Option<FurnishedLeaseDetails>,
-    pub expired_at: Option<DateTime>,
-    pub renew_date: Option<DateTime>,
-    pub duration: Option<FurnishedLeaseDuration>,
 }
 
 impl Lease {

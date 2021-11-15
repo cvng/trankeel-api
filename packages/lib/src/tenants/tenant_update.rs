@@ -6,7 +6,6 @@ use crate::Tenant;
 use async_graphql::InputObject;
 use trankeel_core::database::Db;
 use trankeel_data::PhoneNumber;
-use trankeel_data::TenantData;
 use trankeel_data::TenantId;
 use validator::Validate;
 
@@ -33,19 +32,22 @@ pub struct UpdateTenantInput {
 pub fn update_tenant(db: &impl Db, _auth_id: &AuthId, input: UpdateTenantInput) -> Result<Tenant> {
     input.validate()?;
 
-    db.tenants().update(TenantData {
+    let tenant = db.tenants().by_id(&input.id)?;
+
+    db.tenants().update(&Tenant {
         id: input.id,
         account_id: Default::default(),
         person_id: Default::default(),
         birthdate: input.birthdate,
         birthplace: input.birthplace,
-        email: input.email.map(Into::into),
-        first_name: input.first_name,
-        last_name: input.last_name,
+        email: input.email.map(Into::into).unwrap_or(tenant.email),
+        first_name: input.first_name.unwrap_or(tenant.first_name),
+        last_name: input.last_name.unwrap_or(tenant.last_name),
         note: input.note,
         phone_number: input.phone_number,
         is_student: input.is_student,
         lease_id: None,
-        status: None,
+        status: tenant.status,
+        ..tenant
     })
 }

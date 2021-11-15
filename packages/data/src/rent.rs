@@ -26,7 +26,7 @@ impl Default for RentStatus {
     }
 }
 
-#[derive(Clone, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Insertable, Queryable, SimpleObject, AsChangeset, Identifiable)]
 pub struct Rent {
     pub id: RentId,
     pub created_at: Option<DateTime>,
@@ -50,19 +50,4 @@ impl Rent {
             Duration::zero()
         }
     }
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "rents"]
-pub struct RentData {
-    pub id: RentId,
-    pub period_end: Option<DateTime>,
-    pub period_start: Option<DateTime>,
-    pub amount: Option<Amount>,
-    pub charges_amount: Option<Amount>,
-    pub full_amount: Option<Amount>,
-    pub status: Option<RentStatus>,
-    pub lease_id: Option<LeaseId>,
-    pub receipt_id: Option<ReceiptId>,
-    pub notice_id: Option<NoticeId>,
 }

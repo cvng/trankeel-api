@@ -29,7 +29,7 @@ impl Default for InviteStatus {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
 pub struct Invite {
     pub id: InviteId,
     pub created_at: Option<DateTime>,
@@ -50,15 +50,4 @@ impl Invite {
             .replace(":email", email.inner())
             .into()
     }
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "invites"]
-pub struct InviteData {
-    pub id: InviteId,
-    pub account_id: Option<AccountId>,
-    pub invitee_id: Option<PersonId>,
-    pub token: Option<InviteToken>,
-    pub status: Option<InviteStatus>,
-    pub reason: Option<InviteReason>,
 }

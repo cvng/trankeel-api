@@ -25,7 +25,7 @@ impl Default for CandidacyStatus {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Debug, Insertable, Queryable, SimpleObject, AsChangeset, Identifiable)]
 #[table_name = "candidacies"]
 pub struct Candidacy {
     pub id: CandidacyId,
@@ -49,18 +49,4 @@ impl Candidacy {
             .replace(":id", &self.id.to_string())
             .into()
     }
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "candidacies"]
-pub struct CandidacyData {
-    pub id: CandidacyId,
-    pub status: Option<CandidacyStatus>,
-    pub advertisement_id: Option<AdvertisementId>,
-    pub person_id: Option<PersonId>,
-    pub move_in_date: Option<DateTime>,
-    pub description: Option<String>,
-    pub birthdate: Option<Date>,
-    pub birthplace: Option<String>,
-    pub is_student: Option<bool>,
 }

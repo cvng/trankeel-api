@@ -13,7 +13,6 @@ use trankeel_data::Eventable;
 use trankeel_data::EventableId;
 use trankeel_data::File;
 use trankeel_data::Lease;
-use trankeel_data::LeaseData;
 use trankeel_data::Message;
 use trankeel_data::MessageId;
 use trankeel_data::Name;
@@ -74,7 +73,7 @@ pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
         Trace::StepCompleted(step) => on_step_completed(db, step.clone())?,
     };
 
-    let event = db.events().create(trankeel_data::Event {
+    let event = db.events().create(&trankeel_data::Event {
         id: EventId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -86,7 +85,7 @@ pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
 
     let discussion = db.discussions().by_initiator_id(&participant_id)?;
 
-    db.messages().create(Message {
+    db.messages().create(&Message {
         id: MessageId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -102,7 +101,7 @@ pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
 fn on_candidacy_created(db: &impl Db, candidacy: Candidacy) -> Result<Meta> {
     let account = db.accounts().by_candidacy_id(&candidacy.id)?;
     let participant = db.persons().by_candidacy_id(&candidacy.id)?;
-    let eventable = db.eventables().create(Eventable::Candidacy(candidacy))?;
+    let eventable = db.eventables().create(&Eventable::Candidacy(candidacy))?;
 
     Ok((
         eventable.id(),
@@ -136,7 +135,7 @@ fn on_lease_created(db: &impl Db, lease: Lease) -> Result<Meta> {
         .first()
         .cloned()
         .ok_or(NotFound)?;
-    let eventable = db.eventables().create(Eventable::Lease(lease))?;
+    let eventable = db.eventables().create(&Eventable::Lease(lease))?;
 
     Ok((eventable.id(), account.id, sender.id, participant.id, None))
 }
@@ -144,7 +143,7 @@ fn on_lease_created(db: &impl Db, lease: Lease) -> Result<Meta> {
 fn on_payment_created(db: &impl Db, payment: Payment) -> Result<Meta> {
     let account = db.accounts().by_payment_id(&payment.id)?;
     let participant = db.persons().by_payment_id(&payment.id)?;
-    let eventable = db.eventables().create(Eventable::Payment(payment))?;
+    let eventable = db.eventables().create(&Eventable::Payment(payment))?;
 
     Ok((
         eventable.id(),
@@ -158,7 +157,7 @@ fn on_payment_created(db: &impl Db, payment: Payment) -> Result<Meta> {
 fn on_notice_created(db: &impl Db, notice: Notice) -> Result<Meta> {
     let account = db.accounts().by_notice_id(&notice.id)?;
     let participant = db.persons().by_notice_id(&notice.id)?;
-    let eventable = db.eventables().create(Eventable::File(notice))?;
+    let eventable = db.eventables().create(&Eventable::File(notice))?;
 
     Ok((
         eventable.id(),
@@ -172,7 +171,7 @@ fn on_notice_created(db: &impl Db, notice: Notice) -> Result<Meta> {
 fn on_receipt_created(db: &impl Db, receipt: Receipt) -> Result<Meta> {
     let account = db.accounts().by_receipt_id(&receipt.id)?;
     let participant = db.persons().by_receipt_id(&receipt.id)?;
-    let eventable = db.eventables().create(Eventable::File(receipt))?;
+    let eventable = db.eventables().create(&Eventable::File(receipt))?;
 
     Ok((
         eventable.id(),
@@ -192,16 +191,16 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
         .first()
         .cloned()
         .ok_or(NotFound)?;
-    let eventable = db.eventables().create(Eventable::Step(step.clone()))?;
+    let eventable = db.eventables().create(&Eventable::Step(step.clone()))?;
 
     if let Some(step_event) = step.event.clone() {
         match step_event.into() {
             StepEvent::LeaseSigned => {
                 let lease = db.leases().by_person_id(&participant.id)?;
-                db.leases().update(LeaseData {
+                db.leases().update(&Lease {
                     id: lease.id,
                     signature_date: Some(Utc::now().into()), // TODO: match workflowable
-                    ..Default::default()
+                    ..lease
                 })?;
             }
             StepEvent::LeaseConfirmed => {
@@ -217,10 +216,10 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
 
                 if let Some(effect_date) = effect_date {
                     let lease = db.leases().by_person_id(&participant.id)?;
-                    db.leases().update(LeaseData {
+                    db.leases().update(&Lease {
                         id: lease.id,
-                        effect_date: Some(effect_date.parse::<DateTime<Utc>>()?.into()), // TODO: match workflowable
-                        ..Default::default()
+                        effect_date: effect_date.parse::<DateTime<Utc>>()?.into(), // TODO: match workflowable
+                        ..lease
                     })?;
                 }
             }

@@ -9,7 +9,6 @@ use trankeel_core::activity::trace;
 use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
 use trankeel_data::Candidacy;
-use trankeel_data::CandidacyData;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
@@ -37,10 +36,10 @@ pub(crate) async fn reject_candidacy(
 
     let candidacy = db.candidacies().by_id(&input.id)?;
 
-    db.candidacies().update(CandidacyData {
+    db.candidacies().update(&Candidacy {
         id: candidacy.id,
-        status: Some(CandidacyStatus::Rejected),
-        ..Default::default()
+        status: CandidacyStatus::Rejected,
+        ..candidacy.clone()
     })?;
 
     trace(db, Trace::CandidacyRejected(candidacy.clone()))?;

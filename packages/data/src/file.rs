@@ -32,7 +32,7 @@ pub enum FileType {
     RentReceipt,
 }
 
-#[derive(Clone, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct File {
     pub id: FileId,
     pub created_at: Option<DateTime>,
@@ -43,20 +43,6 @@ pub struct File {
     pub preview_url: Option<Url>,
     pub status: Option<FileStatus>,
     pub type_: FileType,
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "files"]
-pub struct FileData {
-    pub id: FileId,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
-    pub download_url: Option<Url>,
-    pub external_id: Option<ExternalId>,
-    pub filename: Option<String>,
-    pub preview_url: Option<Url>,
-    pub status: Option<FileStatus>,
-    pub type_: Option<FileType>,
 }
 
 // # Impls

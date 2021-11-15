@@ -12,21 +12,12 @@ pub type LenderId = Id;
 
 pub type LenderWithIdentity = (Lender, LegalIdentity);
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
 pub struct Lender {
     pub id: LenderId,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub account_id: AccountId,
-    pub individual_id: Option<PersonId>,
-    pub company_id: Option<CompanyId>,
-}
-
-#[derive(AsChangeset, Identifiable, Insertable)]
-#[table_name = "lenders"]
-pub struct LenderData {
-    pub id: LenderId,
-    pub account_id: Option<AccountId>,
     pub individual_id: Option<PersonId>,
     pub company_id: Option<CompanyId>,
 }

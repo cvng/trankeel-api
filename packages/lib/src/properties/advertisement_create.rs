@@ -38,7 +38,7 @@ pub fn create_advertisement(
 ) -> Result<Advertisement> {
     input.validate()?;
 
-    db.advertisements().create(Advertisement {
+    db.advertisements().create(&Advertisement {
         id: AdvertisementId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),

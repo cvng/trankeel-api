@@ -77,7 +77,7 @@ pub(crate) async fn create_candidacy(
         },
     )?;
 
-    let candidacy = db.candidacies().create(Candidacy {
+    let candidacy = db.candidacies().create(&Candidacy {
         id: CandidacyId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -115,7 +115,7 @@ pub(crate) async fn create_candidacy(
 fn create_candidate(ctx: &Context, account: &Account, input: CreatePersonInput) -> Result<Person> {
     let db = ctx.db();
 
-    let candidate = db.persons().create(Person {
+    let candidate = db.persons().create(&Person {
         id: PersonId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -153,7 +153,7 @@ fn add_warrants(
             warrant_input,
         )?
         .warrant;
-        db.warrants().create(warrant.clone())?;
+        db.warrants().create(&warrant.clone())?;
         warrants.push(warrant);
     }
 
@@ -189,7 +189,7 @@ fn start_discussion_with_lender(
 
     db.discussions().create(&discussion.discussion)?;
     if let Some(message) = discussion.message.clone() {
-        ctx.db().messages().create(message)?;
+        ctx.db().messages().create(&message)?;
     }
 
     Ok(discussion.discussion)

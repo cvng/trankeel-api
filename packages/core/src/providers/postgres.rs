@@ -38,14 +38,11 @@ use trankeel_data::schema::warrants;
 use trankeel_data::schema::workflowables;
 use trankeel_data::schema::workflows;
 use trankeel_data::Account;
-use trankeel_data::AccountData;
 use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
-use trankeel_data::AdvertisementData;
 use trankeel_data::AdvertisementId;
 use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
-use trankeel_data::CandidacyData;
 use trankeel_data::CandidacyId;
 use trankeel_data::Company;
 use trankeel_data::CompanyId;
@@ -60,18 +57,14 @@ use trankeel_data::Eventable;
 use trankeel_data::EventableRow;
 use trankeel_data::ExternalId;
 use trankeel_data::File;
-use trankeel_data::FileData;
 use trankeel_data::FileId;
 use trankeel_data::Invite;
-use trankeel_data::InviteData;
 use trankeel_data::InviteToken;
 use trankeel_data::Lease;
-use trankeel_data::LeaseData;
 use trankeel_data::LeaseFileId;
 use trankeel_data::LeaseId;
 use trankeel_data::LegalIdentity;
 use trankeel_data::Lender;
-use trankeel_data::LenderData;
 use trankeel_data::LenderId;
 use trankeel_data::LenderWithIdentity;
 use trankeel_data::Message;
@@ -79,24 +72,19 @@ use trankeel_data::NoticeId;
 use trankeel_data::Payment;
 use trankeel_data::PaymentId;
 use trankeel_data::Person;
-use trankeel_data::PersonData;
 use trankeel_data::PersonId;
 use trankeel_data::Plan;
 use trankeel_data::PlanId;
 use trankeel_data::ProfessionalWarrant;
 use trankeel_data::Property;
-use trankeel_data::PropertyData;
 use trankeel_data::PropertyId;
 use trankeel_data::ReceiptId;
 use trankeel_data::Rent;
-use trankeel_data::RentData;
 use trankeel_data::RentId;
 use trankeel_data::Step;
-use trankeel_data::StepData;
 use trankeel_data::StepId;
 use trankeel_data::Summary;
 use trankeel_data::Tenant;
-use trankeel_data::TenantData;
 use trankeel_data::TenantId;
 use trankeel_data::Warrant;
 use trankeel_data::WarrantId;
@@ -362,14 +350,14 @@ impl database::AccountStore for AccountStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Account) -> Result<Account> {
+    fn create(&mut self, data: &Account) -> Result<Account> {
         Ok(insert_into(accounts::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: AccountData) -> Result<Account> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Account) -> Result<Account> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
@@ -450,14 +438,14 @@ impl database::PersonStore for PersonStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Person) -> Result<Person> {
+    fn create(&mut self, data: &Person) -> Result<Person> {
         Ok(insert_into(persons::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: PersonData) -> Result<Person> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Person) -> Result<Person> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
@@ -486,7 +474,7 @@ impl database::TenantStore for TenantStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Tenant) -> Result<Tenant> {
+    fn create(&mut self, data: &Tenant) -> Result<Tenant> {
         Ok(insert_into(tenants::table)
             .values(data)
             .get_result(&self.0.get()?)?)
@@ -498,8 +486,8 @@ impl database::TenantStore for TenantStore<'_> {
             .execute(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: TenantData) -> Result<Tenant> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Tenant) -> Result<Tenant> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
@@ -554,8 +542,8 @@ impl database::WarrantStore for WarrantStore<'_> {
             .collect()
     }
 
-    fn create(&mut self, data: WarrantWithIdentity) -> Result<WarrantWithIdentity> {
-        match (data.0.type_, data.1) {
+    fn create(&mut self, data: &WarrantWithIdentity) -> Result<WarrantWithIdentity> {
+        match (data.0.type_, data.1.clone()) {
             (WarrantType::Person, WarrantIdentity::Individual(person)) => {
                 let person = insert_into(persons::table)
                     .values(person)
@@ -641,14 +629,14 @@ impl database::LenderStore for LenderStore<'_> {
         Ok((lender, LegalIdentity::Individual(person)))
     }
 
-    fn create(&mut self, data: Lender) -> Result<Lender> {
+    fn create(&mut self, data: &Lender) -> Result<Lender> {
         Ok(insert_into(lenders::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: LenderData) -> Result<Lender> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Lender) -> Result<Lender> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
@@ -674,14 +662,14 @@ impl database::AdvertisementStore for AdvertisementStore<'_> {
             .load(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Advertisement) -> Result<Advertisement> {
+    fn create(&mut self, data: &Advertisement) -> Result<Advertisement> {
         Ok(insert_into(advertisements::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: AdvertisementData) -> Result<Advertisement> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Advertisement) -> Result<Advertisement> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
@@ -735,14 +723,14 @@ impl database::CandidacyStore for CandidacyStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Candidacy) -> Result<Candidacy> {
+    fn create(&mut self, data: &Candidacy) -> Result<Candidacy> {
         Ok(insert_into(candidacies::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: CandidacyData) -> Result<Candidacy> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Candidacy) -> Result<Candidacy> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
@@ -767,7 +755,7 @@ impl database::PropertyStore for PropertyStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Property) -> Result<Property> {
+    fn create(&mut self, data: &Property) -> Result<Property> {
         Ok(insert_into(properties::table)
             .values(data)
             .get_result(&self.0.get()?)?)
@@ -779,8 +767,8 @@ impl database::PropertyStore for PropertyStore<'_> {
             .execute(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: PropertyData) -> Result<Property> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Property) -> Result<Property> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
@@ -850,7 +838,7 @@ impl database::LeaseStore for LeaseStore<'_> {
             .load(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Lease) -> Result<Lease> {
+    fn create(&mut self, data: &Lease) -> Result<Lease> {
         Ok(insert_into(leases::table)
             .values(data)
             .get_result(&self.0.get()?)?)
@@ -862,8 +850,8 @@ impl database::LeaseStore for LeaseStore<'_> {
             .execute(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: LeaseData) -> Result<Lease> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Lease) -> Result<Lease> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
@@ -905,8 +893,8 @@ impl database::RentStore for RentStore<'_> {
             .get_results(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: RentData) -> Result<Rent> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Rent) -> Result<Rent> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
@@ -921,19 +909,19 @@ impl database::FileStore for FileStore<'_> {
         Ok(files::table.find(id).first(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: File) -> Result<File> {
+    fn create(&mut self, data: &File) -> Result<File> {
         Ok(insert_into(files::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: FileData) -> Result<File> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &File) -> Result<File> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
 impl database::PaymentStore for PaymentStore<'_> {
-    fn create(&mut self, data: Payment) -> Result<Payment> {
+    fn create(&mut self, data: &Payment) -> Result<Payment> {
         Ok(insert_into(payments::table)
             .values(data)
             .get_result(&self.0.get()?)?)
@@ -997,7 +985,7 @@ impl database::EventStore for EventStore<'_> {
             .collect::<Result<Vec<_>>>()
     }
 
-    fn create(&mut self, data: Event) -> Result<Event> {
+    fn create(&mut self, data: &Event) -> Result<Event> {
         Ok(insert_into(events::table)
             .values(data)
             .get_result(&self.0.get()?)?)
@@ -1005,7 +993,7 @@ impl database::EventStore for EventStore<'_> {
 }
 
 impl database::EventableStore for EventableStore<'_> {
-    fn create(&mut self, data: Eventable) -> Result<Eventable> {
+    fn create(&mut self, data: &Eventable) -> Result<Eventable> {
         match &data {
             Eventable::File(inner) => insert_into(eventables::table)
                 .values(eventables::file_id.eq(inner.id))
@@ -1026,7 +1014,7 @@ impl database::EventableStore for EventableStore<'_> {
                 .values(eventables::candidacy_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
         };
-        Ok(data)
+        Ok(data.clone())
     }
 }
 
@@ -1124,7 +1112,7 @@ impl database::MessageStore for MessageStore<'_> {
             .load(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Message) -> Result<Message> {
+    fn create(&mut self, data: &Message) -> Result<Message> {
         Ok(insert_into(messages::table)
             .values(data)
             .get_result(&self.0.get()?)?)
@@ -1138,25 +1126,25 @@ impl database::InviteStore for InviteStore<'_> {
             .first(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Invite) -> Result<Invite> {
+    fn create(&mut self, data: &Invite) -> Result<Invite> {
         Ok(insert_into(invites::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: InviteData) -> Result<Invite> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Invite) -> Result<Invite> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }
 
 impl database::WorkflowableStore for WorkflowableStore<'_> {
-    fn create(&mut self, data: Workflowable) -> Result<Workflowable> {
+    fn create(&mut self, data: &Workflowable) -> Result<Workflowable> {
         match &data {
             Workflowable::Candidacy(candidacy) => insert_into(workflowables::table)
                 .values(workflowables::candidacy_id.eq(candidacy.id))
                 .execute(&self.0.get()?)?,
         };
-        Ok(data)
+        Ok(data.clone())
     }
 }
 
@@ -1182,7 +1170,7 @@ impl database::WorkflowStore for WorkflowStore<'_> {
         Ok(Some((workflow, steps)))
     }
 
-    fn create(&mut self, data: Workflow) -> Result<Workflow> {
+    fn create(&mut self, data: &Workflow) -> Result<Workflow> {
         Ok(insert_into(workflows::table)
             .values(data)
             .get_result(&self.0.get()?)?)
@@ -1201,13 +1189,13 @@ impl database::StepStore for StepStore<'_> {
             .load(&self.0.get()?)?)
     }
 
-    fn create(&mut self, data: Step) -> Result<Step> {
+    fn create(&mut self, data: &Step) -> Result<Step> {
         Ok(insert_into(steps::table)
             .values(data)
             .get_result(&self.0.get()?)?)
     }
 
-    fn update(&mut self, data: StepData) -> Result<Step> {
-        Ok(update(&data).set(&data).get_result(&self.0.get()?)?)
+    fn update(&mut self, data: &Step) -> Result<Step> {
+        Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 }

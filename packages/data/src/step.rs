@@ -24,7 +24,9 @@ impl From<String> for StepEvent {
     }
 }
 
-#[derive(Clone, Debug, Associations, Identifiable, Insertable, Queryable, SimpleObject)]
+#[derive(
+    Clone, Debug, Associations, Identifiable, Insertable, Queryable, SimpleObject, AsChangeset,
+)]
 #[belongs_to(parent = "Workflow")]
 pub struct Step {
     pub id: StepId,
@@ -36,15 +38,4 @@ pub struct Step {
     pub confirmation: Option<String>,
     pub requirements: Option<RequirementOuter>,
     pub event: Option<String>,
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "steps"]
-pub struct StepData {
-    pub id: StepId,
-    pub workflow_id: Option<WorkflowId>,
-    pub label: Option<String>,
-    pub completed: Option<bool>,
-    pub confirmation: Option<String>,
-    pub requirements: Option<RequirementOuter>,
 }

@@ -23,7 +23,7 @@ pub fn create_invite(db: &impl Db, input: CreateInviteInput) -> Result<Invite> {
     let id = InviteId::new();
     let token = InviteToken::new(id.to_string());
 
-    db.invites().create(Invite {
+    db.invites().create(&Invite {
         id,
         created_at: Default::default(),
         updated_at: Default::default(),

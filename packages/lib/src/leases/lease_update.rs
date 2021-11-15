@@ -5,7 +5,6 @@ use crate::AuthId;
 use async_graphql::InputObject;
 use trankeel_core::database::Db;
 use trankeel_data::Lease;
-use trankeel_data::LeaseData;
 use trankeel_data::LeaseId;
 use validator::Validate;
 
@@ -29,20 +28,11 @@ pub fn update_furnished_lease(
 ) -> Result<Lease> {
     input.validate()?;
 
-    db.leases().update(LeaseData {
+    let lease = db.leases().by_id(&input.id)?;
+
+    db.leases().update(&Lease {
         id: input.id,
         details: input.details.map(Into::into),
-        account_id: None,
-        deposit_amount: None,
-        effect_date: None,
-        signature_date: None,
-        rent_amount: None,
-        rent_charges_amount: None,
-        type_: None,
-        lease_id: None,
-        property_id: None,
-        expired_at: None,
-        renew_date: None,
-        duration: None,
+        ..lease
     })
 }

@@ -7,7 +7,6 @@ use trankeel_data::Amount;
 use trankeel_data::Property;
 use trankeel_data::PropertyBuildPeriodType;
 use trankeel_data::PropertyBuildingLegalStatus;
-use trankeel_data::PropertyData;
 use trankeel_data::PropertyEnergyClass;
 use trankeel_data::PropertyGasEmission;
 use trankeel_data::PropertyHabitationUsageType;
@@ -55,10 +54,12 @@ pub fn update_property(
 ) -> Result<Property> {
     input.validate()?;
 
-    db.properties().update(PropertyData {
+    let property = db.properties().by_id(&input.id)?;
+
+    db.properties().update(&Property {
         id: input.id,
         account_id: Default::default(),
-        address: input.address.map(Into::into),
+        address: input.address.map(Into::into).unwrap_or(property.address),
         build_period: input.build_period,
         building_legal_status: input.building_legal_status,
         common_spaces: input.common_spaces,
@@ -68,16 +69,17 @@ pub fn update_property(
         heating_method: input.heating_method,
         housing_type: input.housing_type,
         lender_id: Default::default(),
-        name: input.name,
+        name: input.name.unwrap_or(property.name),
         note: input.note,
         ntic_equipments: input.ntic_equipments,
         other_spaces: input.other_spaces,
-        room_count: input.room_count,
-        status: input.status,
-        surface: input.surface,
+        room_count: input.room_count.unwrap_or(property.room_count),
+        status: input.status.unwrap_or(property.status),
+        surface: input.surface.unwrap_or(property.surface),
         tax: input.tax,
         tenant_private_spaces: input.tenant_private_spaces,
         usage_type: input.usage_type,
         water_heating_method: input.water_heating_method,
+        ..property
     })
 }
