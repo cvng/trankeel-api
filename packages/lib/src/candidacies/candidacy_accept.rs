@@ -1,13 +1,15 @@
 use super::reject_candidacy;
 use super::RejectCandidacyInput;
+use crate::client::Actor;
+use crate::client::Context;
 use crate::error::no;
 use crate::error::Result;
 use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
 use crate::leases::create_lease_from_advertisement;
+use crate::ops;
 use crate::templates::CandidacyAcceptedMail;
 use crate::templates::LeaseDocument;
-use crate::tenants::create_tenant;
 use crate::workflows::complete_step;
 use crate::workflows::create_workflow;
 use crate::workflows::CreateWorkflowInput;
@@ -21,7 +23,6 @@ use trankeel_core::database::Db;
 use trankeel_core::mailer::Mailer;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_data::lease_filename;
-use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyData;
 use trankeel_data::CandidacyId;
@@ -45,16 +46,17 @@ pub struct AcceptCandidacyInput {
 
 // # Operation
 
-pub async fn accept_candidacy(
-    db: &impl Db,
-    pdfmaker: &impl Pdfmaker,
-    mailer: &impl Mailer,
-    auth_id: &AuthId,
+pub(crate) async fn accept_candidacy(
+    ctx: &Context,
+    actor: &Actor,
     input: AcceptCandidacyInput,
 ) -> Result<Candidacy> {
-    input.validate()?;
+    let db = ctx.db();
+    let pdfmaker = ctx.pdfmaker();
+    let mailer = ctx.mailer();
+    let auth_id = actor.check()?;
 
-    let account = db.accounts().by_auth_id(auth_id)?;
+    input.validate()?;
 
     let advertisement = db.advertisements().by_candidacy_id(&input.id)?;
 
@@ -67,7 +69,7 @@ pub async fn accept_candidacy(
         .collect::<Vec<Candidacy>>();
 
     for candidacy in other_candidacies {
-        reject_candidacy(db, auth_id, RejectCandidacyInput { id: candidacy.id }).await?;
+        reject_candidacy(ctx, actor, RejectCandidacyInput { id: candidacy.id }).await?;
     }
 
     // Accept given candidacy.
@@ -83,9 +85,9 @@ pub async fn accept_candidacy(
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
     let candidacy_warrants = db.warrants().by_candidacy_id(&candidacy.id)?;
 
-    let tenant = create_tenant(
-        db,
-        auth_id,
+    let tenant = ops::create_tenant(
+        ctx,
+        actor,
         CreateTenantInput {
             birthdate: candidacy.birthdate,
             birthplace: candidacy.birthplace.clone(),
@@ -98,8 +100,8 @@ pub async fn accept_candidacy(
             warrants: Some(candidacy_warrants.into_iter().map(Into::into).collect()),
             person_id: Some(candidate.id),
         },
-        Some(account),
-    )?;
+    )?
+    .tenant;
     db.persons().update(PersonData {
         id: candidate.id,
         role: Some(PersonRole::Tenant),
