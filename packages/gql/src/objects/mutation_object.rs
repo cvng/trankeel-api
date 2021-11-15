@@ -91,6 +91,7 @@ impl Mutation {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_tenant(ctx.data::<AuthId>()?, input)?
+            .tenant
             .into())
     }
 
@@ -278,7 +279,7 @@ impl Mutation {
         ctx: &Context<'_>,
         input: PushMessageInput,
     ) -> Result<PushMessagePayload> {
-        Ok(ctx.data_unchecked::<Client>().push_message(input).into())
+        Ok(ctx.data_unchecked::<Client>().push_message(input)?.into())
     }
 
     async fn delete_discussion(
