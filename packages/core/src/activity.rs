@@ -5,7 +5,7 @@ use chrono::Utc;
 use diesel::result::Error::NotFound;
 use trankeel_data::AccountId;
 use trankeel_data::Candidacy;
-use trankeel_data::DiscussionData;
+use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
 use trankeel_data::EventId;
 use trankeel_data::EventType;
@@ -225,10 +225,10 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
 
     if step.label == LEASE_ACTIVE_EVENT_LABEL {
         let discussion = db.discussions().by_initiator_id(&participant.id)?;
-        db.discussions().update(DiscussionData {
+        db.discussions().update(&Discussion {
             id: discussion.id,
-            status: Some(DiscussionStatus::Active),
-            ..Default::default()
+            status: DiscussionStatus::Active,
+            ..discussion
         })?;
     }
 
