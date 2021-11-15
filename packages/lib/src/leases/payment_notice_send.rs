@@ -13,7 +13,6 @@ use trankeel_data::FileType;
 use trankeel_data::Notice;
 use trankeel_data::NoticeId;
 use trankeel_data::Rent;
-use trankeel_data::RentData;
 use trankeel_data::RentId;
 use validator::Validate;
 
@@ -100,16 +99,16 @@ async fn generate_notices(
         notice.status = Some(document.status);
 
         // Create notice.
-        let notice = match db.files().create(notice) {
+        let notice = match db.files().create(&notice) {
             Ok(notice) => notice,
             Err(err) => return Err(err),
         };
 
         // Link notice with rent.
-        db.rents().update(RentData {
+        db.rents().update(&Rent {
             id: rent.id,
             notice_id: Some(notice.id),
-            ..Default::default()
+            ..rent
         })?;
 
         notices.push(notice.clone());

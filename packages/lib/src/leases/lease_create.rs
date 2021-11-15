@@ -21,7 +21,6 @@ use trankeel_data::Rent;
 use trankeel_data::RentChargesRecuperationMode;
 use trankeel_data::RentPaymentMethod;
 use trankeel_data::Tenant;
-use trankeel_data::TenantData;
 use trankeel_data::TenantId;
 use trankeel_data::TenantStatus;
 use validator::Validate;
@@ -125,7 +124,7 @@ pub fn create_furnished_lease(
         .and_then(|details| details.duration)
         .unwrap_or_default();
 
-    let lease = db.leases().create(Lease {
+    let lease = db.leases().create(&Lease {
         id: LeaseId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -193,11 +192,13 @@ fn add_lease_tenants(
     tenant_ids
         .iter()
         .map(|&tenant_id| {
-            db.tenants().update(TenantData {
-                id: tenant_id,
-                lease_id: Some(lease_id),
-                status: Some(TenantStatus::Uptodate),
-                ..Default::default()
+            db.tenants().by_id(&tenant_id).and_then(|tenant| {
+                db.tenants().update(&Tenant {
+                    id: tenant_id,
+                    lease_id: Some(lease_id),
+                    status: TenantStatus::Uptodate,
+                    ..tenant
+                })
             })
         })
         .collect()

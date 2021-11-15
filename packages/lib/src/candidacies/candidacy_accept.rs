@@ -24,15 +24,14 @@ use trankeel_core::mailer::Mailer;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_data::lease_filename;
 use trankeel_data::Candidacy;
-use trankeel_data::CandidacyData;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::FileType;
 use trankeel_data::InviteReason;
-use trankeel_data::LeaseData;
+use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
 use trankeel_data::LeaseFileId;
-use trankeel_data::PersonData;
+use trankeel_data::Person;
 use trankeel_data::PersonRole;
 use trankeel_data::WorkflowType;
 use validator::Validate;
@@ -73,10 +72,12 @@ pub(crate) async fn accept_candidacy(
     }
 
     // Accept given candidacy.
-    let candidacy = db.candidacies().update(CandidacyData {
+    let candidacy = db.candidacies().by_id(&input.id)?;
+
+    let candidacy = db.candidacies().update(&Candidacy {
         id: input.id,
-        status: Some(CandidacyStatus::Accepted),
-        ..Default::default()
+        status: CandidacyStatus::Accepted,
+        ..candidacy
     })?;
 
     trace(db, Trace::CandidacyAccepted(candidacy.clone()))?;
@@ -102,10 +103,10 @@ pub(crate) async fn accept_candidacy(
         },
     )?
     .tenant;
-    db.persons().update(PersonData {
+    db.persons().update(&Person {
         id: candidate.id,
-        role: Some(PersonRole::Tenant),
-        ..Default::default()
+        role: PersonRole::Tenant,
+        ..candidate.clone()
     })?;
 
     // Send invite to candidate.
@@ -144,16 +145,16 @@ pub(crate) async fn accept_candidacy(
     lease_file.status = Some(document.status);
 
     // Create lease file.
-    let lease_file = match db.files().create(lease_file) {
+    let lease_file = match db.files().create(&lease_file) {
         Ok(lease_file) => lease_file,
         Err(err) => return Err(err),
     };
 
     // Link lease file with lease.
-    db.leases().update(LeaseData {
+    db.leases().update(&Lease {
         id: lease.id,
         lease_id: Some(lease_file.id),
-        ..Default::default()
+        ..lease
     })?;
 
     // Init candidacy workflow.

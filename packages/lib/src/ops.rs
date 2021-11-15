@@ -24,17 +24,17 @@ pub(crate) fn create_tenant(
     let payload = tenants::create_tenant(state, input)?;
 
     ctx.db().transaction(|| {
-        if let Some(person) = payload.person.clone() {
+        if let Some(person) = &payload.person {
             ctx.db().persons().create(person)?;
         }
-        ctx.db().tenants().create(payload.tenant.clone())?;
-        if let Some(warrants) = payload.warrants.clone() {
+        ctx.db().tenants().create(&payload.tenant)?;
+        if let Some(warrants) = &payload.warrants {
             for warrant in warrants {
                 ctx.db().warrants().create(warrant)?;
             }
         }
-        if let Some(discussion) = payload.discussion.clone() {
-            ctx.db().discussions().create(&discussion)?;
+        if let Some(discussion) = &payload.discussion {
+            ctx.db().discussions().create(discussion)?;
         }
         Ok(())
     })?;
@@ -54,7 +54,7 @@ pub(crate) fn push_message(
     let payload = messaging::push_message(state, input)?;
 
     ctx.db().transaction(|| {
-        ctx.db().messages().create(payload.message.clone())?;
+        ctx.db().messages().create(&payload.message)?;
         ctx.db().discussions().update(&payload.discussion)?;
         Ok(())
     })?;

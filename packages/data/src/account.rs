@@ -29,24 +29,13 @@ impl Default for AccountStatus {
     }
 }
 
-#[derive(Clone, Insertable, Queryable)]
+#[derive(Clone, Insertable, Queryable, AsChangeset, Identifiable)]
 pub struct Account {
     pub id: AccountId,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
     pub plan_id: Option<PlanId>,
     pub status: AccountStatus,
-    pub stripe_customer_id: Option<CustomerId>,
-    pub stripe_subscription_id: Option<SubscriptionId>,
-    pub trial_end: Option<DateTime>,
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "accounts"]
-pub struct AccountData {
-    pub id: AccountId,
-    pub plan_id: Option<PlanId>,
-    pub status: Option<AccountStatus>,
     pub stripe_customer_id: Option<CustomerId>,
     pub stripe_subscription_id: Option<SubscriptionId>,
     pub trial_end: Option<DateTime>,

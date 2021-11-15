@@ -18,7 +18,6 @@ use trankeel_data::PaymentId;
 use trankeel_data::Receipt;
 use trankeel_data::ReceiptId;
 use trankeel_data::Rent;
-use trankeel_data::RentData;
 use trankeel_data::RentId;
 use trankeel_data::RentStatus;
 use trankeel_data::TransactionType;
@@ -108,13 +107,15 @@ fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
     let mut rents = vec![];
 
     for rent_id in rent_ids {
-        let rent = db.rents().update(RentData {
+        let rent = db.rents().by_id(&rent_id)?;
+
+        let rent = db.rents().update(&Rent {
             id: rent_id,
-            status: Some(RentStatus::Paid),
-            ..Default::default()
+            status: RentStatus::Paid,
+            ..rent
         })?;
 
-        let payment = db.payments().create(Payment {
+        let payment = db.payments().create(&Payment {
             id: PaymentId::new(),
             created_at: Default::default(),
             updated_at: Default::default(),
@@ -177,16 +178,16 @@ async fn generate_receipts(
         receipt.status = Some(document.status);
 
         // Create receipt.
-        let receipt = match db.files().create(receipt) {
+        let receipt = match db.files().create(&receipt) {
             Ok(receipt) => receipt,
             Err(err) => return Err(err),
         };
 
         // Link receipt with rent.
-        db.rents().update(RentData {
+        db.rents().update(&Rent {
             id: rent.id,
             receipt_id: Some(receipt.id),
-            ..Default::default()
+            ..rent
         })?;
 
         receipts.push(receipt.clone());

@@ -19,7 +19,7 @@ pub enum EntryFlexibility {
     SevenDays,
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
 pub struct Advertisement {
     pub id: AdvertisementId,
     pub created_at: Option<DateTime>,
@@ -35,21 +35,4 @@ pub struct Advertisement {
     pub property_id: PropertyId,
     pub title: String,
     pub description: String,
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "advertisements"]
-pub struct AdvertisementData {
-    pub id: AdvertisementId,
-    pub published: Option<bool>,
-    pub lease_type: Option<LeaseType>,
-    pub rent_amount: Option<Amount>,
-    pub rent_charges_amount: Option<Amount>,
-    pub deposit_amount: Option<Amount>,
-    pub effect_date: Option<DateTime>,
-    pub flexibility: Option<EntryFlexibility>,
-    pub referral_lease_id: Option<LeaseId>,
-    pub property_id: Option<PropertyId>,
-    pub title: Option<String>,
-    pub description: Option<String>,
 }

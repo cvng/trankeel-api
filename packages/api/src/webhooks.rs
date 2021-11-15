@@ -6,7 +6,7 @@ use rocket::serde::Deserialize;
 use rocket::warn;
 use trankeel::Client;
 use trankeel::Document;
-use trankeel::FileData;
+use trankeel::File;
 use trankeel::FileStatus;
 use trankeel::FileType;
 use trankeel::LeaseCreatedMail;
@@ -33,12 +33,12 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
     let file = client.files().by_external_id(&document.id).unwrap();
     let file = client
         .files()
-        .update(FileData {
+        .update(&File {
             id: file.id,
             status: Some(document.status),
             download_url: document.download_url.clone(),
             preview_url: Some(document.preview_url.clone()),
-            ..Default::default()
+            ..file
         })
         .unwrap();
 

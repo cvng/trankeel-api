@@ -57,7 +57,7 @@ pub fn create_property(
 
     let account = db.accounts().by_auth_id(auth_id)?;
 
-    db.properties().create(Property {
+    db.properties().create(&Property {
         id: PropertyId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),

@@ -4,7 +4,6 @@ use log::info;
 use trankeel_core::billing::BillingProvider;
 use trankeel_core::database::Db;
 use trankeel_data::Account;
-use trankeel_data::AccountData;
 use trankeel_data::AccountId;
 use trankeel_data::AccountStatus;
 use trankeel_data::Address;
@@ -50,7 +49,7 @@ pub async fn create_user_with_account(
     input.validate()?;
 
     // Create account.
-    let account = db.accounts().create(Account {
+    let account = db.accounts().create(&Account {
         id: AccountId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -62,7 +61,7 @@ pub async fn create_user_with_account(
     })?;
 
     // Create user.
-    let user = db.persons().create(Person {
+    let user = db.persons().create(&Person {
         id: PersonId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -78,7 +77,7 @@ pub async fn create_user_with_account(
     })?;
 
     // Create lender.
-    let _lender = db.lenders().create(Lender {
+    let _lender = db.lenders().create(&Lender {
         id: LenderId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -101,13 +100,13 @@ pub async fn create_user_with_account(
     );
 
     // Update the local customer data.
-    db.accounts().update(AccountData {
+    db.accounts().update(&Account {
         id: account.id,
         stripe_customer_id: Some(subscription.customer_id),
         stripe_subscription_id: Some(subscription.id),
-        status: Some(subscription.status),
+        status: subscription.status,
         trial_end: subscription.trial_end,
-        ..Default::default()
+        ..account
     })?;
 
     Ok(user)

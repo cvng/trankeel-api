@@ -2,7 +2,6 @@ use crate::error::Result;
 use async_graphql::InputObject;
 use trankeel_core::database::Db;
 use trankeel_data::Advertisement;
-use trankeel_data::AdvertisementData;
 use trankeel_data::AdvertisementId;
 use trankeel_data::Amount;
 use trankeel_data::AuthId;
@@ -38,18 +37,21 @@ pub fn update_advertisement(
 ) -> Result<Advertisement> {
     input.validate()?;
 
-    db.advertisements().update(AdvertisementData {
+    let advertisement = db.advertisements().by_id(&input.id)?;
+
+    db.advertisements().update(&Advertisement {
         id: input.id,
-        published: input.published,
-        lease_type: input.lease_type,
-        rent_amount: input.rent_amount,
+        published: input.published.unwrap_or(advertisement.published),
+        lease_type: input.lease_type.unwrap_or(advertisement.lease_type),
+        rent_amount: input.rent_amount.unwrap_or(advertisement.rent_amount),
         rent_charges_amount: input.rent_charges_amount,
-        deposit_amount: input.deposit_amount,
-        effect_date: input.effect_date,
+        deposit_amount: input.deposit_amount.unwrap_or(advertisement.deposit_amount),
+        effect_date: advertisement.effect_date,
         flexibility: input.flexibility,
         referral_lease_id: input.referral_lease_id,
-        property_id: None,
-        title: input.title,
-        description: input.description,
+        property_id: advertisement.property_id,
+        title: input.title.unwrap_or(advertisement.title),
+        description: input.description.unwrap_or(advertisement.description),
+        ..advertisement
     })
 }

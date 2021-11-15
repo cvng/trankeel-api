@@ -6,12 +6,11 @@ use trankeel_data::Account;
 use trankeel_data::AccountId;
 use trankeel_data::AccountStatus;
 use trankeel_data::AuthId;
-use trankeel_data::InviteData;
+use trankeel_data::Invite;
 use trankeel_data::InviteReason;
 use trankeel_data::InviteStatus;
 use trankeel_data::InviteToken;
 use trankeel_data::Person;
-use trankeel_data::PersonData;
 use validator::Validate;
 
 #[derive(Clone, InputObject, Validate)]
@@ -33,7 +32,7 @@ pub async fn signup_user_from_invite(
     }
 
     // Create account.
-    let account = db.accounts().create(Account {
+    let account = db.accounts().create(&Account {
         id: AccountId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -45,18 +44,20 @@ pub async fn signup_user_from_invite(
     })?;
 
     // Attach user with account.
-    let user = db.persons().update(PersonData {
+    let user = db.persons().by_id(&invite.invitee_id)?;
+
+    let user = db.persons().update(&Person {
         id: invite.invitee_id,
         auth_id: Some(input.auth_id),
-        account_id: Some(account.id),
-        ..Default::default()
+        account_id: account.id,
+        ..user
     })?;
 
     // Update invite.
-    db.invites().update(InviteData {
+    db.invites().update(&Invite {
         id: invite.id,
-        status: Some(InviteStatus::Accepted),
-        ..Default::default()
+        status: InviteStatus::Accepted,
+        ..invite
     })?;
 
     Ok(user)

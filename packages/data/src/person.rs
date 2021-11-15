@@ -33,7 +33,7 @@ impl Default for PersonRole {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
 pub struct Person {
     pub id: PersonId,
     pub created_at: Option<DateTime>,
@@ -46,21 +46,6 @@ pub struct Person {
     pub address: Option<Address>,
     pub photo_url: Option<Url>,
     pub role: PersonRole,
-    pub phone_number: Option<PhoneNumber>,
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "persons"]
-pub struct PersonData {
-    pub id: PersonId,
-    pub account_id: Option<AccountId>,
-    pub auth_id: Option<AuthId>,
-    pub email: Option<Email>,
-    pub first_name: Option<String>,
-    pub last_name: Option<String>,
-    pub address: Option<Address>,
-    pub photo_url: Option<Url>,
-    pub role: Option<PersonRole>,
     pub phone_number: Option<PhoneNumber>,
 }
 

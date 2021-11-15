@@ -8,7 +8,7 @@ use trankeel_data::AuthId;
 use trankeel_data::LegalIdentity;
 use trankeel_data::Lender;
 use trankeel_data::LenderId;
-use trankeel_data::PersonData;
+use trankeel_data::Person;
 use validator::Validate;
 
 // # Input
@@ -51,12 +51,18 @@ pub fn update_individual_lender(
         _ => return Err(Error::msg("Lender is not an individual")),
     };
 
-    db.persons().update(PersonData {
+    db.persons().update(&Person {
         id: person.id,
         address: input.individual.address.map(Into::into),
-        first_name: input.individual.first_name,
-        last_name: input.individual.last_name,
-        ..Default::default()
+        first_name: input
+            .individual
+            .first_name
+            .unwrap_or_else(|| person.first_name.clone()),
+        last_name: input
+            .individual
+            .last_name
+            .unwrap_or_else(|| person.last_name.clone()),
+        ..person.clone()
     })?;
 
     Ok(lender)

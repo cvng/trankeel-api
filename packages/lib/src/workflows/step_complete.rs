@@ -4,7 +4,6 @@ use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
 use trankeel_data::RequirementOuter;
 use trankeel_data::Step;
-use trankeel_data::StepData;
 use trankeel_data::StepId;
 use validator::Validate;
 
@@ -25,11 +24,11 @@ pub fn complete_step(db: &impl Db, input: CompleteStepInput) -> Result<Step> {
 
     let step = db.steps().by_id(&input.id)?;
 
-    let step = db.steps().update(StepData {
+    let step = db.steps().update(&Step {
         id: step.id,
-        completed: Some(!step.completed),
-        requirements: map_requirements(step, input),
-        ..Default::default()
+        completed: !step.completed,
+        requirements: map_requirements(step.clone(), input),
+        ..step
     })?;
 
     trace(db, Trace::StepCompleted(step.clone()))?;

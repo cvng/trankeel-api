@@ -29,7 +29,7 @@ impl Default for TenantStatus {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
 pub struct Tenant {
     pub id: TenantId,
     pub created_at: Option<DateTime>,
@@ -44,24 +44,6 @@ pub struct Tenant {
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
     pub status: TenantStatus,
-    pub lease_id: Option<LeaseId>,
-    pub is_student: Option<bool>,
-}
-
-#[derive(Default, AsChangeset, Identifiable, Insertable)]
-#[table_name = "tenants"]
-pub struct TenantData {
-    pub id: TenantId,
-    pub account_id: Option<AccountId>,
-    pub person_id: Option<PersonId>,
-    pub birthdate: Option<Date>,
-    pub birthplace: Option<String>,
-    pub email: Option<Email>,
-    pub first_name: Option<String>,
-    pub last_name: Option<String>,
-    pub note: Option<String>,
-    pub phone_number: Option<PhoneNumber>,
-    pub status: Option<TenantStatus>,
     pub lease_id: Option<LeaseId>,
     pub is_student: Option<bool>,
 }
