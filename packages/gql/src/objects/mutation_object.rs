@@ -9,9 +9,13 @@ use super::Person;
 use super::Property;
 use super::Task;
 use super::Tenant;
+use crate::payloads::AddExistingLeasePayload;
 use crate::payloads::CompleteStepPayload;
 use crate::payloads::CreateNoticesPayload;
+use crate::payloads::CreatePropertyPayload;
 use crate::payloads::CreateReceiptsPayload;
+use crate::payloads::CreateTenantPayload;
+use crate::payloads::CreateUserWithAccountPayload;
 use crate::payloads::DeleteDiscussionPayload;
 use crate::payloads::PushMessagePayload;
 use crate::wip;
@@ -20,6 +24,7 @@ use async_graphql::Result;
 use trankeel::AcceptCandidacyInput;
 use trankeel::AccountActivatePlanInput;
 use trankeel::AccountUpdateInput;
+use trankeel::AddExistingLeaseInput;
 use trankeel::AuthId;
 use trankeel::Client;
 use trankeel::CompleteStepInput;
@@ -59,7 +64,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: CreateUserWithAccountInput,
-    ) -> Result<Person> {
+    ) -> Result<CreateUserWithAccountPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_user_with_account(input)
@@ -87,11 +92,14 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn tenant_create(&self, ctx: &Context<'_>, input: CreateTenantInput) -> Result<Tenant> {
+    async fn tenant_create(
+        &self,
+        ctx: &Context<'_>,
+        input: CreateTenantInput,
+    ) -> Result<CreateTenantPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_tenant(ctx.data::<AuthId>()?, input)?
-            .tenant
             .into())
     }
 
@@ -113,7 +121,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: CreatePropertyInput,
-    ) -> Result<Property> {
+    ) -> Result<CreatePropertyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_property(ctx.data::<AuthId>()?, input)?
@@ -157,6 +165,17 @@ impl Mutation {
         Ok(ctx
             .data_unchecked::<Client>()
             .update_advertisement(ctx.data::<AuthId>()?, input)?
+            .into())
+    }
+
+    async fn lease_add_existing(
+        &self,
+        ctx: &Context<'_>,
+        input: AddExistingLeaseInput,
+    ) -> Result<AddExistingLeasePayload> {
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .add_existing_lease(ctx.data::<AuthId>()?, input)?
             .into())
     }
 

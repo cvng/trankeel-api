@@ -26,7 +26,7 @@ impl Default for RentStatus {
     }
 }
 
-#[derive(Clone, Insertable, Queryable, SimpleObject, AsChangeset, Identifiable)]
+#[derive(Clone, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Rent {
     pub id: RentId,
     pub created_at: Option<DateTime>,

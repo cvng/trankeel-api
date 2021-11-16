@@ -33,7 +33,7 @@ impl Default for PersonRole {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
+#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Person {
     pub id: PersonId,
     pub created_at: Option<DateTime>,

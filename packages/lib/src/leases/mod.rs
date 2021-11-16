@@ -1,3 +1,4 @@
+mod lease_add_existing;
 mod lease_create;
 mod lease_delete;
 mod lease_update;
@@ -6,6 +7,7 @@ mod rent_create;
 mod rent_receipt_create;
 mod transaction_create;
 
+pub use lease_add_existing::*;
 pub use lease_create::*;
 pub use lease_delete::*;
 pub use lease_update::*;

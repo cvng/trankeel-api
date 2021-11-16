@@ -16,13 +16,13 @@ use trankeel_data::PersonRole;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantId;
 use trankeel_data::TenantStatus;
+use trankeel_data::TenantWithIdentity;
 use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
 // # Input
 
 #[derive(InputObject, Validate)]
-#[graphql(name = "TenantInput")]
 pub struct CreateTenantInput {
     pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
@@ -34,19 +34,18 @@ pub struct CreateTenantInput {
     pub phone_number: Option<PhoneNumber>,
     pub is_student: Option<bool>,
     pub warrants: Option<Vec<CreateWarrantInput>>,
-    pub person_id: Option<PersonId>,
 }
 
 #[derive(Clone)]
 pub struct CreateTenantState {
     pub account: Account,
     pub account_owner: Person,
+    pub tenant_identity: Option<Person>,
 }
 
 #[derive(Clone)]
 pub struct CreateTenantPayload {
-    pub tenant: Tenant,
-    pub person: Option<Person>,
+    pub tenant: TenantWithIdentity,
     pub warrants: Option<Vec<WarrantWithIdentity>>,
     pub discussion: Option<Discussion>,
 }
@@ -59,35 +58,27 @@ pub fn create_tenant(
 ) -> Result<CreateTenantPayload> {
     input.validate()?;
 
-    let (person_id, person) = if let Some(person_id) = input.person_id {
-        (person_id, None)
-    } else {
-        let person_id = PersonId::new();
-        (
-            person_id,
-            Some(Person {
-                id: person_id,
-                created_at: Default::default(),
-                updated_at: Default::default(),
-                account_id: state.account.id,
-                auth_id: None, // Not authenticable when created.
-                email: input.email.clone().into(),
-                first_name: input.first_name.clone(),
-                last_name: input.last_name.clone(),
-                address: None,
-                photo_url: None,
-                role: PersonRole::Tenant,
-                phone_number: input.phone_number.clone(),
-            }),
-        )
-    };
+    let tenant_identity = state.tenant_identity.clone().unwrap_or(Person {
+        id: PersonId::new(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
+        account_id: state.account.id,
+        auth_id: None, // Not authenticable when created.
+        email: input.email.clone().into(),
+        first_name: input.first_name.clone(),
+        last_name: input.last_name.clone(),
+        address: None,
+        photo_url: None,
+        role: PersonRole::Tenant,
+        phone_number: input.phone_number.clone(),
+    });
 
     let tenant = Tenant {
         id: TenantId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id: state.account.id,
-        person_id,
+        person_id: tenant_identity.id,
         birthdate: input.birthdate,
         birthplace: input.birthplace,
         email: input.email.into(),
@@ -106,19 +97,20 @@ pub fn create_tenant(
         None
     };
 
-    let discussion = if let Some(person) = person.clone() {
+    let discussion = if state.tenant_identity.is_none() {
         Some(start_discussion_with_lender(
             &state.account,
             &state.account_owner,
-            &person,
+            &tenant_identity,
         )?)
     } else {
         None
     };
 
+    let tenant = (tenant, tenant_identity);
+
     Ok(CreateTenantPayload {
         tenant,
-        person,
         warrants,
         discussion,
     })

@@ -99,7 +99,7 @@ impl Default for PropertyStatus {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
+#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
 #[table_name = "properties"]
 pub struct Property {
     pub id: PropertyId,
@@ -120,9 +120,9 @@ pub struct Property {
     pub ntic_equipments: Option<String>,
     pub other_spaces: Option<String>,
     pub tax: Option<Amount>,
-    pub room_count: PropertyRoomType,
+    pub room_count: Option<PropertyRoomType>,
     pub status: PropertyStatus,
-    pub surface: f32,
+    pub surface: Option<f32>,
     pub tenant_private_spaces: Option<String>,
     pub usage_type: Option<PropertyHabitationUsageType>,
     pub water_heating_method: Option<PropertyUsageType>,

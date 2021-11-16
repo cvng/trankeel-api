@@ -1,8 +1,10 @@
 use crate::auth::CreateUserWithAccountInput;
+use crate::auth::CreateUserWithAccountPayload;
 use crate::auth::SignupUserFromInviteInput;
 use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacyInput;
 use crate::error::Result;
+use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateNoticesInput;
 use crate::leases::CreateReceiptsInput;
@@ -15,6 +17,7 @@ use crate::ops;
 use crate::owners::UpdateIndividualLenderInput;
 use crate::properties::CreateAdvertisementInput;
 use crate::properties::CreatePropertyInput;
+use crate::properties::CreatePropertyPayload;
 use crate::properties::DeletePropertyInput;
 use crate::properties::UpdateAdvertisementInput;
 use crate::properties::UpdatePropertyInput;
@@ -23,6 +26,7 @@ use crate::tenants::CreateTenantPayload;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenantInput;
 use crate::workflows::CompleteStepInput;
+use crate::AddExistingLeaseInput;
 use crate::PushMessagePayload;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
@@ -203,7 +207,7 @@ impl<'a> Client {
     pub async fn create_user_with_account(
         &self,
         input: CreateUserWithAccountInput,
-    ) -> Result<Person> {
+    ) -> Result<CreateUserWithAccountPayload> {
         crate::auth::create_user_with_account(&self.0.db, &self.0.billing_provider, input).await
     }
 
@@ -246,8 +250,8 @@ impl<'a> Client {
         &self,
         auth_id: &AuthId,
         input: CreatePropertyInput,
-    ) -> Result<Property> {
-        crate::properties::create_property(&self.0.db, auth_id, input)
+    ) -> Result<CreatePropertyPayload> {
+        ops::create_property(&self.0, &Actor::new(auth_id), input)
     }
 
     pub fn update_property(
@@ -280,6 +284,14 @@ impl<'a> Client {
         input: UpdateAdvertisementInput,
     ) -> Result<Advertisement> {
         crate::properties::update_advertisement(&self.0.db, auth_id, input)
+    }
+
+    pub fn add_existing_lease(
+        &self,
+        auth_id: &AuthId,
+        input: AddExistingLeaseInput,
+    ) -> Result<AddExistingLeasePayload> {
+        ops::add_existing_lease(&self.0, &Actor::new(auth_id), input)
     }
 
     pub fn create_furnished_lease(

@@ -19,7 +19,7 @@ pub enum EntryFlexibility {
     SevenDays,
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
+#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Advertisement {
     pub id: AdvertisementId,
     pub created_at: Option<DateTime>,

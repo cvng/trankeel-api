@@ -12,7 +12,7 @@ pub type LenderId = Id;
 
 pub type LenderWithIdentity = (Lender, LegalIdentity);
 
-#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
+#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Lender {
     pub id: LenderId,
     pub created_at: Option<DateTime>,

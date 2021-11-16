@@ -8,6 +8,7 @@ pub type SubscriptionId = String; // stripe::SubscriptionId;
 
 pub type PaymentMethodId = String; // stripe::PaymentMethodId;
 
+#[derive(SimpleObject)]
 pub struct Subscription {
     pub id: SubscriptionId,
     pub customer_id: CustomerId,

@@ -29,7 +29,7 @@ impl Default for InviteStatus {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
+#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Invite {
     pub id: InviteId,
     pub created_at: Option<DateTime>,

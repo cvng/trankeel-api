@@ -6,12 +6,15 @@ use crate::Email;
 use crate::Id;
 use crate::LeaseId;
 use crate::Name;
+use crate::Person;
 use crate::PersonId;
 use crate::PhoneNumber;
 
 // # Types
 
 pub type TenantId = Id;
+
+pub type TenantWithIdentity = (Tenant, Person);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Tenantstatus"]
@@ -29,7 +32,7 @@ impl Default for TenantStatus {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
+#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Tenant {
     pub id: TenantId,
     pub created_at: Option<DateTime>,

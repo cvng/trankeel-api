@@ -16,11 +16,6 @@ use trankeel::CreateUserWithAccountInput;
 use trankeel::CreateWarrantInput;
 use trankeel::EntryFlexibility;
 use trankeel::LeaseType;
-use trankeel::PropertyBuildPeriodType;
-use trankeel::PropertyBuildingLegalStatus;
-use trankeel::PropertyHabitationUsageType;
-use trankeel::PropertyRoomType;
-use trankeel::PropertyUsageType;
 use trankeel::WarrantType;
 
 #[tokio::main]
@@ -65,7 +60,8 @@ async fn seed() {
             skip_create_customer: Some(true),
         })
         .await
-        .unwrap();
+        .unwrap()
+        .user;
 
     let (lender, _) = client.lenders().by_individual_id(&user.id).unwrap();
 
@@ -80,30 +76,31 @@ async fn seed() {
                     postal_code: "16000".into(),
                     country: Default::default(),
                 },
-                build_period: PropertyBuildPeriodType::From_1949_1974,
-                building_legal_status: PropertyBuildingLegalStatus::Copro,
+                build_period: None,
+                building_legal_status: None,
                 common_spaces: None,
                 energy_class: None,
                 equipments: None,
                 gas_emission: None,
-                heating_method: PropertyUsageType::Collective,
-                housing_type: PropertyUsageType::Individual,
+                heating_method: None,
+                housing_type: None,
                 lender_id: lender.id,
                 name: "Petite mission".into(),
                 note: Some("RAS".into()),
                 description: Some("Description".into()),
                 ntic_equipments: None,
                 other_spaces: None,
-                room_count: PropertyRoomType::T1,
+                room_count: None,
                 status: None,
-                surface: 20.0,
+                surface: None,
                 tax: None,
                 tenant_private_spaces: None,
-                usage_type: PropertyHabitationUsageType::Habitation,
-                water_heating_method: PropertyUsageType::Individual,
+                usage_type: None,
+                water_heating_method: None,
             },
         )
-        .unwrap();
+        .unwrap()
+        .property;
 
     let tenant = client
         .create_tenant(
@@ -118,11 +115,11 @@ async fn seed() {
                 phone_number: None,
                 is_student: Some(false),
                 warrants: None,
-                person_id: None,
             },
         )
         .unwrap()
-        .tenant;
+        .tenant
+        .0;
 
     let lease = client
         .create_furnished_lease(
