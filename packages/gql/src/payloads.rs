@@ -93,6 +93,32 @@ impl From<trankeel::Result<trankeel::DiscussionId>> for DeleteDiscussionPayload 
 }
 
 #[derive(SimpleObject)]
+pub struct CreateTenantPayload {
+    tenant: Tenant,
+}
+
+impl From<trankeel::CreateTenantPayload> for CreateTenantPayload {
+    fn from(item: trankeel::CreateTenantPayload) -> Self {
+        Self {
+            tenant: item.tenant.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct CreatePropertyPayload {
+    property: Property,
+}
+
+impl From<trankeel::CreatePropertyPayload> for CreatePropertyPayload {
+    fn from(item: trankeel::CreatePropertyPayload) -> Self {
+        Self {
+            property: item.property.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
 pub struct PushMessagePayload {
     errors: Option<Vec<Error>>,
     message: Option<Message>,
