@@ -103,7 +103,8 @@ async fn seed() {
                 water_heating_method: PropertyUsageType::Individual,
             },
         )
-        .unwrap();
+        .unwrap()
+        .property;
 
     let tenant = client
         .create_tenant(
@@ -118,11 +119,11 @@ async fn seed() {
                 phone_number: None,
                 is_student: Some(false),
                 warrants: None,
-                person_id: None,
             },
         )
         .unwrap()
-        .tenant;
+        .tenant
+        .0;
 
     let lease = client
         .create_furnished_lease(
