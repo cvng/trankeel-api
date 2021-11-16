@@ -1,7 +1,10 @@
+use crate::objects::Account;
 use crate::objects::Error;
 use crate::objects::File;
 use crate::objects::Lease;
+use crate::objects::Lender;
 use crate::objects::Message;
+use crate::objects::Person;
 use crate::objects::Property;
 use crate::objects::Step;
 use crate::objects::Tenant;
@@ -150,6 +153,25 @@ impl From<trankeel::AddExistingLeasePayload> for AddExistingLeasePayload {
                 .into_iter()
                 .map(|tenant| tenant.0.into())
                 .collect(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct CreateUserWithAccountPayload {
+    account: Account,
+    user: Person,
+    lender: Lender,
+    subscription: Option<trankeel::Subscription>,
+}
+
+impl From<trankeel::CreateUserWithAccountPayload> for CreateUserWithAccountPayload {
+    fn from(item: trankeel::CreateUserWithAccountPayload) -> Self {
+        Self {
+            account: item.account.into(),
+            user: item.user.into(),
+            lender: item.lender.into(),
+            subscription: item.subscription,
         }
     }
 }
