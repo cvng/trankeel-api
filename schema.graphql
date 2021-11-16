@@ -21,6 +21,18 @@ input AccountUpdateInput {
 	id: ID!
 	paymentMethodId: String!
 }
+input AddExistingLeaseInput {
+	rentAmount: Decimal!
+	rentChargesAmount: Decimal
+	type: LeaseType!
+	property: CreatePropertyInput!
+	tenants: [CreateTenantInput!]!
+}
+type AddExistingLeasePayload {
+	lease: Lease!
+	property: Property!
+	tenants: [Tenant!]!
+}
 type Address {
 	city: String!
 	country: String
@@ -138,6 +150,47 @@ input CreatePersonInput {
 input CreateProfessionalWarrantInput {
 	name: String!
 	identifier: String!
+}
+input CreatePropertyInput {
+	address: AddressInput!
+	buildPeriod: PropertyBuildPeriodType!
+	buildingLegalStatus: PropertyBuildingLegalStatus!
+	commonSpaces: String
+	energyClass: PropertyEnergyClass
+	equipments: String
+	gasEmission: PropertyGasEmission
+	heatingMethod: PropertyUsageType!
+	housingType: PropertyUsageType!
+	lenderId: ID!
+	name: String!
+	note: String
+	description: String
+	nticEquipments: String
+	otherSpaces: String
+	roomCount: PropertyRoomType!
+	status: PropertyStatus
+	surface: Float!
+	tax: Decimal
+	tenantPrivateSpaces: String
+	usageType: PropertyHabitationUsageType!
+	waterHeatingMethod: PropertyUsageType!
+}
+type CreatePropertyPayload {
+	property: Property!
+}
+input CreateTenantInput {
+	birthdate: Date
+	birthplace: String
+	email: String!
+	firstName: String!
+	lastName: String!
+	note: String
+	phoneNumber: PhoneNumber
+	isStudent: Boolean
+	warrants: [CreateWarrantInput!]
+}
+type CreateTenantPayload {
+	tenant: Tenant!
 }
 input CreateWarrantInput {
 	type: WarrantType!
@@ -451,14 +504,15 @@ type Mutation {
 	signupUserFromInvite(input: SignupUserFromInviteInput!): Person!
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
-	tenantCreate(input: TenantInput!): Tenant!
+	tenantCreate(input: CreateTenantInput!): CreateTenantPayload!
 	tenantUpdate(input: TenantUpdateInput!): Tenant!
 	tenantDelete(id: ID!): ID!
-	propertyCreate(input: PropertyInput!): Property!
+	propertyCreate(input: CreatePropertyInput!): CreatePropertyPayload!
 	propertyUpdate(input: PropertyUpdateInput!): Property!
 	propertyDelete(id: ID!): ID!
 	createAdvertisement(input: CreateAdvertisementInput!): Advertisement!
 	updateAdvertisement(input: UpdateAdvertisementInput!): Advertisement!
+	leaseAddExisting(input: AddExistingLeaseInput!): AddExistingLeasePayload!
 	leaseFurnishedCreate(input: LeaseFurnishedInput!): Lease!
 	leaseFurnishedUpdate(input: LeaseFurnishedUpdateInput!): Lease!
 	leaseNakedCreate(input: LeaseNakedInput!): Lease!
@@ -581,30 +635,6 @@ enum PropertyGasEmission {
 enum PropertyHabitationUsageType {
 	HABITATION
 	MIXTE
-}
-input PropertyInput {
-	address: AddressInput!
-	buildPeriod: PropertyBuildPeriodType!
-	buildingLegalStatus: PropertyBuildingLegalStatus!
-	commonSpaces: String
-	energyClass: PropertyEnergyClass
-	equipments: String
-	gasEmission: PropertyGasEmission
-	heatingMethod: PropertyUsageType!
-	housingType: PropertyUsageType!
-	lenderId: ID!
-	name: String!
-	note: String
-	description: String
-	nticEquipments: String
-	otherSpaces: String
-	roomCount: PropertyRoomType!
-	status: PropertyStatus
-	surface: Float!
-	tax: Decimal
-	tenantPrivateSpaces: String
-	usageType: PropertyHabitationUsageType!
-	waterHeatingMethod: PropertyUsageType!
 }
 enum PropertyRoomType {
 	OTHER
@@ -817,18 +847,6 @@ type Tenant implements PersonInterface {
 	files: [File!]
 	lease: Lease
 	warrants: [Warrant!]!
-}
-input TenantInput {
-	birthdate: Date
-	birthplace: String
-	email: String!
-	firstName: String!
-	lastName: String!
-	note: String
-	phoneNumber: PhoneNumber
-	isStudent: Boolean
-	warrants: [CreateWarrantInput!]
-	personId: ID
 }
 enum TenantStatus {
 	CANDIDATE
