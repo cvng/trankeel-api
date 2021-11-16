@@ -12,7 +12,9 @@ use super::Tenant;
 use crate::payloads::AddExistingLeasePayload;
 use crate::payloads::CompleteStepPayload;
 use crate::payloads::CreateNoticesPayload;
+use crate::payloads::CreatePropertyPayload;
 use crate::payloads::CreateReceiptsPayload;
+use crate::payloads::CreateTenantPayload;
 use crate::payloads::DeleteDiscussionPayload;
 use crate::payloads::PushMessagePayload;
 use crate::wip;
@@ -89,11 +91,10 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn tenant_create(&self, ctx: &Context<'_>, input: CreateTenantInput) -> Result<Tenant> {
+    async fn tenant_create(&self, ctx: &Context<'_>, input: CreateTenantInput) -> Result<CreateTenantPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_tenant(ctx.data::<AuthId>()?, input)?
-            .tenant
             .into())
     }
 
@@ -115,7 +116,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: CreatePropertyInput,
-    ) -> Result<Property> {
+    ) -> Result<CreatePropertyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_property(ctx.data::<AuthId>()?, input)?
