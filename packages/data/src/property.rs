@@ -99,7 +99,7 @@ impl Default for PropertyStatus {
     }
 }
 
-#[derive(Clone, Debug, Insertable, Queryable, AsChangeset, Identifiable)]
+#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
 #[table_name = "properties"]
 pub struct Property {
     pub id: PropertyId,
