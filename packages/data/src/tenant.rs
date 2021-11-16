@@ -6,12 +6,15 @@ use crate::Email;
 use crate::Id;
 use crate::LeaseId;
 use crate::Name;
+use crate::Person;
 use crate::PersonId;
 use crate::PhoneNumber;
 
 // # Types
 
 pub type TenantId = Id;
+
+pub type TenantWithIdentity = (Tenant, Person);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Tenantstatus"]
