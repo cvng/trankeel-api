@@ -39,13 +39,20 @@ pub struct CreateUserWithAccountInput {
     pub skip_create_customer: Option<bool>,
 }
 
+pub struct CreateUserWithAccountPayload {
+    pub account: Account,
+    pub user: Person,
+    pub lender: Lender,
+    pub subscription: Option<trankeel_data::Subscription>,
+}
+
 // # Operation
 
 pub async fn create_user_with_account(
     db: &impl Db,
     billing_provider: &impl BillingProvider,
     input: CreateUserWithAccountInput,
-) -> Result<Person> {
+) -> Result<CreateUserWithAccountPayload> {
     input.validate()?;
 
     // Create account.
@@ -77,7 +84,7 @@ pub async fn create_user_with_account(
     })?;
 
     // Create lender.
-    let _lender = db.lenders().create(&Lender {
+    let lender = db.lenders().create(&Lender {
         id: LenderId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -87,7 +94,12 @@ pub async fn create_user_with_account(
     })?;
 
     if let Some(true) = input.skip_create_customer {
-        return Ok(user);
+        return Ok(CreateUserWithAccountPayload {
+            account,
+            user,
+            lender,
+            subscription: None,
+        });
     }
 
     // Create subscription.
@@ -100,16 +112,21 @@ pub async fn create_user_with_account(
     );
 
     // Update the local customer data.
-    db.accounts().update(&Account {
+    let account = db.accounts().update(&Account {
         id: account.id,
-        stripe_customer_id: Some(subscription.customer_id),
-        stripe_subscription_id: Some(subscription.id),
+        stripe_customer_id: Some(subscription.customer_id.clone()),
+        stripe_subscription_id: Some(subscription.id.clone()),
         status: subscription.status,
         trial_end: subscription.trial_end,
         ..account
     })?;
 
-    Ok(user)
+    Ok(CreateUserWithAccountPayload {
+        account,
+        user,
+        lender,
+        subscription: Some(subscription),
+    })
 }
 
 // # Utils
