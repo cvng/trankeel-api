@@ -7,9 +7,10 @@ use crate::error::Result;
 use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
 use crate::leases::create_lease_from_advertisement;
-use crate::ops;
 use crate::templates::CandidacyAcceptedMail;
 use crate::templates::LeaseDocument;
+use crate::tenants;
+use crate::tenants::CreateTenantState;
 use crate::workflows::complete_step;
 use crate::workflows::create_workflow;
 use crate::workflows::CreateWorkflowInput;
@@ -23,6 +24,7 @@ use trankeel_core::database::Db;
 use trankeel_core::mailer::Mailer;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_data::lease_filename;
+use trankeel_data::Account;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
@@ -33,6 +35,7 @@ use trankeel_data::LeaseFile;
 use trankeel_data::LeaseFileId;
 use trankeel_data::Person;
 use trankeel_data::PersonRole;
+use trankeel_data::Tenant;
 use trankeel_data::WorkflowType;
 use validator::Validate;
 
@@ -56,6 +59,9 @@ pub(crate) async fn accept_candidacy(
     let auth_id = actor.check()?;
 
     input.validate()?;
+
+    let account = db.accounts().by_auth_id(auth_id)?;
+    let account_owner = db.persons().by_auth_id(auth_id)?;
 
     let advertisement = db.advertisements().by_candidacy_id(&input.id)?;
 
@@ -84,25 +90,8 @@ pub(crate) async fn accept_candidacy(
 
     // Create tenant profile.
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
-    let candidacy_warrants = db.warrants().by_candidacy_id(&candidacy.id)?;
 
-    let tenant = ops::create_tenant(
-        ctx,
-        actor,
-        CreateTenantInput {
-            birthdate: candidacy.birthdate,
-            birthplace: candidacy.birthplace.clone(),
-            email: candidate.email.inner().to_string(),
-            first_name: candidate.first_name.clone(),
-            last_name: candidate.last_name.clone(),
-            note: None,
-            phone_number: candidate.phone_number.clone(),
-            is_student: candidacy.is_student,
-            warrants: Some(candidacy_warrants.into_iter().map(Into::into).collect()),
-            person_id: Some(candidate.id),
-        },
-    )?
-    .tenant;
+    let tenant = promote_tenant(ctx, &account, &account_owner, &candidacy, &candidate)?;
     db.persons().update(&Person {
         id: candidate.id,
         role: PersonRole::Tenant,
@@ -184,4 +173,50 @@ pub(crate) async fn accept_candidacy(
         .await?;
 
     Ok(candidacy)
+}
+
+// # Utils
+
+fn promote_tenant(
+    ctx: &Context,
+    account: &Account,
+    account_owner: &Person,
+    candidacy: &Candidacy,
+    candidate: &Person,
+) -> Result<Tenant> {
+    let db = ctx.db();
+
+    let candidacy_warrants = db.warrants().by_candidacy_id(&candidacy.id)?;
+
+    let payload = tenants::create_tenant(
+        CreateTenantState {
+            account: account.clone(),
+            account_owner: account_owner.clone(),
+            tenant_identity: Some(candidate.clone()),
+        },
+        CreateTenantInput {
+            birthdate: candidacy.birthdate,
+            birthplace: candidacy.birthplace.clone(),
+            email: candidate.email.inner().to_string(),
+            first_name: candidate.first_name.clone(),
+            last_name: candidate.last_name.clone(),
+            note: None,
+            phone_number: candidate.phone_number.clone(),
+            is_student: candidacy.is_student,
+            warrants: Some(candidacy_warrants.into_iter().map(Into::into).collect()),
+        },
+    )?;
+
+    ctx.db().persons().create(&payload.tenant.1)?;
+    ctx.db().tenants().create(&payload.tenant.0)?;
+    if let Some(warrants) = &payload.warrants {
+        for warrant in warrants {
+            ctx.db().warrants().create(warrant)?;
+        }
+    }
+    if let Some(discussion) = &payload.discussion {
+        ctx.db().discussions().create(discussion)?;
+    }
+
+    Ok(payload.tenant.0)
 }
