@@ -15,6 +15,7 @@ use crate::payloads::CreateNoticesPayload;
 use crate::payloads::CreatePropertyPayload;
 use crate::payloads::CreateReceiptsPayload;
 use crate::payloads::CreateTenantPayload;
+use crate::payloads::CreateUserWithAccountPayload;
 use crate::payloads::DeleteDiscussionPayload;
 use crate::payloads::PushMessagePayload;
 use crate::wip;
@@ -63,7 +64,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: CreateUserWithAccountInput,
-    ) -> Result<Person> {
+    ) -> Result<CreateUserWithAccountPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_user_with_account(input)
@@ -91,7 +92,11 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn tenant_create(&self, ctx: &Context<'_>, input: CreateTenantInput) -> Result<CreateTenantPayload> {
+    async fn tenant_create(
+        &self,
+        ctx: &Context<'_>,
+        input: CreateTenantInput,
+    ) -> Result<CreateTenantPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_tenant(ctx.data::<AuthId>()?, input)?
