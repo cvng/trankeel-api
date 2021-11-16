@@ -100,7 +100,7 @@ pub struct CreateTenantPayload {
 impl From<trankeel::CreateTenantPayload> for CreateTenantPayload {
     fn from(item: trankeel::CreateTenantPayload) -> Self {
         Self {
-            tenant: item.tenant.into(),
+            tenant: item.tenant.0.into(),
         }
     }
 }
