@@ -192,6 +192,12 @@ input CreateTenantInput {
 type CreateTenantPayload {
 	tenant: Tenant!
 }
+type CreateUserWithAccountPayload {
+	account: Account!
+	user: Person!
+	lender: Lender!
+	subscription: Subscription
+}
 input CreateWarrantInput {
 	type: WarrantType!
 	individual: CreatePersonInput
@@ -500,7 +506,7 @@ type Message {
 	event: Event
 }
 type Mutation {
-	userCreateWithAccount(input: UserWithAccountInput!): Person!
+	userCreateWithAccount(input: UserWithAccountInput!): CreateUserWithAccountPayload!
 	signupUserFromInvite(input: SignupUserFromInviteInput!): Person!
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
@@ -530,7 +536,7 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -774,6 +780,12 @@ type Step {
 	requirements: [Requirement!]
 	completed: Boolean!
 	completedAt: DateTime
+}
+type Subscription {
+	id: String!
+	customerId: String!
+	status: SubscriptionStatus!
+	trialEnd: DateTime
 }
 """
 https://stripe.com/docs/billing/subscriptions/overview
