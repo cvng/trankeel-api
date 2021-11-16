@@ -29,7 +29,7 @@ impl Default for AccountStatus {
     }
 }
 
-#[derive(Clone, Insertable, Queryable, AsChangeset, Identifiable)]
+#[derive(Clone, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Account {
     pub id: AccountId,
     pub created_at: Option<DateTime>,
