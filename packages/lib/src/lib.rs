@@ -30,6 +30,7 @@ pub use crate::auth::AccountActivatePlanInput;
 pub use crate::auth::AccountUpdateInput;
 pub use crate::auth::AddressInput;
 pub use crate::auth::CreateUserWithAccountInput;
+pub use crate::auth::CreateUserWithAccountPayload;
 pub use crate::auth::SignupUserFromInviteInput;
 pub use crate::candidacies::AcceptCandidacyInput;
 pub use crate::candidacies::CreateCandidacyInput;
