@@ -1,8 +1,7 @@
 use crate::auth::AddressInput;
 use crate::error::Result;
-use crate::AuthId;
 use async_graphql::InputObject;
-use trankeel_core::database::Db;
+use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::LenderId;
 use trankeel_data::Property;
@@ -20,7 +19,6 @@ use validator::Validate;
 // # Input
 
 #[derive(InputObject, Validate)]
-#[graphql(name = "PropertyInput")]
 pub struct CreatePropertyInput {
     pub address: AddressInput,
     pub build_period: PropertyBuildPeriodType,
@@ -46,18 +44,25 @@ pub struct CreatePropertyInput {
     pub water_heating_method: PropertyUsageType,
 }
 
+pub struct CreatePropertyState {
+    pub account: Account,
+}
+
+pub struct CreatePropertyPayload {
+    pub property: Property,
+}
+
 // # Operation
 
 pub fn create_property(
-    db: &impl Db,
-    auth_id: &AuthId,
+    state: CreatePropertyState,
     input: CreatePropertyInput,
-) -> Result<Property> {
+) -> Result<CreatePropertyPayload> {
     input.validate()?;
 
-    let account = db.accounts().by_auth_id(auth_id)?;
+    let account = state.account;
 
-    db.properties().create(&Property {
+    let property = Property {
         id: PropertyId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -83,5 +88,7 @@ pub fn create_property(
         tenant_private_spaces: input.tenant_private_spaces,
         usage_type: Some(input.usage_type),
         water_heating_method: Some(input.water_heating_method),
-    })
+    };
+
+    Ok(CreatePropertyPayload { property })
 }
