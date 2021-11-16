@@ -1,4 +1,5 @@
 use crate::auth::CreateUserWithAccountInput;
+use crate::auth::CreateUserWithAccountPayload;
 use crate::auth::SignupUserFromInviteInput;
 use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacyInput;
@@ -206,7 +207,7 @@ impl<'a> Client {
     pub async fn create_user_with_account(
         &self,
         input: CreateUserWithAccountInput,
-    ) -> Result<Person> {
+    ) -> Result<CreateUserWithAccountPayload> {
         crate::auth::create_user_with_account(&self.0.db, &self.0.billing_provider, input).await
     }
 
