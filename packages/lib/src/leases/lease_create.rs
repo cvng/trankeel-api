@@ -4,6 +4,7 @@ use trankeel_core::activity::trace;
 use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
 use trankeel_core::error::Error;
+use trankeel_data::Account;
 use trankeel_data::Advertisement;
 use trankeel_data::Amount;
 use trankeel_data::AuthId;
@@ -100,7 +101,51 @@ pub struct CreateNakedLeaseInput {
     pub details: Option<CreateNakedLeaseDetailsInput>,
 }
 
+#[derive(InputObject, Validate)]
+pub struct CreateLeaseInput {
+    pub rent_amount: Amount,
+    pub rent_charges_amount: Option<Amount>,
+    pub type_: LeaseType,
+    pub property_id: PropertyId,
+}
+
+pub struct CreateLeaseState {
+    pub account: Account,
+}
+
+pub struct CreateLeasePayload {
+    pub lease: Lease,
+}
+
 // # Operation
+
+pub fn create_lease(
+    state: CreateLeaseState,
+    input: CreateLeaseInput,
+) -> Result<CreateLeasePayload> {
+    let account = state.account;
+
+    let lease = Lease {
+        id: LeaseId::new(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
+        account_id: account.id,
+        deposit_amount: Default::default(),
+        effect_date: Default::default(),
+        signature_date: None,
+        rent_amount: input.rent_amount,
+        rent_charges_amount: input.rent_charges_amount,
+        type_: input.type_,
+        lease_id: None,
+        property_id: input.property_id,
+        details: None,
+        expired_at: None,
+        renew_date: None,
+        duration: Default::default(),
+    };
+
+    Ok(CreateLeasePayload { lease })
+}
 
 pub fn create_furnished_lease(
     db: &impl Db,
