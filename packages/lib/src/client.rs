@@ -16,6 +16,7 @@ use crate::ops;
 use crate::owners::UpdateIndividualLenderInput;
 use crate::properties::CreateAdvertisementInput;
 use crate::properties::CreatePropertyInput;
+use crate::properties::CreatePropertyPayload;
 use crate::properties::DeletePropertyInput;
 use crate::properties::UpdateAdvertisementInput;
 use crate::properties::UpdatePropertyInput;
@@ -248,8 +249,8 @@ impl<'a> Client {
         &self,
         auth_id: &AuthId,
         input: CreatePropertyInput,
-    ) -> Result<Property> {
-        crate::properties::create_property(&self.0.db, auth_id, input)
+    ) -> Result<CreatePropertyPayload> {
+        ops::create_property(&self.0, &Actor::new(auth_id), input)
     }
 
     pub fn update_property(
