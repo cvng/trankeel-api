@@ -1,11 +1,19 @@
 use crate::client::Actor;
 use crate::client::Context;
+use crate::leases;
+use crate::leases::AddExistingLeaseState;
 use crate::messaging;
 use crate::messaging::PushMessagePayload;
 use crate::messaging::PushMessageState;
+use crate::properties;
+use crate::properties::CreatePropertyPayload;
+use crate::properties::CreatePropertyState;
 use crate::tenants;
 use crate::tenants::CreateTenantPayload;
 use crate::tenants::CreateTenantState;
+use crate::AddExistingLeaseInput;
+use crate::AddExistingLeasePayload;
+use crate::CreatePropertyInput;
 use crate::CreateTenantInput;
 use crate::PushMessageInput;
 use crate::Result;
@@ -19,15 +27,14 @@ pub(crate) fn create_tenant(
     let state = CreateTenantState {
         account: ctx.db().accounts().by_auth_id(actor.check()?)?,
         account_owner: ctx.db().persons().by_auth_id(actor.check()?)?,
+        tenant_identity: None,
     };
 
     let payload = tenants::create_tenant(state, input)?;
 
     ctx.db().transaction(|| {
-        if let Some(person) = &payload.person {
-            ctx.db().persons().create(person)?;
-        }
-        ctx.db().tenants().create(&payload.tenant)?;
+        ctx.db().persons().create(&payload.tenant.1)?;
+        ctx.db().tenants().create(&payload.tenant.0)?;
         if let Some(warrants) = &payload.warrants {
             for warrant in warrants {
                 ctx.db().warrants().create(warrant)?;
@@ -56,6 +63,55 @@ pub(crate) fn push_message(
     ctx.db().transaction(|| {
         ctx.db().messages().create(&payload.message)?;
         ctx.db().discussions().update(&payload.discussion)?;
+        Ok(())
+    })?;
+
+    Ok(payload)
+}
+
+pub(crate) fn add_existing_lease(
+    ctx: &Context,
+    actor: &Actor,
+    input: AddExistingLeaseInput,
+) -> Result<AddExistingLeasePayload> {
+    let state = AddExistingLeaseState {
+        account: ctx.db().accounts().by_auth_id(actor.check()?)?,
+        account_owner: ctx.db().persons().by_auth_id(actor.check()?)?,
+    };
+
+    let payload = leases::add_existing_lease(state, input)?;
+
+    ctx.db().transaction(|| {
+        ctx.db().properties().create(&payload.property)?;
+        ctx.db().leases().create(&payload.lease)?;
+        for tenant in &payload.tenants {
+            ctx.db().persons().create(&tenant.1)?;
+            ctx.db().tenants().create(&tenant.0)?;
+        }
+        if let Some(discussions) = &payload.discussions {
+            for discussion in discussions {
+                ctx.db().discussions().create(discussion)?;
+            }
+        }
+        Ok(())
+    })?;
+
+    Ok(payload)
+}
+
+pub(crate) fn create_property(
+    ctx: &Context,
+    actor: &Actor,
+    input: CreatePropertyInput,
+) -> Result<CreatePropertyPayload> {
+    let state = CreatePropertyState {
+        account: ctx.db().accounts().by_auth_id(actor.check()?)?,
+    };
+
+    let payload = properties::create_property(state, input)?;
+
+    ctx.db().transaction(|| {
+        ctx.db().properties().create(&payload.property)?;
         Ok(())
     })?;
 
