@@ -60,7 +60,8 @@ async fn seed() {
             skip_create_customer: Some(true),
         })
         .await
-        .unwrap();
+        .unwrap()
+        .user;
 
     let (lender, _) = client.lenders().by_individual_id(&user.id).unwrap();
 
