@@ -153,27 +153,27 @@ input CreateProfessionalWarrantInput {
 }
 input CreatePropertyInput {
 	address: AddressInput!
-	buildPeriod: PropertyBuildPeriodType!
-	buildingLegalStatus: PropertyBuildingLegalStatus!
+	buildPeriod: PropertyBuildPeriodType
+	buildingLegalStatus: PropertyBuildingLegalStatus
 	commonSpaces: String
 	energyClass: PropertyEnergyClass
 	equipments: String
 	gasEmission: PropertyGasEmission
-	heatingMethod: PropertyUsageType!
-	housingType: PropertyUsageType!
+	heatingMethod: PropertyUsageType
+	housingType: PropertyUsageType
 	lenderId: ID!
 	name: String!
 	note: String
 	description: String
 	nticEquipments: String
 	otherSpaces: String
-	roomCount: PropertyRoomType!
+	roomCount: PropertyRoomType
 	status: PropertyStatus
-	surface: Float!
+	surface: Float
 	tax: Decimal
 	tenantPrivateSpaces: String
-	usageType: PropertyHabitationUsageType!
-	waterHeatingMethod: PropertyUsageType!
+	usageType: PropertyHabitationUsageType
+	waterHeatingMethod: PropertyUsageType
 }
 type CreatePropertyPayload {
 	property: Property!
@@ -530,7 +530,7 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -590,9 +590,9 @@ type Property {
 	nticEquipments: String
 	otherSpaces: String
 	tax: Decimal
-	roomCount: PropertyRoomType!
+	roomCount: PropertyRoomType
 	status: PropertyStatus!
-	surface: Float!
+	surface: Float
 	tenantPrivateSpaces: String
 	usageType: PropertyHabitationUsageType
 	waterHeatingMethod: PropertyUsageType
