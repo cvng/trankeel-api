@@ -191,7 +191,7 @@ pub trait RentStore {
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Rent>;
     fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Rent>;
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Rent>>;
-    fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>>;
+    fn create_many(&mut self, data: &[Rent]) -> Result<Vec<Rent>>;
     fn update(&mut self, data: &Rent) -> Result<Rent>;
 }
 

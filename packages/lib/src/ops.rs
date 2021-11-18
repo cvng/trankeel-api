@@ -84,6 +84,7 @@ pub(crate) fn add_existing_lease(
     ctx.db().transaction(|| {
         ctx.db().properties().create(&payload.property)?;
         ctx.db().leases().create(&payload.lease)?;
+        ctx.db().rents().create_many(&payload.rents)?;
         for tenant in &payload.tenants {
             ctx.db().persons().create(&tenant.1)?;
             ctx.db().tenants().create(&tenant.0)?;

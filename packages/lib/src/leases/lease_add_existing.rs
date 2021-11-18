@@ -10,15 +10,18 @@ use crate::CreateTenantInput;
 use crate::Result;
 use trankeel_data::Account;
 use trankeel_data::Amount;
+use trankeel_data::DateTime;
 use trankeel_data::Discussion;
 use trankeel_data::Lease;
 use trankeel_data::LeaseType;
 use trankeel_data::Person;
 use trankeel_data::Property;
+use trankeel_data::Rent;
 use trankeel_data::TenantWithIdentity;
 
 #[derive(InputObject, Validate)]
 pub struct AddExistingLeaseInput {
+    pub effect_date: DateTime,
     pub rent_amount: Amount,
     pub rent_charges_amount: Option<Amount>,
     pub type_: LeaseType,
@@ -33,6 +36,7 @@ pub struct AddExistingLeaseState {
 
 pub struct AddExistingLeasePayload {
     pub lease: Lease,
+    pub rents: Vec<Rent>,
     pub property: Property,
     pub tenants: Vec<TenantWithIdentity>,
     pub discussions: Option<Vec<Discussion>>,
@@ -59,12 +63,16 @@ pub fn add_existing_lease(
             account: account.clone(),
         },
         CreateLeaseInput {
+            effect_date: input.effect_date,
             rent_amount: input.rent_amount,
             rent_charges_amount: input.rent_charges_amount,
             type_: input.type_,
             property_id: property.property.id,
         },
     )?;
+
+    // Add rents.
+    let rents = lease.lease.rents();
 
     // Add tenant.
     let mut tenants = vec![];
@@ -89,6 +97,7 @@ pub fn add_existing_lease(
 
     Ok(AddExistingLeasePayload {
         lease: lease.lease,
+        rents,
         property: property.property,
         tenants,
         discussions: Some(discussions.into_iter().flatten().collect()),

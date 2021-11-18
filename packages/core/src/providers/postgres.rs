@@ -887,7 +887,7 @@ impl database::RentStore for RentStore<'_> {
             .load(&self.0.get()?)?)
     }
 
-    fn create_many(&mut self, data: Vec<Rent>) -> Result<Vec<Rent>> {
+    fn create_many(&mut self, data: &[Rent]) -> Result<Vec<Rent>> {
         Ok(insert_into(rents::table)
             .values(data)
             .get_results(&self.0.get()?)?)
