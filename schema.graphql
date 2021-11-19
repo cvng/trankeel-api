@@ -22,6 +22,7 @@ input AccountUpdateInput {
 	paymentMethodId: String!
 }
 input AddExistingLeaseInput {
+	effectDate: DateTime!
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
 	type: LeaseType!
@@ -511,7 +512,7 @@ type Mutation {
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
 	tenantCreate(input: CreateTenantInput!): CreateTenantPayload!
-	tenantUpdate(input: TenantUpdateInput!): Tenant!
+	tenantUpdate(input: TenantUpdateInput!): UpdateTenantPayload!
 	tenantDelete(id: ID!): ID!
 	propertyCreate(input: CreatePropertyInput!): CreatePropertyPayload!
 	propertyUpdate(input: PropertyUpdateInput!): Property!
@@ -536,7 +537,7 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -918,6 +919,9 @@ input UpdateAdvertisementInput {
 	referralLeaseId: ID
 	title: String
 	description: String
+}
+type UpdateTenantPayload {
+	tenant: Tenant!
 }
 enum UserRole {
 	ADMIN

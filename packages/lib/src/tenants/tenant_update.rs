@@ -1,10 +1,8 @@
 use crate::error::Result;
 use crate::warrants::CreateWarrantInput;
-use crate::AuthId;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
-use trankeel_core::database::Db;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantId;
 use validator::Validate;
@@ -27,17 +25,26 @@ pub struct UpdateTenantInput {
     pub warrants: Option<Vec<CreateWarrantInput>>,
 }
 
+pub struct UpdateTenantState {
+    pub tenant: Tenant,
+}
+
+pub struct UpdateTenantPayload {
+    pub tenant: Tenant,
+}
+
 // # Operation
 
-pub fn update_tenant(db: &impl Db, _auth_id: &AuthId, input: UpdateTenantInput) -> Result<Tenant> {
+pub fn update_tenant(
+    state: UpdateTenantState,
+    input: UpdateTenantInput,
+) -> Result<UpdateTenantPayload> {
     input.validate()?;
 
-    let tenant = db.tenants().by_id(&input.id)?;
+    let tenant = state.tenant;
 
-    db.tenants().update(&Tenant {
+    let tenant = Tenant {
         id: input.id,
-        account_id: Default::default(),
-        person_id: Default::default(),
         birthdate: input.birthdate,
         birthplace: input.birthplace,
         email: input.email.map(Into::into).unwrap_or(tenant.email),
@@ -46,8 +53,8 @@ pub fn update_tenant(db: &impl Db, _auth_id: &AuthId, input: UpdateTenantInput) 
         note: input.note,
         phone_number: input.phone_number,
         is_student: input.is_student,
-        lease_id: None,
-        status: tenant.status,
         ..tenant
-    })
+    };
+
+    Ok(UpdateTenantPayload { tenant })
 }

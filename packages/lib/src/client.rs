@@ -25,6 +25,7 @@ use crate::tenants::CreateTenantInput;
 use crate::tenants::CreateTenantPayload;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenantInput;
+use crate::tenants::UpdateTenantPayload;
 use crate::workflows::CompleteStepInput;
 use crate::AddExistingLeaseInput;
 use crate::PushMessagePayload;
@@ -69,7 +70,6 @@ use trankeel_data::Property;
 use trankeel_data::PropertyId;
 use trankeel_data::Receipt;
 use trankeel_data::Step;
-use trankeel_data::Tenant;
 use trankeel_data::TenantId;
 
 #[derive(Default)]
@@ -238,8 +238,12 @@ impl<'a> Client {
         ops::create_tenant(&self.0, &Actor::new(auth_id), input)
     }
 
-    pub fn update_tenant(&self, auth_id: &AuthId, input: UpdateTenantInput) -> Result<Tenant> {
-        crate::tenants::update_tenant(&self.0.db, auth_id, input)
+    pub fn update_tenant(
+        &self,
+        auth_id: &AuthId,
+        input: UpdateTenantInput,
+    ) -> Result<UpdateTenantPayload> {
+        ops::update_tenant(&self.0, &Actor::new(auth_id), input)
     }
 
     pub fn delete_tenant(&self, auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {

@@ -109,6 +109,19 @@ impl From<trankeel::CreateTenantPayload> for CreateTenantPayload {
 }
 
 #[derive(SimpleObject)]
+pub struct UpdateTenantPayload {
+    tenant: Tenant,
+}
+
+impl From<trankeel::UpdateTenantPayload> for UpdateTenantPayload {
+    fn from(item: trankeel::UpdateTenantPayload) -> Self {
+        Self {
+            tenant: item.tenant.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
 pub struct CreatePropertyPayload {
     property: Property,
 }
