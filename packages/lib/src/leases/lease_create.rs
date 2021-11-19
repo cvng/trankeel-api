@@ -103,6 +103,7 @@ pub struct CreateNakedLeaseInput {
 
 #[derive(InputObject, Validate)]
 pub struct CreateLeaseInput {
+    pub effect_date: DateTime,
     pub rent_amount: Amount,
     pub rent_charges_amount: Option<Amount>,
     pub type_: LeaseType,
@@ -131,7 +132,7 @@ pub fn create_lease(
         updated_at: Default::default(),
         account_id: account.id,
         deposit_amount: Default::default(),
-        effect_date: Default::default(),
+        effect_date: input.effect_date,
         signature_date: None,
         rent_amount: input.rent_amount,
         rent_charges_amount: input.rent_charges_amount,
@@ -226,7 +227,7 @@ pub(crate) fn create_lease_from_advertisement(
 }
 
 fn add_lease_rents(db: &impl Db, lease: &Lease) -> Result<Vec<Rent>> {
-    db.rents().create_many(lease.rents())
+    db.rents().create_many(&lease.rents())
 }
 
 fn add_lease_tenants(

@@ -11,12 +11,15 @@ use crate::properties::CreatePropertyState;
 use crate::tenants;
 use crate::tenants::CreateTenantPayload;
 use crate::tenants::CreateTenantState;
+use crate::tenants::UpdateTenantPayload;
+use crate::tenants::UpdateTenantState;
 use crate::AddExistingLeaseInput;
 use crate::AddExistingLeasePayload;
 use crate::CreatePropertyInput;
 use crate::CreateTenantInput;
 use crate::PushMessageInput;
 use crate::Result;
+use crate::UpdateTenantInput;
 use trankeel_core::database::Db;
 
 pub(crate) fn create_tenant(
@@ -43,6 +46,25 @@ pub(crate) fn create_tenant(
         if let Some(discussion) = &payload.discussion {
             ctx.db().discussions().create(discussion)?;
         }
+        Ok(())
+    })?;
+
+    Ok(payload)
+}
+
+pub(crate) fn update_tenant(
+    ctx: &Context,
+    _actor: &Actor,
+    input: UpdateTenantInput,
+) -> Result<UpdateTenantPayload> {
+    let state = UpdateTenantState {
+        tenant: ctx.db().tenants().by_id(&input.id)?,
+    };
+
+    let payload = tenants::update_tenant(state, input)?;
+
+    ctx.db().transaction(|| {
+        ctx.db().tenants().update(&payload.tenant)?;
         Ok(())
     })?;
 
@@ -84,6 +106,7 @@ pub(crate) fn add_existing_lease(
     ctx.db().transaction(|| {
         ctx.db().properties().create(&payload.property)?;
         ctx.db().leases().create(&payload.lease)?;
+        ctx.db().rents().create_many(&payload.rents)?;
         for tenant in &payload.tenants {
             ctx.db().persons().create(&tenant.1)?;
             ctx.db().tenants().create(&tenant.0)?;
