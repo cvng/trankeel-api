@@ -1,6 +1,6 @@
 use crate::guards::AuthGuard;
-use async_graphql_rocket::Request;
-use async_graphql_rocket::Response;
+use async_graphql_rocket::GraphQLRequest;
+use async_graphql_rocket::GraphQLResponse;
 use rocket::get;
 use rocket::post;
 use rocket::response::content;
@@ -17,9 +17,9 @@ pub fn graphql_playground() -> content::Html<String> {
 #[post("/graphql", data = "<request>", format = "application/json")]
 pub async fn graphql_request(
     schema: &State<Schema>,
-    request: Request,
+    request: GraphQLRequest,
     auth: AuthGuard,
-) -> Response {
+) -> GraphQLResponse {
     match auth.inner() {
         Some(auth_id) => request.data(auth_id).execute(schema).await,
         None => request.execute(schema).await,
