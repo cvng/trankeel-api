@@ -118,8 +118,7 @@ async fn seed() {
             },
         )
         .unwrap()
-        .tenant
-        .0;
+        .tenant;
 
     let lease = client
         .create_furnished_lease(
