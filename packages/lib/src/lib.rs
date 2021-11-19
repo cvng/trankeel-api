@@ -71,3 +71,11 @@ pub use crate::warrants::CreateProfessionalWarrantInput;
 pub use crate::warrants::CreateWarrantInput;
 pub use crate::workflows::CompleteStepInput;
 pub use trankeel_data::*;
+
+trait Command {
+    type Input;
+    type State;
+    type Payload;
+
+    fn run(state: Self::State, input: Self::Input) -> Result<Self::Payload>;
+}

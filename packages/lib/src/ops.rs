@@ -1,6 +1,6 @@
 use crate::client::Actor;
 use crate::client::Context;
-use crate::leases;
+use crate::leases::AddExistingLease;
 use crate::leases::AddExistingLeaseState;
 use crate::messaging;
 use crate::messaging::PushMessagePayload;
@@ -15,6 +15,7 @@ use crate::tenants::UpdateTenantPayload;
 use crate::tenants::UpdateTenantState;
 use crate::AddExistingLeaseInput;
 use crate::AddExistingLeasePayload;
+use crate::Command;
 use crate::CreatePropertyInput;
 use crate::CreateTenantInput;
 use crate::PushMessageInput;
@@ -101,7 +102,7 @@ pub(crate) fn add_existing_lease(
         account_owner: ctx.db().persons().by_auth_id(actor.check()?)?,
     };
 
-    let payload = leases::add_existing_lease(state, input)?;
+    let payload = AddExistingLease::run(state, input)?;
 
     ctx.db().transaction(|| {
         ctx.db().properties().create(&payload.property)?;
