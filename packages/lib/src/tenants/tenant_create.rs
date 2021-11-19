@@ -16,7 +16,6 @@ use trankeel_data::PersonRole;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantId;
 use trankeel_data::TenantStatus;
-use trankeel_data::TenantWithIdentity;
 use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
@@ -45,7 +44,8 @@ pub struct CreateTenantState {
 
 #[derive(Clone)]
 pub struct CreateTenantPayload {
-    pub tenant: TenantWithIdentity,
+    pub tenant: Tenant,
+    pub tenant_identity: Person,
     pub warrants: Option<Vec<WarrantWithIdentity>>,
     pub discussion: Option<Discussion>,
 }
@@ -107,10 +107,9 @@ pub fn create_tenant(
         None
     };
 
-    let tenant = (tenant, tenant_identity);
-
     Ok(CreateTenantPayload {
         tenant,
+        tenant_identity,
         warrants,
         discussion,
     })

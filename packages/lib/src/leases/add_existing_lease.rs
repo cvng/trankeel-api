@@ -1,13 +1,16 @@
 use super::CreateLeaseInput;
 use super::CreateLeaseState;
 use crate::leases;
+use crate::leases::CreateLeasePayload;
 use crate::properties;
 use crate::properties::CreatePropertyState;
 use crate::tenants;
 use crate::tenants::CreateTenantState;
 use crate::Command;
 use crate::CreatePropertyInput;
+use crate::CreatePropertyPayload;
 use crate::CreateTenantInput;
+use crate::CreateTenantPayload;
 use crate::Result;
 use trankeel_data::Account;
 use trankeel_data::Amount;
@@ -18,7 +21,7 @@ use trankeel_data::LeaseType;
 use trankeel_data::Person;
 use trankeel_data::Property;
 use trankeel_data::Rent;
-use trankeel_data::TenantWithIdentity;
+use trankeel_data::Tenant;
 
 #[derive(InputObject, Validate)]
 pub struct AddExistingLeaseInput {
@@ -39,7 +42,8 @@ pub struct AddExistingLeasePayload {
     pub lease: Lease,
     pub rents: Vec<Rent>,
     pub property: Property,
-    pub tenants: Vec<TenantWithIdentity>,
+    pub tenants: Vec<Tenant>,
+    pub identities: Vec<Person>,
     pub discussions: Option<Vec<Discussion>>,
 }
 
@@ -55,7 +59,7 @@ impl Command for AddExistingLease {
         let account_owner = state.account_owner;
 
         // Add property.
-        let property = properties::create_property(
+        let CreatePropertyPayload { property } = properties::create_property(
             CreatePropertyState {
                 account: account.clone(),
             },
@@ -63,7 +67,7 @@ impl Command for AddExistingLease {
         )?;
 
         // Add lease.
-        let lease = leases::create_lease(
+        let CreateLeasePayload { lease } = leases::create_lease(
             CreateLeaseState {
                 account: account.clone(),
             },
@@ -72,19 +76,25 @@ impl Command for AddExistingLease {
                 rent_amount: input.rent_amount,
                 rent_charges_amount: input.rent_charges_amount,
                 type_: input.type_,
-                property_id: property.property.id,
+                property_id: property.id,
             },
         )?;
 
         // Add rents.
-        let rents = lease.lease.rents();
+        let rents = lease.rents();
 
         // Add tenant.
         let mut tenants = vec![];
+        let mut identities = vec![];
         let mut discussions = vec![];
 
         for tenant_input in input.tenants {
-            let mut tenant = tenants::create_tenant(
+            let CreateTenantPayload {
+                mut tenant,
+                tenant_identity,
+                warrants: _warrants,
+                discussion,
+            } = tenants::create_tenant(
                 CreateTenantState {
                     account: account.clone(),
                     account_owner: account_owner.clone(),
@@ -94,18 +104,22 @@ impl Command for AddExistingLease {
             )?;
 
             // Attach tenant to lease.
-            tenant.tenant.0.lease_id = Some(lease.lease.id);
+            tenant.lease_id = Some(lease.id);
 
-            tenants.push(tenant.tenant);
-            discussions.push(tenant.discussion);
+            tenants.push(tenant);
+            identities.push(tenant_identity);
+            discussions.push(discussion);
         }
 
+        let discussions = Some(discussions.into_iter().flatten().collect());
+
         Ok(AddExistingLeasePayload {
-            lease: lease.lease,
+            lease,
             rents,
-            property: property.property,
+            property,
             tenants,
-            discussions: Some(discussions.into_iter().flatten().collect()),
+            identities,
+            discussions,
         })
     }
 }

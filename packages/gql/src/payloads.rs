@@ -103,7 +103,7 @@ pub struct CreateTenantPayload {
 impl From<trankeel::CreateTenantPayload> for CreateTenantPayload {
     fn from(item: trankeel::CreateTenantPayload) -> Self {
         Self {
-            tenant: item.tenant.0.into(),
+            tenant: item.tenant.into(),
         }
     }
 }
@@ -161,11 +161,7 @@ impl From<trankeel::AddExistingLeasePayload> for AddExistingLeasePayload {
         Self {
             lease: item.lease.into(),
             property: item.property.into(),
-            tenants: item
-                .tenants
-                .into_iter()
-                .map(|tenant| tenant.0.into())
-                .collect(),
+            tenants: item.tenants.into_iter().map(Into::into).collect(),
         }
     }
 }

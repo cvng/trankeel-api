@@ -37,8 +37,8 @@ pub(crate) fn create_tenant(
     let payload = tenants::create_tenant(state, input)?;
 
     ctx.db().transaction(|| {
-        ctx.db().persons().create(&payload.tenant.1)?;
-        ctx.db().tenants().create(&payload.tenant.0)?;
+        ctx.db().persons().create(&payload.tenant_identity)?;
+        ctx.db().tenants().create(&payload.tenant)?;
         if let Some(warrants) = &payload.warrants {
             for warrant in warrants {
                 ctx.db().warrants().create(warrant)?;
@@ -108,9 +108,11 @@ pub(crate) fn add_existing_lease(
         ctx.db().properties().create(&payload.property)?;
         ctx.db().leases().create(&payload.lease)?;
         ctx.db().rents().create_many(&payload.rents)?;
+        for identity in &payload.identities {
+            ctx.db().persons().create(identity)?;
+        }
         for tenant in &payload.tenants {
-            ctx.db().persons().create(&tenant.1)?;
-            ctx.db().tenants().create(&tenant.0)?;
+            ctx.db().tenants().create(tenant)?;
         }
         if let Some(discussions) = &payload.discussions {
             for discussion in discussions {

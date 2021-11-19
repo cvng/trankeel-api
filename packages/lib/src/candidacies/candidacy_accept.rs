@@ -207,8 +207,8 @@ fn promote_tenant(
         },
     )?;
 
-    ctx.db().persons().create(&payload.tenant.1)?;
-    ctx.db().tenants().create(&payload.tenant.0)?;
+    ctx.db().persons().create(&payload.tenant_identity)?;
+    ctx.db().tenants().create(&payload.tenant)?;
     if let Some(warrants) = &payload.warrants {
         for warrant in warrants {
             ctx.db().warrants().create(warrant)?;
@@ -218,5 +218,5 @@ fn promote_tenant(
         ctx.db().discussions().create(discussion)?;
     }
 
-    Ok(payload.tenant.0)
+    Ok(payload.tenant)
 }
