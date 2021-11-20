@@ -2,7 +2,7 @@ use crate::objects::Company;
 use crate::objects::Person;
 use crate::objects::Tenant;
 
-#[derive(async_graphql::Interface)]
+#[derive(Interface)]
 // #[graphql(field(name = "address", type = "Address"))]
 #[graphql(field(name = "display_name", type = "String"))]
 // #[graphql(field(name = "email", type = "Email"))]
@@ -13,7 +13,7 @@ pub enum LegalIdentityInterface {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(async_graphql::Interface)]
+#[derive(Interface)]
 // #[graphql(field(name = "id", type = "ID"))]
 #[graphql(field(name = "first_name", type = "String"))]
 #[graphql(field(name = "last_name", type = "String"))]

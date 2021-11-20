@@ -50,9 +50,9 @@ checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 
 [[package]]
 name = "async-graphql"
-version = "2.11.1"
+version = "3.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13859dc5e56d3213aae538f27df354f08a71f8f978e2ecb8b8e49b40cc57f779"
+checksum = "bfd801b296478ae16a104380e16b983b4e99979da08359806e6f265c49de952b"
 dependencies = [
  "async-graphql-derive",
  "async-graphql-parser",
@@ -67,6 +67,7 @@ dependencies = [
  "indexmap",
  "mime",
  "multer",
+ "num-traits",
  "once_cell",
  "pin-project-lite 0.2.7",
  "regex",
@@ -79,9 +80,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-derive"
-version = "2.11.1"
+version = "3.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "124648c11d4aba7276fd491a6e91ecea6af1af25de0363b690c7ec2fbec6f063"
+checksum = "04d033964216cef820e3d016d2aac90db61d7c911b61283c1c0589a8b98dd7f3"
 dependencies = [
  "Inflector",
  "async-graphql-parser",
@@ -95,9 +96,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-parser"
-version = "2.11.1"
+version = "3.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e55774fe8c3573dcfb7e8c597124d8d3fb710218ef07c3950ece55d1bece3a24"
+checksum = "b408bef95c09a0e7f119de4de4ca2ed5950d87935acbb9fc1bd53885165a9451"
 dependencies = [
  "async-graphql-value",
  "pest",
@@ -108,9 +109,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-rocket"
-version = "2.11.1"
+version = "3.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "113eec32e398ce3cc9f8b4649a5f719e4f7909c0310a92aeae794f0af8d41c88"
+checksum = "f3b9f5acb47a9903ede7248fd30ec7df6204dccf23589edf300a4fbbf23392c9"
 dependencies = [
  "async-graphql",
  "rocket",
@@ -121,9 +122,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-value"
-version = "2.11.1"
+version = "3.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7542e6498a7b022f558886b7eb014095dba4d308a7f12ca6e8978a387a536f3d"
+checksum = "90f437a62bcc57e107886f0731273a4539526ddadadedb3b080c07bfdcdb8237"
 dependencies = [
  "bytes 1.0.1",
  "indexmap",
