@@ -17,8 +17,8 @@ pub fn build_schema() -> Result<Schema> {
     let client = trankeel::init()?;
 
     let schema = async_graphql::Schema::build(Query, Mutation, EmptySubscription)
-        .register_type::<PersonInterface>()
-        .register_type::<LegalIdentityInterface>()
+        .register_output_type::<PersonInterface>()
+        .register_output_type::<LegalIdentityInterface>()
         .extension(ApolloTracing)
         .data(client)
         .finish();
