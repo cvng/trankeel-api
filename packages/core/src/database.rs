@@ -109,6 +109,7 @@ pub trait PersonStore {
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Person>;
     fn by_step_id(&mut self, step_id: &StepId) -> Result<Person>;
     fn create(&mut self, data: &Person) -> Result<Person>;
+    fn create_many(&mut self, data: &[Person]) -> Result<Vec<Person>>;
     fn update(&mut self, data: &Person) -> Result<Person>;
 }
 
@@ -158,6 +159,7 @@ pub trait TenantStore {
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Tenant>>;
     fn by_person_id(&mut self, person_id: &PersonId) -> Result<Tenant>;
     fn create(&mut self, data: &Tenant) -> Result<Tenant>;
+    fn create_many(&mut self, data: &[Tenant]) -> Result<Vec<Tenant>>;
     fn delete(&mut self, data: TenantId) -> Result<Executed>;
     fn update(&mut self, data: &Tenant) -> Result<Tenant>;
 }
@@ -232,6 +234,7 @@ pub trait DiscussionStore {
     fn by_initiator_id(&mut self, person_id: &PersonId) -> Result<Discussion>;
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Discussion>;
     fn create(&mut self, data: &Discussion) -> Result<Discussion>;
+    fn create_many(&mut self, data: &[Discussion]) -> Result<Vec<Discussion>>;
     fn update(&mut self, data: &Discussion) -> Result<Discussion>;
     fn delete(&mut self, data: DiscussionId) -> Result<Executed>;
     fn related_items(&mut self, id: &DiscussionId) -> Result<Vec<DiscussionItem>>;

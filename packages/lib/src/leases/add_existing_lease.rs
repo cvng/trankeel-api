@@ -6,7 +6,6 @@ use crate::properties;
 use crate::properties::CreatePropertyState;
 use crate::tenants;
 use crate::tenants::CreateTenantState;
-use crate::Command;
 use crate::CreatePropertyInput;
 use crate::CreatePropertyPayload;
 use crate::CreateTenantInput;
@@ -44,82 +43,77 @@ pub struct AddExistingLeasePayload {
     pub property: Property,
     pub tenants: Vec<Tenant>,
     pub identities: Vec<Person>,
-    pub discussions: Option<Vec<Discussion>>,
+    pub discussions: Vec<Discussion>,
 }
 
-pub struct AddExistingLease;
+pub fn add_existing_lease(
+    state: AddExistingLeaseState,
+    input: AddExistingLeaseInput,
+) -> Result<AddExistingLeasePayload> {
+    let account = state.account;
+    let account_owner = state.account_owner;
 
-impl Command for AddExistingLease {
-    type Input = AddExistingLeaseInput;
-    type State = AddExistingLeaseState;
-    type Payload = AddExistingLeasePayload;
+    // Add property.
+    let CreatePropertyPayload { property } = properties::create_property(
+        CreatePropertyState {
+            account: account.clone(),
+        },
+        input.property,
+    )?;
 
-    fn run(state: Self::State, input: Self::Input) -> Result<Self::Payload> {
-        let account = state.account;
-        let account_owner = state.account_owner;
+    // Add lease.
+    let CreateLeasePayload { lease } = leases::create_lease(
+        CreateLeaseState {
+            account: account.clone(),
+        },
+        CreateLeaseInput {
+            effect_date: input.effect_date,
+            rent_amount: input.rent_amount,
+            rent_charges_amount: input.rent_charges_amount,
+            type_: input.type_,
+            property_id: property.id,
+        },
+    )?;
 
-        // Add property.
-        let CreatePropertyPayload { property } = properties::create_property(
-            CreatePropertyState {
+    // Add rents.
+    let rents = lease.rents();
+
+    // Add tenant.
+    let mut tenants = vec![];
+    let mut identities = vec![];
+    let mut discussions = vec![];
+
+    for tenant_input in input.tenants {
+        let CreateTenantPayload {
+            mut tenant,
+            tenant_identity,
+            warrants: _warrants,
+            discussion,
+        } = tenants::create_tenant(
+            CreateTenantState {
                 account: account.clone(),
+                account_owner: account_owner.clone(),
+                tenant_identity: None,
             },
-            input.property,
+            tenant_input,
         )?;
 
-        // Add lease.
-        let CreateLeasePayload { lease } = leases::create_lease(
-            CreateLeaseState {
-                account: account.clone(),
-            },
-            CreateLeaseInput {
-                effect_date: input.effect_date,
-                rent_amount: input.rent_amount,
-                rent_charges_amount: input.rent_charges_amount,
-                type_: input.type_,
-                property_id: property.id,
-            },
-        )?;
+        // Attach tenant to lease.
+        tenant.lease_id = Some(lease.id);
 
-        // Add rents.
-        let rents = lease.rents();
-
-        // Add tenant.
-        let mut tenants = vec![];
-        let mut identities = vec![];
-        let mut discussions = vec![];
-
-        for tenant_input in input.tenants {
-            let CreateTenantPayload {
-                mut tenant,
-                tenant_identity,
-                warrants: _warrants,
-                discussion,
-            } = tenants::create_tenant(
-                CreateTenantState {
-                    account: account.clone(),
-                    account_owner: account_owner.clone(),
-                    tenant_identity: None,
-                },
-                tenant_input,
-            )?;
-
-            // Attach tenant to lease.
-            tenant.lease_id = Some(lease.id);
-
-            tenants.push(tenant);
-            identities.push(tenant_identity);
-            discussions.push(discussion);
-        }
-
-        let discussions = Some(discussions.into_iter().flatten().collect());
-
-        Ok(AddExistingLeasePayload {
-            lease,
-            rents,
-            property,
-            tenants,
-            identities,
-            discussions,
-        })
+        tenants.push(tenant);
+        identities.push(tenant_identity);
+        discussions.push(discussion);
     }
+
+    let discussions = discussions.into_iter().flatten().collect();
+
+    Ok(AddExistingLeasePayload {
+        lease,
+        rents,
+        property,
+        tenants,
+        identities,
+        discussions,
+    })
 }

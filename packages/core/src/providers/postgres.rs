@@ -444,6 +444,12 @@ impl database::PersonStore for PersonStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
+    fn create_many(&mut self, data: &[Person]) -> Result<Vec<Person>> {
+        Ok(insert_into(persons::table)
+            .values(data)
+            .get_results(&self.0.get()?)?)
+    }
+
     fn update(&mut self, data: &Person) -> Result<Person> {
         Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
@@ -478,6 +484,12 @@ impl database::TenantStore for TenantStore<'_> {
         Ok(insert_into(tenants::table)
             .values(data)
             .get_result(&self.0.get()?)?)
+    }
+
+    fn create_many(&mut self, data: &[Tenant]) -> Result<Vec<Tenant>> {
+        Ok(insert_into(tenants::table)
+            .values(data)
+            .get_results(&self.0.get()?)?)
     }
 
     fn delete(&mut self, data: TenantId) -> Result<Executed> {
@@ -1061,6 +1073,12 @@ impl database::DiscussionStore for DiscussionStore<'_> {
         Ok(insert_into(discussions::table)
             .values(data)
             .get_result(&self.0.get()?)?)
+    }
+
+    fn create_many(&mut self, data: &[Discussion]) -> Result<Vec<Discussion>> {
+        Ok(insert_into(discussions::table)
+            .values(data)
+            .get_results(&self.0.get()?)?)
     }
 
     fn update(&mut self, data: &Discussion) -> Result<Discussion> {

@@ -1,6 +1,6 @@
 use crate::client::Actor;
 use crate::client::Context;
-use crate::leases::AddExistingLease;
+use crate::leases;
 use crate::leases::AddExistingLeaseState;
 use crate::messaging;
 use crate::messaging::PushMessagePayload;
@@ -22,6 +22,7 @@ use crate::PushMessageInput;
 use crate::Result;
 use crate::UpdateTenantInput;
 use trankeel_core::database::Db;
+use trankeel_data::AuthId;
 
 pub(crate) fn create_tenant(
     ctx: &Context,
@@ -92,37 +93,43 @@ pub(crate) fn push_message(
     Ok(payload)
 }
 
-pub(crate) fn add_existing_lease(
-    ctx: &Context,
-    actor: &Actor,
-    input: AddExistingLeaseInput,
-) -> Result<AddExistingLeasePayload> {
-    let state = AddExistingLeaseState {
-        account: ctx.db().accounts().by_auth_id(actor.check()?)?,
-        account_owner: ctx.db().persons().by_auth_id(actor.check()?)?,
-    };
+pub(crate) struct AddExistingLease<'a> {
+    context: &'a Context,
+    auth_id: &'a AuthId,
+}
 
-    let payload = AddExistingLease::run(state, input)?;
+impl<'a> AddExistingLease<'a> {
+    pub fn new(context: &'a Context, auth_id: &'a AuthId) -> Self {
+        Self { context, auth_id }
+    }
+}
 
-    ctx.db().transaction(|| {
-        ctx.db().properties().create(&payload.property)?;
-        ctx.db().leases().create(&payload.lease)?;
-        ctx.db().rents().create_many(&payload.rents)?;
-        for identity in &payload.identities {
-            ctx.db().persons().create(identity)?;
-        }
-        for tenant in &payload.tenants {
-            ctx.db().tenants().create(tenant)?;
-        }
-        if let Some(discussions) = &payload.discussions {
-            for discussion in discussions {
-                ctx.db().discussions().create(discussion)?;
-            }
-        }
-        Ok(())
-    })?;
+impl<'a> Command for AddExistingLease<'a> {
+    type Input = AddExistingLeaseInput;
+    type Payload = AddExistingLeasePayload;
 
-    Ok(payload)
+    fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+        let db = self.context.db();
+
+        let state = AddExistingLeaseState {
+            account: db.accounts().by_auth_id(self.auth_id)?,
+            account_owner: db.persons().by_auth_id(self.auth_id)?,
+        };
+
+        let payload = leases::add_existing_lease(state, input)?;
+
+        db.transaction(|| {
+            db.properties().create(&payload.property)?;
+            db.leases().create(&payload.lease)?;
+            db.rents().create_many(&payload.rents)?;
+            db.persons().create_many(&payload.identities)?;
+            db.tenants().create_many(&payload.tenants)?;
+            db.discussions().create_many(&payload.discussions)?;
+            Ok(())
+        })?;
+
+        Ok(payload)
+    }
 }
 
 pub(crate) fn create_property(
