@@ -6,13 +6,20 @@ default-run = "trankeel-api"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bin]]
+name = "trankeel-cli"
+path = "src/bin/cli.rs"
+
 [dependencies]
 async-graphql-rocket = "3.0.5"
+chrono = "0.4.19"
 dotenv = "0.15.0"
 jsonwebtoken = "7.2.0"
-trankeel = { path = "../lib" }
-trankeel-graphql = { path = "../gql" }
+regex = "1.5.4"
 rocket = { version = "0.5.0-rc.1", default-features = false, features = ["json"] }
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master", default-features = false }
 sentry = "0.23.0"
 serde = "1.0"
+tokio = { version = "1.10.0", features = ["full"] }
+trankeel = { path = "../lib" }
+trankeel-graphql = { path = "../gql" }

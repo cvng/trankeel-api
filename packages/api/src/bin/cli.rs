@@ -1,7 +1,5 @@
-mod seed_util;
-
-use crate::seed_util::author;
 use chrono::Utc;
+use regex::Regex;
 use std::env;
 use trankeel::AddressInput;
 use trankeel::Amount;
@@ -17,6 +15,26 @@ use trankeel::CreateWarrantInput;
 use trankeel::EntryFlexibility;
 use trankeel::LeaseType;
 use trankeel::WarrantType;
+
+struct Author {
+    first_name: String,
+    last_name: String,
+    email: String,
+}
+
+fn author(text: String) -> Result<Author, regex::Error> {
+    let caps = Regex::new(r"(?P<first_name>\w+) (?P<last_name>\w+) <(?P<email>.*)>")?
+        .captures(&text)
+        .ok_or_else(|| {
+            regex::Error::Syntax("format: \"Dev TRANKEEL <hello@trankeel.dev>\"".into())
+        })?;
+
+    Ok(Author {
+        first_name: caps["first_name"].into(),
+        last_name: caps["last_name"].into(),
+        email: caps["email"].into(),
+    })
+}
 
 #[tokio::main]
 async fn main() {

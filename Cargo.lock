@@ -2831,23 +2831,14 @@ name = "trankeel-api"
 version = "0.3.0"
 dependencies = [
  "async-graphql-rocket",
+ "chrono",
  "dotenv",
  "jsonwebtoken",
+ "regex",
  "rocket",
  "rocket_cors",
  "sentry",
  "serde",
- "trankeel",
- "trankeel-graphql",
-]
-
-[[package]]
-name = "trankeel-cli"
-version = "0.3.0"
-dependencies = [
- "chrono",
- "dotenv",
- "regex",
  "tokio 1.10.0",
  "trankeel",
  "trankeel-graphql",
