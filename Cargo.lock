@@ -50,9 +50,9 @@ checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 
 [[package]]
 name = "async-graphql"
-version = "3.0.5"
+version = "3.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfd801b296478ae16a104380e16b983b4e99979da08359806e6f265c49de952b"
+checksum = "28eb129b44133b4a583f4b38048287d9747ba4a282e4e478c6ee46b9ec19ee2e"
 dependencies = [
  "async-graphql-derive",
  "async-graphql-parser",
@@ -80,9 +80,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-derive"
-version = "3.0.5"
+version = "3.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04d033964216cef820e3d016d2aac90db61d7c911b61283c1c0589a8b98dd7f3"
+checksum = "95b5c943055498dfbdd6390f8856e791e8e689082a7decc47600246af81d8843"
 dependencies = [
  "Inflector",
  "async-graphql-parser",
@@ -96,9 +96,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-parser"
-version = "3.0.5"
+version = "3.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b408bef95c09a0e7f119de4de4ca2ed5950d87935acbb9fc1bd53885165a9451"
+checksum = "a637070071f07804a102b31b7a6f67d7a31bea3c16378351697e131544b54b4a"
 dependencies = [
  "async-graphql-value",
  "pest",
@@ -109,9 +109,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-rocket"
-version = "3.0.5"
+version = "3.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3b9f5acb47a9903ede7248fd30ec7df6204dccf23589edf300a4fbbf23392c9"
+checksum = "a03eaa3f40c9a4423219608c40c98c70ba217f1fa1b6ae221132066b5fa49f61"
 dependencies = [
  "async-graphql",
  "rocket",
@@ -122,9 +122,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-value"
-version = "3.0.5"
+version = "3.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90f437a62bcc57e107886f0731273a4539526ddadadedb3b080c07bfdcdb8237"
+checksum = "13fb21cc4e13005b9778e3db09e9200efec6969a832ea8fd1ad8594682a2e322"
 dependencies = [
  "bytes 1.0.1",
  "indexmap",
