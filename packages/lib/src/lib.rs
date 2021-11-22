@@ -74,8 +74,7 @@ pub use trankeel_data::*;
 
 trait Command {
     type Input;
-    type State;
     type Payload;
 
-    fn run(state: Self::State, input: Self::Input) -> Result<Self::Payload>;
+    fn run(&self, input: Self::Input) -> Result<Self::Payload>;
 }
