@@ -47,10 +47,9 @@ impl<'a> Command for RejectCandidacy<'a> {
             db.candidacies().update(&payload.candidacy)?;
             db.discussions().update(&payload.discussion)?;
             db.messages().create(&payload.message)?;
+            trace(db, Trace::CandidacyRejected(payload.candidacy.clone()))?;
             Ok(())
         })?;
-
-        trace(db, Trace::CandidacyRejected(payload.candidacy.clone()))?;
 
         Ok(payload)
     }
