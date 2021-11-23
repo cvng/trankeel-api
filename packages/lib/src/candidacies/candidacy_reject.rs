@@ -1,19 +1,17 @@
-use crate::client::Actor;
-use crate::client::Context;
-use crate::commands::PushMessage;
 use crate::error::Result;
+use crate::messaging;
+use crate::messaging::PushMessageState;
 use crate::templates::CandidacyRejectedMail;
-use crate::Command;
 use crate::PushMessageInput;
+use crate::PushMessagePayload;
 use async_graphql::InputObject;
-use trankeel_core::activity::trace;
-use trankeel_core::activity::Trace;
-use trankeel_core::database::Db;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
+use trankeel_data::Message;
+use trankeel_data::Person;
 use validator::Validate;
 
 // # Input
@@ -23,45 +21,63 @@ pub struct RejectCandidacyInput {
     pub id: CandidacyId,
 }
 
+pub struct RejectCandidacyState {
+    pub candidacy: Candidacy,
+    pub discussion: Discussion,
+    pub account_owner: Person,
+    pub candidate: Person,
+}
+
+pub struct RejectCandidacyPayload {
+    pub candidacy: Candidacy,
+    pub message: Message,
+    pub discussion: Discussion,
+}
+
 // # Operation
 
-pub(crate) async fn reject_candidacy(
-    ctx: &Context,
-    actor: &Actor,
+pub(crate) fn reject_candidacy(
+    state: RejectCandidacyState,
     input: RejectCandidacyInput,
-) -> Result<Candidacy> {
-    let db = ctx.db();
-    let auth_id = actor.check()?;
-
+) -> Result<RejectCandidacyPayload> {
     input.validate()?;
 
-    let candidacy = db.candidacies().by_id(&input.id)?;
+    let RejectCandidacyState {
+        candidacy,
+        discussion,
+        account_owner,
+        candidate,
+    } = state;
 
-    db.candidacies().update(&Candidacy {
+    let candidacy = Candidacy {
         id: candidacy.id,
         status: CandidacyStatus::Rejected,
-        ..candidacy.clone()
-    })?;
+        ..candidacy
+    };
 
-    trace(db, Trace::CandidacyRejected(candidacy.clone()))?;
-
-    let discussion = db.discussions().by_candidacy_id(&candidacy.id)?;
-
-    db.discussions().update(&Discussion {
+    let discussion = Discussion {
         id: discussion.id,
         status: DiscussionStatus::default(),
         ..discussion
-    })?;
+    };
 
-    let sender = db.persons().by_auth_id(auth_id)?;
+    let PushMessagePayload {
+        message,
+        discussion,
+    } = messaging::push_message(
+        PushMessageState {
+            discussion: discussion.clone(),
+        },
+        PushMessageInput {
+            discussion_id: discussion.id,
+            sender_id: account_owner.id,
+            message: CandidacyRejectedMail::try_new(&candidate)?.to_string(),
+        },
+    )?;
 
-    let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
-
-    PushMessage::new(ctx).run(PushMessageInput {
-        discussion_id: discussion.id,
-        sender_id: sender.id,
-        message: CandidacyRejectedMail::try_new(&candidate)?.to_string(),
-    })?;
-
-    Ok(candidacy)
+    Ok(RejectCandidacyPayload {
+        candidacy,
+        message,
+        discussion,
+    })
 }

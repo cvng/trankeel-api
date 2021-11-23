@@ -1,7 +1,7 @@
-use super::reject_candidacy;
 use super::RejectCandidacyInput;
 use crate::client::Actor;
 use crate::client::Context;
+use crate::commands::RejectCandidacy;
 use crate::error::no;
 use crate::error::Result;
 use crate::invites::create_invite;
@@ -14,6 +14,7 @@ use crate::tenants::CreateTenantState;
 use crate::workflows::complete_step;
 use crate::workflows::create_workflow;
 use crate::workflows::CreateWorkflowInput;
+use crate::Command;
 use crate::CompleteStepInput;
 use crate::CreateTenantInput;
 use async_graphql::InputObject;
@@ -74,7 +75,7 @@ pub(crate) async fn accept_candidacy(
         .collect::<Vec<Candidacy>>();
 
     for candidacy in other_candidacies {
-        reject_candidacy(ctx, actor, RejectCandidacyInput { id: candidacy.id }).await?;
+        RejectCandidacy::new(ctx, actor.check()?).run(RejectCandidacyInput { id: candidacy.id })?;
     }
 
     // Accept given candidacy.
