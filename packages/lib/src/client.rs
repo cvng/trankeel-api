@@ -3,6 +3,8 @@ use crate::auth::CreateUserWithAccountPayload;
 use crate::auth::SignupUserFromInviteInput;
 use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacyInput;
+use crate::commands;
+use crate::commands::AddExistingLease;
 use crate::error::Result;
 use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
@@ -13,8 +15,6 @@ use crate::leases::SendReceiptsInput;
 use crate::leases::UpdateFurnishedLeaseInput;
 use crate::messaging::DeleteDiscussionInput;
 use crate::messaging::PushMessageInput;
-use crate::ops;
-use crate::ops::AddExistingLease;
 use crate::owners::UpdateIndividualLenderInput;
 use crate::properties::CreateAdvertisementInput;
 use crate::properties::CreatePropertyInput;
@@ -237,7 +237,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreateTenantInput,
     ) -> Result<CreateTenantPayload> {
-        ops::create_tenant(&self.0, &Actor::new(auth_id), input)
+        commands::create_tenant(&self.0, &Actor::new(auth_id), input)
     }
 
     pub fn update_tenant(
@@ -245,7 +245,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: UpdateTenantInput,
     ) -> Result<UpdateTenantPayload> {
-        ops::update_tenant(&self.0, &Actor::new(auth_id), input)
+        commands::update_tenant(&self.0, &Actor::new(auth_id), input)
     }
 
     pub fn delete_tenant(&self, auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
@@ -257,7 +257,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreatePropertyInput,
     ) -> Result<CreatePropertyPayload> {
-        ops::create_property(&self.0, &Actor::new(auth_id), input)
+        commands::create_property(&self.0, &Actor::new(auth_id), input)
     }
 
     pub fn update_property(
@@ -361,7 +361,7 @@ impl<'a> Client {
     }
 
     pub fn push_message(&self, input: PushMessageInput) -> Result<PushMessagePayload> {
-        ops::push_message(&self.0, &Actor::default(), input)
+        commands::push_message(&self.0, &Actor::default(), input)
     }
 
     pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {

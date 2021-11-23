@@ -1,7 +1,7 @@
 use crate::client::Actor;
 use crate::client::Context;
+use crate::commands;
 use crate::error::Result;
-use crate::ops;
 use crate::templates::CandidacyRejectedMail;
 use crate::PushMessageInput;
 use async_graphql::InputObject;
@@ -56,7 +56,7 @@ pub(crate) async fn reject_candidacy(
 
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
 
-    ops::push_message(
+    commands::push_message(
         ctx,
         actor,
         PushMessageInput {
