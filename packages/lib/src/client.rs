@@ -3,11 +3,11 @@ use crate::auth::CreateUserWithAccountPayload;
 use crate::auth::SignupUserFromInviteInput;
 use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacyInput;
-use crate::commands;
 use crate::commands::AddExistingLease;
 use crate::commands::CreateProperty;
 use crate::commands::CreateTenant;
 use crate::commands::PushMessage;
+use crate::commands::UpdateTenant;
 use crate::error::Result;
 use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
@@ -245,10 +245,10 @@ impl<'a> Client {
 
     pub fn update_tenant(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: UpdateTenantInput,
     ) -> Result<UpdateTenantPayload> {
-        commands::update_tenant(&self.0, &Actor::new(auth_id), input)
+        UpdateTenant::new(&self.0).run(input)
     }
 
     pub fn delete_tenant(&self, auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {

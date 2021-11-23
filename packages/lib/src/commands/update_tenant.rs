@@ -1,27 +1,40 @@
-use crate::client::Actor;
 use crate::client::Context;
 use crate::tenants;
 use crate::tenants::UpdateTenantPayload;
 use crate::tenants::UpdateTenantState;
+use crate::Command;
 use crate::Result;
 use crate::UpdateTenantInput;
 use trankeel_core::database::Db;
 
-pub(crate) fn update_tenant(
-    ctx: &Context,
-    _actor: &Actor,
-    input: UpdateTenantInput,
-) -> Result<UpdateTenantPayload> {
-    let state = UpdateTenantState {
-        tenant: ctx.db().tenants().by_id(&input.id)?,
-    };
+pub(crate) struct UpdateTenant<'a> {
+    context: &'a Context,
+}
 
-    let payload = tenants::update_tenant(state, input)?;
+impl<'a> UpdateTenant<'a> {
+    pub fn new(context: &'a Context) -> Self {
+        Self { context }
+    }
+}
 
-    ctx.db().transaction(|| {
-        ctx.db().tenants().update(&payload.tenant)?;
-        Ok(())
-    })?;
+impl<'a> Command for UpdateTenant<'a> {
+    type Input = UpdateTenantInput;
+    type Payload = UpdateTenantPayload;
 
-    Ok(payload)
+    fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+        let db = self.context.db();
+
+        let state = UpdateTenantState {
+            tenant: db.tenants().by_id(&input.id)?,
+        };
+
+        let payload = tenants::update_tenant(state, input)?;
+
+        db.transaction(|| {
+            db.tenants().update(&payload.tenant)?;
+            Ok(())
+        })?;
+
+        Ok(payload)
+    }
 }
