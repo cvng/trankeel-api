@@ -7,6 +7,7 @@ use crate::commands;
 use crate::commands::AddExistingLease;
 use crate::commands::CreateProperty;
 use crate::commands::CreateTenant;
+use crate::commands::PushMessage;
 use crate::error::Result;
 use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
@@ -363,7 +364,7 @@ impl<'a> Client {
     }
 
     pub fn push_message(&self, input: PushMessageInput) -> Result<PushMessagePayload> {
-        commands::push_message(&self.0, &Actor::default(), input)
+        PushMessage::new(&self.0).run(input)
     }
 
     pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {

@@ -1,8 +1,9 @@
 use crate::client::Actor;
 use crate::client::Context;
-use crate::commands;
+use crate::commands::PushMessage;
 use crate::error::Result;
 use crate::templates::CandidacyRejectedMail;
+use crate::Command;
 use crate::PushMessageInput;
 use async_graphql::InputObject;
 use trankeel_core::activity::trace;
@@ -56,15 +57,11 @@ pub(crate) async fn reject_candidacy(
 
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
 
-    commands::push_message(
-        ctx,
-        actor,
-        PushMessageInput {
-            discussion_id: discussion.id,
-            sender_id: sender.id,
-            message: CandidacyRejectedMail::try_new(&candidate)?.to_string(),
-        },
-    )?;
+    PushMessage::new(ctx).run(PushMessageInput {
+        discussion_id: discussion.id,
+        sender_id: sender.id,
+        message: CandidacyRejectedMail::try_new(&candidate)?.to_string(),
+    })?;
 
     Ok(candidacy)
 }
