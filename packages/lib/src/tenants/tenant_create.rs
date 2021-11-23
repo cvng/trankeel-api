@@ -1,7 +1,8 @@
 use crate::error::Result;
-use crate::messaging::create_discussion;
+use crate::messaging;
+use crate::messaging::CreateDiscussionPayload;
 use crate::messaging::CreateDiscussionState;
-use crate::warrants::create_warrant;
+use crate::warrants;
 use crate::warrants::CreateWarrantState;
 use crate::CreateDiscussionInput;
 use crate::CreateWarrantInput;
@@ -10,6 +11,7 @@ use crate::Tenant;
 use async_graphql::InputObject;
 use trankeel_data::Account;
 use trankeel_data::Discussion;
+use trankeel_data::DiscussionWithMessages;
 use trankeel_data::Person;
 use trankeel_data::PersonId;
 use trankeel_data::PersonRole;
@@ -92,17 +94,25 @@ pub fn create_tenant(
     };
 
     let warrants = if let Some(warrants_input) = input.warrants {
-        Some(add_warrants(&tenant, &state.account, warrants_input)?)
+        Some(add_tenant_warrants(
+            &state.account,
+            &tenant,
+            warrants_input,
+        )?)
     } else {
         None
     };
 
     let discussion = if state.tenant_identity.is_none() {
-        Some(start_discussion_with_lender(
-            &state.account,
-            &state.account_owner,
-            &tenant_identity,
-        )?)
+        Some(
+            start_discussion_with_lender(
+                &state.account,
+                &state.account_owner,
+                &tenant_identity,
+                None,
+            )?
+            .0,
+        )
     } else {
         None
     };
@@ -117,15 +127,15 @@ pub fn create_tenant(
 
 // # Utils
 
-fn add_warrants(
-    tenant: &Tenant,
+pub fn add_tenant_warrants(
     account: &Account,
+    tenant: &Tenant,
     warrants_input: Vec<CreateWarrantInput>,
 ) -> Result<Vec<WarrantWithIdentity>> {
     let mut warrants = vec![];
 
     for input in warrants_input {
-        let warrant = create_warrant(
+        let warrant = warrants::create_warrant(
             CreateWarrantState {
                 account: account.clone(),
                 tenant: Some(tenant.clone()),
@@ -140,22 +150,27 @@ fn add_warrants(
     Ok(warrants)
 }
 
-fn start_discussion_with_lender(
+pub fn start_discussion_with_lender(
     account: &Account,
     account_owner: &Person,
     initiator: &Person,
-) -> Result<Discussion> {
-    let discussion = create_discussion(
+    message: Option<String>,
+) -> Result<DiscussionWithMessages> {
+    let CreateDiscussionPayload {
+        discussion,
+        message,
+    } = messaging::create_discussion(
         CreateDiscussionState {
             account: account.clone(),
         },
         CreateDiscussionInput {
             recipient_id: account_owner.id,
             initiator_id: initiator.id,
-            message: None,
+            message,
         },
-    )?
-    .discussion;
+    )?;
+
+    let discussion = (discussion, vec![message].into_iter().flatten().collect());
 
     Ok(discussion)
 }

@@ -3,6 +3,12 @@ use crate::auth::CreateUserWithAccountPayload;
 use crate::auth::SignupUserFromInviteInput;
 use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacyInput;
+use crate::commands::AddExistingLease;
+use crate::commands::CreateCandidacy;
+use crate::commands::CreateProperty;
+use crate::commands::CreateTenant;
+use crate::commands::PushMessage;
+use crate::commands::UpdateTenant;
 use crate::error::Result;
 use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
@@ -13,8 +19,6 @@ use crate::leases::SendReceiptsInput;
 use crate::leases::UpdateFurnishedLeaseInput;
 use crate::messaging::DeleteDiscussionInput;
 use crate::messaging::PushMessageInput;
-use crate::ops;
-use crate::ops::AddExistingLease;
 use crate::owners::UpdateIndividualLenderInput;
 use crate::properties::CreateAdvertisementInput;
 use crate::properties::CreatePropertyInput;
@@ -221,7 +225,7 @@ impl<'a> Client {
     }
 
     pub async fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
-        crate::candidacies::create_candidacy(&self.0, &Actor::default(), input).await
+        Ok(CreateCandidacy::new(&self.0).run(input).await?.candidacy)
     }
 
     pub async fn accept_candidacy(
@@ -232,32 +236,32 @@ impl<'a> Client {
         crate::candidacies::accept_candidacy(&self.0, &Actor::new(auth_id), input).await
     }
 
-    pub fn create_tenant(
+    pub async fn create_tenant(
         &self,
         auth_id: &AuthId,
         input: CreateTenantInput,
     ) -> Result<CreateTenantPayload> {
-        ops::create_tenant(&self.0, &Actor::new(auth_id), input)
+        CreateTenant::new(&self.0, auth_id).run(input).await
     }
 
-    pub fn update_tenant(
+    pub async fn update_tenant(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: UpdateTenantInput,
     ) -> Result<UpdateTenantPayload> {
-        ops::update_tenant(&self.0, &Actor::new(auth_id), input)
+        UpdateTenant::new(&self.0).run(input).await
     }
 
     pub fn delete_tenant(&self, auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
         crate::tenants::delete_tenant(&self.0.db, auth_id, input)
     }
 
-    pub fn create_property(
+    pub async fn create_property(
         &self,
         auth_id: &AuthId,
         input: CreatePropertyInput,
     ) -> Result<CreatePropertyPayload> {
-        ops::create_property(&self.0, &Actor::new(auth_id), input)
+        CreateProperty::new(&self.0, auth_id).run(input).await
     }
 
     pub fn update_property(
@@ -292,12 +296,12 @@ impl<'a> Client {
         crate::properties::update_advertisement(&self.0.db, auth_id, input)
     }
 
-    pub fn add_existing_lease(
+    pub async fn add_existing_lease(
         &self,
         auth_id: &AuthId,
         input: AddExistingLeaseInput,
     ) -> Result<AddExistingLeasePayload> {
-        AddExistingLease::new(&self.0, auth_id).run(input)
+        AddExistingLease::new(&self.0, auth_id).run(input).await
     }
 
     pub fn create_furnished_lease(
@@ -360,8 +364,8 @@ impl<'a> Client {
         crate::messaging::delete_discussion(&self.0.db, auth_id, input)
     }
 
-    pub fn push_message(&self, input: PushMessageInput) -> Result<PushMessagePayload> {
-        ops::push_message(&self.0, &Actor::default(), input)
+    pub async fn push_message(&self, input: PushMessageInput) -> Result<PushMessagePayload> {
+        PushMessage::new(&self.0).run(input).await
     }
 
     pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {

@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate async_graphql;
 #[macro_use]
+extern crate async_trait;
+#[macro_use]
 extern crate serde;
 #[allow(unused_imports)]
 #[macro_use]
@@ -10,6 +12,7 @@ mod auth;
 mod billing;
 mod candidacies;
 mod client;
+mod commands;
 mod companies;
 mod error;
 mod files;
@@ -17,7 +20,6 @@ mod imports;
 mod invites;
 mod leases;
 mod messaging;
-mod ops;
 mod owners;
 mod properties;
 mod reports;
@@ -72,9 +74,10 @@ pub use crate::warrants::CreateWarrantInput;
 pub use crate::workflows::CompleteStepInput;
 pub use trankeel_data::*;
 
+#[async_trait]
 trait Command {
     type Input;
     type Payload;
 
-    fn run(&self, input: Self::Input) -> Result<Self::Payload>;
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload>;
 }

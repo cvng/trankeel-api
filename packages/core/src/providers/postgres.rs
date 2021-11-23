@@ -601,6 +601,10 @@ impl database::WarrantStore for WarrantStore<'_> {
             _ => Err(Error::new(NotFound)),
         }
     }
+
+    fn create_many(&mut self, data: &[WarrantWithIdentity]) -> Result<Vec<WarrantWithIdentity>> {
+        data.iter().map(|warrant| self.create(warrant)).collect()
+    }
 }
 
 impl database::LenderStore for LenderStore<'_> {
@@ -1134,6 +1138,12 @@ impl database::MessageStore for MessageStore<'_> {
         Ok(insert_into(messages::table)
             .values(data)
             .get_result(&self.0.get()?)?)
+    }
+
+    fn create_many(&mut self, data: &[Message]) -> Result<Vec<Message>> {
+        Ok(insert_into(messages::table)
+            .values(data)
+            .get_results(&self.0.get()?)?)
     }
 }
 
