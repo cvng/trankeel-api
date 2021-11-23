@@ -6,6 +6,7 @@ use crate::candidacies::CreateCandidacyInput;
 use crate::commands;
 use crate::commands::AddExistingLease;
 use crate::commands::CreateProperty;
+use crate::commands::CreateTenant;
 use crate::error::Result;
 use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
@@ -238,7 +239,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreateTenantInput,
     ) -> Result<CreateTenantPayload> {
-        commands::create_tenant(&self.0, &Actor::new(auth_id), input)
+        CreateTenant::new(&self.0, auth_id).run(input)
     }
 
     pub fn update_tenant(

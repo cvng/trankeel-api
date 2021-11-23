@@ -169,6 +169,7 @@ pub trait WarrantStore {
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Vec<WarrantWithIdentity>>;
     fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Vec<WarrantWithIdentity>>;
     fn create(&mut self, data: &WarrantWithIdentity) -> Result<WarrantWithIdentity>;
+    fn create_many(&mut self, data: &[WarrantWithIdentity]) -> Result<Vec<WarrantWithIdentity>>;
     fn with_identity(&mut self, data: Warrant) -> Result<WarrantWithIdentity>;
 }
 

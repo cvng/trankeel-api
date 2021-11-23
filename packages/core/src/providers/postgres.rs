@@ -601,6 +601,10 @@ impl database::WarrantStore for WarrantStore<'_> {
             _ => Err(Error::new(NotFound)),
         }
     }
+
+    fn create_many(&mut self, data: &[WarrantWithIdentity]) -> Result<Vec<WarrantWithIdentity>> {
+        data.iter().map(|warrant| self.create(warrant)).collect()
+    }
 }
 
 impl database::LenderStore for LenderStore<'_> {
