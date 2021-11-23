@@ -4,6 +4,7 @@ use crate::auth::SignupUserFromInviteInput;
 use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacyInput;
 use crate::commands::AddExistingLease;
+use crate::commands::CreateCandidacy;
 use crate::commands::CreateProperty;
 use crate::commands::CreateTenant;
 use crate::commands::PushMessage;
@@ -224,7 +225,7 @@ impl<'a> Client {
     }
 
     pub async fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
-        crate::candidacies::create_candidacy(&self.0, &Actor::default(), input).await
+        Ok(CreateCandidacy::new(&self.0).run(input)?.candidacy) // TODO: .await
     }
 
     pub async fn accept_candidacy(

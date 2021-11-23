@@ -245,6 +245,7 @@ pub trait DiscussionStore {
 pub trait MessageStore {
     fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Vec<Message>>;
     fn create(&mut self, data: &Message) -> Result<Message>;
+    fn create_many(&mut self, data: &[Message]) -> Result<Vec<Message>>;
 }
 
 pub trait InviteStore {

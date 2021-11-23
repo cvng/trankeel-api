@@ -1139,6 +1139,12 @@ impl database::MessageStore for MessageStore<'_> {
             .values(data)
             .get_result(&self.0.get()?)?)
     }
+
+    fn create_many(&mut self, data: &[Message]) -> Result<Vec<Message>> {
+        Ok(insert_into(messages::table)
+            .values(data)
+            .get_results(&self.0.get()?)?)
+    }
 }
 
 impl database::InviteStore for InviteStore<'_> {
