@@ -21,11 +21,12 @@ impl<'a> RejectCandidacy<'a> {
     }
 }
 
+#[async_trait]
 impl<'a> Command for RejectCandidacy<'a> {
     type Input = RejectCandidacyInput;
     type Payload = RejectCandidacyPayload;
 
-    fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
         let db = self.context.db();
 
         let candidacy = db.candidacies().by_id(&input.id)?;

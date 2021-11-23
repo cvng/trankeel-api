@@ -99,7 +99,8 @@ impl Mutation {
     ) -> Result<CreateTenantPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .create_tenant(ctx.data::<AuthId>()?, input)?
+            .create_tenant(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -110,7 +111,8 @@ impl Mutation {
     ) -> Result<UpdateTenantPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .update_tenant(ctx.data::<AuthId>()?, input)?
+            .update_tenant(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -128,7 +130,8 @@ impl Mutation {
     ) -> Result<CreatePropertyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .create_property(ctx.data::<AuthId>()?, input)?
+            .create_property(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -179,7 +182,8 @@ impl Mutation {
     ) -> Result<AddExistingLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .add_existing_lease(ctx.data::<AuthId>()?, input)?
+            .add_existing_lease(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -302,7 +306,11 @@ impl Mutation {
         ctx: &Context<'_>,
         input: PushMessageInput,
     ) -> Result<PushMessagePayload> {
-        Ok(ctx.data_unchecked::<Client>().push_message(input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .push_message(input)
+            .await?
+            .into())
     }
 
     async fn delete_discussion(

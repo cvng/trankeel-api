@@ -225,7 +225,7 @@ impl<'a> Client {
     }
 
     pub async fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
-        Ok(CreateCandidacy::new(&self.0).run(input)?.candidacy) // TODO: .await
+        Ok(CreateCandidacy::new(&self.0).run(input).await?.candidacy)
     }
 
     pub async fn accept_candidacy(
@@ -236,32 +236,32 @@ impl<'a> Client {
         crate::candidacies::accept_candidacy(&self.0, &Actor::new(auth_id), input).await
     }
 
-    pub fn create_tenant(
+    pub async fn create_tenant(
         &self,
         auth_id: &AuthId,
         input: CreateTenantInput,
     ) -> Result<CreateTenantPayload> {
-        CreateTenant::new(&self.0, auth_id).run(input)
+        CreateTenant::new(&self.0, auth_id).run(input).await
     }
 
-    pub fn update_tenant(
+    pub async fn update_tenant(
         &self,
         _auth_id: &AuthId,
         input: UpdateTenantInput,
     ) -> Result<UpdateTenantPayload> {
-        UpdateTenant::new(&self.0).run(input)
+        UpdateTenant::new(&self.0).run(input).await
     }
 
     pub fn delete_tenant(&self, auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
         crate::tenants::delete_tenant(&self.0.db, auth_id, input)
     }
 
-    pub fn create_property(
+    pub async fn create_property(
         &self,
         auth_id: &AuthId,
         input: CreatePropertyInput,
     ) -> Result<CreatePropertyPayload> {
-        CreateProperty::new(&self.0, auth_id).run(input)
+        CreateProperty::new(&self.0, auth_id).run(input).await
     }
 
     pub fn update_property(
@@ -296,12 +296,12 @@ impl<'a> Client {
         crate::properties::update_advertisement(&self.0.db, auth_id, input)
     }
 
-    pub fn add_existing_lease(
+    pub async fn add_existing_lease(
         &self,
         auth_id: &AuthId,
         input: AddExistingLeaseInput,
     ) -> Result<AddExistingLeasePayload> {
-        AddExistingLease::new(&self.0, auth_id).run(input)
+        AddExistingLease::new(&self.0, auth_id).run(input).await
     }
 
     pub fn create_furnished_lease(
@@ -364,8 +364,8 @@ impl<'a> Client {
         crate::messaging::delete_discussion(&self.0.db, auth_id, input)
     }
 
-    pub fn push_message(&self, input: PushMessageInput) -> Result<PushMessagePayload> {
-        PushMessage::new(&self.0).run(input)
+    pub async fn push_message(&self, input: PushMessageInput) -> Result<PushMessagePayload> {
+        PushMessage::new(&self.0).run(input).await
     }
 
     pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {

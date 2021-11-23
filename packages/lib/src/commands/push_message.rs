@@ -17,11 +17,12 @@ impl<'a> PushMessage<'a> {
     }
 }
 
+#[async_trait]
 impl<'a> Command for PushMessage<'a> {
     type Input = PushMessageInput;
     type Payload = PushMessagePayload;
 
-    fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
         let db = self.context.db();
 
         let state = PushMessageState {

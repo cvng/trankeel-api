@@ -19,11 +19,12 @@ impl<'a> AddExistingLease<'a> {
     }
 }
 
+#[async_trait]
 impl<'a> Command for AddExistingLease<'a> {
     type Input = AddExistingLeaseInput;
     type Payload = AddExistingLeasePayload;
 
-    fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
         let db = self.context.db();
 
         let state = AddExistingLeaseState {

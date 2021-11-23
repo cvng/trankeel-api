@@ -19,11 +19,12 @@ impl<'a> CreateProperty<'a> {
     }
 }
 
+#[async_trait]
 impl<'a> Command for CreateProperty<'a> {
     type Input = CreatePropertyInput;
     type Payload = CreatePropertyPayload;
 
-    fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
         let db = self.context.db();
 
         let state = CreatePropertyState {

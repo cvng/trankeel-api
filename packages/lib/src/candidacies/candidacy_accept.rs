@@ -75,7 +75,7 @@ pub(crate) async fn accept_candidacy(
         .collect::<Vec<Candidacy>>();
 
     for candidacy in other_candidacies {
-        RejectCandidacy::new(ctx, actor.check()?).run(RejectCandidacyInput { id: candidacy.id })?;
+        RejectCandidacy::new(ctx, actor.check()?).run(RejectCandidacyInput { id: candidacy.id }).await?;
     }
 
     // Accept given candidacy.

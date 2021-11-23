@@ -117,6 +117,7 @@ async fn seed() {
                 water_heating_method: None,
             },
         )
+        .await
         .unwrap()
         .property;
 
@@ -135,6 +136,7 @@ async fn seed() {
                 warrants: None,
             },
         )
+        .await
         .unwrap()
         .tenant;
 

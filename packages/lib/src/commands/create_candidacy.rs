@@ -2,6 +2,7 @@ use crate::candidacies;
 use crate::candidacies::CreateCandidacyPayload;
 use crate::candidacies::CreateCandidacyState;
 use crate::client::Context;
+use crate::templates::CandidacyCreatedMail;
 use crate::Command;
 use crate::CreateCandidacyInput;
 use crate::Result;
@@ -9,6 +10,7 @@ use trankeel_core::activity::trace;
 use trankeel_core::activity::Trace;
 use trankeel_core::database::Db;
 use trankeel_core::error::Error;
+use trankeel_core::mailer::Mailer;
 
 pub(crate) struct CreateCandidacy<'a> {
     context: &'a Context,
@@ -20,11 +22,12 @@ impl<'a> CreateCandidacy<'a> {
     }
 }
 
+#[async_trait]
 impl<'a> Command for CreateCandidacy<'a> {
     type Input = CreateCandidacyInput;
     type Payload = CreateCandidacyPayload;
 
-    fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
         let db = self.context.db();
         let mailer = self.context.mailer();
 
@@ -57,7 +60,12 @@ impl<'a> Command for CreateCandidacy<'a> {
 
         trace(db, Trace::CandidacyCreated(payload.candidacy.clone()))?;
 
-        // TODO: mailer.batch(vec![CandidacyCreatedMail::try_new(&payload.candidacy, &payload.candidate)?]).await?;
+        mailer
+            .batch(vec![CandidacyCreatedMail::try_new(
+                &payload.candidacy,
+                &payload.candidate,
+            )?])
+            .await?;
 
         Ok(payload)
     }
