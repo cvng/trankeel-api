@@ -1,27 +1,42 @@
-use crate::client::Actor;
 use crate::client::Context;
 use crate::properties;
 use crate::properties::CreatePropertyPayload;
 use crate::properties::CreatePropertyState;
+use crate::Command;
 use crate::CreatePropertyInput;
 use crate::Result;
 use trankeel_core::database::Db;
+use trankeel_data::AuthId;
 
-pub(crate) fn create_property(
-    ctx: &Context,
-    actor: &Actor,
-    input: CreatePropertyInput,
-) -> Result<CreatePropertyPayload> {
-    let state = CreatePropertyState {
-        account: ctx.db().accounts().by_auth_id(actor.check()?)?,
-    };
+pub(crate) struct CreateProperty<'a> {
+    context: &'a Context,
+    auth_id: &'a AuthId,
+}
 
-    let payload = properties::create_property(state, input)?;
+impl<'a> CreateProperty<'a> {
+    pub fn new(context: &'a Context, auth_id: &'a AuthId) -> Self {
+        Self { context, auth_id }
+    }
+}
 
-    ctx.db().transaction(|| {
-        ctx.db().properties().create(&payload.property)?;
-        Ok(())
-    })?;
+impl<'a> Command for CreateProperty<'a> {
+    type Input = CreatePropertyInput;
+    type Payload = CreatePropertyPayload;
 
-    Ok(payload)
+    fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+        let db = self.context.db();
+
+        let state = CreatePropertyState {
+            account: db.accounts().by_auth_id(self.auth_id)?,
+        };
+
+        let payload = properties::create_property(state, input)?;
+
+        db.transaction(|| {
+            db.properties().create(&payload.property)?;
+            Ok(())
+        })?;
+
+        Ok(payload)
+    }
 }
