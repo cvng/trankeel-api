@@ -32,7 +32,6 @@ impl<'a> Command for CreateCandidacy<'a> {
         let mailer = self.context.mailer();
 
         let account = db.accounts().by_advertisement_id(&input.advertisement_id)?;
-        // In the context of a candidacy, the recipient is the account owner.
         let account_owner = db
             .persons()
             .by_account_id(&account.id)?
@@ -55,10 +54,9 @@ impl<'a> Command for CreateCandidacy<'a> {
             }
             db.discussions().create(&payload.discussion)?;
             db.messages().create_many(&payload.messages)?;
+            trace(db, Trace::CandidacyCreated(payload.candidacy.clone()))?;
             Ok(())
         })?;
-
-        trace(db, Trace::CandidacyCreated(payload.candidacy.clone()))?;
 
         mailer
             .batch(vec![CandidacyCreatedMail::try_new(
