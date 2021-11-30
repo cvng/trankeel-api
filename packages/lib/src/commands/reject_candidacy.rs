@@ -5,8 +5,8 @@ use crate::candidacies::RejectCandidacyState;
 use crate::client::Context;
 use crate::Command;
 use crate::Result;
-use trankeel_core::activity::dispatch;
-use trankeel_core::activity::Event;
+use trankeel_core::dispatcher::dispatch;
+use trankeel_core::dispatcher::Event;
 use trankeel_core::database::Db;
 use trankeel_data::AuthId;
 

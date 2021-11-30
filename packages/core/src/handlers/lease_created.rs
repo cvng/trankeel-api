@@ -1,4 +1,4 @@
-use crate::activity::Event;
+use crate::dispatcher::Event;
 use crate::context::Context;
 use crate::database::Db;
 use crate::error::Result;

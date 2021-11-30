@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-pub mod activity;
 pub mod billing;
 pub mod context;
 pub mod database;
+pub mod dispatcher;
 pub mod error;
 pub mod handlers;
 pub mod mailer;
