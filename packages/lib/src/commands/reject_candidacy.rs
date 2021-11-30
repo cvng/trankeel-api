@@ -5,8 +5,8 @@ use crate::candidacies::RejectCandidacyState;
 use crate::client::Context;
 use crate::Command;
 use crate::Result;
-use trankeel_core::activity::trace;
-use trankeel_core::activity::Trace;
+use trankeel_core::dispatcher::dispatch;
+use trankeel_core::dispatcher::Event;
 use trankeel_core::database::Db;
 use trankeel_data::AuthId;
 
@@ -47,7 +47,7 @@ impl<'a> Command for RejectCandidacy<'a> {
             db.candidacies().update(&payload.candidacy)?;
             db.discussions().update(&payload.discussion)?;
             db.messages().create(&payload.message)?;
-            trace(db, Trace::CandidacyRejected(payload.candidacy.clone()))?;
+            dispatch(vec![Event::CandidacyRejected(payload.candidacy.clone())])?;
             Ok(())
         })?;
 

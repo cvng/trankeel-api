@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::files::CreateFileInput;
-use trankeel_core::activity::trace;
-use trankeel_core::activity::Trace;
+use trankeel_core::dispatcher::dispatch;
+use trankeel_core::dispatcher::Event;
 use trankeel_core::database::Db;
 use trankeel_core::error::Error;
 use trankeel_data::Account;
@@ -195,7 +195,7 @@ pub fn create_furnished_lease(
     // Affect created lease to existing tenants.
     add_lease_tenants(db, lease.id, input.tenant_ids)?;
 
-    trace(db, Trace::LeaseCreated(lease.clone()))?;
+    dispatch(vec![Event::LeaseCreated(lease.clone())])?;
 
     Ok(lease)
 }

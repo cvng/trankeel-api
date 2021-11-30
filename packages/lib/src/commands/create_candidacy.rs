@@ -6,8 +6,8 @@ use crate::templates::CandidacyCreatedMail;
 use crate::Command;
 use crate::CreateCandidacyInput;
 use crate::Result;
-use trankeel_core::activity::trace;
-use trankeel_core::activity::Trace;
+use trankeel_core::dispatcher::dispatch;
+use trankeel_core::dispatcher::Event;
 use trankeel_core::database::Db;
 use trankeel_core::error::Error;
 use trankeel_core::mailer::Mailer;
@@ -54,7 +54,7 @@ impl<'a> Command for CreateCandidacy<'a> {
             }
             db.discussions().create(&payload.discussion)?;
             db.messages().create_many(&payload.messages)?;
-            trace(db, Trace::CandidacyCreated(payload.candidacy.clone()))?;
+            dispatch(vec![Event::CandidacyCreated(payload.candidacy.clone())])?;
             Ok(())
         })?;
 

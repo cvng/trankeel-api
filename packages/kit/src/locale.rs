@@ -11,3 +11,7 @@ pub fn default_tz() -> chrono::FixedOffset {
 pub fn text(key: &str) -> String {
     key.into()
 }
+
+pub fn currency(value: &str) -> String {
+    format!("{} {}", value, DEFAULT_CURRENCY)
+}

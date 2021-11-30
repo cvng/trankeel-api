@@ -19,8 +19,8 @@ use crate::CompleteStepInput;
 use crate::CreateTenantInput;
 use async_graphql::InputObject;
 use chrono::Utc;
-use trankeel_core::activity::trace;
-use trankeel_core::activity::Trace;
+use trankeel_core::dispatcher::dispatch;
+use trankeel_core::dispatcher::Event;
 use trankeel_core::database::Db;
 use trankeel_core::mailer::Mailer;
 use trankeel_core::pdfmaker::Pdfmaker;
@@ -75,7 +75,9 @@ pub(crate) async fn accept_candidacy(
         .collect::<Vec<Candidacy>>();
 
     for candidacy in other_candidacies {
-        RejectCandidacy::new(ctx, actor.check()?).run(RejectCandidacyInput { id: candidacy.id }).await?;
+        RejectCandidacy::new(ctx, actor.check()?)
+            .run(RejectCandidacyInput { id: candidacy.id })
+            .await?;
     }
 
     // Accept given candidacy.
@@ -87,7 +89,7 @@ pub(crate) async fn accept_candidacy(
         ..candidacy
     })?;
 
-    trace(db, Trace::CandidacyAccepted(candidacy.clone()))?;
+    dispatch(vec![Event::CandidacyAccepted(candidacy.clone())])?;
 
     // Create tenant profile.
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
