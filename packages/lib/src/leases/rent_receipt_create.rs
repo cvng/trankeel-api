@@ -3,8 +3,8 @@ use crate::templates::ReceiptCreatedMail;
 use crate::templates::ReceiptDocument;
 use async_graphql::InputObject;
 use chrono::Utc;
-use trankeel_core::activity::trace;
-use trankeel_core::activity::Trace;
+use trankeel_core::activity::dispatch;
+use trankeel_core::activity::Event;
 use trankeel_core::database::Db;
 use trankeel_core::error::Error;
 use trankeel_core::mailer::Mailer;
@@ -93,8 +93,8 @@ pub async fn send_receipts(
             .await?;
 
         match receipt.type_ {
-            FileType::RentReceipt => trace(db, Trace::ReceiptSent(receipt))?,
-            _ => trace(db, Trace::NoticeSent(receipt))?,
+            FileType::RentReceipt => dispatch(vec![Event::ReceiptSent(receipt)])?,
+            _ => dispatch(vec![Event::NoticeSent(receipt)])?,
         };
     }
 
@@ -128,7 +128,7 @@ fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
 
         rents.push(rent);
 
-        trace(db, Trace::PaymentCreated(payment))?;
+        dispatch(vec![Event::PaymentCreated(payment)])?;
     }
 
     Ok(rents)
@@ -192,7 +192,7 @@ async fn generate_receipts(
 
         receipts.push(receipt.clone());
 
-        trace(db, Trace::ReceiptCreated(receipt))?;
+        dispatch(vec![Event::ReceiptCreated(receipt)])?;
     }
 
     Ok(receipts)

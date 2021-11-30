@@ -2,8 +2,8 @@ use crate::error::Result;
 use crate::templates::NoticeDocument;
 use async_graphql::InputObject;
 use chrono::Utc;
-use trankeel_core::activity::trace;
-use trankeel_core::activity::Trace;
+use trankeel_core::activity::dispatch;
+use trankeel_core::activity::Event;
 use trankeel_core::database::Db;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_data::notice_filename;
@@ -113,7 +113,7 @@ async fn generate_notices(
 
         notices.push(notice.clone());
 
-        trace(db, Trace::NoticeCreated(notice))?;
+        dispatch(vec![Event::NoticeCreated(notice)])?;
     }
 
     Ok(notices)

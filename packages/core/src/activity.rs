@@ -1,5 +1,6 @@
 use crate::database::Db;
 use crate::error::Result;
+use crate::providers::Pg;
 use chrono::DateTime;
 use chrono::Utc;
 use diesel::result::Error::NotFound;
@@ -25,11 +26,9 @@ use trankeel_data::Step;
 use trankeel_data::StepEvent;
 use trankeel_kit::locale::DEFAULT_CURRENCY;
 
-type Meta = (EventableId, AccountId, PersonId, PersonId, Option<String>);
-
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone)]
-pub enum Trace {
+pub enum Event {
     CandidacyCreated(Candidacy),
     CandidacyAccepted(Candidacy),
     CandidacyRejected(Candidacy),
@@ -42,77 +41,65 @@ pub enum Trace {
     StepCompleted(Step),
 }
 
-impl From<Trace> for EventType {
-    fn from(item: Trace) -> Self {
+impl From<Event> for EventType {
+    fn from(item: Event) -> Self {
         match item {
-            Trace::CandidacyCreated(_) => Self::CandidacyCreated,
-            Trace::CandidacyAccepted(_) => Self::CandidacyAccepted,
-            Trace::CandidacyRejected(_) => Self::CandidacyRejected,
-            Trace::LeaseCreated(_) => Self::LeaseCreated,
-            Trace::PaymentCreated(_) => Self::PaymentCreated,
-            Trace::NoticeCreated(_) => Self::NoticeCreated,
-            Trace::NoticeSent(_) => Self::NoticeSent,
-            Trace::ReceiptCreated(_) => Self::ReceiptCreated,
-            Trace::ReceiptSent(_) => Self::ReceiptSent,
-            Trace::StepCompleted(_) => Self::StepCompleted,
+            Event::CandidacyCreated(_) => Self::CandidacyCreated,
+            Event::CandidacyAccepted(_) => Self::CandidacyAccepted,
+            Event::CandidacyRejected(_) => Self::CandidacyRejected,
+            Event::LeaseCreated(_) => Self::LeaseCreated,
+            Event::PaymentCreated(_) => Self::PaymentCreated,
+            Event::NoticeCreated(_) => Self::NoticeCreated,
+            Event::NoticeSent(_) => Self::NoticeSent,
+            Event::ReceiptCreated(_) => Self::ReceiptCreated,
+            Event::ReceiptSent(_) => Self::ReceiptSent,
+            Event::StepCompleted(_) => Self::StepCompleted,
         }
     }
 }
 
-pub fn trace(db: &impl Db, trace: Trace) -> Result<Trace> {
-    let (eventable_id, account_id, sender_id, participant_id, content) = match &trace {
-        Trace::CandidacyCreated(candidacy) => on_candidacy_created(db, candidacy.clone())?,
-        Trace::CandidacyAccepted(candidacy) => on_candidacy_accepted(db, candidacy.clone())?,
-        Trace::CandidacyRejected(candidacy) => on_candidacy_accepted(db, candidacy.clone())?,
-        Trace::LeaseCreated(lease) => on_lease_created(db, lease.clone())?,
-        Trace::PaymentCreated(payment) => on_payment_created(db, payment.clone())?,
-        Trace::NoticeCreated(notice) => on_notice_created(db, notice.clone())?,
-        Trace::NoticeSent(notice) => on_notice_created(db, notice.clone())?,
-        Trace::ReceiptCreated(receipt) => on_receipt_created(db, receipt.clone())?,
-        Trace::ReceiptSent(receipt) => on_receipt_created(db, receipt.clone())?,
-        Trace::StepCompleted(step) => on_step_completed(db, step.clone())?,
-    };
+pub fn dispatch(events: Vec<Event>) -> Result<()> {
+    let db = Pg::init();
 
-    let event = db.events().create(&trankeel_data::Event {
-        id: EventId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        account_id,
-        participant_id,
-        eventable_id,
-        type_: trace.clone().into(),
-    })?;
-
-    let discussion = db.discussions().by_initiator_id(&participant_id)?;
-
-    db.messages().create(&Message {
-        id: MessageId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        discussion_id: discussion.id,
-        sender_id,
-        content,
-        event_id: Some(event.id),
-    })?;
-
-    Ok(trace)
+    Pg::transaction(&db, || {
+        events.iter().try_for_each(|event| match event {
+            Event::CandidacyCreated(candidacy) => on_candidacy_created(&db, event, candidacy),
+            Event::CandidacyAccepted(candidacy) => on_candidacy_accepted(&db, event, candidacy),
+            Event::CandidacyRejected(candidacy) => on_candidacy_accepted(&db, event, candidacy),
+            Event::LeaseCreated(payload) => on_lease_created(&db, event, payload),
+            Event::PaymentCreated(payment) => on_payment_created(&db, event, payment),
+            Event::NoticeCreated(notice) => on_notice_created(&db, event, notice),
+            Event::NoticeSent(notice) => on_notice_created(&db, event, notice),
+            Event::ReceiptCreated(receipt) => on_receipt_created(&db, event, receipt),
+            Event::ReceiptSent(receipt) => on_receipt_created(&db, event, receipt),
+            Event::StepCompleted(step) => on_step_completed(&db, event, step),
+        })
+    })
 }
 
-fn on_candidacy_created(db: &impl Db, candidacy: Candidacy) -> Result<Meta> {
+// # Handlers
+
+fn on_candidacy_created(db: &Pg, event: &Event, candidacy: &Candidacy) -> Result<()> {
     let account = db.accounts().by_candidacy_id(&candidacy.id)?;
     let participant = db.persons().by_candidacy_id(&candidacy.id)?;
-    let eventable = db.eventables().create(&Eventable::Candidacy(candidacy))?;
+    let eventable = db
+        .eventables()
+        .create(&Eventable::Candidacy(candidacy.clone()))?;
 
-    Ok((
+    notify(
+        db,
+        event.clone().into(),
         eventable.id(),
         account.id,
         participant.id,
         participant.id,
         None,
-    ))
+    )?;
+
+    Ok(())
 }
 
-fn on_candidacy_accepted(db: &impl Db, candidacy: Candidacy) -> Result<Meta> {
+fn on_candidacy_accepted(db: &Pg, event: &Event, candidacy: &Candidacy) -> Result<()> {
     let account = db.accounts().by_candidacy_id(&candidacy.id)?;
     let participant = db.persons().by_candidacy_id(&candidacy.id)?;
     let sender = db
@@ -121,12 +108,22 @@ fn on_candidacy_accepted(db: &impl Db, candidacy: Candidacy) -> Result<Meta> {
         .first()
         .cloned()
         .ok_or(NotFound)?;
-    let eventable = Eventable::Candidacy(candidacy); // already created in on_candidacy_created
+    let eventable = Eventable::Candidacy(candidacy.clone()); // already created in on_candidacy_created
 
-    Ok((eventable.id(), account.id, sender.id, participant.id, None))
+    notify(
+        db,
+        event.clone().into(),
+        eventable.id(),
+        account.id,
+        sender.id,
+        participant.id,
+        None,
+    )?;
+
+    Ok(())
 }
 
-fn on_lease_created(db: &impl Db, lease: Lease) -> Result<Meta> {
+fn on_lease_created(db: &Pg, event: &Event, lease: &Lease) -> Result<()> {
     let account = db.accounts().by_lease_id(&lease.id)?;
     let participant = db.persons().by_lease_id(&lease.id)?;
     let sender = db
@@ -135,54 +132,78 @@ fn on_lease_created(db: &impl Db, lease: Lease) -> Result<Meta> {
         .first()
         .cloned()
         .ok_or(NotFound)?;
-    let eventable = db.eventables().create(&Eventable::Lease(lease))?;
+    let eventable = db.eventables().create(&Eventable::Lease(lease.clone()))?;
 
-    Ok((eventable.id(), account.id, sender.id, participant.id, None))
+    notify(
+        db,
+        event.clone().into(),
+        eventable.id(),
+        account.id,
+        sender.id,
+        participant.id,
+        None,
+    )?;
+
+    Ok(())
 }
 
-fn on_payment_created(db: &impl Db, payment: Payment) -> Result<Meta> {
+fn on_payment_created(db: &Pg, event: &Event, payment: &Payment) -> Result<()> {
     let account = db.accounts().by_payment_id(&payment.id)?;
     let participant = db.persons().by_payment_id(&payment.id)?;
-    let eventable = db.eventables().create(&Eventable::Payment(payment))?;
+    let eventable = db
+        .eventables()
+        .create(&Eventable::Payment(payment.clone()))?;
 
-    Ok((
+    notify(
+        db,
+        event.clone().into(),
         eventable.id(),
         account.id,
         participant.id,
         participant.id,
         None,
-    ))
+    )?;
+
+    Ok(())
 }
 
-fn on_notice_created(db: &impl Db, notice: Notice) -> Result<Meta> {
+fn on_notice_created(db: &Pg, event: &Event, notice: &Notice) -> Result<()> {
     let account = db.accounts().by_notice_id(&notice.id)?;
     let participant = db.persons().by_notice_id(&notice.id)?;
-    let eventable = db.eventables().create(&Eventable::File(notice))?;
+    let eventable = db.eventables().create(&Eventable::File(notice.clone()))?;
 
-    Ok((
+    notify(
+        db,
+        event.clone().into(),
         eventable.id(),
         account.id,
         participant.id,
         participant.id,
         None,
-    ))
+    )?;
+
+    Ok(())
 }
 
-fn on_receipt_created(db: &impl Db, receipt: Receipt) -> Result<Meta> {
+fn on_receipt_created(db: &Pg, event: &Event, receipt: &Receipt) -> Result<()> {
     let account = db.accounts().by_receipt_id(&receipt.id)?;
     let participant = db.persons().by_receipt_id(&receipt.id)?;
-    let eventable = db.eventables().create(&Eventable::File(receipt))?;
+    let eventable = db.eventables().create(&Eventable::File(receipt.clone()))?;
 
-    Ok((
+    notify(
+        db,
+        event.clone().into(),
         eventable.id(),
         account.id,
         participant.id,
         participant.id,
         None,
-    ))
+    )?;
+
+    Ok(())
 }
 
-fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
+fn on_step_completed(db: &Pg, event: &Event, step: &Step) -> Result<()> {
     let account = db.accounts().by_step_id(&step.id)?;
     let participant = db.persons().by_step_id(&step.id)?;
     let sender = db
@@ -234,20 +255,56 @@ fn on_step_completed(db: &impl Db, step: Step) -> Result<Meta> {
         }
     }
 
-    let message = render_step_message(db, step, participant.clone())?;
+    let message = render_step_message(db, step.clone(), participant.clone())?;
 
-    Ok((
+    notify(
+        db,
+        event.clone().into(),
         eventable.id(),
         account.id,
         sender.id,
         participant.id,
         message,
-    ))
+    )?;
+
+    Ok(())
 }
 
 // # Utils
 
-fn render_step_message(db: &impl Db, step: Step, participant: Person) -> Result<Option<String>> {
+fn notify(
+    db: &Pg,
+    type_: EventType,
+    eventable_id: EventableId,
+    account_id: AccountId,
+    sender_id: PersonId,
+    participant_id: PersonId,
+    content: Option<String>,
+) -> Result<Message> {
+    let event = db.events().create(&trankeel_data::Event {
+        id: EventId::new(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
+        account_id,
+        participant_id,
+        eventable_id,
+        type_,
+    })?;
+
+    let discussion = db.discussions().by_initiator_id(&participant_id)?;
+
+    db.messages().create(&Message {
+        id: MessageId::new(),
+        created_at: Default::default(),
+        updated_at: Default::default(),
+        discussion_id: discussion.id,
+        sender_id,
+        content,
+        event_id: Some(event.id),
+    })
+}
+
+fn render_step_message(db: &Pg, step: Step, participant: Person) -> Result<Option<String>> {
     let tenant = db.tenants().by_person_id(&participant.id)?;
     let lease = db.leases().by_tenant_id(&tenant.id)?; // TODO: match workflowable
     Ok(step.confirmation.map(|message| {

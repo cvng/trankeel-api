@@ -1,6 +1,6 @@
 use crate::error::Result;
-use trankeel_core::activity::trace;
-use trankeel_core::activity::Trace;
+use trankeel_core::activity::dispatch;
+use trankeel_core::activity::Event;
 use trankeel_core::database::Db;
 use trankeel_data::RequirementOuter;
 use trankeel_data::Step;
@@ -31,7 +31,7 @@ pub fn complete_step(db: &impl Db, input: CompleteStepInput) -> Result<Step> {
         ..step
     })?;
 
-    trace(db, Trace::StepCompleted(step.clone()))?;
+    dispatch(vec![Event::StepCompleted(step.clone())])?;
 
     Ok(step)
 }
