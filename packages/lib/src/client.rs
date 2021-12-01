@@ -56,7 +56,6 @@ use trankeel_core::database::ReportStore;
 use trankeel_core::database::TenantStore;
 use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
-use trankeel_core::error::Error;
 use trankeel_core::mailer::IntoMail;
 use trankeel_core::mailer::Mail;
 use trankeel_core::mailer::Mailer;
@@ -78,21 +77,6 @@ use trankeel_data::PropertyId;
 use trankeel_data::Receipt;
 use trankeel_data::Step;
 use trankeel_data::TenantId;
-
-#[derive(Default)]
-pub(crate) struct Actor(Option<AuthId>);
-
-impl Actor {
-    pub fn new(auth_id: &AuthId) -> Self {
-        Self(Some(auth_id.clone()))
-    }
-
-    pub fn check(&self) -> Result<&AuthId> {
-        self.0
-            .as_ref()
-            .ok_or_else(|| Error::msg("authentication error"))
-    }
-}
 
 pub struct Client(Context);
 
@@ -204,7 +188,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        crate::candidacies::accept_candidacy(&self.0, &Actor::new(auth_id), input).await
+        crate::candidacies::accept_candidacy(&self.0, auth_id, input).await
     }
 
     pub async fn create_tenant(

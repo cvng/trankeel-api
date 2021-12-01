@@ -1,6 +1,5 @@
 use super::RejectCandidacy;
 use super::RejectCandidacyInput;
-use crate::client::Actor;
 use crate::error::Result;
 use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
@@ -26,6 +25,7 @@ use trankeel_core::templates::CandidacyAcceptedMail;
 use trankeel_core::templates::LeaseDocument;
 use trankeel_data::lease_filename;
 use trankeel_data::Account;
+use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
@@ -51,13 +51,12 @@ pub struct AcceptCandidacyInput {
 
 pub(crate) async fn accept_candidacy(
     ctx: &Context,
-    actor: &Actor,
+    auth_id: &AuthId,
     input: AcceptCandidacyInput,
 ) -> Result<Candidacy> {
     let db = ctx.db();
     let pdfmaker = ctx.pdfmaker();
     let mailer = ctx.mailer();
-    let auth_id = actor.check()?;
 
     input.validate()?;
 
@@ -75,7 +74,7 @@ pub(crate) async fn accept_candidacy(
         .collect::<Vec<Candidacy>>();
 
     for candidacy in other_candidacies {
-        RejectCandidacy::new(ctx, actor.check()?)
+        RejectCandidacy::new(ctx, auth_id)
             .run(RejectCandidacyInput { id: candidacy.id })
             .await?;
     }
