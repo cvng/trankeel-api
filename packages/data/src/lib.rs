@@ -14,6 +14,7 @@ extern crate rust_decimal_macros;
 #[macro_use]
 extern crate serde;
 
+pub mod locale;
 pub mod schema;
 
 mod account;

@@ -1,3 +1,4 @@
+use crate::config;
 use crate::error::no;
 use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
@@ -11,7 +12,6 @@ use trankeel_data::Property;
 use trankeel_data::Receipt;
 use trankeel_data::Rent;
 use trankeel_data::Tenant;
-use trankeel_kit::config::config;
 
 pub type NoticeDocument = ReceiptDocument; // alias for a ReceiptDocument
 
@@ -107,7 +107,7 @@ impl ReceiptDocument {
 
 impl IntoDocument for ReceiptDocument {
     fn template_id(&self) -> String {
-        config().templates("receipt_document").unwrap().id
+        config::config().templates("receipt_document").unwrap().id
     }
 
     fn filename(&self) -> String {
@@ -123,7 +123,7 @@ mod tests {
     #[test]
     fn test_receipt_document() {
         let document = ReceiptDocument::default();
-        let text = config()
+        let text = config::config()
             .templates("receipt_document")
             .unwrap()
             .as_string()

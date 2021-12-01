@@ -2,10 +2,7 @@ use crate::schema::workflows;
 use crate::DateTime;
 use crate::Id;
 use crate::Step;
-use crate::StepId;
 use crate::WorkflowableId;
-use serde_json::to_string;
-use trankeel_kit::config::config;
 
 pub type WorkflowId = Id;
 
@@ -26,28 +23,6 @@ pub struct Workflow {
     pub workflowable_id: WorkflowableId,
     pub type_: WorkflowType,
     pub completed: bool,
-}
-
-impl Workflow {
-    pub fn steps(&self) -> Vec<Step> {
-        config()
-            .workflows(&to_string(&self.type_).unwrap())
-            .unwrap()
-            .parse()
-            .into_iter()
-            .map(|step| Step {
-                id: StepId::new(),
-                created_at: Default::default(),
-                updated_at: Default::default(),
-                workflow_id: self.id,
-                label: step.label,
-                event: Some(step.event),
-                completed: Default::default(),
-                confirmation: Some(step.confirmation),
-                requirements: step.requirements.map(Into::into),
-            })
-            .collect()
-    }
 }
 
 #[derive(Default, AsChangeset, Identifiable, Insertable)]

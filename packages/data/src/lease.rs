@@ -1,3 +1,4 @@
+use crate::locale;
 use crate::rent_util;
 use crate::schema::leases;
 use crate::AccountId;
@@ -13,7 +14,6 @@ use crate::Rent;
 use crate::RentId;
 use crate::RentStatus;
 use chrono::Utc;
-use trankeel_kit::locale;
 
 pub type LeaseId = Id;
 

@@ -1,10 +1,10 @@
+use crate::config;
 use crate::error::no;
 use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
 use trankeel_data::DateTime;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
-use trankeel_kit::config::config;
 
 #[derive(Clone, Debug, Serialize)]
 pub struct LeaseDocument {
@@ -25,7 +25,7 @@ impl LeaseDocument {
 
 impl IntoDocument for LeaseDocument {
     fn template_id(&self) -> String {
-        config().templates("lease_document").unwrap().id
+        config::config().templates("lease_document").unwrap().id
     }
 
     fn filename(&self) -> String {

@@ -1,3 +1,4 @@
+use crate::config;
 use crate::error::Result;
 use crate::templates::parse_template;
 use serde::Serialize;
@@ -5,7 +6,6 @@ use std::fmt;
 use std::fmt::Display;
 use trankeel_data::Name;
 use trankeel_data::Person;
-use trankeel_kit::config::config;
 
 #[derive(Clone, Default, Debug, Serialize)]
 pub struct CandidacyRejectedMail {
@@ -21,7 +21,7 @@ impl CandidacyRejectedMail {
 
     pub fn as_text(&self) -> String {
         parse_template(
-            &config()
+            &config::config()
                 .templates("candidacy_rejected_mail")
                 .unwrap()
                 .as_string()

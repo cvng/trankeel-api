@@ -1,13 +1,13 @@
+use crate::config;
 use crate::error::Result;
 use crate::mailer::Contact;
 use crate::mailer::IntoMail;
 use serde::Serialize;
+use trankeel_data::locale;
 use trankeel_data::Candidacy;
 use trankeel_data::Invite;
 use trankeel_data::Person;
 use trankeel_data::Url;
-use trankeel_kit::config::config;
-use trankeel_kit::locale;
 
 #[derive(Clone, Default, Debug, Serialize)]
 pub struct CandidacyAcceptedMail {
@@ -18,7 +18,7 @@ pub struct CandidacyAcceptedMail {
 impl CandidacyAcceptedMail {
     pub fn try_new(_candidacy: &Candidacy, candidate: &Person, invite: &Invite) -> Result<Self> {
         Ok(Self {
-            invite_url: invite.as_url(candidate.email.clone()),
+            invite_url: config::invite_url(invite, candidate.email.clone()),
             _recipients: vec![candidate.clone().into()],
         })
     }
@@ -26,7 +26,7 @@ impl CandidacyAcceptedMail {
 
 impl IntoMail for CandidacyAcceptedMail {
     fn template_id(&self) -> u32 {
-        config()
+        config::config()
             .templates("candidacy_accepted_mail")
             .unwrap()
             .id
@@ -51,7 +51,7 @@ mod tests {
     #[test]
     fn test_candidacy_accepted_mail() {
         let mail = CandidacyAcceptedMail::default();
-        let text = config()
+        let text = config::config()
             .templates("candidacy_accepted_mail")
             .unwrap()
             .as_string()

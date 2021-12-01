@@ -1,7 +1,7 @@
+use crate::locale;
 use crate::Inline;
 use std::fmt;
 use std::fmt::Display;
-use trankeel_kit::locale;
 
 // # Types
 
