@@ -18,6 +18,14 @@ use trankeel_data::Lease;
 use trankeel_data::Payment;
 use trankeel_data::Step;
 
+#[async_trait]
+pub trait Command {
+    type Input;
+    type Payload;
+
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload>;
+}
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone)]
 pub enum Event {

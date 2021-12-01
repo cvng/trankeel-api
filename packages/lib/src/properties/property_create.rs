@@ -1,9 +1,9 @@
 use crate::auth::AddressInput;
 use crate::error::Result;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
+use trankeel_core::dispatcher::Command;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::AuthId;

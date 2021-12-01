@@ -33,7 +33,6 @@ use crate::tenants::UpdateTenantInput;
 use crate::tenants::UpdateTenantPayload;
 use crate::workflows::CompleteStepInput;
 use crate::AddExistingLeaseInput;
-use crate::Command;
 use crate::PushMessagePayload;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
@@ -56,6 +55,7 @@ use trankeel_core::database::ReportStore;
 use trankeel_core::database::TenantStore;
 use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::mailer::IntoMail;
 use trankeel_core::mailer::Mail;
 use trankeel_core::mailer::Mailer;
@@ -330,13 +330,4 @@ impl<'a> Client {
     pub async fn batch_mails(&self, mails: Vec<impl IntoMail>) -> Result<Vec<Mail>> {
         self.0.mailer().batch(mails).await
     }
-}
-
-pub fn init() -> Result<Client> {
-    Ok(Client::new(
-        Pg::init(),
-        Pdfmonkey::init(),
-        Sendinblue::init(),
-        Stripe::init(),
-    ))
 }

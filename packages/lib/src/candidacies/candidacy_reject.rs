@@ -1,13 +1,13 @@
 use crate::error::Result;
 use crate::messaging;
 use crate::messaging::PushMessageState;
-use crate::Command;
 use crate::PushMessageInput;
 use crate::PushMessagePayload;
 use async_graphql::InputObject;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::templates::CandidacyRejectedMail;
 use trankeel_data::AuthId;

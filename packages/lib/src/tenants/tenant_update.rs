@@ -1,11 +1,11 @@
 use crate::error::Result;
 use crate::warrants::CreateWarrantInput;
-use crate::Command;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
+use trankeel_core::dispatcher::Command;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantId;
 use validator::Validate;

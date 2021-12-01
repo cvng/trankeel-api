@@ -1,8 +1,8 @@
-use crate::Command;
 use crate::Result;
 use chrono::Utc;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
+use trankeel_core::dispatcher::Command;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Message;
