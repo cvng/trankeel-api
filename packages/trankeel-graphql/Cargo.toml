@@ -10,5 +10,5 @@ doctest = false
 
 [dependencies]
 async-graphql = { version = "3.0.5", features = ["apollo_tracing"] }
-trankeel = { path = "../lib" }
+trankeel = { path = "../trankeel" }
 serde = "1.0"
