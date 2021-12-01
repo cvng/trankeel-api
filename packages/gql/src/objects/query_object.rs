@@ -1,3 +1,4 @@
+use super::wip;
 use super::Advertisement;
 use super::Candidacy;
 use super::Discussion;
@@ -12,7 +13,6 @@ use super::Plan;
 use super::Property;
 use super::Rent;
 use super::Tenant;
-use crate::wip;
 use async_graphql::Context;
 use async_graphql::Result;
 use trankeel::AdvertisementId;

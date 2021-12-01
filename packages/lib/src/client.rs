@@ -59,6 +59,7 @@ use trankeel_core::dispatcher::Command;
 use trankeel_core::mailer::IntoMail;
 use trankeel_core::mailer::Mail;
 use trankeel_core::mailer::Mailer;
+use trankeel_core::providers;
 use trankeel_core::providers::Pdfmonkey;
 use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
@@ -330,4 +331,13 @@ impl<'a> Client {
     pub async fn batch_mails(&self, mails: Vec<impl IntoMail>) -> Result<Vec<Mail>> {
         self.0.mailer().batch(mails).await
     }
+}
+
+pub fn init() -> Result<Client> {
+    Ok(Client::new(
+        providers::Pg::init(),
+        providers::Pdfmonkey::init(),
+        providers::Sendinblue::init(),
+        providers::Stripe::init(),
+    ))
 }
