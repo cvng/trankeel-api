@@ -1,5 +1,8 @@
 #![allow(dead_code)]
 
+#[macro_use]
+extern crate serde;
+
 pub mod billing;
 pub mod context;
 pub mod database;
@@ -10,4 +13,5 @@ pub mod mailer;
 pub mod messenger;
 pub mod pdfmaker;
 pub mod providers;
+pub mod templates;
 pub mod testing;

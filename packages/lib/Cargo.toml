@@ -12,7 +12,6 @@ doctest = false
 async-graphql = "3.0.5"
 async-trait = "0.1.51"
 chrono = "0.4.19"
-liquid = "0.23.0"
 log = "0.4.14"
 thiserror = "1.0.30"
 trankeel-core = { path = "../core" }

@@ -1,7 +1,7 @@
 use crate::error::Result;
+use crate::mailer::Contact;
+use crate::mailer::IntoMail;
 use serde::Serialize;
-use trankeel_core::mailer::Contact;
-use trankeel_core::mailer::IntoMail;
 use trankeel_data::Candidacy;
 use trankeel_data::Invite;
 use trankeel_data::Person;

@@ -1,6 +1,4 @@
 use crate::error::Result;
-use crate::templates::ReceiptCreatedMail;
-use crate::templates::ReceiptDocument;
 use async_graphql::InputObject;
 use chrono::Utc;
 use trankeel_core::database::Db;
@@ -9,6 +7,8 @@ use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
 use trankeel_core::mailer::Mailer;
 use trankeel_core::pdfmaker::Pdfmaker;
+use trankeel_core::templates::ReceiptCreatedMail;
+use trankeel_core::templates::ReceiptDocument;
 use trankeel_data::receipt_filename;
 use trankeel_data::AuthId;
 use trankeel_data::DateTime;
