@@ -6,9 +6,9 @@ use crate::templates::CandidacyCreatedMail;
 use crate::Command;
 use crate::CreateCandidacyInput;
 use crate::Result;
+use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Event;
-use trankeel_core::database::Db;
 use trankeel_core::error::Error;
 use trankeel_core::mailer::Mailer;
 
