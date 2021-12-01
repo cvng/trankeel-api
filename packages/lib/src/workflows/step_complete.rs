@@ -1,7 +1,7 @@
 use crate::error::Result;
+use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Event;
-use trankeel_core::database::Db;
 use trankeel_data::RequirementOuter;
 use trankeel_data::Step;
 use trankeel_data::StepId;

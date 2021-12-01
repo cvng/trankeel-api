@@ -1,6 +1,6 @@
 use super::candidacy_accepted::candidacy_accepted;
-use crate::dispatcher::Event;
 use crate::context::Context;
+use crate::dispatcher::Event;
 use crate::error::Result;
 use trankeel_data::Candidacy;
 

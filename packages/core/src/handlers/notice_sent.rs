@@ -1,6 +1,6 @@
 use super::notice_created::notice_created;
-use crate::dispatcher::Event;
 use crate::context::Context;
+use crate::dispatcher::Event;
 use crate::error::Result;
 use trankeel_data::Notice;
 

@@ -1,6 +1,6 @@
-use crate::dispatcher::Event;
 use crate::context::Context;
 use crate::database::Db;
+use crate::dispatcher::Event;
 use crate::error::Result;
 use crate::messenger;
 use diesel::result::Error::NotFound;
