@@ -3,6 +3,9 @@ use crate::warrants::CreateWarrantInput;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
+use trankeel_core::context::Context;
+use trankeel_core::database::Db;
+use trankeel_core::dispatcher::Command;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantId;
 use validator::Validate;
@@ -34,6 +37,39 @@ pub struct UpdateTenantPayload {
 }
 
 // # Operation
+
+pub(crate) struct UpdateTenant<'a> {
+    context: &'a Context,
+}
+
+impl<'a> UpdateTenant<'a> {
+    pub fn new(context: &'a Context) -> Self {
+        Self { context }
+    }
+}
+
+#[async_trait]
+impl<'a> Command for UpdateTenant<'a> {
+    type Input = UpdateTenantInput;
+    type Payload = UpdateTenantPayload;
+
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+        let db = self.context.db();
+
+        let state = UpdateTenantState {
+            tenant: db.tenants().by_id(&input.id)?,
+        };
+
+        let payload = update_tenant(state, input)?;
+
+        db.transaction(|| {
+            db.tenants().update(&payload.tenant)?;
+            Ok(())
+        })?;
+
+        Ok(payload)
+    }
+}
 
 pub fn update_tenant(
     state: UpdateTenantState,

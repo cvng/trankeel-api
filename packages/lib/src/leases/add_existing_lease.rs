@@ -11,8 +11,12 @@ use crate::CreatePropertyPayload;
 use crate::CreateTenantInput;
 use crate::CreateTenantPayload;
 use crate::Result;
+use trankeel_core::context::Context;
+use trankeel_core::database::Db;
+use trankeel_core::dispatcher::Command;
 use trankeel_data::Account;
 use trankeel_data::Amount;
+use trankeel_data::AuthId;
 use trankeel_data::DateTime;
 use trankeel_data::Discussion;
 use trankeel_data::Lease;
@@ -44,6 +48,46 @@ pub struct AddExistingLeasePayload {
     pub tenants: Vec<Tenant>,
     pub identities: Vec<Person>,
     pub discussions: Vec<Discussion>,
+}
+
+pub(crate) struct AddExistingLease<'a> {
+    context: &'a Context,
+    auth_id: &'a AuthId,
+}
+
+impl<'a> AddExistingLease<'a> {
+    pub fn new(context: &'a Context, auth_id: &'a AuthId) -> Self {
+        Self { context, auth_id }
+    }
+}
+
+#[async_trait]
+impl<'a> Command for AddExistingLease<'a> {
+    type Input = AddExistingLeaseInput;
+    type Payload = AddExistingLeasePayload;
+
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+        let db = self.context.db();
+
+        let state = AddExistingLeaseState {
+            account: db.accounts().by_auth_id(self.auth_id)?,
+            account_owner: db.persons().by_auth_id(self.auth_id)?,
+        };
+
+        let payload = add_existing_lease(state, input)?;
+
+        db.transaction(|| {
+            db.properties().create(&payload.property)?;
+            db.leases().create(&payload.lease)?;
+            db.rents().create_many(&payload.rents)?;
+            db.persons().create_many(&payload.identities)?;
+            db.tenants().create_many(&payload.tenants)?;
+            db.discussions().create_many(&payload.discussions)?;
+            Ok(())
+        })?;
+
+        Ok(payload)
+    }
 }
 
 pub fn add_existing_lease(

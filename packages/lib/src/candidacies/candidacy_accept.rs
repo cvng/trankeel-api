@@ -1,7 +1,5 @@
+use super::RejectCandidacy;
 use super::RejectCandidacyInput;
-use crate::client::Actor;
-use crate::client::Context;
-use crate::commands::RejectCandidacy;
 use crate::error::Result;
 use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
@@ -11,13 +9,14 @@ use crate::tenants::CreateTenantState;
 use crate::workflows::complete_step;
 use crate::workflows::create_workflow;
 use crate::workflows::CreateWorkflowInput;
-use crate::Command;
 use crate::CompleteStepInput;
 use crate::CreateTenantInput;
 use async_graphql::InputObject;
 use chrono::Utc;
+use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::no;
 use trankeel_core::mailer::Mailer;
@@ -26,6 +25,7 @@ use trankeel_core::templates::CandidacyAcceptedMail;
 use trankeel_core::templates::LeaseDocument;
 use trankeel_data::lease_filename;
 use trankeel_data::Account;
+use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
@@ -51,13 +51,12 @@ pub struct AcceptCandidacyInput {
 
 pub(crate) async fn accept_candidacy(
     ctx: &Context,
-    actor: &Actor,
+    auth_id: &AuthId,
     input: AcceptCandidacyInput,
 ) -> Result<Candidacy> {
     let db = ctx.db();
     let pdfmaker = ctx.pdfmaker();
     let mailer = ctx.mailer();
-    let auth_id = actor.check()?;
 
     input.validate()?;
 
@@ -75,7 +74,7 @@ pub(crate) async fn accept_candidacy(
         .collect::<Vec<Candidacy>>();
 
     for candidacy in other_candidacies {
-        RejectCandidacy::new(ctx, actor.check()?)
+        RejectCandidacy::new(ctx, auth_id)
             .run(RejectCandidacyInput { id: candidacy.id })
             .await?;
     }

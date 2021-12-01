@@ -2,15 +2,12 @@
 extern crate async_graphql;
 #[macro_use]
 extern crate async_trait;
-#[allow(unused_imports)]
 #[macro_use]
 extern crate validator;
 
 mod auth;
-mod billing;
 mod candidacies;
 mod client;
-mod commands;
 mod companies;
 mod error;
 mod files;
@@ -20,7 +17,6 @@ mod leases;
 mod messaging;
 mod owners;
 mod properties;
-mod reports;
 mod tenants;
 mod warrants;
 mod workflows;
@@ -33,7 +29,6 @@ pub use crate::auth::CreateUserWithAccountPayload;
 pub use crate::auth::SignupUserFromInviteInput;
 pub use crate::candidacies::AcceptCandidacyInput;
 pub use crate::candidacies::CreateCandidacyInput;
-pub use crate::client::init;
 pub use crate::client::Client;
 pub use crate::error::Error;
 pub use crate::error::Result;
@@ -68,13 +63,15 @@ pub use crate::tenants::UpdateTenantPayload;
 pub use crate::warrants::CreateProfessionalWarrantInput;
 pub use crate::warrants::CreateWarrantInput;
 pub use crate::workflows::CompleteStepInput;
+pub use trankeel_core::providers;
 pub use trankeel_core::templates;
 pub use trankeel_data::*;
 
-#[async_trait]
-trait Command {
-    type Input;
-    type Payload;
-
-    async fn run(&self, input: Self::Input) -> Result<Self::Payload>;
+pub fn init() -> Result<Client> {
+    Ok(Client::new(
+        providers::Pg::init(),
+        providers::Pdfmonkey::init(),
+        providers::Sendinblue::init(),
+        providers::Stripe::init(),
+    ))
 }

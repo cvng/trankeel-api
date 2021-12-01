@@ -1,5 +1,8 @@
 use crate::Result;
 use chrono::Utc;
+use trankeel_core::context::Context;
+use trankeel_core::database::Db;
+use trankeel_core::dispatcher::Command;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Message;
@@ -21,6 +24,40 @@ pub struct PushMessageState {
 pub struct PushMessagePayload {
     pub message: Message,
     pub discussion: Discussion,
+}
+
+pub(crate) struct PushMessage<'a> {
+    context: &'a Context,
+}
+
+impl<'a> PushMessage<'a> {
+    pub fn new(context: &'a Context) -> Self {
+        Self { context }
+    }
+}
+
+#[async_trait]
+impl<'a> Command for PushMessage<'a> {
+    type Input = PushMessageInput;
+    type Payload = PushMessagePayload;
+
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+        let db = self.context.db();
+
+        let state = PushMessageState {
+            discussion: db.discussions().by_id(&input.discussion_id)?,
+        };
+
+        let payload = push_message(state, input)?;
+
+        db.transaction(|| {
+            db.messages().create(&payload.message)?;
+            db.discussions().update(&payload.discussion)?;
+            Ok(())
+        })?;
+
+        Ok(payload)
+    }
 }
 
 pub fn push_message(

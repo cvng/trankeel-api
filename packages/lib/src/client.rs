@@ -1,17 +1,11 @@
-pub use trankeel_core::context::Context;
-
 use crate::auth::CreateUserWithAccountInput;
 use crate::auth::CreateUserWithAccountPayload;
 use crate::auth::SignupUserFromInviteInput;
 use crate::candidacies::AcceptCandidacyInput;
+use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
-use crate::commands::AddExistingLease;
-use crate::commands::CreateCandidacy;
-use crate::commands::CreateProperty;
-use crate::commands::CreateTenant;
-use crate::commands::PushMessage;
-use crate::commands::UpdateTenant;
 use crate::error::Result;
+use crate::leases::AddExistingLease;
 use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateNoticesInput;
@@ -20,23 +14,27 @@ use crate::leases::DeleteLeaseInput;
 use crate::leases::SendReceiptsInput;
 use crate::leases::UpdateFurnishedLeaseInput;
 use crate::messaging::DeleteDiscussionInput;
+use crate::messaging::PushMessage;
 use crate::messaging::PushMessageInput;
 use crate::owners::UpdateIndividualLenderInput;
 use crate::properties::CreateAdvertisementInput;
+use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
 use crate::properties::CreatePropertyPayload;
 use crate::properties::DeletePropertyInput;
 use crate::properties::UpdateAdvertisementInput;
 use crate::properties::UpdatePropertyInput;
+use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::tenants::CreateTenantPayload;
 use crate::tenants::DeleteTenantInput;
+use crate::tenants::UpdateTenant;
 use crate::tenants::UpdateTenantInput;
 use crate::tenants::UpdateTenantPayload;
 use crate::workflows::CompleteStepInput;
 use crate::AddExistingLeaseInput;
-use crate::Command;
 use crate::PushMessagePayload;
+use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
 use trankeel_core::database::CandidacyStore;
@@ -57,7 +55,7 @@ use trankeel_core::database::ReportStore;
 use trankeel_core::database::TenantStore;
 use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
-use trankeel_core::error::Error;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::mailer::IntoMail;
 use trankeel_core::mailer::Mail;
 use trankeel_core::mailer::Mailer;
@@ -80,26 +78,11 @@ use trankeel_data::Receipt;
 use trankeel_data::Step;
 use trankeel_data::TenantId;
 
-#[derive(Default)]
-pub(crate) struct Actor(Option<AuthId>);
-
-impl Actor {
-    pub fn new(auth_id: &AuthId) -> Self {
-        Self(Some(auth_id.clone()))
-    }
-
-    pub fn check(&self) -> Result<&AuthId> {
-        self.0
-            .as_ref()
-            .ok_or_else(|| Error::msg("authentication error"))
-    }
-}
-
-pub struct Client(Context);
+pub struct Client(context::Context);
 
 impl<'a> Client {
     pub fn new(pg: Pg, pdfmonkey: Pdfmonkey, sendinblue: Sendinblue, stripe: Stripe) -> Self {
-        Self(Context::new(pg, pdfmonkey, sendinblue, stripe))
+        Self(context::Context::new(pg, pdfmonkey, sendinblue, stripe))
     }
 
     // Stores
@@ -205,7 +188,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        crate::candidacies::accept_candidacy(&self.0, &Actor::new(auth_id), input).await
+        crate::candidacies::accept_candidacy(&self.0, auth_id, input).await
     }
 
     pub async fn create_tenant(
@@ -347,13 +330,4 @@ impl<'a> Client {
     pub async fn batch_mails(&self, mails: Vec<impl IntoMail>) -> Result<Vec<Mail>> {
         self.0.mailer().batch(mails).await
     }
-}
-
-pub fn init() -> Result<Client> {
-    Ok(Client::new(
-        Pg::init(),
-        Pdfmonkey::init(),
-        Sendinblue::init(),
-        Stripe::init(),
-    ))
 }

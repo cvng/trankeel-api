@@ -9,7 +9,11 @@ use crate::CreateWarrantInput;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
+use trankeel_core::context::Context;
+use trankeel_core::database::Db;
+use trankeel_core::dispatcher::Command;
 use trankeel_data::Account;
+use trankeel_data::AuthId;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionWithMessages;
 use trankeel_data::Person;
@@ -53,6 +57,49 @@ pub struct CreateTenantPayload {
 }
 
 // # Operation
+
+pub(crate) struct CreateTenant<'a> {
+    context: &'a Context,
+    auth_id: &'a AuthId,
+}
+
+impl<'a> CreateTenant<'a> {
+    pub fn new(context: &'a Context, auth_id: &'a AuthId) -> Self {
+        Self { context, auth_id }
+    }
+}
+
+#[async_trait]
+impl<'a> Command for CreateTenant<'a> {
+    type Input = CreateTenantInput;
+    type Payload = CreateTenantPayload;
+
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+        let db = self.context.db();
+
+        let state = CreateTenantState {
+            account: db.accounts().by_auth_id(self.auth_id)?,
+            account_owner: db.persons().by_auth_id(self.auth_id)?,
+            tenant_identity: None,
+        };
+
+        let payload = create_tenant(state, input)?;
+
+        db.transaction(|| {
+            db.persons().create(&payload.tenant_identity)?;
+            db.tenants().create(&payload.tenant)?;
+            if let Some(warrants) = &payload.warrants {
+                db.warrants().create_many(warrants)?;
+            }
+            if let Some(discussion) = &payload.discussion {
+                db.discussions().create(discussion)?;
+            }
+            Ok(())
+        })?;
+
+        Ok(payload)
+    }
+}
 
 pub fn create_tenant(
     state: CreateTenantState,
