@@ -1,11 +1,11 @@
 use crate::error::Result;
-use crate::templates::NoticeDocument;
 use async_graphql::InputObject;
 use chrono::Utc;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::pdfmaker::Pdfmaker;
+use trankeel_core::templates::NoticeDocument;
 use trankeel_data::notice_filename;
 use trankeel_data::AuthId;
 use trankeel_data::DateTime;

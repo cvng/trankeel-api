@@ -1,6 +1,6 @@
 use crate::error::no;
 use crate::error::Result;
-use trankeel_core::pdfmaker::IntoDocument;
+use crate::pdfmaker::IntoDocument;
 use trankeel_data::DateTime;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;

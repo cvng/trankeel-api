@@ -1,10 +1,10 @@
 use crate::error::Result;
 use crate::messaging;
 use crate::messaging::PushMessageState;
-use crate::templates::CandidacyRejectedMail;
 use crate::PushMessageInput;
 use crate::PushMessagePayload;
 use async_graphql::InputObject;
+use trankeel_core::templates::CandidacyRejectedMail;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;

@@ -1,7 +1,7 @@
 use crate::error::no;
 use crate::error::Result;
-use trankeel_core::mailer::Contact;
-use trankeel_core::mailer::IntoMail;
+use crate::mailer::Contact;
+use crate::mailer::IntoMail;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
 use trankeel_data::Tenant;

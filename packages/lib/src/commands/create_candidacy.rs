@@ -2,7 +2,6 @@ use crate::candidacies;
 use crate::candidacies::CreateCandidacyPayload;
 use crate::candidacies::CreateCandidacyState;
 use crate::client::Context;
-use crate::templates::CandidacyCreatedMail;
 use crate::Command;
 use crate::CreateCandidacyInput;
 use crate::Result;
@@ -11,6 +10,7 @@ use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
 use trankeel_core::mailer::Mailer;
+use trankeel_core::templates::CandidacyCreatedMail;
 
 pub(crate) struct CreateCandidacy<'a> {
     context: &'a Context,

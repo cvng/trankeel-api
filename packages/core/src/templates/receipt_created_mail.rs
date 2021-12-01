@@ -1,8 +1,8 @@
 use crate::error::no;
 use crate::error::Result;
+use crate::mailer::Contact;
+use crate::mailer::IntoMail;
 use serde::Serialize;
-use trankeel_core::mailer::Contact;
-use trankeel_core::mailer::IntoMail;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;
 use trankeel_data::FileId;

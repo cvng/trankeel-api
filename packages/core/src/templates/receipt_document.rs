@@ -1,16 +1,16 @@
 use crate::error::no;
 use crate::error::Result;
-use crate::Amount;
-use crate::DateTime;
-use crate::FileType;
-use crate::LenderWithIdentity;
-use crate::Name;
-use crate::Property;
-use crate::Rent;
-use crate::Tenant;
+use crate::pdfmaker::IntoDocument;
 use serde::Serialize;
-use trankeel_core::pdfmaker::IntoDocument;
+use trankeel_data::Amount;
+use trankeel_data::DateTime;
+use trankeel_data::FileType;
+use trankeel_data::LenderWithIdentity;
+use trankeel_data::Name;
+use trankeel_data::Property;
 use trankeel_data::Receipt;
+use trankeel_data::Rent;
+use trankeel_data::Tenant;
 use trankeel_kit::config::config;
 
 pub type NoticeDocument = ReceiptDocument; // alias for a ReceiptDocument

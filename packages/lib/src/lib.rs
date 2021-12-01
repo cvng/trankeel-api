@@ -2,8 +2,6 @@
 extern crate async_graphql;
 #[macro_use]
 extern crate async_trait;
-#[macro_use]
-extern crate serde;
 #[allow(unused_imports)]
 #[macro_use]
 extern crate validator;
@@ -23,7 +21,6 @@ mod messaging;
 mod owners;
 mod properties;
 mod reports;
-mod templates;
 mod tenants;
 mod warrants;
 mod workflows;
@@ -63,7 +60,6 @@ pub use crate::properties::CreatePropertyPayload;
 pub use crate::properties::DeletePropertyInput;
 pub use crate::properties::UpdateAdvertisementInput;
 pub use crate::properties::UpdatePropertyInput;
-pub use crate::templates::LeaseCreatedMail;
 pub use crate::tenants::CreateTenantInput;
 pub use crate::tenants::CreateTenantPayload;
 pub use crate::tenants::DeleteTenantInput;
@@ -72,6 +68,7 @@ pub use crate::tenants::UpdateTenantPayload;
 pub use crate::warrants::CreateProfessionalWarrantInput;
 pub use crate::warrants::CreateWarrantInput;
 pub use crate::workflows::CompleteStepInput;
+pub use trankeel_core::templates;
 pub use trankeel_data::*;
 
 #[async_trait]
