@@ -2822,7 +2822,6 @@ dependencies = [
  "thiserror",
  "trankeel-core",
  "trankeel-data",
- "trankeel-kit",
  "validator",
 ]
 
@@ -2860,8 +2859,8 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio 0.2.25",
+ "toml",
  "trankeel-data",
- "trankeel-kit",
 ]
 
 [[package]]
@@ -2881,7 +2880,6 @@ dependencies = [
  "rust_decimal_macros",
  "serde",
  "serde_json",
- "trankeel-kit",
  "uuid",
 ]
 
@@ -2892,15 +2890,6 @@ dependencies = [
  "async-graphql",
  "serde",
  "trankeel",
-]
-
-[[package]]
-name = "trankeel-kit"
-version = "0.3.0"
-dependencies = [
- "chrono",
- "serde",
- "toml",
 ]
 
 [[package]]

@@ -1,13 +1,13 @@
+use crate::config;
 use crate::error::no;
 use crate::error::Result;
 use crate::mailer::Contact;
 use crate::mailer::IntoMail;
+use trankeel_data::locale;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
 use trankeel_data::Tenant;
 use trankeel_data::Url;
-use trankeel_kit::config::config;
-use trankeel_kit::locale;
 
 #[derive(Clone, Debug, Serialize)]
 pub struct LeaseCreatedMail {
@@ -29,7 +29,7 @@ impl LeaseCreatedMail {
 
 impl IntoMail for LeaseCreatedMail {
     fn template_id(&self) -> u32 {
-        config()
+        config::config()
             .templates("lease_created_mail")
             .unwrap()
             .id

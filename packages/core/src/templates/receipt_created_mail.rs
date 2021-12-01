@@ -1,8 +1,10 @@
+use crate::config;
 use crate::error::no;
 use crate::error::Result;
 use crate::mailer::Contact;
 use crate::mailer::IntoMail;
 use serde::Serialize;
+use trankeel_data::locale;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;
 use trankeel_data::FileId;
@@ -12,8 +14,6 @@ use trankeel_data::Receipt;
 use trankeel_data::Rent;
 use trankeel_data::Tenant;
 use trankeel_data::Url;
-use trankeel_kit::config::config;
-use trankeel_kit::locale;
 
 #[derive(Clone, Default, Debug, Serialize)]
 pub struct ReceiptCreatedMail {
@@ -79,7 +79,7 @@ impl ReceiptCreatedMail {
 
 impl IntoMail for ReceiptCreatedMail {
     fn template_id(&self) -> u32 {
-        config()
+        config::config()
             .templates("receipt_created_mail")
             .unwrap()
             .id
@@ -108,7 +108,7 @@ mod tests {
     #[test]
     fn test_receipt_created_mail() {
         let mail = ReceiptCreatedMail::default();
-        let text = config()
+        let text = config::config()
             .templates("receipt_created_mail")
             .unwrap()
             .as_string()

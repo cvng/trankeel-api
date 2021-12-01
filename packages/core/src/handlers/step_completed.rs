@@ -6,6 +6,7 @@ use crate::messenger;
 use chrono::DateTime;
 use chrono::Utc;
 use diesel::result::Error::NotFound;
+use trankeel_data::locale;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
 use trankeel_data::Eventable;
@@ -14,7 +15,6 @@ use trankeel_data::Name;
 use trankeel_data::Person;
 use trankeel_data::Step;
 use trankeel_data::StepEvent;
-use trankeel_kit::locale;
 
 pub fn step_completed(ctx: &Context, event: &Event, step: &Step) -> Result<()> {
     let db = ctx.db();

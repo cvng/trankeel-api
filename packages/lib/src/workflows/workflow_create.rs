@@ -1,4 +1,5 @@
 use crate::error::Result;
+use trankeel_core::config;
 use trankeel_core::database::Db;
 use trankeel_data::Workflow;
 use trankeel_data::WorkflowId;
@@ -30,8 +31,7 @@ pub fn create_workflow(db: &impl Db, input: CreateWorkflowInput) -> Result<Workf
         completed: Default::default(),
     })?;
 
-    workflow
-        .steps()
+    config::workflow_steps(&workflow)
         .into_iter()
         .map(|step| db.steps().create(&step))
         .collect::<Result<Vec<_>>>()?;

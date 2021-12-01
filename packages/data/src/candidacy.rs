@@ -4,8 +4,6 @@ use crate::Date;
 use crate::DateTime;
 use crate::Id;
 use crate::PersonId;
-use crate::Url;
-use trankeel_kit::config::config;
 
 // # Types
 
@@ -39,14 +37,4 @@ pub struct Candidacy {
     pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
     pub is_student: Option<bool>,
-}
-
-impl Candidacy {
-    pub fn as_url(&self) -> Url {
-        config()
-            .routes("candidacy_url")
-            .unwrap()
-            .replace(":id", &self.id.to_string())
-            .into()
-    }
 }
