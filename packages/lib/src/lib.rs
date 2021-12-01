@@ -29,6 +29,7 @@ pub use crate::auth::CreateUserWithAccountPayload;
 pub use crate::auth::SignupUserFromInviteInput;
 pub use crate::candidacies::AcceptCandidacyInput;
 pub use crate::candidacies::CreateCandidacyInput;
+pub use crate::client::init;
 pub use crate::client::Client;
 pub use crate::error::Error;
 pub use crate::error::Result;
@@ -63,15 +64,5 @@ pub use crate::tenants::UpdateTenantPayload;
 pub use crate::warrants::CreateProfessionalWarrantInput;
 pub use crate::warrants::CreateWarrantInput;
 pub use crate::workflows::CompleteStepInput;
-pub use trankeel_core::providers;
 pub use trankeel_core::templates;
 pub use trankeel_data::*;
-
-pub fn init() -> Result<Client> {
-    Ok(Client::new(
-        providers::Pg::init(),
-        providers::Pdfmonkey::init(),
-        providers::Sendinblue::init(),
-        providers::Stripe::init(),
-    ))
-}
