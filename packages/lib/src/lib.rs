@@ -2,7 +2,6 @@
 extern crate async_graphql;
 #[macro_use]
 extern crate async_trait;
-#[allow(unused_imports)]
 #[macro_use]
 extern crate validator;
 

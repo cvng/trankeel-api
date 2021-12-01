@@ -35,7 +35,7 @@ use crate::workflows::CompleteStepInput;
 use crate::AddExistingLeaseInput;
 use crate::Command;
 use crate::PushMessagePayload;
-use trankeel_core::context::Context;
+use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
 use trankeel_core::database::CandidacyStore;
@@ -78,11 +78,11 @@ use trankeel_data::Receipt;
 use trankeel_data::Step;
 use trankeel_data::TenantId;
 
-pub struct Client(Context);
+pub struct Client(context::Context);
 
 impl<'a> Client {
     pub fn new(pg: Pg, pdfmonkey: Pdfmonkey, sendinblue: Sendinblue, stripe: Stripe) -> Self {
-        Self(Context::new(pg, pdfmonkey, sendinblue, stripe))
+        Self(context::Context::new(pg, pdfmonkey, sendinblue, stripe))
     }
 
     // Stores
