@@ -1,7 +1,6 @@
+use super::RejectCandidacy;
 use super::RejectCandidacyInput;
 use crate::client::Actor;
-use crate::client::Context;
-use crate::commands::RejectCandidacy;
 use crate::error::Result;
 use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
@@ -16,6 +15,7 @@ use crate::CompleteStepInput;
 use crate::CreateTenantInput;
 use async_graphql::InputObject;
 use chrono::Utc;
+use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Event;

@@ -1,8 +1,12 @@
 use crate::auth::AddressInput;
 use crate::error::Result;
+use crate::Command;
 use async_graphql::InputObject;
+use trankeel_core::context::Context;
+use trankeel_core::database::Db;
 use trankeel_data::Account;
 use trankeel_data::Amount;
+use trankeel_data::AuthId;
 use trankeel_data::LenderId;
 use trankeel_data::Property;
 use trankeel_data::PropertyBuildPeriodType;
@@ -53,6 +57,40 @@ pub struct CreatePropertyPayload {
 }
 
 // # Operation
+
+pub(crate) struct CreateProperty<'a> {
+    context: &'a Context,
+    auth_id: &'a AuthId,
+}
+
+impl<'a> CreateProperty<'a> {
+    pub fn new(context: &'a Context, auth_id: &'a AuthId) -> Self {
+        Self { context, auth_id }
+    }
+}
+
+#[async_trait]
+impl<'a> Command for CreateProperty<'a> {
+    type Input = CreatePropertyInput;
+    type Payload = CreatePropertyPayload;
+
+    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
+        let db = self.context.db();
+
+        let state = CreatePropertyState {
+            account: db.accounts().by_auth_id(self.auth_id)?,
+        };
+
+        let payload = create_property(state, input)?;
+
+        db.transaction(|| {
+            db.properties().create(&payload.property)?;
+            Ok(())
+        })?;
+
+        Ok(payload)
+    }
+}
 
 pub fn create_property(
     state: CreatePropertyState,
