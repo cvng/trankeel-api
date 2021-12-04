@@ -1,15 +1,17 @@
 use crate::context::Context;
 use crate::error::Result;
-use crate::handlers::candidacy_accepted::candidacy_accepted;
-use crate::handlers::candidacy_created::candidacy_created;
-use crate::handlers::candidacy_rejected::candidacy_rejected;
-use crate::handlers::lease_created::lease_created;
-use crate::handlers::notice_created::notice_created;
-use crate::handlers::notice_sent::notice_sent;
-use crate::handlers::payment_created::payment_created;
-use crate::handlers::receipt_created::receipt_created;
-use crate::handlers::receipt_sent::receipt_sent;
-use crate::handlers::step_completed::step_completed;
+use crate::handlers::candidacy_accepted;
+use crate::handlers::candidacy_created;
+use crate::handlers::candidacy_rejected;
+use crate::handlers::lease_created;
+use crate::handlers::notice_created;
+use crate::handlers::notice_sent;
+use crate::handlers::payment_created;
+use crate::handlers::property_created;
+use crate::handlers::receipt_created;
+use crate::handlers::receipt_sent;
+use crate::handlers::step_completed;
+use crate::handlers::PropertyCreated;
 use crate::providers::Pg;
 use trankeel_data::Candidacy;
 use trankeel_data::EventType;
@@ -36,6 +38,7 @@ pub enum Event {
     NoticeCreated(File),
     NoticeSent(File),
     PaymentCreated(Payment),
+    PropertyCreated(PropertyCreated),
     ReceiptCreated(File),
     ReceiptSent(File),
     StepCompleted(Step),
@@ -51,6 +54,7 @@ impl From<Event> for EventType {
             Event::NoticeCreated(_) => Self::NoticeCreated,
             Event::NoticeSent(_) => Self::NoticeSent,
             Event::PaymentCreated(_) => Self::PaymentCreated,
+            Event::PropertyCreated(_) => unimplemented!(),
             Event::ReceiptCreated(_) => Self::ReceiptCreated,
             Event::ReceiptSent(_) => Self::ReceiptSent,
             Event::StepCompleted(_) => Self::StepCompleted,
@@ -58,7 +62,7 @@ impl From<Event> for EventType {
     }
 }
 
-pub fn dispatch(events: Vec<Event>) -> Result<()> {
+pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
     let ctx = Context::env();
 
     Pg::transaction(ctx.db(), || {
@@ -70,9 +74,12 @@ pub fn dispatch(events: Vec<Event>) -> Result<()> {
             Event::NoticeCreated(notice) => notice_created(&ctx, event, notice),
             Event::NoticeSent(notice) => notice_sent(&ctx, event, notice),
             Event::PaymentCreated(payment) => payment_created(&ctx, event, payment),
+            Event::PropertyCreated(event) => property_created(&ctx, event),
             Event::ReceiptCreated(receipt) => receipt_created(&ctx, event, receipt),
             Event::ReceiptSent(receipt) => receipt_sent(&ctx, event, receipt),
             Event::StepCompleted(step) => step_completed(&ctx, event, step),
         })
-    })
+    })?;
+
+    Ok(events)
 }
