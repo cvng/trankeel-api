@@ -52,7 +52,6 @@ pub use crate::messaging::PushMessagePayload;
 pub use crate::owners::UpdateIndividualLenderInput;
 pub use crate::properties::CreateAdvertisementInput;
 pub use crate::properties::CreatePropertyInput;
-pub use crate::properties::CreatePropertyPayload;
 pub use crate::properties::DeletePropertyInput;
 pub use crate::properties::UpdateAdvertisementInput;
 pub use crate::properties::UpdatePropertyInput;
