@@ -126,10 +126,10 @@ pub struct CreatePropertyPayload {
     property: Property,
 }
 
-impl From<trankeel::CreatePropertyPayload> for CreatePropertyPayload {
-    fn from(item: trankeel::CreatePropertyPayload) -> Self {
+impl From<trankeel::Property> for CreatePropertyPayload {
+    fn from(item: trankeel::Property) -> Self {
         Self {
-            property: item.property.into(),
+            property: item.into(),
         }
     }
 }
