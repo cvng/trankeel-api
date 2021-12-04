@@ -17,10 +17,9 @@ use crate::messaging::DeleteDiscussionInput;
 use crate::messaging::PushMessage;
 use crate::messaging::PushMessageInput;
 use crate::owners::UpdateIndividualLenderInput;
+use crate::properties;
 use crate::properties::CreateAdvertisementInput;
-use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
-use crate::properties::CreatePropertyPayload;
 use crate::properties::DeletePropertyInput;
 use crate::properties::UpdateAdvertisementInput;
 use crate::properties::UpdatePropertyInput;
@@ -216,8 +215,8 @@ impl<'a> Client {
         &self,
         auth_id: &AuthId,
         input: CreatePropertyInput,
-    ) -> Result<CreatePropertyPayload> {
-        CreateProperty::new(&self.0, auth_id).run(input).await
+    ) -> Result<Property> {
+        properties::create_property(self.0.db(), auth_id, input).await
     }
 
     pub fn update_property(
