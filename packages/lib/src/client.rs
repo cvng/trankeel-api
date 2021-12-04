@@ -17,8 +17,8 @@ use crate::messaging::DeleteDiscussionInput;
 use crate::messaging::PushMessage;
 use crate::messaging::PushMessageInput;
 use crate::owners::UpdateIndividualLenderInput;
-use crate::properties;
 use crate::properties::CreateAdvertisementInput;
+use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
 use crate::properties::DeletePropertyInput;
 use crate::properties::UpdateAdvertisementInput;
@@ -54,7 +54,11 @@ use trankeel_core::database::ReportStore;
 use trankeel_core::database::TenantStore;
 use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
+use trankeel_core::dispatcher;
 use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::Event;
+use trankeel_core::error::Error;
+use trankeel_core::handlers::PropertyCreated;
 use trankeel_core::mailer::IntoMail;
 use trankeel_core::mailer::Mail;
 use trankeel_core::mailer::Mailer;
@@ -216,7 +220,19 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreatePropertyInput,
     ) -> Result<Property> {
-        properties::create_property(self.0.db(), auth_id, input).await
+        let account = self.0.db().accounts().by_auth_id(auth_id)?;
+
+        CreateProperty::new(&account)
+            .run(input)
+            .await
+            .and_then(dispatcher::dispatch)?
+            .iter()
+            .find_map(|event| match event {
+                Event::PropertyCreated(PropertyCreated { property }) => Some(property),
+                _ => None,
+            })
+            .cloned()
+            .ok_or_else(|| Error::msg("create_property"))
     }
 
     pub fn update_property(
