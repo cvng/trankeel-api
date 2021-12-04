@@ -1,13 +1,13 @@
 CREATE TYPE eventtype AS ENUM (
-    'candidacy_created',
     'candidacy_accepted',
+    'candidacy_created',
     'candidacy_rejected',
     'lease_created',
     'notice_created',
     'notice_sent',
+    'payment_created',
     'receipt_created',
     'receipt_sent',
-    'payment_created',
     'step_completed'
 );
 
