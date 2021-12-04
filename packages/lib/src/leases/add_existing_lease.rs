@@ -2,12 +2,10 @@ use super::CreateLeaseInput;
 use super::CreateLeaseState;
 use crate::leases;
 use crate::leases::CreateLeasePayload;
-use crate::properties;
-use crate::properties::CreatePropertyState;
+use crate::properties::CreateProperty;
 use crate::tenants;
 use crate::tenants::CreateTenantState;
 use crate::CreatePropertyInput;
-use crate::CreatePropertyPayload;
 use crate::CreateTenantInput;
 use crate::CreateTenantPayload;
 use crate::Result;
@@ -98,12 +96,7 @@ pub fn add_existing_lease(
     let account_owner = state.account_owner;
 
     // Add property.
-    let CreatePropertyPayload { property } = properties::create_property(
-        CreatePropertyState {
-            account: account.clone(),
-        },
-        input.property,
-    )?;
+    let property = CreateProperty::new(&account).create_property(input.property)?;
 
     // Add lease.
     let CreateLeasePayload { lease } = leases::create_lease(
