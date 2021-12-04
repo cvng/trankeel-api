@@ -1,12 +1,11 @@
 use crate::auth::AddressInput;
 use crate::error::Result;
 use async_graphql::InputObject;
-use trankeel_core::context::Context;
-use trankeel_core::database::Db;
 use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::Event;
+use trankeel_core::handlers::PropertyCreated;
 use trankeel_data::Account;
 use trankeel_data::Amount;
-use trankeel_data::AuthId;
 use trankeel_data::LenderId;
 use trankeel_data::Property;
 use trankeel_data::PropertyBuildPeriodType;
@@ -19,8 +18,6 @@ use trankeel_data::PropertyRoomType;
 use trankeel_data::PropertyStatus;
 use trankeel_data::PropertyUsageType;
 use validator::Validate;
-
-// # Input
 
 #[derive(InputObject, Validate)]
 pub struct CreatePropertyInput {
@@ -48,85 +45,58 @@ pub struct CreatePropertyInput {
     pub water_heating_method: Option<PropertyUsageType>,
 }
 
-pub struct CreatePropertyState {
-    pub account: Account,
-}
-
-pub struct CreatePropertyPayload {
-    pub property: Property,
-}
-
-// # Operation
-
-pub(crate) struct CreateProperty<'a> {
-    context: &'a Context,
-    auth_id: &'a AuthId,
+pub struct CreateProperty<'a> {
+    account: &'a Account,
 }
 
 impl<'a> CreateProperty<'a> {
-    pub fn new(context: &'a Context, auth_id: &'a AuthId) -> Self {
-        Self { context, auth_id }
+    pub fn new(account: &'a Account) -> Self {
+        Self { account }
+    }
+
+    pub fn create_property(&self, input: CreatePropertyInput) -> Result<Property> {
+        input.validate()?;
+
+        Ok(Property {
+            id: PropertyId::new(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            account_id: self.account.id,
+            address: input.address.into(),
+            build_period: input.build_period,
+            building_legal_status: input.building_legal_status,
+            common_spaces: input.common_spaces,
+            energy_class: input.energy_class,
+            equipments: input.equipments,
+            gas_emission: input.gas_emission,
+            heating_method: input.heating_method,
+            housing_type: input.housing_type,
+            lender_id: input.lender_id,
+            name: input.name,
+            note: input.note,
+            ntic_equipments: input.ntic_equipments,
+            other_spaces: input.other_spaces,
+            tax: input.tax,
+            room_count: input.room_count,
+            status: input.status.unwrap_or_default(),
+            surface: input.surface,
+            tenant_private_spaces: input.tenant_private_spaces,
+            usage_type: input.usage_type,
+            water_heating_method: input.water_heating_method,
+        })
     }
 }
 
 #[async_trait]
 impl<'a> Command for CreateProperty<'a> {
     type Input = CreatePropertyInput;
-    type Payload = CreatePropertyPayload;
+    type Payload = Vec<Event>;
 
     async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
-        let db = self.context.db();
+        let property = self.create_property(input)?;
 
-        let state = CreatePropertyState {
-            account: db.accounts().by_auth_id(self.auth_id)?,
-        };
-
-        let payload = create_property(state, input)?;
-
-        db.transaction(|| {
-            db.properties().create(&payload.property)?;
-            Ok(())
-        })?;
-
-        Ok(payload)
+        Ok(vec![
+            Event::PropertyCreated(PropertyCreated::new(&property)), //
+        ])
     }
-}
-
-pub fn create_property(
-    state: CreatePropertyState,
-    input: CreatePropertyInput,
-) -> Result<CreatePropertyPayload> {
-    input.validate()?;
-
-    let account = state.account;
-
-    let property = Property {
-        id: PropertyId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        account_id: account.id,
-        address: input.address.into(),
-        build_period: input.build_period,
-        building_legal_status: input.building_legal_status,
-        common_spaces: input.common_spaces,
-        energy_class: input.energy_class,
-        equipments: input.equipments,
-        gas_emission: input.gas_emission,
-        heating_method: input.heating_method,
-        housing_type: input.housing_type,
-        lender_id: input.lender_id,
-        name: input.name,
-        note: input.note,
-        ntic_equipments: input.ntic_equipments,
-        other_spaces: input.other_spaces,
-        tax: input.tax,
-        room_count: input.room_count,
-        status: input.status.unwrap_or_default(),
-        surface: input.surface,
-        tenant_private_spaces: input.tenant_private_spaces,
-        usage_type: input.usage_type,
-        water_heating_method: input.water_heating_method,
-    };
-
-    Ok(CreatePropertyPayload { property })
 }
