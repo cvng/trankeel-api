@@ -96,7 +96,9 @@ pub fn add_existing_lease(
     let account_owner = state.account_owner;
 
     // Add property.
-    let property = CreateProperty::new(&account).create_property(input.property)?;
+    let property = CreateProperty::new(&account)
+        .create_property(input.property)?
+        .property;
 
     // Add lease.
     let CreateLeasePayload { lease } = leases::create_lease(

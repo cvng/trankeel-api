@@ -45,7 +45,7 @@ pub struct CreatePropertyInput {
     pub water_heating_method: Option<PropertyUsageType>,
 }
 
-pub struct CreateProperty<'a> {
+pub(crate) struct CreateProperty<'a> {
     account: &'a Account,
 }
 
@@ -54,10 +54,10 @@ impl<'a> CreateProperty<'a> {
         Self { account }
     }
 
-    pub fn create_property(&self, input: CreatePropertyInput) -> Result<Property> {
+    pub fn create_property(&self, input: CreatePropertyInput) -> Result<PropertyCreated> {
         input.validate()?;
 
-        Ok(Property {
+        let property = Property {
             id: PropertyId::new(),
             created_at: Default::default(),
             updated_at: Default::default(),
@@ -83,7 +83,9 @@ impl<'a> CreateProperty<'a> {
             tenant_private_spaces: input.tenant_private_spaces,
             usage_type: input.usage_type,
             water_heating_method: input.water_heating_method,
-        })
+        };
+
+        Ok(PropertyCreated { property })
     }
 }
 
@@ -93,8 +95,8 @@ impl<'a> Command for CreateProperty<'a> {
     type Payload = Vec<Event>;
 
     async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
-        let property = self.create_property(input)?;
+        let payload = self.create_property(input)?;
 
-        Ok(vec![Event::PropertyCreated(PropertyCreated { property })])
+        Ok(vec![Event::PropertyCreated(payload)])
     }
 }
