@@ -118,8 +118,7 @@ async fn seed() {
             },
         )
         .await
-        .unwrap()
-        .property;
+        .unwrap();
 
     let tenant = client
         .create_tenant(

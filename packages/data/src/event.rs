@@ -13,20 +13,15 @@ pub type EventWithEventable = (Event, Eventable);
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Eventtype"]
 pub enum EventType {
-    CandidacyCreated,
     CandidacyAccepted,
+    CandidacyCreated,
     CandidacyRejected,
     LeaseCreated,
-    #[graphql(name = "PAYMENT_NOTICE_CREATED")]
     NoticeCreated,
-    #[graphql(name = "PAYMENT_NOTICE_SENT")]
     NoticeSent,
-    #[graphql(name = "RENT_RECEIPT_CREATED")]
-    ReceiptCreated,
-    #[graphql(name = "RENT_RECEIPT_SENT")]
-    ReceiptSent,
-    #[graphql(name = "TRANSACTION_CREATED")]
     PaymentCreated,
+    ReceiptCreated,
+    ReceiptSent,
     StepCompleted,
 }
 
