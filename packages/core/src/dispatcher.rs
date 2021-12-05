@@ -11,6 +11,7 @@ use crate::handlers::property_created;
 use crate::handlers::receipt_created;
 use crate::handlers::receipt_sent;
 use crate::handlers::step_completed;
+use crate::handlers::CandidacyRejected;
 use crate::handlers::PropertyCreated;
 use crate::providers::Pg;
 use trankeel_data::Candidacy;
@@ -33,7 +34,7 @@ pub trait Command {
 pub enum Event {
     CandidacyAccepted(Candidacy),
     CandidacyCreated(Candidacy),
-    CandidacyRejected(Candidacy),
+    CandidacyRejected(CandidacyRejected),
     LeaseCreated(Lease),
     NoticeCreated(File),
     NoticeSent(File),
@@ -69,12 +70,12 @@ pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
         events.iter().try_for_each(|event| match event {
             Event::CandidacyAccepted(candidacy) => candidacy_accepted(&ctx, event, candidacy),
             Event::CandidacyCreated(candidacy) => candidacy_created(&ctx, event, candidacy),
-            Event::CandidacyRejected(candidacy) => candidacy_rejected(&ctx, event, candidacy),
+            Event::CandidacyRejected(event) => candidacy_rejected(&ctx, event.clone()),
             Event::LeaseCreated(lease) => lease_created(&ctx, event, lease),
             Event::NoticeCreated(notice) => notice_created(&ctx, event, notice),
             Event::NoticeSent(notice) => notice_sent(&ctx, event, notice),
             Event::PaymentCreated(payment) => payment_created(&ctx, event, payment),
-            Event::PropertyCreated(event) => property_created(&ctx, event),
+            Event::PropertyCreated(event) => property_created(&ctx, event.clone()),
             Event::ReceiptCreated(receipt) => receipt_created(&ctx, event, receipt),
             Event::ReceiptSent(receipt) => receipt_sent(&ctx, event, receipt),
             Event::StepCompleted(step) => step_completed(&ctx, event, step),

@@ -15,6 +15,7 @@ use async_graphql::InputObject;
 use chrono::Utc;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
+use trankeel_core::dispatcher;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
@@ -74,9 +75,13 @@ pub(crate) async fn accept_candidacy(
         .collect::<Vec<Candidacy>>();
 
     for candidacy in other_candidacies {
-        RejectCandidacy::new(ctx, auth_id)
+        let account_owner = db.persons().by_auth_id(auth_id)?;
+        let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
+        let discussion = db.discussions().by_candidacy_id(&candidacy.id)?;
+        RejectCandidacy::new(&candidacy, &candidate, &account_owner, &discussion)
             .run(RejectCandidacyInput { id: candidacy.id })
-            .await?;
+            .await
+            .and_then(dispatcher::dispatch)?;
     }
 
     // Accept given candidacy.
