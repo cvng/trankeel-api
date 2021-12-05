@@ -95,8 +95,6 @@ impl<'a> Command for CreateProperty<'a> {
     async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
         let property = self.create_property(input)?;
 
-        Ok(vec![
-            Event::PropertyCreated(PropertyCreated::new(&property)), //
-        ])
+        Ok(vec![Event::PropertyCreated(PropertyCreated { property })])
     }
 }
