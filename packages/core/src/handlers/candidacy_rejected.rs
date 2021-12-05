@@ -14,7 +14,7 @@ pub struct CandidacyRejected {
     pub message: Message,
 }
 
-pub fn candidacy_rejected(ctx: &Context, event: &CandidacyRejected) -> Result<()> {
+pub fn candidacy_rejected(ctx: &Context, event: CandidacyRejected) -> Result<()> {
     let db = ctx.db();
 
     db.candidacies().update(&event.candidacy)?;
