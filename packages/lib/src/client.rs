@@ -230,8 +230,16 @@ impl<'a> Client {
         input: CreatePropertyInput,
     ) -> Result<Property> {
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
+        let (lender, ..) = self
+            .0
+            .db()
+            .lenders()
+            .by_account_id(&account.id)?
+            .first()
+            .cloned()
+            .ok_or_else(|| Error::msg("lender_not_found"))?;
 
-        CreateProperty::new(&account)
+        CreateProperty::new(&account, &lender)
             .run(input)
             .await
             .and_then(dispatcher::dispatch)?

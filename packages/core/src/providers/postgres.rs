@@ -637,6 +637,17 @@ impl database::LenderStore for LenderStore<'_> {
             .collect::<Result<Vec<_>>>()
     }
 
+    fn by_account_id(&mut self, account_id: &AccountId) -> Result<Vec<LenderWithIdentity>> {
+        lenders::table
+            .select(lenders::all_columns)
+            .left_join(persons::table.on(persons::account_id.eq(lenders::account_id)))
+            .filter(lenders::account_id.eq(account_id))
+            .load(&self.0.get()?)?
+            .iter()
+            .map(|lender: &Lender| self.by_id(&lender.id))
+            .collect::<Result<Vec<_>>>()
+    }
+
     fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithIdentity> {
         let lender: Lender = lenders::table
             .filter(lenders::individual_id.eq(individual_id))

@@ -120,6 +120,7 @@ pub trait CompanyStore {
 pub trait LenderStore {
     fn by_id(&mut self, id: &LenderId) -> Result<LenderWithIdentity>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<LenderWithIdentity>>;
+    fn by_account_id(&mut self, account_id: &AccountId) -> Result<Vec<LenderWithIdentity>>;
     fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithIdentity>;
     fn create(&mut self, data: &Lender) -> Result<Lender>;
     fn update(&mut self, data: &Lender) -> Result<Lender>;
