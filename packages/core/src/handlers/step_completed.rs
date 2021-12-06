@@ -2,7 +2,7 @@ use crate::context::Context;
 use crate::database::Db;
 use crate::dispatcher::Event;
 use crate::error::Result;
-use crate::messenger;
+use crate::messenger::Messenger;
 use chrono::DateTime;
 use chrono::Utc;
 use diesel::result::Error::NotFound;
@@ -18,6 +18,7 @@ use trankeel_data::StepEvent;
 
 pub fn step_completed(ctx: &Context, event: &Event, step: &Step) -> Result<()> {
     let db = ctx.db();
+    let messenger = ctx.messenger();
 
     let account = db.accounts().by_step_id(&step.id)?;
     let participant = db.persons().by_step_id(&step.id)?;
@@ -74,7 +75,7 @@ pub fn step_completed(ctx: &Context, event: &Event, step: &Step) -> Result<()> {
     let lease = db.leases().by_tenant_id(&tenant.id)?; // TODO: match workflowable
     let message = render_step_message(step.clone(), participant.clone(), lease)?;
 
-    messenger::message(
+    messenger.message(
         db,
         event.clone().into(),
         eventable.id(),
