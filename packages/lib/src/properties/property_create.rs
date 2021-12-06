@@ -6,6 +6,7 @@ use trankeel_core::dispatcher::Event;
 use trankeel_core::handlers::PropertyCreated;
 use trankeel_data::Account;
 use trankeel_data::Amount;
+use trankeel_data::Lender;
 use trankeel_data::LenderId;
 use trankeel_data::Property;
 use trankeel_data::PropertyBuildPeriodType;
@@ -30,7 +31,7 @@ pub struct CreatePropertyInput {
     pub gas_emission: Option<PropertyGasEmission>,
     pub heating_method: Option<PropertyUsageType>,
     pub housing_type: Option<PropertyUsageType>,
-    pub lender_id: LenderId,
+    pub lender_id: Option<LenderId>,
     pub name: String,
     pub note: Option<String>,
     pub description: Option<String>,
@@ -47,21 +48,24 @@ pub struct CreatePropertyInput {
 
 pub(crate) struct CreateProperty<'a> {
     account: &'a Account,
+    lender: &'a Lender,
 }
 
 impl<'a> CreateProperty<'a> {
-    pub fn new(account: &'a Account) -> Self {
-        Self { account }
+    pub fn new(account: &'a Account, lender: &'a Lender) -> Self {
+        Self { account, lender }
     }
 
     pub fn create_property(&self, input: CreatePropertyInput) -> Result<PropertyCreated> {
         input.validate()?;
 
+        let CreateProperty { account, lender } = *self;
+
         let property = Property {
             id: PropertyId::new(),
             created_at: Default::default(),
             updated_at: Default::default(),
-            account_id: self.account.id,
+            account_id: account.id,
             address: input.address.into(),
             build_period: input.build_period,
             building_legal_status: input.building_legal_status,
@@ -71,7 +75,7 @@ impl<'a> CreateProperty<'a> {
             gas_emission: input.gas_emission,
             heating_method: input.heating_method,
             housing_type: input.housing_type,
-            lender_id: input.lender_id,
+            lender_id: input.lender_id.unwrap_or(lender.id),
             name: input.name,
             note: input.note,
             ntic_equipments: input.ntic_equipments,

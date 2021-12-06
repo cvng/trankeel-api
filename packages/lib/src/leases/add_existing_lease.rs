@@ -12,6 +12,7 @@ use crate::Result;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::Command;
+use trankeel_core::error::Error;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::AuthId;
@@ -19,6 +20,7 @@ use trankeel_data::DateTime;
 use trankeel_data::Discussion;
 use trankeel_data::Lease;
 use trankeel_data::LeaseType;
+use trankeel_data::Lender;
 use trankeel_data::Person;
 use trankeel_data::Property;
 use trankeel_data::Rent;
@@ -37,6 +39,7 @@ pub struct AddExistingLeaseInput {
 pub struct AddExistingLeaseState {
     pub account: Account,
     pub account_owner: Person,
+    pub lender: Lender,
 }
 
 pub struct AddExistingLeasePayload {
@@ -67,9 +70,19 @@ impl<'a> Command for AddExistingLease<'a> {
     async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
         let db = self.context.db();
 
+        let account = db.accounts().by_auth_id(self.auth_id)?;
+        let account_owner = db.persons().by_auth_id(self.auth_id)?;
+        let (lender, ..) = db
+            .lenders()
+            .by_account_id(&account.id)?
+            .first()
+            .cloned()
+            .ok_or_else(|| Error::msg("lender_not_found"))?;
+
         let state = AddExistingLeaseState {
-            account: db.accounts().by_auth_id(self.auth_id)?,
-            account_owner: db.persons().by_auth_id(self.auth_id)?,
+            account,
+            account_owner,
+            lender,
         };
 
         let payload = add_existing_lease(state, input)?;
@@ -92,11 +105,14 @@ pub fn add_existing_lease(
     state: AddExistingLeaseState,
     input: AddExistingLeaseInput,
 ) -> Result<AddExistingLeasePayload> {
-    let account = state.account;
-    let account_owner = state.account_owner;
+    let AddExistingLeaseState {
+        account,
+        account_owner,
+        lender,
+    } = state;
 
     // Add property.
-    let property = CreateProperty::new(&account)
+    let property = CreateProperty::new(&account, &lender)
         .create_property(input.property)?
         .property;
 

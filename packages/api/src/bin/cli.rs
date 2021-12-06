@@ -102,7 +102,7 @@ async fn seed() {
                 gas_emission: None,
                 heating_method: None,
                 housing_type: None,
-                lender_id: lender.id,
+                lender_id: None,
                 name: "Petite mission".into(),
                 note: Some("RAS".into()),
                 description: Some("Description".into()),

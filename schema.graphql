@@ -162,7 +162,7 @@ input CreatePropertyInput {
 	gasEmission: PropertyGasEmission
 	heatingMethod: PropertyUsageType
 	housingType: PropertyUsageType
-	lenderId: ID!
+	lenderId: ID
 	name: String!
 	note: String
 	description: String

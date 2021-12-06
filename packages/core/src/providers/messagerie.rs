@@ -24,8 +24,8 @@ impl Messenger for Messagerie {
         type_: EventType,
         eventable_id: EventableId,
         account_id: AccountId,
-        participant_id: PersonId,
         sender_id: PersonId,
+        participant_id: PersonId,
         content: Option<String>,
     ) -> Result<Message> {
         let event = db.events().create(&trankeel_data::Event {
