@@ -63,6 +63,7 @@ use trankeel_core::mailer::IntoMail;
 use trankeel_core::mailer::Mail;
 use trankeel_core::mailer::Mailer;
 use trankeel_core::providers;
+use trankeel_core::providers::Messagerie;
 use trankeel_core::providers::Pdfmonkey;
 use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
@@ -85,8 +86,16 @@ use trankeel_data::TenantId;
 pub struct Client(context::Context);
 
 impl<'a> Client {
-    pub fn new(pg: Pg, pdfmonkey: Pdfmonkey, sendinblue: Sendinblue, stripe: Stripe) -> Self {
-        Self(context::Context::new(pg, pdfmonkey, sendinblue, stripe))
+    pub fn new(
+        pg: Pg,
+        pdfmonkey: Pdfmonkey,
+        sendinblue: Sendinblue,
+        messagerie: Messagerie,
+        stripe: Stripe,
+    ) -> Self {
+        Self(context::Context::new(
+            pg, pdfmonkey, sendinblue, messagerie, stripe,
+        ))
     }
 
     // Stores
@@ -353,6 +362,7 @@ pub fn init() -> Result<Client> {
         providers::Pg::init(),
         providers::Pdfmonkey::init(),
         providers::Sendinblue::init(),
+        providers::Messagerie::init(),
         providers::Stripe::init(),
     ))
 }
