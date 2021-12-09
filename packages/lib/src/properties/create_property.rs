@@ -1,7 +1,7 @@
 use crate::auth::AddressInput;
 use crate::error::Result;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::AsyncCommand;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::handlers::PropertyCreated;
 use trankeel_data::Account;
@@ -46,23 +46,33 @@ pub struct CreatePropertyInput {
     pub water_heating_method: Option<PropertyUsageType>,
 }
 
-pub(crate) struct CreateProperty<'a> {
-    account: &'a Account,
-    lender: &'a Lender,
+pub(crate) struct CreateProperty {
+    property_id: PropertyId,
+    account: Account,
+    lender: Lender,
 }
 
-impl<'a> CreateProperty<'a> {
-    pub fn new(account: &'a Account, lender: &'a Lender) -> Self {
-        Self { account, lender }
+impl CreateProperty {
+    pub fn new(property_id: PropertyId, account: Account, lender: Lender) -> Self {
+        Self {
+            property_id,
+            account,
+            lender,
+        }
     }
 
-    pub fn create_property(&self, input: CreatePropertyInput) -> Result<PropertyCreated> {
+    pub fn create_property(self, input: CreatePropertyInput) -> Result<Property> {
         input.validate()?;
 
-        let CreateProperty { account, lender } = *self;
+        let CreateProperty {
+            property_id,
+            account,
+            lender,
+            ..
+        } = self;
 
         let property = Property {
-            id: PropertyId::new(),
+            id: property_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             account_id: account.id,
@@ -89,18 +99,16 @@ impl<'a> CreateProperty<'a> {
             water_heating_method: input.water_heating_method,
         };
 
-        Ok(PropertyCreated { property })
+        Ok(property)
     }
 }
 
-#[async_trait]
-impl<'a> AsyncCommand for CreateProperty<'a> {
+impl Command for CreateProperty {
     type Input = CreatePropertyInput;
-    type Payload = Vec<Event>;
 
-    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
-        let payload = self.create_property(input)?;
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
+        let property = self.create_property(input)?;
 
-        Ok(vec![Event::PropertyCreated(payload)])
+        Ok(vec![PropertyCreated { property }.into()])
     }
 }
