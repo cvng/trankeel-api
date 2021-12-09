@@ -23,6 +23,7 @@ use trankeel_data::LeaseType;
 use trankeel_data::Lender;
 use trankeel_data::Person;
 use trankeel_data::Property;
+use trankeel_data::PropertyId;
 use trankeel_data::Rent;
 use trankeel_data::Tenant;
 
@@ -112,9 +113,8 @@ pub fn add_existing_lease(
     } = state;
 
     // Add property.
-    let property = CreateProperty::new(&account, &lender)
-        .create_property(input.property)?
-        .property;
+    let property = CreateProperty::new(PropertyId::new(), account.clone(), lender)
+        .create_property(input.property)?;
 
     // Add lease.
     let CreateLeasePayload { lease } = leases::create_lease(

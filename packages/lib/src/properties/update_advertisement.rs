@@ -27,7 +27,7 @@ pub struct UpdateAdvertisementInput {
     pub description: Option<String>,
 }
 
-pub struct UpdateAdvertisement {
+pub(crate) struct UpdateAdvertisement {
     pub advertisement: Advertisement,
 }
 

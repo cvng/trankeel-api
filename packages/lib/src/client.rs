@@ -59,9 +59,7 @@ use trankeel_core::database::WorkflowStore;
 use trankeel_core::dispatcher;
 use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_core::dispatcher::Command;
-use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
-use trankeel_core::handlers::PropertyCreated;
 use trankeel_core::mailer::IntoMail;
 use trankeel_core::mailer::Mail;
 use trankeel_core::mailer::Mailer;
@@ -233,6 +231,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreatePropertyInput,
     ) -> Result<Property> {
+        let property_id = PropertyId::new();
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let (lender, ..) = self
             .0
@@ -243,17 +242,9 @@ impl<'a> Client {
             .cloned()
             .ok_or_else(|| Error::msg("lender_not_found"))?;
 
-        CreateProperty::new(&account, &lender)
-            .run(input)
-            .await
-            .and_then(dispatcher::dispatch)?
-            .iter()
-            .find_map(|event| match event {
-                Event::PropertyCreated(PropertyCreated { property }) => Some(property),
-                _ => None,
-            })
-            .cloned()
-            .ok_or_else(|| Error::msg("create_property"))
+        dispatcher::dispatch(CreateProperty::new(property_id, account, lender).run(input)?)?;
+
+        self.0.db().properties().by_id(&property_id)
     }
 
     pub fn update_property(
