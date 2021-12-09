@@ -117,7 +117,7 @@ pub fn add_existing_lease(
         .create_property(input.property)?;
 
     // Add lease.
-    let CreateLeasePayload { lease } = leases::create_lease(
+    let CreateLeasePayload { mut lease } = leases::create_lease(
         CreateLeaseState {
             account: account.clone(),
         },
@@ -129,6 +129,9 @@ pub fn add_existing_lease(
             property_id: property.id,
         },
     )?;
+
+    // Make the lease active by using a signature date.
+    lease.signature_date = Some(lease.effect_date);
 
     // Add rents.
     let rents = lease.rents();
