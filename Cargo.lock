@@ -109,9 +109,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-rocket"
-version = "3.0.7"
+version = "3.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4d21167bbb60d5adf33084b0c4ac958a12efa868256e846e74f94e28e57018d"
+checksum = "9803e889c8663ed8e0dc390aeccd668590794f3aec68344059a6efb3e9510248"
 dependencies = [
  "async-graphql",
  "rocket",
