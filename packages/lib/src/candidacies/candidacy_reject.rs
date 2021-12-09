@@ -4,7 +4,7 @@ use crate::messaging::PushMessageState;
 use crate::PushMessageInput;
 use crate::PushMessagePayload;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::handlers::CandidacyRejected;
 use trankeel_core::templates::CandidacyRejectedMail;
@@ -79,7 +79,7 @@ impl<'a> RejectCandidacy<'a> {
 }
 
 #[async_trait]
-impl<'a> Command for RejectCandidacy<'a> {
+impl<'a> AsyncCommand for RejectCandidacy<'a> {
     type Input = RejectCandidacyInput;
     type Payload = Vec<Event>;
 

@@ -2,7 +2,7 @@ use crate::Result;
 use chrono::Utc;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
-use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Message;
@@ -37,7 +37,7 @@ impl<'a> PushMessage<'a> {
 }
 
 #[async_trait]
-impl<'a> Command for PushMessage<'a> {
+impl<'a> AsyncCommand for PushMessage<'a> {
     type Input = PushMessageInput;
     type Payload = PushMessagePayload;
 
