@@ -5,7 +5,7 @@ use crate::Tenant;
 use async_graphql::InputObject;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
-use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantId;
 use validator::Validate;
@@ -49,7 +49,7 @@ impl<'a> UpdateTenant<'a> {
 }
 
 #[async_trait]
-impl<'a> Command for UpdateTenant<'a> {
+impl<'a> AsyncCommand for UpdateTenant<'a> {
     type Input = UpdateTenantInput;
     type Payload = UpdateTenantPayload;
 

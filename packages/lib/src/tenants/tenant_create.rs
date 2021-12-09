@@ -11,7 +11,7 @@ use crate::Tenant;
 use async_graphql::InputObject;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
-use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_data::Account;
 use trankeel_data::AuthId;
 use trankeel_data::Discussion;
@@ -70,7 +70,7 @@ impl<'a> CreateTenant<'a> {
 }
 
 #[async_trait]
-impl<'a> Command for CreateTenant<'a> {
+impl<'a> AsyncCommand for CreateTenant<'a> {
     type Input = CreateTenantInput;
     type Payload = CreateTenantPayload;
 

@@ -22,11 +22,17 @@ use trankeel_data::Payment;
 use trankeel_data::Step;
 
 #[async_trait]
-pub trait Command {
+pub trait AsyncCommand {
     type Input;
     type Payload;
 
     async fn run(&self, input: Self::Input) -> Result<Self::Payload>;
+}
+
+pub trait Command {
+    type Input;
+
+    fn run(&self, input: Self::Input) -> Result<Vec<Event>>;
 }
 
 #[allow(clippy::large_enum_variant)]

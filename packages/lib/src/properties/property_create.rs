@@ -1,7 +1,7 @@
 use crate::auth::AddressInput;
 use crate::error::Result;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::handlers::PropertyCreated;
 use trankeel_data::Account;
@@ -94,7 +94,7 @@ impl<'a> CreateProperty<'a> {
 }
 
 #[async_trait]
-impl<'a> Command for CreateProperty<'a> {
+impl<'a> AsyncCommand for CreateProperty<'a> {
     type Input = CreatePropertyInput;
     type Payload = Vec<Event>;
 

@@ -11,7 +11,7 @@ use crate::CreateTenantPayload;
 use crate::Result;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
-use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_core::error::Error;
 use trankeel_data::Account;
 use trankeel_data::Amount;
@@ -63,7 +63,7 @@ impl<'a> AddExistingLease<'a> {
 }
 
 #[async_trait]
-impl<'a> Command for AddExistingLease<'a> {
+impl<'a> AsyncCommand for AddExistingLease<'a> {
     type Input = AddExistingLeaseInput;
     type Payload = AddExistingLeasePayload;
 

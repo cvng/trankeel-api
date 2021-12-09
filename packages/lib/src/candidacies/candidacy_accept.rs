@@ -17,7 +17,7 @@ use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher;
 use trankeel_core::dispatcher::dispatch;
-use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::no;
 use trankeel_core::mailer::Mailer;
