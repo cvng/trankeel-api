@@ -11,7 +11,9 @@ pub struct PropertyCreated {
 pub fn property_created(ctx: &Context, event: PropertyCreated) -> Result<()> {
     let db = ctx.db();
 
-    db.properties().create(&event.property)?;
+    let PropertyCreated { property } = event;
+
+    db.properties().create(&property)?;
 
     Ok(())
 }

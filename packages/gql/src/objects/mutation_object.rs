@@ -11,6 +11,7 @@ use super::Property;
 use super::Task;
 use crate::payloads::AddExistingLeasePayload;
 use crate::payloads::CompleteStepPayload;
+use crate::payloads::CreateAdvertisementPayload;
 use crate::payloads::CreateNoticesPayload;
 use crate::payloads::CreatePropertyPayload;
 use crate::payloads::CreateReceiptsPayload;
@@ -157,7 +158,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: CreateAdvertisementInput,
-    ) -> Result<Advertisement> {
+    ) -> Result<CreateAdvertisementPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_advertisement(ctx.data::<AuthId>()?, input)?
