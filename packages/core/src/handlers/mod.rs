@@ -1,4 +1,5 @@
 pub mod advertisement_created;
+pub mod advertisement_updated;
 pub mod candidacy_accepted;
 pub mod candidacy_created;
 pub mod candidacy_rejected;
@@ -12,6 +13,7 @@ pub mod receipt_sent;
 pub mod step_completed;
 
 pub use advertisement_created::*;
+pub use advertisement_updated::*;
 pub use candidacy_accepted::*;
 pub use candidacy_created::*;
 pub use candidacy_rejected::*;

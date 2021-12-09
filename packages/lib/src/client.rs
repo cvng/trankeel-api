@@ -22,6 +22,7 @@ use crate::properties::CreateAdvertisementInput;
 use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
 use crate::properties::DeletePropertyInput;
+use crate::properties::UpdateAdvertisement;
 use crate::properties::UpdateAdvertisementInput;
 use crate::properties::UpdatePropertyInput;
 use crate::tenants::CreateTenant;
@@ -285,10 +286,15 @@ impl<'a> Client {
 
     pub fn update_advertisement(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: UpdateAdvertisementInput,
     ) -> Result<Advertisement> {
-        crate::properties::update_advertisement(self.0.db(), auth_id, input)
+        let advertisement_id = input.id;
+        let advertisement = self.0.db().advertisements().by_id(&advertisement_id)?;
+
+        dispatcher::dispatch(UpdateAdvertisement::new(advertisement).run(input)?)?;
+
+        self.0.db().advertisements().by_id(&advertisement_id)
     }
 
     pub async fn add_existing_lease(

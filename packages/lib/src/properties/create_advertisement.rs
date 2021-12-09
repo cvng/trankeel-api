@@ -41,7 +41,7 @@ impl CreateAdvertisement {
 impl Command for CreateAdvertisement {
     type Input = CreateAdvertisementInput;
 
-    fn run(&self, input: Self::Input) -> Result<Vec<Event>> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let advertisement = Advertisement {

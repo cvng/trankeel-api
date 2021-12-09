@@ -1,6 +1,7 @@
 use crate::context::Context;
 use crate::error::Result;
 use crate::handlers::advertisement_created;
+use crate::handlers::advertisement_updated;
 use crate::handlers::candidacy_accepted;
 use crate::handlers::candidacy_created;
 use crate::handlers::candidacy_rejected;
@@ -13,6 +14,7 @@ use crate::handlers::receipt_created;
 use crate::handlers::receipt_sent;
 use crate::handlers::step_completed;
 use crate::handlers::AdvertisementCreated;
+use crate::handlers::AdvertisementUpdated;
 use crate::handlers::CandidacyRejected;
 use crate::handlers::PropertyCreated;
 use crate::providers::Pg;
@@ -34,13 +36,14 @@ pub trait AsyncCommand {
 pub trait Command {
     type Input;
 
-    fn run(&self, input: Self::Input) -> Result<Vec<Event>>;
+    fn run(self, input: Self::Input) -> Result<Vec<Event>>;
 }
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone)]
 pub enum Event {
     AdvertisementCreated(AdvertisementCreated),
+    AdvertisementUpdated(AdvertisementUpdated),
     CandidacyAccepted(Candidacy),
     CandidacyCreated(Candidacy),
     CandidacyRejected(CandidacyRejected),
@@ -58,6 +61,7 @@ impl From<Event> for EventType {
     fn from(item: Event) -> Self {
         match item {
             Event::AdvertisementCreated(_) => unimplemented!(),
+            Event::AdvertisementUpdated(_) => unimplemented!(),
             Event::CandidacyAccepted(_) => Self::CandidacyAccepted,
             Event::CandidacyCreated(_) => Self::CandidacyCreated,
             Event::CandidacyRejected(_) => Self::CandidacyRejected,
@@ -79,6 +83,7 @@ pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
     Pg::transaction(ctx.db(), || {
         events.iter().try_for_each(|event| match event {
             Event::AdvertisementCreated(event) => advertisement_created(&ctx, event.clone()),
+            Event::AdvertisementUpdated(event) => advertisement_updated(&ctx, event.clone()),
             Event::CandidacyAccepted(candidacy) => candidacy_accepted(&ctx, event, candidacy),
             Event::CandidacyCreated(candidacy) => candidacy_created(&ctx, event, candidacy),
             Event::CandidacyRejected(event) => candidacy_rejected(&ctx, event.clone()),

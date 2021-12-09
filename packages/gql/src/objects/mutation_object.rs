@@ -1,6 +1,5 @@
 use super::wip;
 use super::Account;
-use super::Advertisement;
 use super::Candidacy;
 use super::File;
 use super::Lease;
@@ -19,6 +18,7 @@ use crate::payloads::CreateTenantPayload;
 use crate::payloads::CreateUserWithAccountPayload;
 use crate::payloads::DeleteDiscussionPayload;
 use crate::payloads::PushMessagePayload;
+use crate::payloads::UpdateAdvertisementPayload;
 use crate::payloads::UpdateTenantPayload;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -169,7 +169,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: UpdateAdvertisementInput,
-    ) -> Result<Advertisement> {
+    ) -> Result<UpdateAdvertisementPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .update_advertisement(ctx.data::<AuthId>()?, input)?

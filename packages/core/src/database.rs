@@ -128,6 +128,7 @@ pub trait LenderStore {
 
 pub trait AdvertisementStore {
     fn by_id(&mut self, id: &AdvertisementId) -> Result<Advertisement>;
+    fn by_id_published(&mut self, id: &AdvertisementId) -> Result<Advertisement>;
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Advertisement>;
     fn by_property_id(&mut self, property_id: &PropertyId) -> Result<Vec<Advertisement>>;
     fn create(&mut self, data: &Advertisement) -> Result<Advertisement>;

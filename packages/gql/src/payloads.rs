@@ -149,6 +149,19 @@ impl From<trankeel::Advertisement> for CreateAdvertisementPayload {
 }
 
 #[derive(SimpleObject)]
+pub struct UpdateAdvertisementPayload {
+    advertisement: Advertisement,
+}
+
+impl From<trankeel::Advertisement> for UpdateAdvertisementPayload {
+    fn from(item: trankeel::Advertisement) -> Self {
+        Self {
+            advertisement: item.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
 pub struct PushMessagePayload {
     errors: Option<Vec<Error>>,
     message: Option<Message>,
