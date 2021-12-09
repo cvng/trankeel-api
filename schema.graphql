@@ -123,6 +123,9 @@ input CreateAdvertisementInput {
 	title: String!
 	description: String!
 }
+type CreateAdvertisementPayload {
+	advertisement: Advertisement!
+}
 input CreateCandidacyInput {
 	advertisementId: ID!
 	email: String!
@@ -517,8 +520,8 @@ type Mutation {
 	propertyCreate(input: CreatePropertyInput!): CreatePropertyPayload!
 	propertyUpdate(input: PropertyUpdateInput!): Property!
 	propertyDelete(id: ID!): ID!
-	createAdvertisement(input: CreateAdvertisementInput!): Advertisement!
-	updateAdvertisement(input: UpdateAdvertisementInput!): Advertisement!
+	createAdvertisement(input: CreateAdvertisementInput!): CreateAdvertisementPayload!
+	updateAdvertisement(input: UpdateAdvertisementInput!): UpdateAdvertisementPayload!
 	leaseAddExisting(input: AddExistingLeaseInput!): AddExistingLeasePayload!
 	leaseFurnishedCreate(input: LeaseFurnishedInput!): Lease!
 	leaseFurnishedUpdate(input: LeaseFurnishedUpdateInput!): Lease!
@@ -919,6 +922,9 @@ input UpdateAdvertisementInput {
 	referralLeaseId: ID
 	title: String
 	description: String
+}
+type UpdateAdvertisementPayload {
+	advertisement: Advertisement!
 }
 type UpdateTenantPayload {
 	tenant: Tenant!

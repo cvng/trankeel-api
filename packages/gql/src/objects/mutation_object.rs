@@ -1,6 +1,5 @@
 use super::wip;
 use super::Account;
-use super::Advertisement;
 use super::Candidacy;
 use super::File;
 use super::Lease;
@@ -11,6 +10,7 @@ use super::Property;
 use super::Task;
 use crate::payloads::AddExistingLeasePayload;
 use crate::payloads::CompleteStepPayload;
+use crate::payloads::CreateAdvertisementPayload;
 use crate::payloads::CreateNoticesPayload;
 use crate::payloads::CreatePropertyPayload;
 use crate::payloads::CreateReceiptsPayload;
@@ -18,6 +18,7 @@ use crate::payloads::CreateTenantPayload;
 use crate::payloads::CreateUserWithAccountPayload;
 use crate::payloads::DeleteDiscussionPayload;
 use crate::payloads::PushMessagePayload;
+use crate::payloads::UpdateAdvertisementPayload;
 use crate::payloads::UpdateTenantPayload;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -157,7 +158,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: CreateAdvertisementInput,
-    ) -> Result<Advertisement> {
+    ) -> Result<CreateAdvertisementPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_advertisement(ctx.data::<AuthId>()?, input)?
@@ -168,7 +169,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: UpdateAdvertisementInput,
-    ) -> Result<Advertisement> {
+    ) -> Result<UpdateAdvertisementPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .update_advertisement(ctx.data::<AuthId>()?, input)?

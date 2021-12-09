@@ -17,10 +17,12 @@ use crate::messaging::DeleteDiscussionInput;
 use crate::messaging::PushMessage;
 use crate::messaging::PushMessageInput;
 use crate::owners::UpdateIndividualLenderInput;
+use crate::properties::CreateAdvertisement;
 use crate::properties::CreateAdvertisementInput;
 use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
 use crate::properties::DeletePropertyInput;
+use crate::properties::UpdateAdvertisement;
 use crate::properties::UpdateAdvertisementInput;
 use crate::properties::UpdatePropertyInput;
 use crate::tenants::CreateTenant;
@@ -56,6 +58,7 @@ use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
 use trankeel_core::dispatcher;
 use trankeel_core::dispatcher::AsyncCommand;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
 use trankeel_core::handlers::PropertyCreated;
@@ -69,6 +72,7 @@ use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
 use trankeel_core::providers::Stripe;
 use trankeel_data::Advertisement;
+use trankeel_data::AdvertisementId;
 use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::DiscussionId;
@@ -270,18 +274,27 @@ impl<'a> Client {
 
     pub fn create_advertisement(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: CreateAdvertisementInput,
     ) -> Result<Advertisement> {
-        crate::properties::create_advertisement(self.0.db(), auth_id, input)
+        let advertisement_id = AdvertisementId::new();
+
+        dispatcher::dispatch(CreateAdvertisement::new(advertisement_id).run(input)?)?;
+
+        self.0.db().advertisements().by_id(&advertisement_id)
     }
 
     pub fn update_advertisement(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: UpdateAdvertisementInput,
     ) -> Result<Advertisement> {
-        crate::properties::update_advertisement(self.0.db(), auth_id, input)
+        let advertisement_id = input.id;
+        let advertisement = self.0.db().advertisements().by_id(&advertisement_id)?;
+
+        dispatcher::dispatch(UpdateAdvertisement::new(advertisement).run(input)?)?;
+
+        self.0.db().advertisements().by_id(&advertisement_id)
     }
 
     pub async fn add_existing_lease(

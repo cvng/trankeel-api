@@ -1,4 +1,5 @@
 use crate::objects::Account;
+use crate::objects::Advertisement;
 use crate::objects::Error;
 use crate::objects::File;
 use crate::objects::Lease;
@@ -130,6 +131,32 @@ impl From<trankeel::Property> for CreatePropertyPayload {
     fn from(item: trankeel::Property) -> Self {
         Self {
             property: item.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct CreateAdvertisementPayload {
+    advertisement: Advertisement,
+}
+
+impl From<trankeel::Advertisement> for CreateAdvertisementPayload {
+    fn from(item: trankeel::Advertisement) -> Self {
+        Self {
+            advertisement: item.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct UpdateAdvertisementPayload {
+    advertisement: Advertisement,
+}
+
+impl From<trankeel::Advertisement> for UpdateAdvertisementPayload {
+    fn from(item: trankeel::Advertisement) -> Self {
+        Self {
+            advertisement: item.into(),
         }
     }
 }

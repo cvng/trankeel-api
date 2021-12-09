@@ -45,7 +45,7 @@ impl Query {
         Ok(ctx
             .data_unchecked::<Client>()
             .advertisements()
-            .by_id(&id)?
+            .by_id_published(&id)?
             .into())
     }
 
