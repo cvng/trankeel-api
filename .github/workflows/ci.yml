@@ -22,6 +22,6 @@ jobs:
 
       - run: cargo build --release --locked
 
-      - run: cargo clippy --release --locked
+      - run: cargo clippy --release --locked -- --deny warnings
 
       - run: cargo test --release --locked

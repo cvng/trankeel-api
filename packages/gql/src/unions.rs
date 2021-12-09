@@ -91,6 +91,7 @@ impl From<trankeel::LenderWithIdentity> for LegalIdentity {
     }
 }
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Union)]
 pub enum WarrantIdentity {
     Individual(Person),

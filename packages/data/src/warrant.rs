@@ -20,6 +20,7 @@ pub enum WarrantType {
     Company,
 }
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone)]
 pub enum WarrantIdentity {
     Individual(Person),
