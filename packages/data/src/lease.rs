@@ -21,6 +21,8 @@ pub type LeaseFile = File; // alias for a File
 
 pub type LeaseFileId = FileId; // alias for a FileId
 
+pub type LeaseWithRents = (Lease, Vec<Rent>);
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 pub enum LeaseStatus {
     Unsigned,
