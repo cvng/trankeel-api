@@ -66,7 +66,7 @@ impl From<Event> for EventType {
     }
 }
 
-pub fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<Vec<Event>> {
+pub fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     Pg::transaction(ctx.db(), || {
         events.iter().try_for_each(|event| match event {
             Event::AdvertisementCreated(event) => advertisement_created(ctx, event.clone()),
@@ -88,7 +88,7 @@ pub fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<Vec<Event>> {
         })
     })?;
 
-    Ok(events)
+    Ok(())
 }
 
 pub async fn dispatch_async(ctx: &Context, events: Vec<Event>) -> Result<()> {
