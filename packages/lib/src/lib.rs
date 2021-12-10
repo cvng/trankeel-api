@@ -56,7 +56,6 @@ pub use crate::tenants::CreateTenantInput;
 pub use crate::tenants::CreateTenantPayload;
 pub use crate::tenants::DeleteTenantInput;
 pub use crate::tenants::UpdateTenantInput;
-pub use crate::tenants::UpdateTenantPayload;
 pub use crate::warrants::CreateProfessionalWarrantInput;
 pub use crate::warrants::CreateWarrantInput;
 pub use crate::workflows::CompleteStepInput;

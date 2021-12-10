@@ -114,10 +114,10 @@ pub struct UpdateTenantPayload {
     tenant: Tenant,
 }
 
-impl From<trankeel::UpdateTenantPayload> for UpdateTenantPayload {
-    fn from(item: trankeel::UpdateTenantPayload) -> Self {
+impl From<trankeel::Tenant> for UpdateTenantPayload {
+    fn from(item: trankeel::Tenant) -> Self {
         Self {
-            tenant: item.tenant.into(),
+            tenant: item.into(),
         }
     }
 }

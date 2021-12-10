@@ -30,7 +30,6 @@ use crate::tenants::CreateTenantInput;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenant;
 use crate::tenants::UpdateTenantInput;
-use crate::tenants::UpdateTenantPayload;
 use crate::workflows::CompleteStepInput;
 use crate::AddExistingLeaseInput;
 use crate::PushMessagePayload;
@@ -211,26 +210,29 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreateTenantInput,
     ) -> Result<Tenant> {
-        let db = self.0.db();
-
         let tenant_id = TenantId::new();
-        let account = db.accounts().by_auth_id(auth_id)?;
-        let account_owner = db.persons().by_auth_id(auth_id)?;
+        let account = self.0.db().accounts().by_auth_id(auth_id)?;
+        let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
         let identity = None;
 
         dispatcher::dispatch(
             CreateTenant::new(tenant_id, account, account_owner, identity).run(input)?,
         )?;
 
-        db.tenants().by_id(&tenant_id)
+        self.0.db().tenants().by_id(&tenant_id)
     }
 
     pub async fn update_tenant(
         &self,
         _auth_id: &AuthId,
         input: UpdateTenantInput,
-    ) -> Result<UpdateTenantPayload> {
-        UpdateTenant::new(&self.0).run(input).await
+    ) -> Result<Tenant> {
+        let tenant_id = input.id;
+        let tenant = self.0.db().tenants().by_id(&tenant_id)?;
+
+        dispatcher::dispatch(UpdateTenant::new(tenant).run(input)?)?;
+
+        self.0.db().tenants().by_id(&tenant_id)
     }
 
     pub fn delete_tenant(&self, auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
