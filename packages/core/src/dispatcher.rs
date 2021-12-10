@@ -66,39 +66,35 @@ impl From<Event> for EventType {
     }
 }
 
-pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
-    let ctx = Context::env();
-
+pub fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     Pg::transaction(ctx.db(), || {
         events.iter().try_for_each(|event| match event {
-            Event::AdvertisementCreated(event) => advertisement_created(&ctx, event.clone()),
-            Event::AdvertisementUpdated(event) => advertisement_updated(&ctx, event.clone()),
-            Event::CandidacyAccepted(candidacy) => candidacy_accepted(&ctx, event, candidacy),
-            Event::CandidacyCreated(candidacy) => candidacy_created(&ctx, event, candidacy),
-            Event::CandidacyRejected(event) => candidacy_rejected(&ctx, event.clone()),
-            Event::LeaseAffected(event) => lease_affected(&ctx, event.clone()),
-            Event::LeaseCreated(event) => lease_created(&ctx, event.clone()),
-            Event::NoticeCreated(notice) => notice_created(&ctx, event, notice),
-            Event::PaymentCreated(payment) => payment_created(&ctx, event, payment),
-            Event::PropertyCreated(event) => property_created(&ctx, event.clone()),
-            Event::PropertyUpdated(event) => property_updated(&ctx, event.clone()),
-            Event::ReceiptCreated(receipt) => receipt_created(&ctx, event, receipt),
+            Event::AdvertisementCreated(event) => advertisement_created(ctx, event.clone()),
+            Event::AdvertisementUpdated(event) => advertisement_updated(ctx, event.clone()),
+            Event::CandidacyAccepted(candidacy) => candidacy_accepted(ctx, event, candidacy),
+            Event::CandidacyCreated(candidacy) => candidacy_created(ctx, event, candidacy),
+            Event::CandidacyRejected(event) => candidacy_rejected(ctx, event.clone()),
+            Event::LeaseAffected(event) => lease_affected(ctx, event.clone()),
+            Event::LeaseCreated(event) => lease_created(ctx, event.clone()),
+            Event::NoticeCreated(notice) => notice_created(ctx, event, notice),
+            Event::PaymentCreated(payment) => payment_created(ctx, event, payment),
+            Event::PropertyCreated(event) => property_created(ctx, event.clone()),
+            Event::PropertyUpdated(event) => property_updated(ctx, event.clone()),
+            Event::ReceiptCreated(receipt) => receipt_created(ctx, event, receipt),
             Event::ReceiptSent(_) => unimplemented!(),
-            Event::StepCompleted(step) => step_completed(&ctx, event, step),
-            Event::TenantCreated(event) => tenant_created(&ctx, event.clone()),
-            Event::TenantUpdated(event) => tenant_updated(&ctx, event.clone()),
+            Event::StepCompleted(step) => step_completed(ctx, event, step),
+            Event::TenantCreated(event) => tenant_created(ctx, event.clone()),
+            Event::TenantUpdated(event) => tenant_updated(ctx, event.clone()),
         })
     })?;
 
-    Ok(events)
+    Ok(())
 }
 
-pub async fn dispatch_async(events: Vec<Event>) -> Result<()> {
-    let ctx = Context::env();
-
+pub async fn dispatch_async(ctx: &Context, events: Vec<Event>) -> Result<()> {
     for event in events {
         match event {
-            Event::ReceiptSent(event) => receipt_sent(&ctx, event).await?,
+            Event::ReceiptSent(event) => receipt_sent(ctx, event).await?,
             _ => unimplemented!(),
         }
     }

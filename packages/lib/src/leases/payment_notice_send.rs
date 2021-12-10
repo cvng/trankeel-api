@@ -1,6 +1,7 @@
 use crate::error::Result;
 use async_graphql::InputObject;
 use chrono::Utc;
+use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Event;
@@ -28,23 +29,24 @@ pub struct CreateNoticesInput {
 // # Operation
 
 pub async fn create_notices(
-    db: &impl Db,
+    ctx: &Context,
     auth_id: &AuthId,
-    pdfmaker: &impl Pdfmaker,
     input: CreateNoticesInput,
 ) -> Result<Vec<Notice>> {
     input.validate()?;
 
-    let rents = find_rents(db, auth_id, input.rent_ids)?;
+    let rents = find_rents(ctx, auth_id, input.rent_ids)?;
 
-    let notices = generate_notices(db, pdfmaker, rents).await?;
+    let notices = generate_notices(ctx, rents).await?;
 
     Ok(notices)
 }
 
 // # Utils
 
-fn find_rents(db: &impl Db, _auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
+fn find_rents(ctx: &Context, _auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
+    let db = ctx.db();
+
     let mut rents = vec![];
 
     for rent_id in rent_ids {
@@ -55,11 +57,10 @@ fn find_rents(db: &impl Db, _auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<
     Ok(rents)
 }
 
-async fn generate_notices(
-    db: &impl Db,
-    pdfmaker: &impl Pdfmaker,
-    rents: Vec<Rent>,
-) -> Result<Vec<Notice>> {
+async fn generate_notices(ctx: &Context, rents: Vec<Rent>) -> Result<Vec<Notice>> {
+    let db = ctx.db();
+    let pdfmaker = ctx.pdfmaker();
+
     let mut notices = vec![];
 
     for rent in rents {
@@ -113,7 +114,7 @@ async fn generate_notices(
 
         notices.push(notice.clone());
 
-        dispatch(vec![Event::NoticeCreated(notice)])?;
+        dispatch(ctx, vec![Event::NoticeCreated(notice)])?;
     }
 
     Ok(notices)

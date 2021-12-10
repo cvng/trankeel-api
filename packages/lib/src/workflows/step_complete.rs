@@ -1,4 +1,5 @@
 use crate::error::Result;
+use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Event;
@@ -19,7 +20,9 @@ pub struct RequirementInput {
     pub value: String,
 }
 
-pub fn complete_step(db: &impl Db, input: CompleteStepInput) -> Result<Step> {
+pub fn complete_step(ctx: &Context, input: CompleteStepInput) -> Result<Step> {
+    let db = ctx.db();
+
     input.validate()?;
 
     let step = db.steps().by_id(&input.id)?;
@@ -31,7 +34,7 @@ pub fn complete_step(db: &impl Db, input: CompleteStepInput) -> Result<Step> {
         ..step
     })?;
 
-    dispatch(vec![Event::StepCompleted(step.clone())])?;
+    dispatch(ctx, vec![Event::StepCompleted(step.clone())])?;
 
     Ok(step)
 }

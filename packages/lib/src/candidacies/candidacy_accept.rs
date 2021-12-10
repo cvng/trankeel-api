@@ -82,7 +82,7 @@ pub(crate) async fn accept_candidacy(
         RejectCandidacy::new(&candidacy, &candidate, &account_owner, &discussion)
             .run(RejectCandidacyInput { id: candidacy.id })
             .await
-            .and_then(dispatcher::dispatch)?;
+            .and_then(|events| dispatcher::dispatch(ctx, events))?;
     }
 
     // Accept given candidacy.
@@ -94,7 +94,7 @@ pub(crate) async fn accept_candidacy(
         ..candidacy
     })?;
 
-    dispatch(vec![Event::CandidacyAccepted(candidacy.clone())])?;
+    dispatch(ctx, vec![Event::CandidacyAccepted(candidacy.clone())])?;
 
     // Create tenant profile.
     let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
@@ -117,7 +117,7 @@ pub(crate) async fn accept_candidacy(
 
     // Create unsigned lease.
     let advertisement = db.advertisements().by_id(&candidacy.advertisement_id)?;
-    let lease = create_lease_from_advertisement(db, auth_id, &advertisement, vec![tenant])?;
+    let lease = create_lease_from_advertisement(ctx, auth_id, &advertisement, vec![tenant])?;
 
     // Init new lease file.
     let lease_file_id = LeaseFileId::new();
@@ -167,7 +167,7 @@ pub(crate) async fn accept_candidacy(
     let steps = db.steps().by_workflow_id(&workflow.id)?;
 
     complete_step(
-        db,
+        ctx,
         CompleteStepInput {
             id: steps.first().ok_or_else(|| no("workflow.first_step"))?.id,
             requirements: None,

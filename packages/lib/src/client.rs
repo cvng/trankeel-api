@@ -217,6 +217,7 @@ impl<'a> Client {
         let identity = None;
 
         dispatcher::dispatch(
+            &self.0,
             CreateTenant::new(tenant_id, account, account_owner, identity).run(input)?,
         )?;
 
@@ -231,7 +232,7 @@ impl<'a> Client {
         let tenant_id = input.id;
         let tenant = self.0.db().tenants().by_id(&tenant_id)?;
 
-        dispatcher::dispatch(UpdateTenant::new(tenant).run(input)?)?;
+        dispatcher::dispatch(&self.0, UpdateTenant::new(tenant).run(input)?)?;
 
         self.0.db().tenants().by_id(&tenant_id)
     }
@@ -256,7 +257,10 @@ impl<'a> Client {
             .cloned()
             .ok_or_else(|| Error::msg("lender_not_found"))?;
 
-        dispatcher::dispatch(CreateProperty::new(property_id, account, lender).run(input)?)?;
+        dispatcher::dispatch(
+            &self.0,
+            CreateProperty::new(property_id, account, lender).run(input)?,
+        )?;
 
         self.0.db().properties().by_id(&property_id)
     }
@@ -269,7 +273,7 @@ impl<'a> Client {
         let property = self.0.db().properties().by_id(&input.id)?;
         let property_id = property.id;
 
-        dispatcher::dispatch(UpdateProperty::new(property).run(input)?)?;
+        dispatcher::dispatch(&self.0, UpdateProperty::new(property).run(input)?)?;
 
         self.0.db().properties().by_id(&property_id)
     }
@@ -289,7 +293,10 @@ impl<'a> Client {
     ) -> Result<Advertisement> {
         let advertisement_id = AdvertisementId::new();
 
-        dispatcher::dispatch(CreateAdvertisement::new(advertisement_id).run(input)?)?;
+        dispatcher::dispatch(
+            &self.0,
+            CreateAdvertisement::new(advertisement_id).run(input)?,
+        )?;
 
         self.0.db().advertisements().by_id(&advertisement_id)
     }
@@ -302,7 +309,7 @@ impl<'a> Client {
         let advertisement_id = input.id;
         let advertisement = self.0.db().advertisements().by_id(&advertisement_id)?;
 
-        dispatcher::dispatch(UpdateAdvertisement::new(advertisement).run(input)?)?;
+        dispatcher::dispatch(&self.0, UpdateAdvertisement::new(advertisement).run(input)?)?;
 
         self.0.db().advertisements().by_id(&advertisement_id)
     }
@@ -318,6 +325,7 @@ impl<'a> Client {
         let (lender, ..) = self.0.db().lenders().by_account_id_first(&account.id)?;
 
         dispatcher::dispatch(
+            &self.0,
             AddExistingLease::new(lease_id, account, account_owner, lender).run(input)?,
         )?;
 
@@ -329,7 +337,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        crate::leases::create_furnished_lease(self.0.db(), auth_id, input)
+        crate::leases::create_furnished_lease(&self.0, auth_id, input)
     }
 
     pub fn update_furnished_lease(
@@ -357,11 +365,11 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreateReceiptsInput,
     ) -> Result<Vec<Receipt>> {
-        crate::leases::create_receipts(self.0.db(), auth_id, self.0.pdfmaker(), input).await
+        crate::leases::create_receipts(&self.0, auth_id, input).await
     }
 
     pub async fn send_receipts(&self, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
-        dispatcher::dispatch_async(leases::send_receipts(input)?).await?;
+        dispatcher::dispatch_async(&self.0, leases::send_receipts(input)?).await?;
 
         Ok(vec![])
     }
@@ -371,7 +379,7 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreateNoticesInput,
     ) -> Result<Vec<Notice>> {
-        crate::leases::create_notices(self.0.db(), auth_id, self.0.pdfmaker(), input).await
+        crate::leases::create_notices(&self.0, auth_id, input).await
     }
 
     pub fn delete_discussion(
@@ -387,7 +395,7 @@ impl<'a> Client {
     }
 
     pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
-        crate::workflows::complete_step(self.0.db(), input)
+        crate::workflows::complete_step(&self.0, input)
     }
 
     pub async fn batch_mails(&self, mails: Vec<impl IntoMail>) -> Result<Vec<Mail>> {

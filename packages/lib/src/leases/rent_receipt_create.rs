@@ -1,6 +1,7 @@
 use crate::error::Result;
 use async_graphql::InputObject;
 use chrono::Utc;
+use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Event;
@@ -39,16 +40,15 @@ pub struct SendReceiptsInput {
 // # Operation
 
 pub async fn create_receipts(
-    db: &impl Db,
+    ctx: &Context,
     _auth_id: &AuthId,
-    pdfmaker: &impl Pdfmaker,
     input: CreateReceiptsInput,
 ) -> Result<Vec<Receipt>> {
     input.validate()?;
 
-    let rents = setlle_rents(db, input.rent_ids)?;
+    let rents = setlle_rents(ctx, input.rent_ids)?;
 
-    let receipts = generate_receipts(db, pdfmaker, rents).await?;
+    let receipts = generate_receipts(ctx, rents).await?;
 
     Ok(receipts)
 }
@@ -66,7 +66,9 @@ pub fn send_receipts(input: SendReceiptsInput) -> Result<Vec<Event>> {
 
 // # Utils
 
-fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
+fn setlle_rents(ctx: &Context, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
+    let db = ctx.db();
+
     let mut rents = vec![];
 
     for rent_id in rent_ids {
@@ -91,17 +93,16 @@ fn setlle_rents(db: &impl Db, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
 
         rents.push(rent);
 
-        dispatch(vec![Event::PaymentCreated(payment)])?;
+        dispatch(ctx, vec![Event::PaymentCreated(payment)])?;
     }
 
     Ok(rents)
 }
 
-async fn generate_receipts(
-    db: &impl Db,
-    pdfmaker: &impl Pdfmaker,
-    rents: Vec<Rent>,
-) -> Result<Vec<Receipt>> {
+async fn generate_receipts(ctx: &Context, rents: Vec<Rent>) -> Result<Vec<Receipt>> {
+    let db = ctx.db();
+    let pdfmaker = ctx.pdfmaker();
+
     let mut receipts = vec![];
 
     for rent in rents {
@@ -155,7 +156,7 @@ async fn generate_receipts(
 
         receipts.push(receipt.clone());
 
-        dispatch(vec![Event::ReceiptCreated(receipt)])?;
+        dispatch(ctx, vec![Event::ReceiptCreated(receipt)])?;
     }
 
     Ok(receipts)
