@@ -5,6 +5,7 @@ use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
 use crate::error::Result;
+use crate::leases;
 use crate::leases::AddExistingLease;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateNoticesInput;
@@ -359,12 +360,10 @@ impl<'a> Client {
         crate::leases::create_receipts(self.0.db(), auth_id, self.0.pdfmaker(), input).await
     }
 
-    pub async fn send_receipts(
-        &self,
-        auth_id: &AuthId,
-        input: SendReceiptsInput,
-    ) -> Result<Vec<Receipt>> {
-        crate::leases::send_receipts(self.0.db(), auth_id, self.0.mailer(), input).await
+    pub async fn send_receipts(&self, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
+        dispatcher::dispatch_async(leases::send_receipts(input)?).await?;
+
+        Ok(vec![])
     }
 
     pub async fn create_notices(
