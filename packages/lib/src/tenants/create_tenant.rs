@@ -3,6 +3,7 @@ use crate::messaging;
 use crate::messaging::CreateDiscussionPayload;
 use crate::messaging::CreateDiscussionState;
 use crate::warrants;
+use crate::warrants::CreateWarrantPayload;
 use crate::warrants::CreateWarrantState;
 use crate::CreateDiscussionInput;
 use crate::CreateWarrantInput;
@@ -77,7 +78,7 @@ impl CreateTenant {
             identity,
         } = self;
 
-        let is_new_tenant = identity.is_none();
+        let identity_already_exists = identity.is_some();
 
         // Create tenant identity (used for messaging).
         let identity = identity.unwrap_or(Person {
@@ -116,28 +117,28 @@ impl CreateTenant {
 
         // Affect warrants if provided.
         let warrants = if let Some(warrants_input) = input.warrants {
-            let mut warrants = vec![];
-
-            for input in warrants_input {
-                let warrant = warrants::create_warrant(
-                    CreateWarrantState {
-                        account: account.clone(),
-                        tenant: Some(tenant.clone()),
-                        candidacy: None,
-                    },
-                    input,
-                )?
-                .warrant;
-                warrants.push(warrant);
-            }
-
-            Some(warrants)
+            warrants_input
+                .into_iter()
+                .map(|input| {
+                    warrants::create_warrant(
+                        CreateWarrantState {
+                            account: account.clone(),
+                            tenant: Some(tenant.clone()),
+                            candidacy: None,
+                        },
+                        input,
+                    )
+                })
+                .collect::<Result<Vec<_>>>()?
+                .into_iter()
+                .map(|CreateWarrantPayload { warrant }| Some(warrant))
+                .collect()
         } else {
             None
         };
 
-        // Create discussion if new tenant.
-        let discussion = if is_new_tenant {
+        // Create discussion if needed.
+        let discussion = if !identity_already_exists {
             messaging::create_discussion(
                 CreateDiscussionState { account },
                 CreateDiscussionInput {
@@ -171,14 +172,12 @@ impl Command for CreateTenant {
             discussion,
         } = self.create_tenant(input)?;
 
-        Ok(vec![
-            TenantCreated {
-                tenant,
-                identity,
-                discussion,
-                warrants,
-            }
-            .into(), //
-        ])
+        Ok(vec![TenantCreated {
+            tenant,
+            identity,
+            discussion,
+            warrants,
+        }
+        .into()])
     }
 }
