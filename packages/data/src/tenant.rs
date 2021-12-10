@@ -10,8 +10,6 @@ use crate::Person;
 use crate::PersonId;
 use crate::PhoneNumber;
 
-// # Types
-
 pub type TenantId = Id;
 
 pub type TenantWithIdentity = (Tenant, Person);
@@ -51,7 +49,14 @@ pub struct Tenant {
     pub is_student: Option<bool>,
 }
 
-// # Impls
+impl Tenant {
+    pub fn with_lease(self, lease_id: &LeaseId) -> Self {
+        Self {
+            lease_id: Some(*lease_id),
+            ..self
+        }
+    }
+}
 
 impl Name for Tenant {
     fn first_name(&self) -> String {

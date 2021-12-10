@@ -102,12 +102,14 @@ pub trait PersonStore {
     fn by_id(&mut self, id: &PersonId) -> Result<Person>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Person>;
     fn by_account_id(&mut self, account_id: &AccountId) -> Result<Vec<Person>>;
+    fn by_account_id_first(&mut self, account_id: &AccountId) -> Result<Person>;
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Person>;
     fn by_notice_id(&mut self, notice_id: &NoticeId) -> Result<Person>;
     fn by_receipt_id(&mut self, receipt_id: &ReceiptId) -> Result<Person>;
     fn by_payment_id(&mut self, payment_id: &PaymentId) -> Result<Person>;
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Person>;
     fn by_step_id(&mut self, step_id: &StepId) -> Result<Person>;
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Person>;
     fn create(&mut self, data: &Person) -> Result<Person>;
     fn create_many(&mut self, data: &[Person]) -> Result<Vec<Person>>;
     fn update(&mut self, data: &Person) -> Result<Person>;
