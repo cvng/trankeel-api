@@ -1,5 +1,6 @@
 use crate::error::Result;
 use crate::files::CreateFileInput;
+use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::error::Error;
@@ -104,10 +105,12 @@ pub struct CreateNakedLeaseInput {
 // # Operation
 
 pub fn create_furnished_lease(
-    db: &impl Db,
+    ctx: &Context,
     auth_id: &AuthId,
     input: CreateFurnishedLeaseInput,
 ) -> Result<Lease> {
+    let db = ctx.db();
+
     input.validate()?;
 
     let account = db.accounts().by_auth_id(auth_id)?;
@@ -159,6 +162,7 @@ pub fn create_furnished_lease(
     });
 
     dispatch(
+        ctx,
         vec![LeaseCreated {
             lease: lease.clone(),
             rents,
@@ -191,13 +195,13 @@ pub fn create_furnished_lease(
 // # Utils
 
 pub(crate) fn create_lease_from_advertisement(
-    db: &impl Db,
+    ctx: &Context,
     auth_id: &AuthId,
     advertisement: &Advertisement,
     tenants: Vec<Tenant>,
 ) -> Result<Lease> {
     create_furnished_lease(
-        db,
+        ctx,
         auth_id,
         CreateFurnishedLeaseInput {
             details: None,

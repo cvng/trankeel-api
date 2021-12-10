@@ -110,7 +110,10 @@ impl<'a> AsyncCommand for CreateCandidacy<'a> {
             }
             db.discussions().create(&payload.discussion)?;
             db.messages().create_many(&payload.messages)?;
-            dispatch(vec![Event::CandidacyCreated(payload.candidacy.clone())])?;
+            dispatch(
+                self.context,
+                vec![Event::CandidacyCreated(payload.candidacy.clone())],
+            )?;
             Ok(())
         })?;
 
