@@ -180,6 +180,10 @@ input CreatePropertyInput {
 type CreatePropertyPayload {
 	property: Property!
 }
+type CreateReceiptsPayload {
+	errors: [Error!]
+	receipts: [File!]
+}
 input CreateTenantInput {
 	birthdate: Date
 	birthplace: String
@@ -532,13 +536,13 @@ type Mutation {
 	transactionDelete(id: ID!): ID!
 	fileUpload(input: FileInput!): File!
 	importUpload(input: ImportInput!): Task!
-	rentReceiptCreate(input: RentReceiptInput!): RentReceiptPayload!
-	sendPaymentNotice(input: SendPaymentNoticeInput!): CreateNoticesPayload!
+	createReceipts(input: RentReceiptInput!): CreateReceiptsPayload!
+	createNotices(input: SendPaymentNoticeInput!): CreateNoticesPayload!
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -723,10 +727,6 @@ input RentReceiptInput {
 	date: DateTime
 	sendMail: Boolean
 }
-type RentReceiptPayload {
-	errors: [Error!]
-	receipts: [File!]
-}
 enum RentStatus {
 	PARTIAL
 	PENDING
@@ -835,9 +835,9 @@ type Tenant implements PersonInterface {
 	rentPayedThisYear: String
 	unpaidRentAmount: Decimal
 	files: [File!]
-	lease: Lease
 	warrants: [Warrant!]!
 	discussion: Discussion!
+	lease: Lease
 }
 enum TenantStatus {
 	CANDIDATE

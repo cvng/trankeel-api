@@ -11,8 +11,6 @@ use trankeel::File;
 use trankeel::FileStatus;
 use trankeel::FileType;
 use trankeel::LeaseFile;
-use trankeel::Notice;
-use trankeel::Receipt;
 use trankeel::SendReceiptsInput;
 
 /// https://www.pdfmonkey.io/fr/doc/api/webhooks
@@ -50,9 +48,9 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
     // Specific processing by document type.
     match file.type_ {
-        FileType::LeaseDocument => on_lease_created(&client, &file).await,
-        FileType::RentReceipt => on_receipt_created(&client, &file).await,
-        FileType::PaymentNotice => on_notice_created(&client, &file).await,
+        FileType::LeaseDocument => handle_lease_created(&client, &file).await,
+        FileType::RentReceipt => handle_receipt_or_notice_created(&client, &file).await,
+        FileType::PaymentNotice => handle_receipt_or_notice_created(&client, &file).await,
     }
 
     Status::Ok
@@ -60,7 +58,7 @@ pub async fn pdfmonkey_request(request: Json<PdfmonkeyPayload>) -> Status {
 
 // # Handlers
 
-async fn on_lease_created(client: &Client, lease_file: &LeaseFile) {
+async fn handle_lease_created(client: &Client, lease_file: &LeaseFile) {
     let lease = client.leases().by_lease_file_id(&lease_file.id).unwrap();
     let tenants = client.tenants().by_lease_id(&lease.id).unwrap();
 
@@ -72,42 +70,16 @@ async fn on_lease_created(client: &Client, lease_file: &LeaseFile) {
         .unwrap();
 }
 
-async fn on_receipt_created(client: &Client, receipt: &Receipt) {
-    let rent = client.rents().by_receipt_id(&receipt.id).unwrap();
+async fn handle_receipt_or_notice_created(client: &Client, receipt_or_notice: &File) {
+    let rent = match receipt_or_notice.type_ {
+        FileType::RentReceipt => client.rents().by_receipt_id(&receipt_or_notice.id).unwrap(),
+        FileType::PaymentNotice => client.rents().by_notice_id(&receipt_or_notice.id).unwrap(),
+        _ => unimplemented!(),
+    };
+
     let input = SendReceiptsInput {
         rent_ids: vec![rent.id],
     };
 
-    // Guess auth_id from given receipt (first user of the account).
-    let lease = client.leases().by_receipt_id(&receipt.id).unwrap();
-    let user = client
-        .persons()
-        .by_account_id(&lease.account_id)
-        .unwrap()
-        .first()
-        .cloned()
-        .unwrap();
-    let auth_id = user.auth_id.unwrap();
-
-    client.send_receipts(&auth_id, input).await.unwrap();
-}
-
-async fn on_notice_created(client: &Client, notice: &Notice) {
-    let rent = client.rents().by_notice_id(&notice.id).unwrap();
-    let input = SendReceiptsInput {
-        rent_ids: vec![rent.id],
-    };
-
-    // Guess auth_id from given receipt (first user of the account).
-    let lease = client.leases().by_notice_id(&notice.id).unwrap();
-    let user = client
-        .persons()
-        .by_account_id(&lease.account_id)
-        .unwrap()
-        .first()
-        .cloned()
-        .unwrap();
-    let auth_id = user.auth_id.unwrap();
-
-    client.send_receipts(&auth_id, input).await.unwrap();
+    client.send_receipts(input).await.unwrap();
 }

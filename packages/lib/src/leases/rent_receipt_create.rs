@@ -4,10 +4,8 @@ use chrono::Utc;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Event;
-use trankeel_core::error::Error;
-use trankeel_core::mailer::Mailer;
+use trankeel_core::handlers::ReceiptSent;
 use trankeel_core::pdfmaker::Pdfmaker;
-use trankeel_core::templates::ReceiptCreatedMail;
 use trankeel_core::templates::ReceiptDocument;
 use trankeel_data::receipt_filename;
 use trankeel_data::AuthId;
@@ -55,50 +53,15 @@ pub async fn create_receipts(
     Ok(receipts)
 }
 
-pub async fn send_receipts(
-    db: &impl Db,
-    _auth_id: &AuthId,
-    mailer: &impl Mailer,
-    input: SendReceiptsInput,
-) -> Result<Vec<Receipt>> {
+pub fn send_receipts(input: SendReceiptsInput) -> Result<Vec<Event>> {
     input.validate()?;
 
-    let mut receipts = vec![];
+    let SendReceiptsInput { rent_ids } = input;
 
-    for rent_id in input.rent_ids {
-        let rent = db.rents().by_id(&rent_id)?;
-        let lease = db.leases().by_id(&rent.lease_id)?;
-        let tenants = db.tenants().by_lease_id(&lease.id)?;
-
-        let receipt_id = if let Some(receipt_id) = rent.receipt_id {
-            receipt_id
-        } else if let Some(notice_id) = rent.notice_id {
-            notice_id
-        } else {
-            return Err(Error::msg("not found"));
-        };
-        let receipt = match db.files().by_id(&receipt_id) {
-            Ok(receipt) => receipt,
-            Err(err) => return Err(err),
-        };
-        receipts.push(receipt.clone());
-
-        mailer
-            .batch(vec![ReceiptCreatedMail::try_new(
-                &receipt,
-                &rent,
-                tenants,
-                Utc::now().into(),
-            )?])
-            .await?;
-
-        match receipt.type_ {
-            FileType::RentReceipt => dispatch(vec![Event::ReceiptSent(receipt)])?,
-            _ => dispatch(vec![Event::NoticeSent(receipt)])?,
-        };
-    }
-
-    Ok(receipts)
+    Ok(rent_ids
+        .into_iter()
+        .map(|rent_id| ReceiptSent { rent_id }.into())
+        .collect())
 }
 
 // # Utils

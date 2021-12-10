@@ -54,7 +54,6 @@ impl From<trankeel::Result<Vec<trankeel::Notice>>> for CreateNoticesPayload {
 }
 
 #[derive(SimpleObject)]
-#[graphql(name = "RentReceiptPayload")]
 pub struct CreateReceiptsPayload {
     errors: Option<Vec<Error>>,
     receipts: Option<Vec<File>>,

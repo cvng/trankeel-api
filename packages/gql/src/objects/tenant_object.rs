@@ -49,7 +49,6 @@ pub struct Tenant {
     pub rent_payed_this_year: Option<String>,
     pub unpaid_rent_amount: Option<Amount>,
     pub files: Option<Vec<File>>,
-    pub lease: Option<Lease>,
 }
 
 #[async_graphql::ComplexObject]
@@ -70,6 +69,18 @@ impl Tenant {
             .discussions()
             .by_initiator_id(&self.person_id)?
             .into())
+    }
+
+    async fn lease(&self, ctx: &Context<'_>) -> Result<Option<Lease>> {
+        Ok(match self.lease_id {
+            Some(lease_id) => Some(
+                ctx.data_unchecked::<Client>()
+                    .leases()
+                    .by_id(&lease_id)?
+                    .into(),
+            ),
+            None => None,
+        })
     }
 }
 
@@ -101,7 +112,6 @@ impl From<trankeel::Tenant> for Tenant {
             rent_payed_this_year: None,
             unpaid_rent_amount: None,
             files: None,
-            lease: None,
         }
     }
 }

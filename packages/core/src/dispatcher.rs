@@ -33,12 +33,11 @@ pub enum Event {
     LeaseAffected(LeaseAffected),
     LeaseCreated(LeaseCreated),
     NoticeCreated(File),
-    NoticeSent(File),
     PaymentCreated(Payment),
     PropertyCreated(PropertyCreated),
     PropertyUpdated(PropertyUpdated),
     ReceiptCreated(File),
-    ReceiptSent(File),
+    ReceiptSent(ReceiptSent),
     StepCompleted(Step),
     TenantCreated(TenantCreated),
     TenantUpdated(TenantUpdated),
@@ -55,7 +54,6 @@ impl From<Event> for EventType {
             Event::LeaseAffected(_) => unimplemented!(),
             Event::LeaseCreated(_) => Self::LeaseCreated,
             Event::NoticeCreated(_) => Self::NoticeCreated,
-            Event::NoticeSent(_) => Self::NoticeSent,
             Event::PaymentCreated(_) => Self::PaymentCreated,
             Event::PropertyCreated(_) => unimplemented!(),
             Event::PropertyUpdated(_) => unimplemented!(),
@@ -81,12 +79,11 @@ pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
             Event::LeaseAffected(event) => lease_affected(&ctx, event.clone()),
             Event::LeaseCreated(event) => lease_created(&ctx, event.clone()),
             Event::NoticeCreated(notice) => notice_created(&ctx, event, notice),
-            Event::NoticeSent(notice) => notice_sent(&ctx, event, notice),
             Event::PaymentCreated(payment) => payment_created(&ctx, event, payment),
             Event::PropertyCreated(event) => property_created(&ctx, event.clone()),
             Event::PropertyUpdated(event) => property_updated(&ctx, event.clone()),
             Event::ReceiptCreated(receipt) => receipt_created(&ctx, event, receipt),
-            Event::ReceiptSent(receipt) => receipt_sent(&ctx, event, receipt),
+            Event::ReceiptSent(_) => unimplemented!(),
             Event::StepCompleted(step) => step_completed(&ctx, event, step),
             Event::TenantCreated(event) => tenant_created(&ctx, event.clone()),
             Event::TenantUpdated(event) => tenant_updated(&ctx, event.clone()),
@@ -94,4 +91,17 @@ pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
     })?;
 
     Ok(events)
+}
+
+pub async fn dispatch_async(events: Vec<Event>) -> Result<()> {
+    let ctx = Context::env();
+
+    for event in events {
+        match event {
+            Event::ReceiptSent(event) => receipt_sent(&ctx, event).await?,
+            _ => unimplemented!(),
+        }
+    }
+
+    Ok(())
 }

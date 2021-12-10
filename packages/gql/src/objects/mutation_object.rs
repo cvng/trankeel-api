@@ -276,8 +276,7 @@ impl Mutation {
         Err(wip())
     }
 
-    #[graphql(name = "rentReceiptCreate")]
-    async fn edit_rent_receipts(
+    async fn create_receipts(
         &self,
         ctx: &Context<'_>,
         input: CreateReceiptsInput,
@@ -289,8 +288,7 @@ impl Mutation {
             .into())
     }
 
-    #[graphql(name = "sendPaymentNotice")]
-    async fn send_payment_notices(
+    async fn create_notices(
         &self,
         ctx: &Context<'_>,
         input: CreateNoticesInput,
