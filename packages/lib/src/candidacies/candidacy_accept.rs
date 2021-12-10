@@ -4,13 +4,13 @@ use crate::error::Result;
 use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
 use crate::leases::create_lease_from_advertisement;
-use crate::tenants;
-use crate::tenants::CreateTenantState;
+use crate::tenants::CreateTenant;
 use crate::workflows::complete_step;
 use crate::workflows::create_workflow;
 use crate::workflows::CreateWorkflowInput;
 use crate::CompleteStepInput;
 use crate::CreateTenantInput;
+use crate::CreateTenantPayload;
 use async_graphql::InputObject;
 use chrono::Utc;
 use trankeel_core::context::Context;
@@ -38,6 +38,7 @@ use trankeel_data::LeaseFileId;
 use trankeel_data::Person;
 use trankeel_data::PersonRole;
 use trankeel_data::Tenant;
+use trankeel_data::TenantId;
 use trankeel_data::WorkflowType;
 use validator::Validate;
 
@@ -195,35 +196,39 @@ fn promote_tenant(
 
     let candidacy_warrants = db.warrants().by_candidacy_id(&candidacy.id)?;
 
-    let payload = tenants::create_tenant(
-        CreateTenantState {
-            account: account.clone(),
-            account_owner: account_owner.clone(),
-            tenant_identity: Some(candidate.clone()),
-        },
-        CreateTenantInput {
-            birthdate: candidacy.birthdate,
-            birthplace: candidacy.birthplace.clone(),
-            email: candidate.email.inner().to_string(),
-            first_name: candidate.first_name.clone(),
-            last_name: candidate.last_name.clone(),
-            note: None,
-            phone_number: candidate.phone_number.clone(),
-            is_student: candidacy.is_student,
-            warrants: Some(candidacy_warrants.into_iter().map(Into::into).collect()),
-        },
-    )?;
+    let CreateTenantPayload {
+        tenant,
+        identity,
+        warrants,
+        discussion,
+    } = CreateTenant::new(
+        TenantId::new(),
+        account.clone(),
+        account_owner.clone(),
+        Some(candidate.clone()),
+    )
+    .create_tenant(CreateTenantInput {
+        birthdate: candidacy.birthdate,
+        birthplace: candidacy.birthplace.clone(),
+        email: candidate.email.inner().to_string(),
+        first_name: candidate.first_name.clone(),
+        last_name: candidate.last_name.clone(),
+        note: None,
+        phone_number: candidate.phone_number.clone(),
+        is_student: candidacy.is_student,
+        warrants: Some(candidacy_warrants.into_iter().map(Into::into).collect()),
+    })?;
 
-    ctx.db().persons().create(&payload.tenant_identity)?;
-    ctx.db().tenants().create(&payload.tenant)?;
-    if let Some(warrants) = &payload.warrants {
+    ctx.db().persons().create(&identity)?;
+    ctx.db().tenants().create(&tenant)?;
+    if let Some(warrants) = &warrants {
         for warrant in warrants {
             ctx.db().warrants().create(warrant)?;
         }
     }
-    if let Some(discussion) = &payload.discussion {
+    if let Some(discussion) = &discussion {
         ctx.db().discussions().create(discussion)?;
     }
 
-    Ok(payload.tenant)
+    Ok(tenant)
 }

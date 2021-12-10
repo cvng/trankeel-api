@@ -136,8 +136,7 @@ async fn seed() {
             },
         )
         .await
-        .unwrap()
-        .tenant;
+        .unwrap();
 
     let lease = client
         .create_furnished_lease(
