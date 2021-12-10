@@ -6,10 +6,28 @@ use crate::messenger::Messenger;
 use diesel::result::Error::NotFound;
 use trankeel_data::Eventable;
 use trankeel_data::Lease;
+use trankeel_data::Rent;
 
-pub fn lease_created(ctx: &Context, event: &Event, lease: &Lease) -> Result<()> {
+#[derive(Clone)]
+pub struct LeaseCreated {
+    pub lease: Lease,
+    pub rents: Vec<Rent>,
+}
+
+impl From<LeaseCreated> for Event {
+    fn from(item: LeaseCreated) -> Self {
+        Self::LeaseCreated(item)
+    }
+}
+
+pub fn lease_created(ctx: &Context, event: LeaseCreated) -> Result<()> {
     let db = ctx.db();
     let messenger = ctx.messenger();
+
+    let LeaseCreated { lease, rents } = event.clone();
+
+    db.leases().create(&lease)?;
+    db.rents().create_many(&rents)?;
 
     let account = db.accounts().by_lease_id(&lease.id)?;
     let participant = db.persons().by_lease_id(&lease.id)?;
@@ -19,11 +37,11 @@ pub fn lease_created(ctx: &Context, event: &Event, lease: &Lease) -> Result<()> 
         .first()
         .cloned()
         .ok_or(NotFound)?;
-    let eventable = db.eventables().create(&Eventable::Lease(lease.clone()))?;
+    let eventable = db.eventables().create(&Eventable::Lease(lease))?;
 
     messenger.message(
         db,
-        event.clone().into(),
+        Event::LeaseCreated(event).into(),
         eventable.id(),
         account.id,
         sender.id,

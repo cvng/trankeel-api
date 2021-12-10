@@ -13,15 +13,17 @@ use crate::handlers::property_created;
 use crate::handlers::receipt_created;
 use crate::handlers::receipt_sent;
 use crate::handlers::step_completed;
+use crate::handlers::tenant_created;
 use crate::handlers::AdvertisementCreated;
 use crate::handlers::AdvertisementUpdated;
 use crate::handlers::CandidacyRejected;
+use crate::handlers::LeaseCreated;
 use crate::handlers::PropertyCreated;
+use crate::handlers::TenantCreated;
 use crate::providers::Pg;
 use trankeel_data::Candidacy;
 use trankeel_data::EventType;
 use trankeel_data::File;
-use trankeel_data::Lease;
 use trankeel_data::Payment;
 use trankeel_data::Step;
 
@@ -47,7 +49,7 @@ pub enum Event {
     CandidacyAccepted(Candidacy),
     CandidacyCreated(Candidacy),
     CandidacyRejected(CandidacyRejected),
-    LeaseCreated(Lease),
+    LeaseCreated(LeaseCreated),
     NoticeCreated(File),
     NoticeSent(File),
     PaymentCreated(Payment),
@@ -55,6 +57,7 @@ pub enum Event {
     ReceiptCreated(File),
     ReceiptSent(File),
     StepCompleted(Step),
+    TenantCreated(TenantCreated),
 }
 
 impl From<Event> for EventType {
@@ -73,6 +76,7 @@ impl From<Event> for EventType {
             Event::ReceiptCreated(_) => Self::ReceiptCreated,
             Event::ReceiptSent(_) => Self::ReceiptSent,
             Event::StepCompleted(_) => Self::StepCompleted,
+            Event::TenantCreated(_) => unimplemented!(),
         }
     }
 }
@@ -87,7 +91,7 @@ pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
             Event::CandidacyAccepted(candidacy) => candidacy_accepted(&ctx, event, candidacy),
             Event::CandidacyCreated(candidacy) => candidacy_created(&ctx, event, candidacy),
             Event::CandidacyRejected(event) => candidacy_rejected(&ctx, event.clone()),
-            Event::LeaseCreated(lease) => lease_created(&ctx, event, lease),
+            Event::LeaseCreated(event) => lease_created(&ctx, event.clone()),
             Event::NoticeCreated(notice) => notice_created(&ctx, event, notice),
             Event::NoticeSent(notice) => notice_sent(&ctx, event, notice),
             Event::PaymentCreated(payment) => payment_created(&ctx, event, payment),
@@ -95,6 +99,7 @@ pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
             Event::ReceiptCreated(receipt) => receipt_created(&ctx, event, receipt),
             Event::ReceiptSent(receipt) => receipt_sent(&ctx, event, receipt),
             Event::StepCompleted(step) => step_completed(&ctx, event, step),
+            Event::TenantCreated(event) => tenant_created(&ctx, event.clone()),
         })
     })?;
 

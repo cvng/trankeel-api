@@ -31,8 +31,6 @@ input AddExistingLeaseInput {
 }
 type AddExistingLeasePayload {
 	lease: Lease!
-	property: Property!
-	tenants: [Tenant!]!
 }
 type Address {
 	city: String!

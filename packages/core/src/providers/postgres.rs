@@ -648,6 +648,14 @@ impl database::LenderStore for LenderStore<'_> {
             .collect::<Result<Vec<_>>>()
     }
 
+    fn by_account_id_first(&mut self, account_id: &AccountId) -> Result<LenderWithIdentity> {
+        Ok(self
+            .by_account_id(account_id)?
+            .first()
+            .cloned()
+            .ok_or(NotFound)?)
+    }
+
     fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithIdentity> {
         let lender: Lender = lenders::table
             .filter(lenders::individual_id.eq(individual_id))

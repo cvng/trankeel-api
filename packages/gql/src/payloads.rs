@@ -179,17 +179,11 @@ impl From<trankeel::PushMessagePayload> for PushMessagePayload {
 #[derive(SimpleObject)]
 pub struct AddExistingLeasePayload {
     lease: Lease,
-    property: Property,
-    tenants: Vec<Tenant>,
 }
 
-impl From<trankeel::AddExistingLeasePayload> for AddExistingLeasePayload {
-    fn from(item: trankeel::AddExistingLeasePayload) -> Self {
-        Self {
-            lease: item.lease.into(),
-            property: item.property.into(),
-            tenants: item.tenants.into_iter().map(Into::into).collect(),
-        }
+impl From<trankeel::Lease> for AddExistingLeasePayload {
+    fn from(item: trankeel::Lease) -> Self {
+        Self { lease: item.into() }
     }
 }
 
