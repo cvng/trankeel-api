@@ -1,4 +1,5 @@
 use super::Account;
+use super::Discussion;
 use super::File;
 use super::Lease;
 use super::Payment;
@@ -61,6 +62,14 @@ impl Tenant {
             .into_iter()
             .map(Into::into)
             .collect())
+    }
+
+    async fn discussion(&self, ctx: &Context<'_>) -> Result<Discussion> {
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .discussions()
+            .by_initiator_id(&self.person_id)?
+            .into())
     }
 }
 
