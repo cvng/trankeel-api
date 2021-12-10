@@ -6,7 +6,6 @@ use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
 use crate::error::Result;
 use crate::leases::AddExistingLease;
-use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateNoticesInput;
 use crate::leases::CreateReceiptsInput;
@@ -292,8 +291,17 @@ impl<'a> Client {
         &self,
         auth_id: &AuthId,
         input: AddExistingLeaseInput,
-    ) -> Result<AddExistingLeasePayload> {
-        AddExistingLease::new(&self.0, auth_id).run(input).await
+    ) -> Result<Lease> {
+        let lease_id = LeaseId::new();
+        let account = self.0.db().accounts().by_auth_id(auth_id)?;
+        let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
+        let (lender, ..) = self.0.db().lenders().by_account_id_first(&account.id)?;
+
+        dispatcher::dispatch(
+            AddExistingLease::new(lease_id, account, account_owner, lender).run(input)?,
+        )?;
+
+        self.0.db().leases().by_id(&lease_id)
     }
 
     pub fn create_furnished_lease(

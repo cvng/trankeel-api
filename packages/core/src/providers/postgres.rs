@@ -378,6 +378,14 @@ impl database::PersonStore for PersonStore<'_> {
             .load(&self.0.get()?)?)
     }
 
+    fn by_account_id_first(&mut self, account_id: &AccountId) -> Result<Person> {
+        Ok(self
+            .by_account_id(account_id)?
+            .first()
+            .cloned()
+            .ok_or(NotFound)?)
+    }
+
     fn by_candidacy_id(&mut self, candidacy_id: &CandidacyId) -> Result<Person> {
         Ok(persons::table
             .select(persons::all_columns)
@@ -435,6 +443,14 @@ impl database::PersonStore for PersonStore<'_> {
             .left_join(workflows::table.on(workflows::workflowable_id.eq(candidacies::id))) // TODO: match workflowable
             .left_join(steps::table.on(steps::workflow_id.eq(workflows::id)))
             .filter(steps::id.eq(step_id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Person> {
+        Ok(persons::table
+            .select(persons::all_columns)
+            .left_join(tenants::table.on(tenants::person_id.eq(persons::id)))
+            .filter(tenants::id.eq(tenant_id))
             .first(&self.0.get()?)?)
     }
 
@@ -646,6 +662,14 @@ impl database::LenderStore for LenderStore<'_> {
             .iter()
             .map(|lender: &Lender| self.by_id(&lender.id))
             .collect::<Result<Vec<_>>>()
+    }
+
+    fn by_account_id_first(&mut self, account_id: &AccountId) -> Result<LenderWithIdentity> {
+        Ok(self
+            .by_account_id(account_id)?
+            .first()
+            .cloned()
+            .ok_or(NotFound)?)
     }
 
     fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithIdentity> {

@@ -2,8 +2,8 @@ use crate::error::Result;
 use crate::files::CreateFileInput;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
-use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
+use trankeel_core::handlers::LeaseCreated;
 use trankeel_data::Account;
 use trankeel_data::Advertisement;
 use trankeel_data::Amount;
@@ -111,6 +111,7 @@ pub struct CreateLeaseInput {
 }
 
 pub struct CreateLeaseState {
+    pub lease_id: LeaseId,
     pub account: Account,
 }
 
@@ -124,10 +125,10 @@ pub fn create_lease(
     state: CreateLeaseState,
     input: CreateLeaseInput,
 ) -> Result<CreateLeasePayload> {
-    let account = state.account;
+    let CreateLeaseState { lease_id, account } = state;
 
     let lease = Lease {
-        id: LeaseId::new(),
+        id: lease_id,
         created_at: Default::default(),
         updated_at: Default::default(),
         account_id: account.id,
@@ -190,12 +191,16 @@ pub fn create_furnished_lease(
     })?;
 
     // Generate lease rents.
-    add_lease_rents(db, &lease)?;
+    let rents = add_lease_rents(db, &lease)?;
 
     // Affect created lease to existing tenants.
     add_lease_tenants(db, lease.id, input.tenant_ids)?;
 
-    dispatch(vec![Event::LeaseCreated(lease.clone())])?;
+    dispatch(vec![LeaseCreated {
+        lease: lease.clone(),
+        rents,
+    }
+    .into()])?;
 
     Ok(lease)
 }
