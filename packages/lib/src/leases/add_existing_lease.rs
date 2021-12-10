@@ -1,7 +1,5 @@
+use super::CreateLease;
 use super::CreateLeaseInput;
-use super::CreateLeasePayload;
-use super::CreateLeaseState;
-use crate::leases;
 use crate::properties::CreateProperty;
 use crate::tenants;
 use crate::tenants::CreateTenantState;
@@ -72,28 +70,20 @@ impl Command for AddExistingLease {
             .create_property(input.property)?;
 
         // Create lease.
-        let CreateLeasePayload { lease } = leases::create_lease(
-            CreateLeaseState {
-                lease_id,
-                account: account.clone(),
-            },
-            CreateLeaseInput {
+        let (lease, rents) = CreateLease::new(lease_id, account.clone()) //
+            .create_lease(CreateLeaseInput {
                 effect_date: input.effect_date,
                 rent_amount: input.rent_amount,
                 rent_charges_amount: input.rent_charges_amount,
                 type_: input.type_,
                 property_id: property.id,
-            },
-        )?;
+            })?;
 
         // Make the lease active by using a signature date.
         let lease = Lease {
             signature_date: Some(lease.effect_date),
             ..lease
         };
-
-        // Generate rents.
-        let rents = lease.rents();
 
         // Create tenants.
         let tenants_with_identities = input

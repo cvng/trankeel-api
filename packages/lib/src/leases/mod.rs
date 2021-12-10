@@ -1,5 +1,6 @@
 mod add_existing_lease;
-mod lease_create;
+mod create_furnished_lease;
+mod create_lease;
 mod lease_delete;
 mod lease_update;
 mod payment_notice_send;
@@ -8,7 +9,8 @@ mod rent_receipt_create;
 mod transaction_create;
 
 pub use add_existing_lease::*;
-pub use lease_create::*;
+pub use create_furnished_lease::*;
+pub use create_lease::*;
 pub use lease_delete::*;
 pub use lease_update::*;
 pub use payment_notice_send::*;
