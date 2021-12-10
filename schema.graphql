@@ -837,6 +837,7 @@ type Tenant implements PersonInterface {
 	files: [File!]
 	lease: Lease
 	warrants: [Warrant!]!
+	discussion: Discussion!
 }
 enum TenantStatus {
 	CANDIDATE
