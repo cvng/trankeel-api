@@ -516,7 +516,7 @@ type Mutation {
 	tenantUpdate(input: TenantUpdateInput!): UpdateTenantPayload!
 	tenantDelete(id: ID!): ID!
 	propertyCreate(input: CreatePropertyInput!): CreatePropertyPayload!
-	propertyUpdate(input: PropertyUpdateInput!): Property!
+	propertyUpdate(input: UpdatePropertyInput!): UpdatePropertyPayload!
 	propertyDelete(id: ID!): ID!
 	createAdvertisement(input: CreateAdvertisementInput!): CreateAdvertisementPayload!
 	updateAdvertisement(input: UpdateAdvertisementInput!): UpdateAdvertisementPayload!
@@ -538,7 +538,7 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -659,30 +659,6 @@ enum PropertyStatus {
 	RENTED
 	UNDER_CONSTRUCTION
 	UNRENTED
-}
-input PropertyUpdateInput {
-	address: AddressInput
-	buildPeriod: PropertyBuildPeriodType
-	buildingLegalStatus: PropertyBuildingLegalStatus
-	commonSpaces: String
-	energyClass: PropertyEnergyClass
-	equipments: String
-	gasEmission: PropertyGasEmission
-	heatingMethod: PropertyUsageType
-	housingType: PropertyUsageType
-	id: ID!
-	name: String
-	note: String
-	description: String
-	nticEquipments: String
-	otherSpaces: String
-	roomCount: PropertyRoomType
-	status: PropertyStatus
-	surface: Float
-	tax: Decimal
-	tenantPrivateSpaces: String
-	usageType: PropertyHabitationUsageType
-	waterHeatingMethod: PropertyUsageType
 }
 enum PropertyUsageType {
 	COLLECTIVE
@@ -923,6 +899,32 @@ input UpdateAdvertisementInput {
 }
 type UpdateAdvertisementPayload {
 	advertisement: Advertisement!
+}
+input UpdatePropertyInput {
+	address: AddressInput
+	buildPeriod: PropertyBuildPeriodType
+	buildingLegalStatus: PropertyBuildingLegalStatus
+	commonSpaces: String
+	energyClass: PropertyEnergyClass
+	equipments: String
+	gasEmission: PropertyGasEmission
+	heatingMethod: PropertyUsageType
+	housingType: PropertyUsageType
+	id: ID!
+	name: String
+	note: String
+	nticEquipments: String
+	otherSpaces: String
+	roomCount: PropertyRoomType
+	status: PropertyStatus
+	surface: Float
+	tax: Decimal
+	tenantPrivateSpaces: String
+	usageType: PropertyHabitationUsageType
+	waterHeatingMethod: PropertyUsageType
+}
+type UpdatePropertyPayload {
+	property: Property!
 }
 type UpdateTenantPayload {
 	tenant: Tenant!

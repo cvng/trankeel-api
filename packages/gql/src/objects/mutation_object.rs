@@ -6,7 +6,6 @@ use super::Lease;
 use super::Lender;
 use super::Payment;
 use super::Person;
-use super::Property;
 use super::Task;
 use crate::payloads::AddExistingLeasePayload;
 use crate::payloads::CompleteStepPayload;
@@ -19,6 +18,7 @@ use crate::payloads::CreateUserWithAccountPayload;
 use crate::payloads::DeleteDiscussionPayload;
 use crate::payloads::PushMessagePayload;
 use crate::payloads::UpdateAdvertisementPayload;
+use crate::payloads::UpdatePropertyPayload;
 use crate::payloads::UpdateTenantPayload;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -140,7 +140,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: UpdatePropertyInput,
-    ) -> Result<Property> {
+    ) -> Result<UpdatePropertyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .update_property(ctx.data::<AuthId>()?, input)?

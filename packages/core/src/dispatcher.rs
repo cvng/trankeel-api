@@ -1,27 +1,6 @@
 use crate::context::Context;
 use crate::error::Result;
-use crate::handlers::advertisement_created;
-use crate::handlers::advertisement_updated;
-use crate::handlers::candidacy_accepted;
-use crate::handlers::candidacy_created;
-use crate::handlers::candidacy_rejected;
-use crate::handlers::lease_affected;
-use crate::handlers::lease_created;
-use crate::handlers::notice_created;
-use crate::handlers::notice_sent;
-use crate::handlers::payment_created;
-use crate::handlers::property_created;
-use crate::handlers::receipt_created;
-use crate::handlers::receipt_sent;
-use crate::handlers::step_completed;
-use crate::handlers::tenant_created;
-use crate::handlers::AdvertisementCreated;
-use crate::handlers::AdvertisementUpdated;
-use crate::handlers::CandidacyRejected;
-use crate::handlers::LeaseAffected;
-use crate::handlers::LeaseCreated;
-use crate::handlers::PropertyCreated;
-use crate::handlers::TenantCreated;
+use crate::handlers::*;
 use crate::providers::Pg;
 use trankeel_data::Candidacy;
 use trankeel_data::EventType;
@@ -57,6 +36,7 @@ pub enum Event {
     NoticeSent(File),
     PaymentCreated(Payment),
     PropertyCreated(PropertyCreated),
+    PropertyUpdated(PropertyUpdated),
     ReceiptCreated(File),
     ReceiptSent(File),
     StepCompleted(Step),
@@ -77,6 +57,7 @@ impl From<Event> for EventType {
             Event::NoticeSent(_) => Self::NoticeSent,
             Event::PaymentCreated(_) => Self::PaymentCreated,
             Event::PropertyCreated(_) => unimplemented!(),
+            Event::PropertyUpdated(_) => unimplemented!(),
             Event::ReceiptCreated(_) => Self::ReceiptCreated,
             Event::ReceiptSent(_) => Self::ReceiptSent,
             Event::StepCompleted(_) => Self::StepCompleted,
@@ -101,6 +82,7 @@ pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
             Event::NoticeSent(notice) => notice_sent(&ctx, event, notice),
             Event::PaymentCreated(payment) => payment_created(&ctx, event, payment),
             Event::PropertyCreated(event) => property_created(&ctx, event.clone()),
+            Event::PropertyUpdated(event) => property_updated(&ctx, event.clone()),
             Event::ReceiptCreated(receipt) => receipt_created(&ctx, event, receipt),
             Event::ReceiptSent(receipt) => receipt_sent(&ctx, event, receipt),
             Event::StepCompleted(step) => step_completed(&ctx, event, step),

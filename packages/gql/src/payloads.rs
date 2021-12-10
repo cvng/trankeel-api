@@ -136,6 +136,19 @@ impl From<trankeel::Property> for CreatePropertyPayload {
 }
 
 #[derive(SimpleObject)]
+pub struct UpdatePropertyPayload {
+    property: Property,
+}
+
+impl From<trankeel::Property> for UpdatePropertyPayload {
+    fn from(item: trankeel::Property) -> Self {
+        Self {
+            property: item.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
 pub struct CreateAdvertisementPayload {
     advertisement: Advertisement,
 }

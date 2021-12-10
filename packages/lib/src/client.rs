@@ -23,6 +23,7 @@ use crate::properties::CreatePropertyInput;
 use crate::properties::DeletePropertyInput;
 use crate::properties::UpdateAdvertisement;
 use crate::properties::UpdateAdvertisementInput;
+use crate::properties::UpdateProperty;
 use crate::properties::UpdatePropertyInput;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
@@ -248,10 +249,15 @@ impl<'a> Client {
 
     pub fn update_property(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: UpdatePropertyInput,
     ) -> Result<Property> {
-        crate::properties::update_property(self.0.db(), auth_id, input)
+        let property = self.0.db().properties().by_id(&input.id)?;
+        let property_id = property.id;
+
+        dispatcher::dispatch(UpdateProperty::new(property).run(input)?)?;
+
+        self.0.db().properties().by_id(&property_id)
     }
 
     pub fn delete_property(

@@ -40,7 +40,7 @@ impl UpdateAdvertisement {
 impl Command for UpdateAdvertisement {
     type Input = UpdateAdvertisementInput;
 
-    fn run(self, input: UpdateAdvertisementInput) -> Result<Vec<Event>> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let UpdateAdvertisement { advertisement } = self;
