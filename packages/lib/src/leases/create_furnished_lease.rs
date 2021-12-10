@@ -3,7 +3,9 @@ use crate::files::CreateFileInput;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::error::Error;
+use trankeel_core::handlers::LeaseAffected;
 use trankeel_core::handlers::LeaseCreated;
+use trankeel_core::handlers::TenantUpdated;
 use trankeel_data::Advertisement;
 use trankeel_data::Amount;
 use trankeel_data::AuthId;
@@ -17,7 +19,6 @@ use trankeel_data::LeaseRentReferenceIrl;
 use trankeel_data::LeaseType;
 use trankeel_data::NakedLeaseDuration;
 use trankeel_data::PropertyId;
-use trankeel_data::Rent;
 use trankeel_data::RentChargesRecuperationMode;
 use trankeel_data::RentPaymentMethod;
 use trankeel_data::Tenant;
@@ -110,6 +111,11 @@ pub fn create_furnished_lease(
     input.validate()?;
 
     let account = db.accounts().by_auth_id(auth_id)?;
+    let tenants = input
+        .tenant_ids
+        .iter()
+        .map(|&tenant_id| db.tenants().by_id(&tenant_id))
+        .collect::<Result<Vec<_>>>()?;
 
     if let Some(signature_date) = input.signature_date {
         if input.effect_date.inner() > signature_date.inner() {
@@ -124,7 +130,7 @@ pub fn create_furnished_lease(
         .and_then(|details| details.duration)
         .unwrap_or_default();
 
-    let lease = db.leases().create(&Lease {
+    let lease = Lease {
         id: LeaseId::new(),
         created_at: Default::default(),
         updated_at: Default::default(),
@@ -141,19 +147,43 @@ pub fn create_furnished_lease(
         property_id: input.property_id,
         expired_at: None,
         renew_date: None,
-    })?;
+    };
 
     // Generate lease rents.
-    let rents = add_lease_rents(db, &lease)?;
+    let rents = lease.rents();
 
-    // Affect created lease to existing tenants.
-    add_lease_tenants(db, lease.id, input.tenant_ids)?;
+    // Update status for existing tenants.
+    let tenants = tenants.into_iter().map(|tenant| Tenant {
+        status: TenantStatus::Uptodate,
+        ..tenant
+    });
 
-    dispatch(vec![LeaseCreated {
-        lease: lease.clone(),
-        rents,
-    }
-    .into()])?;
+    dispatch(
+        vec![LeaseCreated {
+            lease: lease.clone(),
+            rents,
+        }
+        .into()]
+        .into_iter()
+        .chain(
+            tenants
+                .clone()
+                .map(|tenant| TenantUpdated { tenant }.into())
+                .collect::<Vec<_>>(),
+        )
+        .chain(
+            tenants
+                .map(|tenant| {
+                    LeaseAffected {
+                        lease_id: lease.id,
+                        tenant_id: tenant.id,
+                    }
+                    .into()
+                })
+                .collect::<Vec<_>>(),
+        )
+        .collect(),
+    )?;
 
     Ok(lease)
 }
@@ -182,30 +212,6 @@ pub(crate) fn create_lease_from_advertisement(
             tenant_ids: tenants.into_iter().map(|tenant| tenant.id).collect(),
         },
     )
-}
-
-fn add_lease_rents(db: &impl Db, lease: &Lease) -> Result<Vec<Rent>> {
-    db.rents().create_many(&lease.rents())
-}
-
-fn add_lease_tenants(
-    db: &impl Db,
-    lease_id: LeaseId,
-    tenant_ids: Vec<TenantId>,
-) -> Result<Vec<Tenant>> {
-    tenant_ids
-        .iter()
-        .map(|&tenant_id| {
-            db.tenants().by_id(&tenant_id).and_then(|tenant| {
-                db.tenants().update(&Tenant {
-                    id: tenant_id,
-                    lease_id: Some(lease_id),
-                    status: TenantStatus::Uptodate,
-                    ..tenant
-                })
-            })
-        })
-        .collect()
 }
 
 impl From<CreateFurnishedLeaseDetailsInput> for FurnishedLeaseDetails {

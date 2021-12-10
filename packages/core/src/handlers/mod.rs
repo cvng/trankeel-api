@@ -14,6 +14,7 @@ mod receipt_created;
 mod receipt_sent;
 mod step_completed;
 mod tenant_created;
+mod tenant_updated;
 
 pub use advertisement_created::*;
 pub use advertisement_updated::*;
@@ -31,3 +32,4 @@ pub use receipt_created::*;
 pub use receipt_sent::*;
 pub use step_completed::*;
 pub use tenant_created::*;
+pub use tenant_updated::*;

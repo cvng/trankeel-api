@@ -41,6 +41,7 @@ pub enum Event {
     ReceiptSent(File),
     StepCompleted(Step),
     TenantCreated(TenantCreated),
+    TenantUpdated(TenantUpdated),
 }
 
 impl From<Event> for EventType {
@@ -62,6 +63,7 @@ impl From<Event> for EventType {
             Event::ReceiptSent(_) => Self::ReceiptSent,
             Event::StepCompleted(_) => Self::StepCompleted,
             Event::TenantCreated(_) => unimplemented!(),
+            Event::TenantUpdated(_) => unimplemented!(),
         }
     }
 }
@@ -87,6 +89,7 @@ pub fn dispatch(events: Vec<Event>) -> Result<Vec<Event>> {
             Event::ReceiptSent(receipt) => receipt_sent(&ctx, event, receipt),
             Event::StepCompleted(step) => step_completed(&ctx, event, step),
             Event::TenantCreated(event) => tenant_created(&ctx, event.clone()),
+            Event::TenantUpdated(event) => tenant_updated(&ctx, event.clone()),
         })
     })?;
 
