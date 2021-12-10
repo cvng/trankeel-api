@@ -27,7 +27,6 @@ use crate::properties::UpdateProperty;
 use crate::properties::UpdatePropertyInput;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
-use crate::tenants::CreateTenantPayload;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenant;
 use crate::tenants::UpdateTenantInput;
@@ -83,6 +82,7 @@ use trankeel_data::Property;
 use trankeel_data::PropertyId;
 use trankeel_data::Receipt;
 use trankeel_data::Step;
+use trankeel_data::Tenant;
 use trankeel_data::TenantId;
 
 pub struct Client(context::Context);
@@ -210,8 +210,19 @@ impl<'a> Client {
         &self,
         auth_id: &AuthId,
         input: CreateTenantInput,
-    ) -> Result<CreateTenantPayload> {
-        CreateTenant::new(&self.0, auth_id).run(input).await
+    ) -> Result<Tenant> {
+        let db = self.0.db();
+
+        let tenant_id = TenantId::new();
+        let account = db.accounts().by_auth_id(auth_id)?;
+        let account_owner = db.persons().by_auth_id(auth_id)?;
+        let identity = None;
+
+        dispatcher::dispatch(
+            CreateTenant::new(tenant_id, account, account_owner, identity).run(input)?,
+        )?;
+
+        db.tenants().by_id(&tenant_id)
     }
 
     pub async fn update_tenant(

@@ -1,8 +1,7 @@
 use super::CreateLease;
 use super::CreateLeaseInput;
 use crate::properties::CreateProperty;
-use crate::tenants;
-use crate::tenants::CreateTenantState;
+use crate::tenants::CreateTenant;
 use crate::CreatePropertyInput;
 use crate::CreateTenantInput;
 use crate::CreateTenantPayload;
@@ -22,6 +21,7 @@ use trankeel_data::LeaseType;
 use trankeel_data::Lender;
 use trankeel_data::Person;
 use trankeel_data::PropertyId;
+use trankeel_data::TenantId;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]
@@ -90,28 +90,27 @@ impl Command for AddExistingLease {
             .tenants
             .into_iter()
             .map(|tenant_input| {
-                tenants::create_tenant(
-                    CreateTenantState {
-                        account: account.clone(),
-                        account_owner: account_owner.clone(),
-                        tenant_identity: None,
-                    },
-                    tenant_input,
+                CreateTenant::new(
+                    TenantId::new(),
+                    account.clone(),
+                    account_owner.clone(),
+                    None,
                 )
+                .create_tenant(tenant_input)
             })
             .collect::<Result<Vec<_>>>()?
             .into_iter()
             .map(
                 |CreateTenantPayload {
                      tenant,
-                     tenant_identity,
+                     identity,
                      warrants,
                      discussion,
                  }| {
                     (
                         // Attach tenant to lease.
                         tenant.with_lease(&lease_id),
-                        tenant_identity,
+                        identity,
                         discussion,
                         warrants,
                     )

@@ -1,9 +1,12 @@
 use crate::auth::CreatePersonInput;
 use crate::error::Result;
 use crate::files::CreateFileInput;
-use crate::tenants;
+use crate::messaging;
+use crate::messaging::CreateDiscussionPayload;
+use crate::messaging::CreateDiscussionState;
 use crate::warrants;
 use crate::warrants::CreateWarrantState;
+use crate::CreateDiscussionInput;
 use crate::CreateWarrantInput;
 use async_graphql::InputObject;
 use trankeel_core::context::Context;
@@ -168,12 +171,19 @@ pub(crate) fn create_candidacy(
         None
     };
 
-    let (discussion, messages) = tenants::start_discussion_with_lender(
-        &account,
-        &account_owner,
-        &candidate,
-        Some(candidacy.description.clone()),
+    let CreateDiscussionPayload {
+        discussion,
+        message,
+    } = messaging::create_discussion(
+        CreateDiscussionState { account },
+        CreateDiscussionInput {
+            recipient_id: account_owner.id,
+            initiator_id: candidate.id,
+            message: Some(candidacy.description.clone()),
+        },
     )?;
+
+    let messages = vec![message].into_iter().flatten().collect();
 
     let discussion = Discussion {
         id: discussion.id,
