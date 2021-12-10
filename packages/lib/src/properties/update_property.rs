@@ -55,7 +55,7 @@ impl UpdateProperty {
 impl Command for UpdateProperty {
     type Input = UpdatePropertyInput;
 
-    fn run(self, input: UpdatePropertyInput) -> Result<Vec<Event>> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let UpdateProperty { property } = self;
