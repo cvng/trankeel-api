@@ -48,9 +48,9 @@ BEGIN
         SELECT
             accounts.id AS account_id,
 
-            coalesce(sum(full_amount), 0) AS amount_expected,
-            coalesce(sum(full_amount) FILTER (WHERE rents.status = 'paid'), 0) AS amount_settled,
-            coalesce(sum(full_amount) FILTER (WHERE rents.status = 'partially_paid'), 0) AS amount_partial,
+            sum(full_amount) AS amount_expected,
+            sum(full_amount) FILTER (WHERE rents.status = 'paid') AS amount_settled,
+            sum(full_amount) FILTER (WHERE rents.status = 'partially_paid') AS amount_partial,
 
             count(rents.id) AS n_expected,
             count(rents.id) FILTER (WHERE rents.status = 'paid') AS n_settled,
@@ -59,6 +59,7 @@ BEGIN
         LEFT JOIN leases ON leases.id = rents.lease_id
         LEFT JOIN accounts ON accounts.id = leases.account_id
         WHERE date_trunc('month', period_start) = date_trunc('month', current_month)
+        AND date_trunc('year', period_start) = date_trunc('year', current_month)
         GROUP BY accounts.id
         HAVING accounts.id IS NOT NULL
     ),
