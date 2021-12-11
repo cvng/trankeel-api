@@ -1,9 +1,5 @@
-use super::Account;
 use super::Discussion;
-use super::File;
 use super::Lease;
-use super::Payment;
-use super::Property;
 use super::Warrant;
 use async_graphql::Context;
 use async_graphql::Result;
@@ -42,13 +38,6 @@ pub struct Tenant {
     pub display_name: String,
     pub short_name: String,
     pub full_name: String,
-    pub last_transaction: Option<Payment>,
-    pub account: Option<Account>,
-    pub property: Option<Property>,
-    pub property_name: Option<String>,
-    pub rent_payed_this_year: Option<String>,
-    pub unpaid_rent_amount: Option<Amount>,
-    pub files: Option<Vec<File>>,
 }
 
 #[async_graphql::ComplexObject]
@@ -82,6 +71,15 @@ impl Tenant {
             None => None,
         })
     }
+
+    async fn balance(&self, ctx: &Context<'_>) -> Result<Option<Amount>> {
+        Ok(Some(
+            ctx.data_unchecked::<Client>()
+                .balances()
+                .by_tenant_id(&self.id)?
+                .balance,
+        ))
+    }
 }
 
 impl From<trankeel::Tenant> for Tenant {
@@ -105,13 +103,6 @@ impl From<trankeel::Tenant> for Tenant {
             display_name: item.display_name(),
             short_name: item.short_name(),
             full_name: item.full_name(),
-            last_transaction: None,
-            account: None,
-            property: None,
-            property_name: None,
-            rent_payed_this_year: None,
-            unpaid_rent_amount: None,
-            files: None,
         }
     }
 }

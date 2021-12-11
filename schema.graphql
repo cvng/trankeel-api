@@ -828,16 +828,10 @@ type Tenant implements PersonInterface {
 	displayName: String!
 	shortName: String!
 	fullName: String!
-	lastTransaction: Transaction
-	account: Account
-	property: Property
-	propertyName: String
-	rentPayedThisYear: String
-	unpaidRentAmount: Decimal
-	files: [File!]
 	warrants: [Warrant!]!
 	discussion: Discussion!
 	lease: Lease
+	balance: Decimal
 }
 enum TenantStatus {
 	CANDIDATE

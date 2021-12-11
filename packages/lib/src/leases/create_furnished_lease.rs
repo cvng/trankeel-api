@@ -157,6 +157,7 @@ pub fn create_furnished_lease(
 
     // Update status for existing tenants.
     let tenants = tenants.into_iter().map(|tenant| Tenant {
+        lease_id: Some(lease.id),
         status: TenantStatus::Uptodate,
         ..tenant
     });
@@ -177,13 +178,7 @@ pub fn create_furnished_lease(
         )
         .chain(
             tenants
-                .map(|tenant| {
-                    LeaseAffected {
-                        lease_id: lease.id,
-                        tenant_id: tenant.id,
-                    }
-                    .into()
-                })
+                .map(|tenant| LeaseAffected { tenant }.into())
                 .collect::<Vec<_>>(),
         )
         .collect(),

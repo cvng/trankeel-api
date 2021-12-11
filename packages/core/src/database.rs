@@ -4,6 +4,7 @@ use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
 use trankeel_data::AdvertisementId;
 use trankeel_data::AuthId;
+use trankeel_data::Balance;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::Company;
@@ -59,6 +60,7 @@ pub type Executed = usize;
 
 pub trait Db {
     fn accounts(&self) -> Box<dyn AccountStore + '_>;
+    fn balances(&self) -> Box<dyn BalanceStore + '_>;
     fn persons(&self) -> Box<dyn PersonStore + '_>;
     fn companies(&self) -> Box<dyn CompanyStore + '_>;
     fn lenders(&self) -> Box<dyn LenderStore + '_>;
@@ -96,6 +98,10 @@ pub trait AccountStore {
     fn by_step_id(&mut self, step_id: &StepId) -> Result<Account>;
     fn create(&mut self, data: &Account) -> Result<Account>;
     fn update(&mut self, data: &Account) -> Result<Account>;
+}
+
+pub trait BalanceStore {
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Balance>;
 }
 
 pub trait PersonStore {

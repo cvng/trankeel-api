@@ -49,15 +49,6 @@ pub struct Tenant {
     pub is_student: Option<bool>,
 }
 
-impl Tenant {
-    pub fn with_lease(self, lease_id: &LeaseId) -> Self {
-        Self {
-            lease_id: Some(*lease_id),
-            ..self
-        }
-    }
-}
-
 impl Name for Tenant {
     fn first_name(&self) -> String {
         self.first_name.clone()
