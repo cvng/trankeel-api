@@ -13,6 +13,7 @@ use diesel::result::Error::NotFound;
 use diesel::update;
 use diesel::PgConnection;
 use std::env;
+use trankeel_data::balances;
 use trankeel_data::reports;
 use trankeel_data::schema::accounts;
 use trankeel_data::schema::advertisements;
@@ -42,6 +43,7 @@ use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
 use trankeel_data::AdvertisementId;
 use trankeel_data::AuthId;
+use trankeel_data::Balance;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::Company;
@@ -123,6 +125,10 @@ impl Pg {
 impl Db for Pg {
     fn accounts(&self) -> Box<dyn database::AccountStore + '_> {
         Box::new(AccountStore(&self.0))
+    }
+
+    fn balances(&self) -> Box<dyn database::BalanceStore + '_> {
+        Box::new(BalanceStore(&self.0))
     }
 
     fn persons(&self) -> Box<dyn database::PersonStore + '_> {
@@ -215,6 +221,8 @@ impl Db for Pg {
 }
 
 pub struct AccountStore<'a>(pub &'a PgPool);
+
+pub struct BalanceStore<'a>(pub &'a PgPool);
 
 pub struct EventStore<'a>(pub &'a PgPool);
 
@@ -358,6 +366,14 @@ impl database::AccountStore for AccountStore<'_> {
 
     fn update(&mut self, data: &Account) -> Result<Account> {
         Ok(update(data).set(data).get_result(&self.0.get()?)?)
+    }
+}
+
+impl database::BalanceStore for BalanceStore<'_> {
+    fn by_tenant_id(&mut self, tenant_id: &TenantId) -> Result<Balance> {
+        Ok(balances::table
+            .filter(balances::tenant_id.eq(tenant_id))
+            .first(&self.0.get()?)?)
     }
 }
 

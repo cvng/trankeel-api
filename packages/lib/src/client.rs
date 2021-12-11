@@ -37,6 +37,7 @@ use crate::PushMessagePayload;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
+use trankeel_core::database::BalanceStore;
 use trankeel_core::database::CandidacyStore;
 use trankeel_core::database::CompanyStore;
 use trankeel_core::database::Db;
@@ -104,6 +105,10 @@ impl<'a> Client {
 
     pub fn accounts(&self) -> Box<dyn AccountStore + '_> {
         self.0.db().accounts()
+    }
+
+    pub fn balances(&self) -> Box<dyn BalanceStore + '_> {
+        self.0.db().balances()
     }
 
     pub fn persons(&self) -> Box<dyn PersonStore + '_> {

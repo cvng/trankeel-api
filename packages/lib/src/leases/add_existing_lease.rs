@@ -21,7 +21,9 @@ use trankeel_data::LeaseType;
 use trankeel_data::Lender;
 use trankeel_data::Person;
 use trankeel_data::PropertyId;
+use trankeel_data::Tenant;
 use trankeel_data::TenantId;
+use trankeel_data::TenantStatus;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]
@@ -109,7 +111,11 @@ impl Command for AddExistingLease {
                  }| {
                     (
                         // Attach tenant to lease.
-                        tenant.with_lease(&lease_id),
+                        Tenant {
+                            lease_id: Some(lease_id),
+                            status: TenantStatus::Uptodate,
+                            ..tenant
+                        },
                         identity,
                         discussion,
                         warrants,
@@ -138,13 +144,7 @@ impl Command for AddExistingLease {
         )
         .chain(
             tenants_with_identities
-                .map(|(tenant, ..)| {
-                    LeaseAffected {
-                        lease_id,
-                        tenant_id: tenant.id,
-                    }
-                    .into()
-                })
+                .map(|(tenant, ..)| LeaseAffected { tenant }.into())
                 .collect::<Vec<_>>(),
         )
         .collect())
