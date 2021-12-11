@@ -20,7 +20,6 @@ use trankeel_data::PersonId;
 use trankeel_data::PersonRole;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantId;
-use trankeel_data::TenantStatus;
 use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
@@ -112,7 +111,6 @@ impl CreateTenant {
             phone_number: input.phone_number,
             is_student: input.is_student,
             lease_id: None,
-            status: TenantStatus::default(),
         };
 
         // Affect warrants if provided.

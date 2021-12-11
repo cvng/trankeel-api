@@ -1,5 +1,6 @@
 use crate::schema::tenants;
 use crate::AccountId;
+use crate::Balance;
 use crate::Date;
 use crate::DateTime;
 use crate::Email;
@@ -12,12 +13,13 @@ use crate::PhoneNumber;
 
 pub type TenantId = Id;
 
+pub type TenantWithBalance = (Tenant, Balance);
+
 pub type TenantWithIdentity = (Tenant, Person);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
-#[DieselType = "Tenantstatus"]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Enum)]
 pub enum TenantStatus {
-    Candidate,
+    Candidate, // unused
     Gone,
     Late,
     New,
@@ -44,9 +46,23 @@ pub struct Tenant {
     pub last_name: String,
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
-    pub status: TenantStatus,
     pub lease_id: Option<LeaseId>,
     pub is_student: Option<bool>,
+}
+
+impl Tenant {
+    pub fn status(&self, balance: Balance) -> TenantStatus {
+        match self.lease_id {
+            Some(_) => {
+                if balance.balance.is_zero() {
+                    TenantStatus::Uptodate
+                } else {
+                    TenantStatus::Late
+                }
+            }
+            None => TenantStatus::default(),
+        }
+    }
 }
 
 impl Name for Tenant {

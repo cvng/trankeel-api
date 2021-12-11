@@ -27,7 +27,6 @@ pub type LeaseWithRents = (Lease, Vec<Rent>);
 pub enum LeaseStatus {
     Unsigned,
     Active,
-    #[graphql(name = "ENDED")]
     Expired,
 }
 

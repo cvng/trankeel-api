@@ -9,6 +9,10 @@ impl Amount {
     pub fn inner(&self) -> rust_decimal::Decimal {
         self.0
     }
+
+    pub fn is_zero(&self) -> bool {
+        self.0 == rust_decimal::Decimal::ZERO
+    }
 }
 
 impl From<rust_decimal::Decimal> for Amount {

@@ -45,6 +45,7 @@ use trankeel_data::StepId;
 use trankeel_data::Summary;
 use trankeel_data::Tenant;
 use trankeel_data::TenantId;
+use trankeel_data::TenantWithBalance;
 use trankeel_data::Warrant;
 use trankeel_data::WarrantId;
 use trankeel_data::WarrantWithIdentity;
@@ -167,6 +168,8 @@ pub trait PropertyStore {
 pub trait TenantStore {
     fn by_id(&mut self, id: &TenantId) -> Result<Tenant>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Tenant>>;
+    fn by_id_with_balance(&mut self, id: &TenantId) -> Result<TenantWithBalance>;
+    fn by_auth_id_with_balances(&mut self, auth_id: &AuthId) -> Result<Vec<TenantWithBalance>>;
     fn by_lease_id(&mut self, lease_id: &LeaseId) -> Result<Vec<Tenant>>;
     fn by_person_id(&mut self, person_id: &PersonId) -> Result<Tenant>;
     fn create(&mut self, data: &Tenant) -> Result<Tenant>;
