@@ -121,7 +121,7 @@ impl From<trankeel::TenantWithBalance> for Tenant {
             short_name: item.0.short_name(),
             full_name: item.0.full_name(),
             status: item.0.status(item.1.clone()),
-            balance: Some(item.1.balance),
+            balance: item.1.map(|balance| balance.balance),
         }
     }
 }
