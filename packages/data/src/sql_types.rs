@@ -24,7 +24,6 @@ pub use crate::Propertyroomtype;
 pub use crate::Propertystatus;
 pub use crate::Propertyusagetype;
 pub use crate::Rentstatus;
-pub use crate::Tenantstatus;
 pub use crate::Transactiontype;
 pub use crate::Warranttype;
 pub use crate::Workflowtype;

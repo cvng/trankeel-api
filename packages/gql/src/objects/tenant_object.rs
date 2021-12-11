@@ -31,13 +31,14 @@ pub struct Tenant {
     pub last_name: String,
     pub note: Option<String>,
     pub phone_number: Option<PhoneNumber>,
-    pub status: TenantStatus,
     pub lease_id: Option<LeaseId>,
     pub is_student: Option<bool>,
     //
     pub display_name: String,
     pub short_name: String,
     pub full_name: String,
+    pub status: TenantStatus,
+    pub balance: Option<Amount>,
 }
 
 #[async_graphql::ComplexObject]
@@ -71,15 +72,6 @@ impl Tenant {
             None => None,
         })
     }
-
-    async fn balance(&self, ctx: &Context<'_>) -> Result<Option<Amount>> {
-        Ok(Some(
-            ctx.data_unchecked::<Client>()
-                .balances()
-                .by_tenant_id(&self.id)?
-                .balance,
-        ))
-    }
 }
 
 impl From<trankeel::Tenant> for Tenant {
@@ -97,12 +89,39 @@ impl From<trankeel::Tenant> for Tenant {
             last_name: item.last_name.clone(),
             note: item.note.clone(),
             phone_number: item.phone_number.clone(),
-            status: item.status,
             lease_id: item.lease_id,
             is_student: item.is_student,
             display_name: item.display_name(),
             short_name: item.short_name(),
             full_name: item.full_name(),
+            status: Default::default(),
+            balance: Default::default(),
+        }
+    }
+}
+
+impl From<trankeel::TenantWithBalance> for Tenant {
+    fn from(item: trankeel::TenantWithBalance) -> Self {
+        Self {
+            id: item.0.id,
+            created_at: item.0.created_at,
+            updated_at: item.0.updated_at,
+            account_id: item.0.account_id,
+            person_id: item.0.person_id,
+            birthdate: item.0.birthdate,
+            birthplace: item.0.birthplace.clone(),
+            email: item.0.email.clone(),
+            first_name: item.0.first_name.clone(),
+            last_name: item.0.last_name.clone(),
+            note: item.0.note.clone(),
+            phone_number: item.0.phone_number.clone(),
+            lease_id: item.0.lease_id,
+            is_student: item.0.is_student,
+            display_name: item.0.display_name(),
+            short_name: item.0.short_name(),
+            full_name: item.0.full_name(),
+            status: item.0.status(item.1.clone()),
+            balance: item.1.map(|balance| balance.balance),
         }
     }
 }

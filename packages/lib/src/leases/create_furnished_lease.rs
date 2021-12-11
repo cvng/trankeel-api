@@ -24,7 +24,6 @@ use trankeel_data::RentChargesRecuperationMode;
 use trankeel_data::RentPaymentMethod;
 use trankeel_data::Tenant;
 use trankeel_data::TenantId;
-use trankeel_data::TenantStatus;
 use validator::Validate;
 
 // # Input
@@ -158,7 +157,6 @@ pub fn create_furnished_lease(
     // Update status for existing tenants.
     let tenants = tenants.into_iter().map(|tenant| Tenant {
         lease_id: Some(lease.id),
-        status: TenantStatus::Uptodate,
         ..tenant
     });
 

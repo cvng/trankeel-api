@@ -88,6 +88,7 @@ use trankeel_data::StepId;
 use trankeel_data::Summary;
 use trankeel_data::Tenant;
 use trankeel_data::TenantId;
+use trankeel_data::TenantWithBalance;
 use trankeel_data::Warrant;
 use trankeel_data::WarrantId;
 use trankeel_data::WarrantIdentity;
@@ -496,6 +497,23 @@ impl database::TenantStore for TenantStore<'_> {
         Ok(tenants::table
             .select(tenants::all_columns)
             .left_join(persons::table.on(persons::account_id.eq(tenants::account_id)))
+            .filter(persons::auth_id.eq(auth_id.inner()))
+            .load(&self.0.get()?)?)
+    }
+
+    fn by_id_with_balance(&mut self, id: &TenantId) -> Result<TenantWithBalance> {
+        Ok(tenants::table
+            .left_join(balances::table.on(balances::tenant_id.eq(tenants::id)))
+            .select((tenants::all_columns, balances::all_columns.nullable()))
+            .filter(tenants::id.eq(id))
+            .first(&self.0.get()?)?)
+    }
+
+    fn by_auth_id_with_balances(&mut self, auth_id: &AuthId) -> Result<Vec<TenantWithBalance>> {
+        Ok(tenants::table
+            .left_join(persons::table.on(persons::account_id.eq(tenants::account_id)))
+            .left_join(balances::table.on(balances::tenant_id.eq(tenants::id)))
+            .select((tenants::all_columns, balances::all_columns.nullable()))
             .filter(persons::auth_id.eq(auth_id.inner()))
             .load(&self.0.get()?)?)
     }

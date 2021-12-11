@@ -1,11 +1,3 @@
-CREATE TYPE tenantstatus AS ENUM (
-    'candidate',
-    'gone',
-    'late',
-    'new',
-    'uptodate'
-);
-
 CREATE TABLE tenants (
     id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMPTZ DEFAULT current_timestamp,
@@ -19,7 +11,6 @@ CREATE TABLE tenants (
     last_name TEXT NOT NULL,
     note TEXT,
     phone_number TEXT,
-    status TENANTSTATUS NOT NULL,
     lease_id UUID REFERENCES leases(id) ON DELETE SET NULL,
     is_student BOOLEAN
 );

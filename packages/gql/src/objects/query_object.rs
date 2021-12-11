@@ -115,13 +115,13 @@ impl Query {
             Ok(vec![ctx
                 .data_unchecked::<Client>()
                 .tenants()
-                .by_id(&id)?
+                .by_id_with_balance(&id)?
                 .into()])
         } else {
             Ok(ctx
                 .data_unchecked::<Client>()
                 .tenants()
-                .by_auth_id(ctx.data::<AuthId>()?)?
+                .by_auth_id_with_balances(ctx.data::<AuthId>()?)?
                 .into_iter()
                 .map(Into::into)
                 .collect())

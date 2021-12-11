@@ -460,7 +460,7 @@ enum LeaseRentReferenceIrl {
 enum LeaseStatus {
 	UNSIGNED
 	ACTIVE
-	ENDED
+	EXPIRED
 }
 enum LeaseType {
 	FURNISHED
@@ -822,16 +822,16 @@ type Tenant implements PersonInterface {
 	lastName: String!
 	note: String
 	phoneNumber: PhoneNumber
-	status: TenantStatus!
 	leaseId: ID
 	isStudent: Boolean
 	displayName: String!
 	shortName: String!
 	fullName: String!
+	status: TenantStatus!
+	balance: Decimal
 	warrants: [Warrant!]!
 	discussion: Discussion!
 	lease: Lease
-	balance: Decimal
 }
 enum TenantStatus {
 	CANDIDATE

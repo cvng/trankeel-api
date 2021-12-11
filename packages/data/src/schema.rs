@@ -358,7 +358,6 @@ table! {
         last_name -> Text,
         note -> Nullable<Text>,
         phone_number -> Nullable<Text>,
-        status -> Tenantstatus,
         lease_id -> Nullable<Uuid>,
         is_student -> Nullable<Bool>,
     }

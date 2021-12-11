@@ -1,3 +1,5 @@
+use crate::schema::persons;
+use crate::schema::tenants;
 use crate::Amount;
 use crate::Id;
 use crate::TenantId;
@@ -18,3 +20,9 @@ table! {
         balance -> Numeric,
     }
 }
+
+joinable!(balances -> tenants (tenant_id));
+
+allow_tables_to_appear_in_same_query!(balances, tenants,);
+
+allow_tables_to_appear_in_same_query!(balances, persons,);
