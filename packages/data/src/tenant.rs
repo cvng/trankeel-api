@@ -13,7 +13,7 @@ use crate::PhoneNumber;
 
 pub type TenantId = Id;
 
-pub type TenantWithBalance = (Tenant, Balance);
+pub type TenantWithBalance = (Tenant, Option<Balance>);
 
 pub type TenantWithIdentity = (Tenant, Person);
 
@@ -51,15 +51,18 @@ pub struct Tenant {
 }
 
 impl Tenant {
-    pub fn status(&self, balance: Balance) -> TenantStatus {
+    pub fn status(&self, balance: Option<Balance>) -> TenantStatus {
         match self.lease_id {
-            Some(_) => {
-                if balance.balance.is_zero() {
-                    TenantStatus::Uptodate
-                } else {
-                    TenantStatus::Late
+            Some(_) => match balance {
+                Some(balance) => {
+                    if balance.balance.is_zero() {
+                        TenantStatus::Uptodate
+                    } else {
+                        TenantStatus::Late
+                    }
                 }
-            }
+                None => TenantStatus::Late,
+            },
             None => TenantStatus::default(),
         }
     }
