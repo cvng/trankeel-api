@@ -11,17 +11,21 @@ use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
 use crate::candidacies::CreateCandidacyPayload;
 use crate::error::Result;
-use crate::leases::send_receipts;
 use crate::leases::AddExistingLease;
 use crate::leases::AddExistingLeaseInput;
 use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLease;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateFurnishedLeasePayload;
+use crate::leases::CreateNotices;
 use crate::leases::CreateNoticesInput;
+use crate::leases::CreateNoticesPayload;
+use crate::leases::CreateReceipts;
 use crate::leases::CreateReceiptsInput;
+use crate::leases::CreateReceiptsPayload;
 use crate::leases::DeleteLease;
 use crate::leases::DeleteLeaseInput;
+use crate::leases::SendReceipts;
 use crate::leases::SendReceiptsInput;
 use crate::leases::UpdateFurnishedLease;
 use crate::leases::UpdateFurnishedLeaseInput;
@@ -93,6 +97,7 @@ use trankeel_core::handlers::LeaseAffected;
 use trankeel_core::handlers::LeaseCreated;
 use trankeel_core::handlers::PropertyCreated;
 use trankeel_core::handlers::PropertyUpdated;
+use trankeel_core::handlers::ReceiptSent;
 use trankeel_core::handlers::TenantCreated;
 use trankeel_core::handlers::TenantUpdated;
 use trankeel_core::mailer::IntoMail;
@@ -641,24 +646,37 @@ impl<'a> Client {
 
     pub async fn create_receipts(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: CreateReceiptsInput,
     ) -> Result<Vec<Receipt>> {
-        crate::leases::create_receipts(&self.0, auth_id, input).await
+        let CreateReceiptsPayload { receipts } = CreateReceipts::new(&self.0).run(input).await?;
+
+        Ok(receipts)
     }
 
     pub async fn send_receipts(&self, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
-        dispatcher::dispatch_async(&self.0, send_receipts(input)?).await?;
+        let rent_ids = SendReceipts.run(input)?;
+
+        dispatcher::dispatch_async(
+            &self.0,
+            rent_ids
+                .into_iter()
+                .map(|rent_id| ReceiptSent { rent_id }.into())
+                .collect(),
+        )
+        .await?;
 
         Ok(vec![])
     }
 
     pub async fn create_notices(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: CreateNoticesInput,
     ) -> Result<Vec<Notice>> {
-        crate::leases::create_notices(&self.0, auth_id, input).await
+        let CreateNoticesPayload { notices } = CreateNotices::new(&self.0).run(input).await?;
+
+        Ok(notices)
     }
 
     pub fn delete_discussion(
