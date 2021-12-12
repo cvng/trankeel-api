@@ -1296,6 +1296,12 @@ impl database::StepStore for StepStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
+    fn create_many(&mut self, data: &[Step]) -> Result<Vec<Step>> {
+        Ok(insert_into(steps::table)
+            .values(data)
+            .get_results(&self.0.get()?)?)
+    }
+
     fn update(&mut self, data: &Step) -> Result<Step> {
         Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }

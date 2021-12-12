@@ -284,5 +284,6 @@ pub trait StepStore {
     fn by_id(&mut self, id: &StepId) -> Result<Step>;
     fn by_workflow_id(&mut self, workflow_id: &WorkflowId) -> Result<Vec<Step>>;
     fn create(&mut self, data: &Step) -> Result<Step>;
+    fn create_many(&mut self, data: &[Step]) -> Result<Vec<Step>>;
     fn update(&mut self, data: &Step) -> Result<Step>;
 }
