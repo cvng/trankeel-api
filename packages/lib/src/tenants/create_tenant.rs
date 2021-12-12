@@ -2,9 +2,8 @@ use crate::error::Result;
 use crate::messaging;
 use crate::messaging::CreateDiscussionPayload;
 use crate::messaging::CreateDiscussionState;
-use crate::warrants;
-use crate::warrants::CreateWarrantPayload;
-use crate::warrants::CreateWarrantState;
+use crate::tenants::CreateWarrant;
+use crate::tenants::CreateWarrantPayload;
 use crate::CreateDiscussionInput;
 use crate::CreateWarrantInput;
 use crate::Date;
@@ -112,16 +111,7 @@ impl Command for CreateTenant {
         let warrants = if let Some(warrants_input) = input.warrants {
             warrants_input
                 .into_iter()
-                .map(|input| {
-                    warrants::create_warrant(
-                        CreateWarrantState {
-                            account: account.clone(),
-                            tenant: Some(tenant.clone()),
-                            candidacy: None,
-                        },
-                        input,
-                    )
-                })
+                .map(|input| CreateWarrant::new(&account, Some(&tenant), None).run(input))
                 .collect::<Result<Vec<_>>>()?
                 .into_iter()
                 .map(|CreateWarrantPayload { warrant }| Some(warrant))

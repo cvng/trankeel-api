@@ -4,15 +4,15 @@ use crate::files::CreateFileInput;
 use crate::messaging;
 use crate::messaging::CreateDiscussionPayload;
 use crate::messaging::CreateDiscussionState;
-use crate::warrants;
-use crate::warrants::CreateWarrantState;
+use crate::tenants::CreateWarrant;
+use crate::tenants::CreateWarrantInput;
 use crate::CreateDiscussionInput;
-use crate::CreateWarrantInput;
 use async_graphql::InputObject;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::AsyncCommand;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
 use trankeel_core::mailer::Mailer;
@@ -230,15 +230,9 @@ fn add_candidacy_warrants(
     let mut warrants = vec![];
 
     for input in warrants_input {
-        let warrant = warrants::create_warrant(
-            CreateWarrantState {
-                account: account.clone(),
-                tenant: None,
-                candidacy: Some(candidacy.clone()),
-            },
-            input,
-        )?
-        .warrant;
+        let warrant = CreateWarrant::new(account, None, Some(candidacy))
+            .run(input)?
+            .warrant;
         warrants.push(warrant);
     }
 

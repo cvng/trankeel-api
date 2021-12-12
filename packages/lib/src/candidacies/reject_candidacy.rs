@@ -56,7 +56,7 @@ impl Command for RejectCandidacy {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let Self {
+        let RejectCandidacy {
             candidacy,
             candidate,
             account_owner,
