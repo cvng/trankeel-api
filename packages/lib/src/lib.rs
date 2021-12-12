@@ -6,7 +6,6 @@ extern crate async_trait;
 mod auth;
 mod candidacies;
 mod client;
-mod companies;
 mod error;
 mod files;
 mod invites;
