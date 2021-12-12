@@ -23,7 +23,7 @@ use trankeel_data::Tenant;
 use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
-type TenantWithIdentity = (
+type TenantWithIdentityExtended = (
     Tenant,
     Person,
     Option<Discussion>,
@@ -44,7 +44,7 @@ pub struct AddExistingLeasePayload {
     pub lease: Lease,
     pub rents: Vec<Rent>,
     pub property: Property,
-    pub tenants_with_identities: Vec<TenantWithIdentity>,
+    pub tenants_with_identities: Vec<TenantWithIdentityExtended>,
 }
 
 pub(crate) struct AddExistingLease {
