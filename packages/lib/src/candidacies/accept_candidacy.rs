@@ -22,7 +22,6 @@ use chrono::Utc;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher;
-use trankeel_core::dispatcher::dispatch;
 use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::no;
@@ -71,12 +70,12 @@ impl<'a> AcceptCandidacy<'a> {
 }
 
 impl<'a> AcceptCandidacy<'a> {
-    pub(crate) async fn run(self, input: AcceptCandidacyInput) -> Result<AcceptCandidacyPayload> {
+    pub async fn run(self, input: AcceptCandidacyInput) -> Result<AcceptCandidacyPayload> {
         let ctx = self.ctx;
         let auth_id = self.auth_id;
-        let db = ctx.db();
-        let pdfmaker = ctx.pdfmaker();
-        let mailer = ctx.mailer();
+        let db = self.ctx.db();
+        let pdfmaker = self.ctx.pdfmaker();
+        let mailer = self.ctx.mailer();
 
         input.validate()?;
 
@@ -127,7 +126,7 @@ impl<'a> AcceptCandidacy<'a> {
             ..candidacy
         })?;
 
-        dispatch(ctx, vec![Event::CandidacyAccepted(candidacy.clone())])?;
+        dispatcher::dispatch(ctx, vec![Event::CandidacyAccepted(candidacy.clone())])?;
 
         // Create tenant profile.
         let candidate = db.persons().by_candidacy_id(&candidacy.id)?;
@@ -199,7 +198,7 @@ impl<'a> AcceptCandidacy<'a> {
             },
         )?;
 
-        dispatch(
+        dispatcher::dispatch(
             ctx,
             vec![LeaseCreated {
                 lease: lease.clone(),
@@ -275,7 +274,7 @@ impl<'a> AcceptCandidacy<'a> {
             id: step.id,
             requirements: None,
         })?;
-        dispatch(ctx, vec![Event::StepCompleted(step.clone())])?;
+        dispatcher::dispatch(ctx, vec![Event::StepCompleted(step.clone())])?;
 
         mailer
             .batch(vec![CandidacyAcceptedMail::try_new(
