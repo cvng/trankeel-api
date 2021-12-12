@@ -11,12 +11,12 @@ use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
 use crate::candidacies::CreateCandidacyPayload;
 use crate::error::Result;
-use crate::leases::AddExistingLease;
-use crate::leases::AddExistingLeaseInput;
-use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLease;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateFurnishedLeasePayload;
+use crate::leases::CreateLease;
+use crate::leases::CreateLeaseInput;
+use crate::leases::CreateLeasePayload;
 use crate::leases::CreateNotices;
 use crate::leases::CreateNoticesInput;
 use crate::leases::CreateNoticesPayload;
@@ -504,21 +504,17 @@ impl<'a> Client {
         Ok(advertisement)
     }
 
-    pub async fn add_existing_lease(
-        &self,
-        auth_id: &AuthId,
-        input: AddExistingLeaseInput,
-    ) -> Result<Lease> {
+    pub async fn create_lease(&self, auth_id: &AuthId, input: CreateLeaseInput) -> Result<Lease> {
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
         let (lender, ..) = self.0.db().lenders().by_account_id_first(&account.id)?;
 
-        let AddExistingLeasePayload {
+        let CreateLeasePayload {
             lease,
             rents,
             property,
             tenants_with_identities,
-        } = AddExistingLease::new(&account, &account_owner, &lender).run(input)?;
+        } = CreateLease::new(&account, &account_owner, &lender).run(input)?;
 
         dispatcher::dispatch(
             &self.0,
