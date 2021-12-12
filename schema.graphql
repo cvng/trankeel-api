@@ -139,8 +139,12 @@ input CreateCandidacyInput {
 	birthdate: Date!
 	birthplace: String
 	isStudent: Boolean!
-	files: [FileInput!]
+	files: [CreateFileInput!]
 	warrants: [CreateWarrantInput!]
+}
+input CreateFileInput {
+	downloadUrl: URL!
+	type: FileType!
 }
 type CreateNoticesPayload {
 	errors: [Error!]
@@ -281,10 +285,6 @@ type File {
 	status: FileStatus
 	type: FileType!
 }
-input FileInput {
-	downloadUrl: URL!
-	type: FileType!
-}
 """
 https://www.pdfmonkey.io/fr/doc/api/generer-un-document
 """
@@ -299,10 +299,6 @@ enum FileType {
 	LEASE_DOCUMENT
 	PAYMENT_NOTICE
 	RENT_RECEIPT
-}
-input ImportInput {
-	files: [FileInput!]!
-	source: ImportSource!
 }
 enum ImportSource {
 	RENTILA
@@ -429,7 +425,7 @@ input LeaseFurnishedInput {
 	depositAmount: Decimal!
 	effectDate: DateTime!
 	renewDate: DateTime
-	file: FileInput
+	file: CreateFileInput
 	propertyId: ID!
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
@@ -438,7 +434,7 @@ input LeaseFurnishedInput {
 }
 input LeaseFurnishedUpdateInput {
 	data: LeaseFurnishedDataInput
-	file: FileInput
+	file: CreateFileInput
 	id: ID!
 }
 input LeaseNakedDataInput {
@@ -534,15 +530,15 @@ type Mutation {
 	candidacyAccept(input: AcceptCandidacyInput!): Candidacy!
 	transactionCreate(input: TransactionInput!): Transaction!
 	transactionDelete(id: ID!): ID!
-	fileUpload(input: FileInput!): File!
-	importUpload(input: ImportInput!): Task!
+	fileUpload(input: CreateFileInput!): File!
+	importUpload(input: UploadImportInput!): Task!
 	createReceipts(input: RentReceiptInput!): CreateReceiptsPayload!
 	createNotices(input: SendPaymentNoticeInput!): CreateNoticesPayload!
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -927,6 +923,10 @@ input UpdateTenantInput {
 }
 type UpdateTenantPayload {
 	tenant: Tenant!
+}
+input UploadImportInput {
+	files: [CreateFileInput!]!
+	source: ImportSource!
 }
 enum UserRole {
 	ADMIN

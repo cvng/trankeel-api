@@ -43,7 +43,6 @@ use trankeel::DeleteDiscussionInput;
 use trankeel::DeleteLeaseInput;
 use trankeel::DeletePropertyInput;
 use trankeel::DeleteTenantInput;
-use trankeel::ImportInput;
 use trankeel::LeaseId;
 use trankeel::PaymentId;
 use trankeel::PropertyId;
@@ -56,6 +55,7 @@ use trankeel::UpdateFurnishedLeaseInput;
 use trankeel::UpdateIndividualLenderInput;
 use trankeel::UpdatePropertyInput;
 use trankeel::UpdateTenantInput;
+use trankeel::UploadImportInput;
 
 pub struct Mutation;
 
@@ -272,7 +272,7 @@ impl Mutation {
         Err(wip())
     }
 
-    async fn import_upload(&self, _input: ImportInput) -> Result<Task> {
+    async fn import_upload(&self, _input: UploadImportInput) -> Result<Task> {
         Err(wip())
     }
 
