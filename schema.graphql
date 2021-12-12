@@ -12,14 +12,10 @@ type Account {
 	trialEnd: DateTime
 	plan: Plan
 }
-input AccountActivatePlanInput {
+input ActivateAccountPlanInput {
 	id: ID!
 	name: String!
 	planCode: PlanCode!
-}
-input AccountUpdateInput {
-	id: ID!
-	paymentMethodId: String!
 }
 input AddExistingLeaseInput {
 	effectDate: DateTime!
@@ -205,6 +201,15 @@ input CreateTenantInput {
 }
 type CreateTenantPayload {
 	tenant: Tenant!
+}
+input CreateUserWithAccountInput {
+	address: AddressInput
+	authId: AuthenticationID!
+	email: String!
+	firstName: String!
+	lastName: String!
+	phoneNumber: String
+	skipCreateCustomer: Boolean
 }
 type CreateUserWithAccountPayload {
 	account: Account!
@@ -508,10 +513,10 @@ type Message {
 	event: Event
 }
 type Mutation {
-	userCreateWithAccount(input: UserWithAccountInput!): CreateUserWithAccountPayload!
+	userCreateWithAccount(input: CreateUserWithAccountInput!): CreateUserWithAccountPayload!
 	signupUserFromInvite(input: SignupUserFromInviteInput!): Person!
-	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
-	accountActivatePlan(input: AccountActivatePlanInput!): Account!
+	accountUpdatePaymentMethod(input: UpdateAccountInput!): Account!
+	accountActivatePlan(input: ActivateAccountPlanInput!): Account!
 	tenantCreate(input: CreateTenantInput!): CreateTenantPayload!
 	tenantUpdate(input: UpdateTenantInput!): UpdateTenantPayload!
 	tenantDelete(id: ID!): ID!
@@ -538,7 +543,7 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -858,6 +863,10 @@ enum TransactionType {
 	RENT
 }
 scalar URL
+input UpdateAccountInput {
+	id: ID!
+	paymentMethodId: String!
+}
 input UpdateAdvertisementInput {
 	id: ID!
 	published: Boolean
@@ -935,15 +944,6 @@ enum UserRole {
 	USER
 	VIEWER
 	WARRANT
-}
-input UserWithAccountInput {
-	address: AddressInput
-	authId: AuthenticationID!
-	email: String!
-	firstName: String!
-	lastName: String!
-	phoneNumber: String
-	skipCreateCustomer: Boolean
 }
 type Warrant {
 	id: ID!

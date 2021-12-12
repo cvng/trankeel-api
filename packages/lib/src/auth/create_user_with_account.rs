@@ -15,8 +15,6 @@ use trankeel_data::PersonId;
 use trankeel_data::PersonRole;
 use validator::Validate;
 
-// # Input
-
 #[derive(Clone, InputObject)]
 pub struct AddressInput {
     pub city: String,
@@ -26,8 +24,7 @@ pub struct AddressInput {
     pub postal_code: String,
 }
 
-#[derive(Clone, InputObject, Validate)]
-#[graphql(name = "UserWithAccountInput")]
+#[derive(InputObject, Validate)]
 pub struct CreateUserWithAccountInput {
     pub address: Option<AddressInput>,
     pub auth_id: AuthId,
@@ -45,8 +42,6 @@ pub struct CreateUserWithAccountPayload {
     pub lender: Lender,
     pub subscription: Option<trankeel_data::Subscription>,
 }
-
-// # Operation
 
 pub async fn create_user_with_account(
     db: &impl Db,
@@ -128,8 +123,6 @@ pub async fn create_user_with_account(
         subscription: Some(subscription),
     })
 }
-
-// # Utils
 
 impl From<AddressInput> for Address {
     fn from(item: AddressInput) -> Self {

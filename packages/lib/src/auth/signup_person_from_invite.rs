@@ -13,7 +13,7 @@ use trankeel_data::InviteToken;
 use trankeel_data::Person;
 use validator::Validate;
 
-#[derive(Clone, InputObject, Validate)]
+#[derive(InputObject, Validate)]
 pub struct SignupUserFromInviteInput {
     pub auth_id: AuthId,
     pub invite_token: InviteToken,

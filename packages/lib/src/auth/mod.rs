@@ -1,13 +1,13 @@
-mod account_activate_plan;
-mod account_update;
-mod person_create;
-mod person_create_with_account;
-mod person_signup_from_invite;
+mod activate_account_plan;
+mod create_person;
+mod create_user_with_account;
+mod signup_person_from_invite;
+mod update_account;
 mod update_person;
 
-pub use account_activate_plan::*;
-pub use account_update::*;
-pub use person_create::*;
-pub use person_create_with_account::*;
-pub use person_signup_from_invite::*;
+pub use activate_account_plan::*;
+pub use create_person::*;
+pub use create_user_with_account::*;
+pub use signup_person_from_invite::*;
+pub use update_account::*;
 pub use update_person::*;
