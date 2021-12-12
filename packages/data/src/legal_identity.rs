@@ -32,3 +32,9 @@ impl LegalIdentity {
         }
     }
 }
+
+impl From<Person> for LegalIdentity {
+    fn from(item: Person) -> Self {
+        Self::Individual(item)
+    }
+}
