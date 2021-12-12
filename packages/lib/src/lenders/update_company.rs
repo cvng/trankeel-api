@@ -1,8 +1,8 @@
 use crate::auth::AddressInput;
 use async_graphql::InputObject;
+use validator::Validate;
 
-#[derive(InputObject)]
-#[graphql(name = "CompanyUpdateInput")]
+#[derive(InputObject, Validate)]
 pub struct UpdateCompanyInput {
-    address: Option<AddressInput>,
+    pub address: Option<AddressInput>,
 }

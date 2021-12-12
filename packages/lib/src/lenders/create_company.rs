@@ -5,7 +5,7 @@ use validator::Validate;
 
 #[derive(InputObject, Validate)]
 pub struct CreateCompanyInput {
-    address: AddressInput,
-    email: Email,
-    legal_entity: String,
+    pub address: AddressInput,
+    pub email: Email,
+    pub legal_entity: String,
 }

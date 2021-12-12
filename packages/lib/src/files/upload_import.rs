@@ -5,6 +5,6 @@ use validator::Validate;
 
 #[derive(InputObject, Validate)]
 pub struct UploadImportInput {
-    files: Vec<CreateFileInput>,
-    source: ImportSource,
+    pub files: Vec<CreateFileInput>,
+    pub source: ImportSource,
 }

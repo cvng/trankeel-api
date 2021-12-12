@@ -5,6 +5,6 @@ use validator::Validate;
 
 #[derive(InputObject, Validate)]
 pub struct GenerateDocumentInput {
-    attachable_id: AttachableId,
-    type_: FileType,
+    pub attachable_id: AttachableId,
+    pub type_: FileType,
 }

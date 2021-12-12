@@ -5,6 +5,6 @@ use validator::Validate;
 
 #[derive(InputObject, Validate)]
 pub struct CreateFileInput {
-    download_url: Url,
-    type_: FileType,
+    pub download_url: Url,
+    pub type_: FileType,
 }
