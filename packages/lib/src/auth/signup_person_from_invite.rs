@@ -1,6 +1,6 @@
 use crate::error::Result;
 use async_graphql::InputObject;
-use trankeel_core::database::Db;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::error::Error;
 use trankeel_data::Account;
 use trankeel_data::AccountId;
@@ -19,46 +19,70 @@ pub struct SignupUserFromInviteInput {
     pub invite_token: InviteToken,
 }
 
-pub async fn signup_user_from_invite(
-    db: &impl Db,
-    input: SignupUserFromInviteInput,
-) -> Result<Person> {
-    input.validate()?;
+pub struct SignupUserFromInvitePayload {
+    pub invite: Invite,
+    pub invitee: Person,
+    pub account: Account,
+}
 
-    let invite = db.invites().by_token(&input.invite_token)?;
+pub(crate) struct SignupUserFromInvite {
+    invite: Invite,
+    invitee: Person,
+}
 
-    if invite.reason != InviteReason::CandidacyAccepted {
-        return Err(Error::msg("unknown reason"));
+impl SignupUserFromInvite {
+    pub fn new(invite: &Invite, invitee: &Person) -> Self {
+        Self {
+            invite: invite.clone(),
+            invitee: invitee.clone(),
+        }
     }
+}
 
-    // Create account.
-    let account = db.accounts().create(&Account {
-        id: AccountId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        plan_id: None,
-        status: AccountStatus::Active, // Active account by default.
-        stripe_customer_id: None,
-        stripe_subscription_id: None,
-        trial_end: None,
-    })?;
+impl Command for SignupUserFromInvite {
+    type Input = SignupUserFromInviteInput;
+    type Payload = SignupUserFromInvitePayload;
 
-    // Attach user with account.
-    let user = db.persons().by_id(&invite.invitee_id)?;
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+        input.validate()?;
 
-    let user = db.persons().update(&Person {
-        id: invite.invitee_id,
-        auth_id: Some(input.auth_id),
-        account_id: account.id,
-        ..user
-    })?;
+        let Self { invite, invitee } = self;
 
-    // Update invite.
-    db.invites().update(&Invite {
-        id: invite.id,
-        status: InviteStatus::Accepted,
-        ..invite
-    })?;
+        if invite.reason != InviteReason::CandidacyAccepted {
+            return Err(Error::msg("unknown invite reason"));
+        }
 
-    Ok(user)
+        // Create account.
+        let account = Account {
+            id: AccountId::new(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            plan_id: None,
+            status: AccountStatus::Active, // Active account by default.
+            stripe_customer_id: None,
+            stripe_subscription_id: None,
+            trial_end: None,
+        };
+
+        // Attach user with account.
+        let invitee = Person {
+            id: invite.invitee_id,
+            auth_id: Some(input.auth_id),
+            account_id: account.id,
+            ..invitee
+        };
+
+        // Update invite.
+        let invite = Invite {
+            id: invite.id,
+            status: InviteStatus::Accepted,
+            ..invite
+        };
+
+        Ok(Self::Payload {
+            invite,
+            invitee,
+            account,
+        })
+    }
 }
