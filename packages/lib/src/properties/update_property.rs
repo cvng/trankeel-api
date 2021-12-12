@@ -63,7 +63,7 @@ impl Command for UpdateProperty {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let UpdateProperty { property } = self;
+        let Self { property } = self;
 
         let property = Property {
             id: input.id,
@@ -90,6 +90,6 @@ impl Command for UpdateProperty {
             ..property
         };
 
-        Ok(UpdatePropertyPayload { property })
+        Ok(Self::Payload { property })
     }
 }

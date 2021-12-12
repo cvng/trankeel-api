@@ -56,7 +56,7 @@ impl Command for RejectCandidacy {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let RejectCandidacy {
+        let Self {
             candidacy,
             candidate,
             account_owner,
@@ -87,7 +87,7 @@ impl Command for RejectCandidacy {
             },
         )?;
 
-        Ok(RejectCandidacyPayload {
+        Ok(Self::Payload {
             candidacy,
             message,
             discussion,

@@ -65,7 +65,7 @@ impl Command for CreateTenant {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let CreateTenant {
+        let Self {
             account,
             account_owner,
             identity,
@@ -135,7 +135,7 @@ impl Command for CreateTenant {
             None
         };
 
-        Ok(CreateTenantPayload {
+        Ok(Self::Payload {
             tenant,
             identity,
             warrants,

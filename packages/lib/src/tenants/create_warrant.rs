@@ -58,7 +58,7 @@ impl Command for CreateWarrant {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let CreateWarrant {
+        let Self {
             account,
             tenant,
             candidacy,
@@ -142,7 +142,7 @@ impl Command for CreateWarrant {
             _ => return Err(Error::msg("individual or company is missing")),
         };
 
-        Ok(CreateWarrantPayload { warrant })
+        Ok(Self::Payload { warrant })
     }
 }
 

@@ -46,7 +46,7 @@ impl Command for UpdateTenant {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let UpdateTenant { tenant } = self;
+        let Self { tenant } = self;
 
         let tenant = Tenant {
             id: input.id,
@@ -61,6 +61,6 @@ impl Command for UpdateTenant {
             ..tenant
         };
 
-        Ok(UpdateTenantPayload { tenant })
+        Ok(Self::Payload { tenant })
     }
 }

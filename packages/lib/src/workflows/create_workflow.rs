@@ -39,7 +39,7 @@ impl Command for CreateWorkflow {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let CreateWorkflow { workflowable } = self;
+        let Self { workflowable } = self;
 
         let workflow = Workflow {
             id: WorkflowId::new(),
@@ -52,6 +52,6 @@ impl Command for CreateWorkflow {
 
         let steps = config::workflow_steps(&workflow).into_iter().collect(); // IO.
 
-        Ok(CreateWorkflowPayload { workflow, steps })
+        Ok(Self::Payload { workflow, steps })
     }
 }

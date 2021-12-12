@@ -39,7 +39,7 @@ impl Command for CompleteStep {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let CompleteStep { step } = self;
+        let Self { step } = self;
 
         let step = Step {
             id: step.id,
@@ -48,7 +48,7 @@ impl Command for CompleteStep {
             ..step
         };
 
-        Ok(CompleteStepPayload { step })
+        Ok(Self::Payload { step })
     }
 }
 
