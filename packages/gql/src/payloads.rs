@@ -211,7 +211,7 @@ impl From<trankeel::CreateUserWithAccountPayload> for CreateUserWithAccountPaylo
             account: item.account.into(),
             user: item.user.into(),
             lender: item.lender.into(),
-            subscription: item.subscription,
+            subscription: None,
         }
     }
 }
