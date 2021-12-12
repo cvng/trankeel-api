@@ -18,9 +18,11 @@ use crate::leases::UpdateFurnishedLeaseInput;
 use crate::lenders::UpdateIndividualLender;
 use crate::lenders::UpdateIndividualLenderInput;
 use crate::lenders::UpdateIndividualLenderPayload;
+use crate::messaging::DeleteDiscussion;
 use crate::messaging::DeleteDiscussionInput;
 use crate::messaging::PushMessage;
 use crate::messaging::PushMessageInput;
+use crate::messaging::PushMessagePayload;
 use crate::properties::CreateAdvertisement;
 use crate::properties::CreateAdvertisementInput;
 use crate::properties::CreateAdvertisementPayload;
@@ -507,14 +509,31 @@ impl<'a> Client {
 
     pub fn delete_discussion(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: DeleteDiscussionInput,
     ) -> Result<DiscussionId> {
-        crate::messaging::delete_discussion(self.0.db(), auth_id, input)
+        let discussion_id = DeleteDiscussion.run(input)?;
+
+        self.0.db().discussions().delete(&discussion_id)?;
+
+        Ok(discussion_id)
     }
 
     pub async fn push_message(&self, input: PushMessageInput) -> Result<Message> {
-        Ok(PushMessage::new(&self.0).run(input).await?.message)
+        let discussion = self.0.db().discussions().by_id(&input.discussion_id)?;
+
+        let PushMessagePayload {
+            message,
+            discussion,
+        } = PushMessage::new(&discussion).run(input)?;
+
+        self.0.db().transaction(|| {
+            self.0.db().messages().create(&message)?;
+            self.0.db().discussions().update(&discussion)?;
+            Ok(())
+        })?;
+
+        Ok(message)
     }
 
     pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {

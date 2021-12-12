@@ -1,11 +1,10 @@
 use crate::error::Result;
-use crate::messaging;
+use crate::messaging::CreateDiscussion;
+use crate::messaging::CreateDiscussionInput;
 use crate::messaging::CreateDiscussionPayload;
-use crate::messaging::CreateDiscussionState;
 use crate::warrants::CreateWarrant;
 use crate::warrants::CreateWarrantInput;
 use crate::warrants::CreateWarrantPayload;
-use crate::CreateDiscussionInput;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
@@ -122,15 +121,13 @@ impl Command for CreateTenant {
 
         // Create discussion if needed.
         let discussion = if !identity_already_exists {
-            messaging::create_discussion(
-                CreateDiscussionState { account },
-                CreateDiscussionInput {
+            CreateDiscussion::new(&account)
+                .run(CreateDiscussionInput {
                     recipient_id: account_owner.id,
                     initiator_id: identity.id,
                     message: None,
-                },
-            )
-            .map(|CreateDiscussionPayload { discussion, .. }| Some(discussion))?
+                })
+                .map(|CreateDiscussionPayload { discussion, .. }| Some(discussion))?
         } else {
             None
         };
