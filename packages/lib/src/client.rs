@@ -24,6 +24,7 @@ use crate::properties::CreateAdvertisementPayload;
 use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
 use crate::properties::CreatePropertyPayload;
+use crate::properties::DeleteProperty;
 use crate::properties::DeletePropertyInput;
 use crate::properties::UpdateAdvertisement;
 use crate::properties::UpdateAdvertisementInput;
@@ -337,10 +338,14 @@ impl<'a> Client {
 
     pub fn delete_property(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: DeletePropertyInput,
     ) -> Result<PropertyId> {
-        crate::properties::delete_property(self.0.db(), auth_id, input)
+        let property_id = DeleteProperty.run(input)?;
+
+        self.0.db().properties().delete(&property_id)?;
+
+        Ok(property_id)
     }
 
     pub fn create_advertisement(
