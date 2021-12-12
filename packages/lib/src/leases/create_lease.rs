@@ -98,7 +98,7 @@ impl Command for CreateLease {
             duration: Default::default(),
         };
 
-        // Create rents.
+        // Generate rents.
         let rents = lease.rents();
 
         // Make the lease active by using a signature date.
