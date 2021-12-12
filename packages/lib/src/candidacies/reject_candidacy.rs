@@ -1,8 +1,8 @@
 use crate::error::Result;
 use crate::messaging;
+use crate::messaging::PushMessageInput;
+use crate::messaging::PushMessagePayload;
 use crate::messaging::PushMessageState;
-use crate::PushMessageInput;
-use crate::PushMessagePayload;
 use async_graphql::InputObject;
 use trankeel_core::dispatcher::Command;
 use trankeel_core::templates::CandidacyRejectedMail;

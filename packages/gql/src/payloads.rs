@@ -175,15 +175,13 @@ impl From<trankeel::Advertisement> for UpdateAdvertisementPayload {
 
 #[derive(SimpleObject)]
 pub struct PushMessagePayload {
-    errors: Option<Vec<Error>>,
-    message: Option<Message>,
+    message: Message,
 }
 
-impl From<trankeel::PushMessagePayload> for PushMessagePayload {
-    fn from(item: trankeel::PushMessagePayload) -> Self {
+impl From<trankeel::Message> for PushMessagePayload {
+    fn from(item: trankeel::Message) -> Self {
         Self {
-            errors: Some(vec![]),
-            message: Some(item.message.into()),
+            message: item.into(),
         }
     }
 }

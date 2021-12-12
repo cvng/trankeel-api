@@ -1,9 +1,10 @@
 use crate::auth::AddressInput;
 use async_graphql::InputObject;
 use trankeel_data::Email;
+use validator::Validate;
 
-#[derive(InputObject)]
-pub struct CompanyInput {
+#[derive(InputObject, Validate)]
+pub struct CreateCompanyInput {
     address: AddressInput,
     email: Email,
     legal_entity: String,
