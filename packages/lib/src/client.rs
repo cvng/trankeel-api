@@ -1,6 +1,9 @@
+use crate::auth::CreateUserWithAccount;
 use crate::auth::CreateUserWithAccountInput;
 use crate::auth::CreateUserWithAccountPayload;
+use crate::auth::SignupUserFromInvite;
 use crate::auth::SignupUserFromInviteInput;
+use crate::auth::SignupUserFromInvitePayload;
 use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
@@ -48,6 +51,8 @@ use crate::tenants::UpdateTenantPayload;
 use crate::workflows::CompleteStep;
 use crate::workflows::CompleteStepInput;
 use crate::workflows::CompleteStepPayload;
+use log::info;
+use trankeel_core::billing::BillingProvider;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
@@ -92,6 +97,7 @@ use trankeel_core::providers::Pdfmonkey;
 use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
 use trankeel_core::providers::Stripe;
+use trankeel_data::Account;
 use trankeel_data::Advertisement;
 use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
@@ -213,14 +219,72 @@ impl<'a> Client {
         &self,
         input: CreateUserWithAccountInput,
     ) -> Result<CreateUserWithAccountPayload> {
-        crate::auth::create_user_with_account(self.0.db(), self.0.billing_provider(), input).await
+        let skip_create_customer = matches!(input.skip_create_customer, Some(true));
+
+        let CreateUserWithAccountPayload {
+            user,
+            lender,
+            account,
+        } = CreateUserWithAccount::new().run(input)?;
+
+        self.0.db().transaction(|| {
+            self.0.db().accounts().create(&account)?;
+            self.0.db().persons().create(&user)?;
+            self.0.db().lenders().create(&lender)?;
+            Ok(())
+        })?;
+
+        if !skip_create_customer {
+            // Create subscription.
+            let subscription = self
+                .0
+                .billing_provider()
+                .create_subscription_with_customer(user.email.clone())
+                .await?;
+            info!(
+                "Created subscription {} for account {}",
+                subscription.id, account.id
+            );
+
+            // Update the local customer data.
+            self.0.db().accounts().update(&Account {
+                id: account.id,
+                stripe_customer_id: Some(subscription.customer_id.clone()),
+                stripe_subscription_id: Some(subscription.id.clone()),
+                status: subscription.status,
+                trial_end: subscription.trial_end,
+                ..account
+            })?;
+        }
+
+        Ok(CreateUserWithAccountPayload {
+            user,
+            lender,
+            account,
+        })
     }
 
     pub async fn signup_user_from_invite(
         &self,
         input: SignupUserFromInviteInput,
     ) -> Result<Person> {
-        crate::auth::signup_user_from_invite(self.0.db(), input).await
+        let invite = self.0.db().invites().by_token(&input.invite_token)?;
+        let invitee = self.0.db().persons().by_id(&invite.invitee_id)?;
+
+        let SignupUserFromInvitePayload {
+            invite,
+            invitee,
+            account,
+        } = SignupUserFromInvite::new(&invite, &invitee).run(input)?;
+
+        self.0.db().transaction(|| {
+            self.0.db().accounts().create(&account)?;
+            self.0.db().persons().update(&invitee)?;
+            self.0.db().invites().update(&invite)?;
+            Ok(())
+        })?;
+
+        Ok(invitee)
     }
 
     pub async fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
