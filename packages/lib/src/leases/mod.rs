@@ -6,6 +6,7 @@ mod create_payment;
 mod create_receipts;
 mod create_rent;
 mod delete_lease;
+mod send_receipts;
 mod update_furnished_lease;
 
 pub use add_existing_lease::*;
@@ -16,4 +17,5 @@ pub use create_payment::*;
 pub use create_receipts::*;
 pub use create_rent::*;
 pub use delete_lease::*;
+pub use send_receipts::*;
 pub use update_furnished_lease::*;
