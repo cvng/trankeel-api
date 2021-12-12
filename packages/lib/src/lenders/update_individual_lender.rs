@@ -60,7 +60,7 @@ impl Command for UpdateIndividualLender {
             ..invididual
         };
 
-        let lender = (lender, LegalIdentity::Individual(invididual));
+        let lender = (lender, invididual.into());
 
         Ok(Self::Payload { lender })
     }
