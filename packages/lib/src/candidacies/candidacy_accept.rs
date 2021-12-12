@@ -2,8 +2,9 @@ use super::RejectCandidacy;
 use super::RejectCandidacyInput;
 use super::RejectCandidacyPayload;
 use crate::error::Result;
-use crate::invites::create_invite;
+use crate::invites::CreateInvite;
 use crate::invites::CreateInviteInput;
+use crate::invites::CreateInvitePayload;
 use crate::leases::create_lease_from_advertisement;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
@@ -126,13 +127,11 @@ pub(crate) async fn accept_candidacy(
     })?;
 
     // Send invite to candidate.
-    let invite = create_invite(
-        db,
-        CreateInviteInput {
-            invitee_id: candidate.id,
-            reason: InviteReason::CandidacyAccepted,
-        },
-    )?;
+    let invitee = db.persons().by_id(&candidate.id)?;
+    let CreateInvitePayload { invite } = CreateInvite::new(&invitee).run(CreateInviteInput {
+        invitee_id: invitee.id,
+        reason: InviteReason::CandidacyAccepted,
+    })?;
 
     // Create unsigned lease.
     let advertisement = db.advertisements().by_id(&candidacy.advertisement_id)?;
