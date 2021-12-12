@@ -63,7 +63,7 @@ impl Command for CreateTenant {
     type Input = CreateTenantInput;
     type Payload = CreateTenantPayload;
 
-    fn run(self, input: CreateTenantInput) -> Result<CreateTenantPayload> {
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
         let CreateTenant {
