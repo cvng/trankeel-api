@@ -115,6 +115,7 @@ impl Command for CreateFurnishedLease {
 
         let Self { account, tenants } = self;
 
+        // Check signature date.
         if let Some(signature_date) = input.signature_date {
             if input.effect_date.inner() > signature_date.inner() {
                 return Err(Error::msg("effect date must be anterior to signature date"));
@@ -128,6 +129,7 @@ impl Command for CreateFurnishedLease {
             .and_then(|details| details.duration)
             .unwrap_or_default();
 
+        // Create lease.
         let lease = Lease {
             id: LeaseId::new(),
             created_at: Default::default(),
@@ -147,7 +149,7 @@ impl Command for CreateFurnishedLease {
             renew_date: None,
         };
 
-        // Generate lease rents.
+        // Generate rents.
         let rents = lease.rents();
 
         // Update status for existing tenants.
