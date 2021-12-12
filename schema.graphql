@@ -212,9 +212,9 @@ input CreateUserWithAccountInput {
 	skipCreateCustomer: Boolean
 }
 type CreateUserWithAccountPayload {
-	account: Account!
 	user: Person!
 	lender: Lender!
+	account: Account!
 	subscription: Subscription
 }
 input CreateWarrantInput {
@@ -514,7 +514,7 @@ type Message {
 }
 type Mutation {
 	userCreateWithAccount(input: CreateUserWithAccountInput!): CreateUserWithAccountPayload!
-	signupUserFromInvite(input: SignupUserFromInviteInput!): Person!
+	signupUserFromInvite(input: SignupUserFromInviteInput!): SignupUserFromInvitePayload!
 	accountUpdatePaymentMethod(input: UpdateAccountInput!): Account!
 	accountActivatePlan(input: ActivateAccountPlanInput!): Account!
 	tenantCreate(input: CreateTenantInput!): CreateTenantPayload!
@@ -747,6 +747,9 @@ input SendPaymentNoticeInput {
 input SignupUserFromInviteInput {
 	authId: AuthenticationID!
 	inviteToken: InviteToken!
+}
+type SignupUserFromInvitePayload {
+	user: Person!
 }
 type Step {
 	id: ID!
