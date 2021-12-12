@@ -75,14 +75,14 @@ impl Command for CreateWarrant {
         };
 
         let warrant = match (input.type_, input.individual, input.company) {
-            (WarrantType::Person, Some(person_input), _) => (
+            (WarrantType::Person, Some(individual_input), _) => (
                 Warrant {
                     id: WarrantId::new(),
                     created_at: Default::default(),
                     updated_at: Default::default(),
                     type_: WarrantType::Person,
                     tenant_id,
-                    individual_id: Default::default(),
+                    individual_id: None,
                     professional_id: None,
                     candidacy_id,
                 },
@@ -92,13 +92,13 @@ impl Command for CreateWarrant {
                     updated_at: Default::default(),
                     account_id: account.id,
                     auth_id: None,
-                    email: person_input.email,
-                    first_name: person_input.first_name,
-                    last_name: person_input.last_name,
-                    address: person_input.address.map(Into::into),
+                    email: individual_input.email,
+                    first_name: individual_input.first_name,
+                    last_name: individual_input.last_name,
+                    address: individual_input.address.map(Into::into),
                     photo_url: None,
                     role: PersonRole::Warrant,
-                    phone_number: person_input.phone_number,
+                    phone_number: individual_input.phone_number,
                 }),
             ),
             (WarrantType::Visale, _, Some(company_input)) => (
@@ -109,7 +109,7 @@ impl Command for CreateWarrant {
                     type_: WarrantType::Visale,
                     tenant_id,
                     individual_id: None,
-                    professional_id: Default::default(),
+                    professional_id: None,
                     candidacy_id,
                 },
                 WarrantIdentity::Professional(ProfessionalWarrant {
@@ -128,7 +128,7 @@ impl Command for CreateWarrant {
                     type_: WarrantType::Company,
                     tenant_id,
                     individual_id: None,
-                    professional_id: Default::default(),
+                    professional_id: None,
                     candidacy_id,
                 },
                 WarrantIdentity::Professional(ProfessionalWarrant {
