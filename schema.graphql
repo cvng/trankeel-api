@@ -142,17 +142,16 @@ input CreateFileInput {
 	downloadUrl: URL!
 	type: FileType!
 }
-type CreateNoticesPayload {
-	errors: [Error!]
-	notices: [File!]
-}
-input CreatePersonInput {
-	email: Email!
+input CreateIndividualWarrantInput {
+	email: String!
 	firstName: String!
 	lastName: String!
 	address: AddressInput
 	phoneNumber: PhoneNumber
-	role: UserRole!
+}
+type CreateNoticesPayload {
+	errors: [Error!]
+	notices: [File!]
 }
 input CreateProfessionalWarrantInput {
 	name: String!
@@ -220,7 +219,7 @@ type CreateUserWithAccountPayload {
 }
 input CreateWarrantInput {
 	type: WarrantType!
-	individual: CreatePersonInput
+	individual: CreateIndividualWarrantInput
 	company: CreateProfessionalWarrantInput
 }
 scalar Date
