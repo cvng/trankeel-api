@@ -500,10 +500,6 @@ enum LenderFlexibility {
 	THREE_DAYS
 	SEVEN_DAYS
 }
-input LenderIndividualUpdateInput {
-	id: ID!
-	individual: UserUpdateInput!
-}
 type Message {
 	id: ID!
 	createdAt: DateTime
@@ -533,7 +529,7 @@ type Mutation {
 	leaseFurnishedUpdate(input: LeaseFurnishedUpdateInput!): Lease!
 	leaseNakedCreate(input: LeaseNakedInput!): Lease!
 	leaseDelete(id: ID!): ID!
-	lenderIndividualUpdate(input: LenderIndividualUpdateInput!): Lender!
+	lenderIndividualUpdate(input: UpdateIndividualLenderInput!): Lender!
 	candidacyCreate(input: CreateCandidacyInput!): Candidacy!
 	candidacyAccept(input: AcceptCandidacyInput!): Candidacy!
 	transactionCreate(input: TransactionInput!): Transaction!
@@ -546,7 +542,7 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -678,8 +674,7 @@ input PushMessageInput {
 	message: String!
 }
 type PushMessagePayload {
-	errors: [Error!]
-	message: Message
+	message: Message!
 }
 type Query {
 	viewer: Person!
@@ -883,6 +878,15 @@ input UpdateAdvertisementInput {
 type UpdateAdvertisementPayload {
 	advertisement: Advertisement!
 }
+input UpdateIndividualLenderInput {
+	id: ID!
+	individual: UpdatePersonInput!
+}
+input UpdatePersonInput {
+	address: AddressInput
+	firstName: String
+	lastName: String
+}
 input UpdatePropertyInput {
 	address: AddressInput
 	buildPeriod: PropertyBuildPeriodType
@@ -931,11 +935,6 @@ enum UserRole {
 	USER
 	VIEWER
 	WARRANT
-}
-input UserUpdateInput {
-	address: AddressInput
-	firstName: String
-	lastName: String
 }
 input UserWithAccountInput {
 	address: AddressInput
