@@ -44,7 +44,7 @@ impl Command for CompleteStep {
         let step = Step {
             id: step.id,
             completed: !step.completed,
-            requirements: match_requirements(step.clone(), input),
+            requirements: match_requirements(&step, input),
             ..step
         };
 
@@ -52,8 +52,8 @@ impl Command for CompleteStep {
     }
 }
 
-fn match_requirements(step: Step, input: CompleteStepInput) -> Option<RequirementOuter> {
-    let requirements = match step.requirements {
+fn match_requirements(step: &Step, input: CompleteStepInput) -> Option<RequirementOuter> {
+    let requirements = match step.requirements.clone() {
         Some(requirements) => requirements.requirements,
         None => return None,
     };
