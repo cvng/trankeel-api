@@ -129,7 +129,7 @@ pub(crate) async fn accept_candidacy(
     // Send invite to candidate.
     let invitee = db.persons().by_id(&candidate.id)?;
     let CreateInvitePayload { invite } = CreateInvite::new(&invitee).run(CreateInviteInput {
-        invitee_id: candidate.id,
+        invitee_id: invitee.id,
         reason: InviteReason::CandidacyAccepted,
     })?;
 
