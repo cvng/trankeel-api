@@ -53,7 +53,6 @@ impl<'a> CreateNotices<'a> {
         }
 
         // Generate notices.
-
         let mut notices = vec![];
 
         for rent in rents {
