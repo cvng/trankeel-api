@@ -12,6 +12,36 @@ use crate::objects::Tenant;
 use trankeel::DiscussionId;
 
 #[derive(SimpleObject)]
+pub struct CreateUserWithAccountPayload {
+    user: Person,
+    lender: Lender,
+    account: Account,
+    subscription: Option<trankeel::Subscription>,
+}
+
+impl From<trankeel::CreateUserWithAccountPayload> for CreateUserWithAccountPayload {
+    fn from(item: trankeel::CreateUserWithAccountPayload) -> Self {
+        Self {
+            user: item.user.into(),
+            lender: item.lender.into(),
+            account: item.account.into(),
+            subscription: None,
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct SignupUserFromInvitePayload {
+    user: Person,
+}
+
+impl From<trankeel::Person> for SignupUserFromInvitePayload {
+    fn from(item: trankeel::Person) -> Self {
+        Self { user: item.into() }
+    }
+}
+
+#[derive(SimpleObject)]
 pub struct CompleteStepPayload {
     errors: Option<Vec<Error>>,
     step: Option<Step>,
@@ -194,24 +224,5 @@ pub struct AddExistingLeasePayload {
 impl From<trankeel::Lease> for AddExistingLeasePayload {
     fn from(item: trankeel::Lease) -> Self {
         Self { lease: item.into() }
-    }
-}
-
-#[derive(SimpleObject)]
-pub struct CreateUserWithAccountPayload {
-    account: Account,
-    user: Person,
-    lender: Lender,
-    subscription: Option<trankeel::Subscription>,
-}
-
-impl From<trankeel::CreateUserWithAccountPayload> for CreateUserWithAccountPayload {
-    fn from(item: trankeel::CreateUserWithAccountPayload) -> Self {
-        Self {
-            account: item.account.into(),
-            user: item.user.into(),
-            lender: item.lender.into(),
-            subscription: None,
-        }
     }
 }
