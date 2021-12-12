@@ -217,11 +217,11 @@ impl From<trankeel::Message> for PushMessagePayload {
 }
 
 #[derive(SimpleObject)]
-pub struct AddExistingLeasePayload {
+pub struct CreateLeasePayload {
     lease: Lease,
 }
 
-impl From<trankeel::Lease> for AddExistingLeasePayload {
+impl From<trankeel::Lease> for CreateLeasePayload {
     fn from(item: trankeel::Lease) -> Self {
         Self { lease: item.into() }
     }
