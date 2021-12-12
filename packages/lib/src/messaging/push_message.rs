@@ -21,7 +21,7 @@ pub struct PushMessagePayload {
 }
 
 pub(crate) struct PushMessage {
-    pub discussion: Discussion,
+    discussion: Discussion,
 }
 
 impl PushMessage {
