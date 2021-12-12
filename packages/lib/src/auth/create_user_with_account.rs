@@ -1,8 +1,6 @@
 use crate::error::Result;
 use async_graphql::InputObject;
-use log::info;
-use trankeel_core::billing::BillingProvider;
-use trankeel_core::database::Db;
+use trankeel_core::dispatcher::Command;
 use trankeel_data::Account;
 use trankeel_data::AccountId;
 use trankeel_data::AccountStatus;
@@ -37,91 +35,70 @@ pub struct CreateUserWithAccountInput {
 }
 
 pub struct CreateUserWithAccountPayload {
-    pub account: Account,
     pub user: Person,
     pub lender: Lender,
-    pub subscription: Option<trankeel_data::Subscription>,
+    pub account: Account,
 }
 
-pub async fn create_user_with_account(
-    db: &impl Db,
-    billing_provider: &impl BillingProvider,
-    input: CreateUserWithAccountInput,
-) -> Result<CreateUserWithAccountPayload> {
-    input.validate()?;
+pub(crate) struct CreateUserWithAccount;
 
-    // Create account.
-    let account = db.accounts().create(&Account {
-        id: AccountId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        plan_id: None,
-        status: AccountStatus::Trialing,
-        stripe_customer_id: None,
-        stripe_subscription_id: None,
-        trial_end: None,
-    })?;
+impl CreateUserWithAccount {
+    pub fn new() -> Self {
+        Self
+    }
+}
 
-    // Create user.
-    let user = db.persons().create(&Person {
-        id: PersonId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        account_id: account.id,
-        auth_id: Some(input.auth_id),
-        email: input.email.clone().into(),
-        first_name: input.first_name,
-        last_name: input.last_name,
-        address: input.address.map(Into::into),
-        photo_url: None,
-        role: PersonRole::User,
-        phone_number: input.phone_number.map(Into::into),
-    })?;
+impl Command for CreateUserWithAccount {
+    type Input = CreateUserWithAccountInput;
+    type Payload = CreateUserWithAccountPayload;
 
-    // Create lender.
-    let lender = db.lenders().create(&Lender {
-        id: LenderId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        account_id: account.id,
-        individual_id: Some(user.id),
-        company_id: None,
-    })?;
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+        input.validate()?;
 
-    if let Some(true) = input.skip_create_customer {
-        return Ok(CreateUserWithAccountPayload {
-            account,
+        // Create account.
+        let account = Account {
+            id: AccountId::new(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            plan_id: None,
+            status: AccountStatus::default(),
+            stripe_customer_id: None,
+            stripe_subscription_id: None,
+            trial_end: None,
+        };
+
+        // Create user.
+        let user = Person {
+            id: PersonId::new(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            account_id: account.id,
+            auth_id: Some(input.auth_id),
+            email: input.email.clone().into(),
+            first_name: input.first_name,
+            last_name: input.last_name,
+            address: input.address.map(Into::into),
+            photo_url: None,
+            role: PersonRole::User,
+            phone_number: input.phone_number.map(Into::into),
+        };
+
+        // Create lender.
+        let lender = Lender {
+            id: LenderId::new(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            account_id: account.id,
+            individual_id: Some(user.id),
+            company_id: None,
+        };
+
+        Ok(Self::Payload {
             user,
             lender,
-            subscription: None,
-        });
+            account,
+        })
     }
-
-    // Create subscription.
-    let subscription = billing_provider
-        .create_subscription_with_customer(input.email.into())
-        .await?;
-    info!(
-        "Created subscription {} for account {}",
-        subscription.id, account.id
-    );
-
-    // Update the local customer data.
-    let account = db.accounts().update(&Account {
-        id: account.id,
-        stripe_customer_id: Some(subscription.customer_id.clone()),
-        stripe_subscription_id: Some(subscription.id.clone()),
-        status: subscription.status,
-        trial_end: subscription.trial_end,
-        ..account
-    })?;
-
-    Ok(CreateUserWithAccountPayload {
-        account,
-        user,
-        lender,
-        subscription: Some(subscription),
-    })
 }
 
 impl From<AddressInput> for Address {
