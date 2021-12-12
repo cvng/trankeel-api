@@ -5,8 +5,9 @@ use crate::candidacies::AcceptCandidacyInput;
 use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
 use crate::error::Result;
-use crate::leases;
+use crate::leases::send_receipts;
 use crate::leases::AddExistingLease;
+use crate::leases::AddExistingLeaseInput;
 use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateNoticesInput;
@@ -14,10 +15,12 @@ use crate::leases::CreateReceiptsInput;
 use crate::leases::DeleteLeaseInput;
 use crate::leases::SendReceiptsInput;
 use crate::leases::UpdateFurnishedLeaseInput;
+use crate::lenders::UpdateIndividualLender;
+use crate::lenders::UpdateIndividualLenderInput;
+use crate::lenders::UpdateIndividualLenderPayload;
 use crate::messaging::DeleteDiscussionInput;
 use crate::messaging::PushMessage;
 use crate::messaging::PushMessageInput;
-use crate::owners::UpdateIndividualLenderInput;
 use crate::properties::CreateAdvertisement;
 use crate::properties::CreateAdvertisementInput;
 use crate::properties::CreateAdvertisementPayload;
@@ -34,6 +37,7 @@ use crate::properties::UpdatePropertyInput;
 use crate::properties::UpdatePropertyPayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
+use crate::tenants::CreateTenantPayload;
 use crate::tenants::DeleteTenant;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenant;
@@ -42,9 +46,6 @@ use crate::tenants::UpdateTenantPayload;
 use crate::workflows::CompleteStep;
 use crate::workflows::CompleteStepInput;
 use crate::workflows::CompleteStepPayload;
-use crate::AddExistingLeaseInput;
-use crate::CreateTenantPayload;
-use crate::PushMessagePayload;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
@@ -95,7 +96,9 @@ use trankeel_data::Candidacy;
 use trankeel_data::DiscussionId;
 use trankeel_data::Lease;
 use trankeel_data::LeaseId;
+use trankeel_data::LegalIdentity;
 use trankeel_data::Lender;
+use trankeel_data::Message;
 use trankeel_data::Notice;
 use trankeel_data::Person;
 use trankeel_data::Property;
@@ -463,10 +466,21 @@ impl<'a> Client {
 
     pub fn update_individual_lender(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: UpdateIndividualLenderInput,
     ) -> Result<Lender> {
-        crate::owners::update_individual_lender(self.0.db(), auth_id, input)
+        let (lender, identity) = self.0.db().lenders().by_id(&input.id)?;
+
+        let UpdateIndividualLenderPayload {
+            lender: (lender, identity),
+        } = UpdateIndividualLender::new(&(lender, identity)).run(input)?;
+
+        match identity {
+            LegalIdentity::Individual(person) => self.0.db().persons().update(&person)?,
+            _ => return Err(Error::msg("lender is not an individual")),
+        };
+
+        Ok(lender)
     }
 
     pub async fn create_receipts(
@@ -478,7 +492,7 @@ impl<'a> Client {
     }
 
     pub async fn send_receipts(&self, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
-        dispatcher::dispatch_async(&self.0, leases::send_receipts(input)?).await?;
+        dispatcher::dispatch_async(&self.0, send_receipts(input)?).await?;
 
         Ok(vec![])
     }
@@ -499,8 +513,8 @@ impl<'a> Client {
         crate::messaging::delete_discussion(self.0.db(), auth_id, input)
     }
 
-    pub async fn push_message(&self, input: PushMessageInput) -> Result<PushMessagePayload> {
-        PushMessage::new(&self.0).run(input).await
+    pub async fn push_message(&self, input: PushMessageInput) -> Result<Message> {
+        Ok(PushMessage::new(&self.0).run(input).await?.message)
     }
 
     pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
