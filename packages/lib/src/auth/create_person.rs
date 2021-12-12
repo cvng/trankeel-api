@@ -63,16 +63,3 @@ impl Command for CreatePerson {
         Ok(Self::Payload { person })
     }
 }
-
-impl From<Person> for CreatePersonInput {
-    fn from(item: Person) -> Self {
-        Self {
-            email: item.email,
-            first_name: item.first_name,
-            last_name: item.last_name,
-            address: item.address.map(Into::into),
-            phone_number: item.phone_number,
-            role: item.role,
-        }
-    }
-}
