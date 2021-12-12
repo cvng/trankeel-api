@@ -15,12 +15,17 @@ use crate::leases::send_receipts;
 use crate::leases::AddExistingLease;
 use crate::leases::AddExistingLeaseInput;
 use crate::leases::AddExistingLeasePayload;
+use crate::leases::CreateFurnishedLease;
 use crate::leases::CreateFurnishedLeaseInput;
+use crate::leases::CreateFurnishedLeasePayload;
 use crate::leases::CreateNoticesInput;
 use crate::leases::CreateReceiptsInput;
+use crate::leases::DeleteLease;
 use crate::leases::DeleteLeaseInput;
 use crate::leases::SendReceiptsInput;
+use crate::leases::UpdateFurnishedLease;
 use crate::leases::UpdateFurnishedLeaseInput;
+use crate::leases::UpdateFurnishedLeasePayload;
 use crate::lenders::UpdateIndividualLender;
 use crate::lenders::UpdateIndividualLenderInput;
 use crate::lenders::UpdateIndividualLenderPayload;
@@ -553,19 +558,66 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        crate::leases::create_furnished_lease(&self.0, auth_id, input)
+        let account = self.0.db().accounts().by_auth_id(auth_id)?;
+        let tenants = input
+            .tenant_ids
+            .iter()
+            .map(|&tenant_id| self.0.db().tenants().by_id(&tenant_id))
+            .collect::<Result<Vec<_>>>()?;
+
+        let CreateFurnishedLeasePayload {
+            lease,
+            rents,
+            tenants,
+        } = CreateFurnishedLease::new(&account, &tenants).run(input)?;
+
+        dispatcher::dispatch(
+            &self.0,
+            vec![LeaseCreated {
+                lease: lease.clone(),
+                rents,
+            }
+            .into()]
+            .into_iter()
+            .chain(
+                tenants
+                    .clone()
+                    .into_iter()
+                    .map(|tenant| TenantUpdated { tenant }.into())
+                    .collect::<Vec<_>>(),
+            )
+            .chain(
+                tenants
+                    .into_iter()
+                    .map(|tenant| LeaseAffected { tenant }.into())
+                    .collect::<Vec<_>>(),
+            )
+            .collect(),
+        )?;
+
+        Ok(lease)
     }
 
     pub fn update_furnished_lease(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: UpdateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        crate::leases::update_furnished_lease(self.0.db(), auth_id, input)
+        let lease = self.0.db().leases().by_id(&input.id)?;
+
+        let UpdateFurnishedLeasePayload { lease } = UpdateFurnishedLease::new(&lease).run(input)?;
+
+        self.0.db().leases().update(&lease)?;
+
+        Ok(lease)
     }
 
-    pub fn delete_lease(&self, auth_id: &AuthId, input: DeleteLeaseInput) -> Result<LeaseId> {
-        crate::leases::delete_lease(self.0.db(), auth_id, input)
+    pub fn delete_lease(&self, _auth_id: &AuthId, input: DeleteLeaseInput) -> Result<LeaseId> {
+        let lease_id = DeleteLease.run(input)?;
+
+        self.0.db().leases().delete(&lease_id)?;
+
+        Ok(lease_id)
     }
 
     pub fn update_individual_lender(

@@ -5,7 +5,9 @@ use crate::error::Result;
 use crate::invites::CreateInvite;
 use crate::invites::CreateInviteInput;
 use crate::invites::CreateInvitePayload;
-use crate::leases::create_lease_from_advertisement;
+use crate::leases::CreateFurnishedLease;
+use crate::leases::CreateFurnishedLeaseInput;
+use crate::leases::CreateFurnishedLeasePayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::tenants::CreateTenantPayload;
@@ -25,6 +27,9 @@ use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::no;
 use trankeel_core::handlers::CandidacyRejected;
+use trankeel_core::handlers::LeaseAffected;
+use trankeel_core::handlers::LeaseCreated;
+use trankeel_core::handlers::TenantUpdated;
 use trankeel_core::mailer::Mailer;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_core::templates::CandidacyAcceptedMail;
@@ -173,9 +178,50 @@ impl<'a> AcceptCandidacy<'a> {
                 reason: InviteReason::CandidacyAccepted,
             })?;
 
-        // Create unsigned lease.
+        // Create unsigned lease from advertisement.
         let advertisement = db.advertisements().by_id(&candidacy.advertisement_id)?;
-        let lease = create_lease_from_advertisement(ctx, auth_id, &advertisement, vec![tenant])?;
+        let CreateFurnishedLeasePayload {
+            lease,
+            rents,
+            tenants,
+        } = CreateFurnishedLease::new(&account, &vec![tenant.clone()]).run(
+            CreateFurnishedLeaseInput {
+                details: None,
+                deposit_amount: advertisement.deposit_amount,
+                effect_date: advertisement.effect_date,
+                renew_date: None,
+                file: None,
+                property_id: advertisement.property_id,
+                rent_amount: advertisement.rent_amount,
+                rent_charges_amount: advertisement.rent_charges_amount,
+                signature_date: None,
+                tenant_ids: vec![tenant].iter().map(|tenant| tenant.id).collect(),
+            },
+        )?;
+
+        dispatch(
+            ctx,
+            vec![LeaseCreated {
+                lease: lease.clone(),
+                rents,
+            }
+            .into()]
+            .into_iter()
+            .chain(
+                tenants
+                    .clone()
+                    .into_iter()
+                    .map(|tenant| TenantUpdated { tenant }.into())
+                    .collect::<Vec<_>>(),
+            )
+            .chain(
+                tenants
+                    .into_iter()
+                    .map(|tenant| LeaseAffected { tenant }.into())
+                    .collect::<Vec<_>>(),
+            )
+            .collect(),
+        )?;
 
         // Init new lease file.
         let lease_file_id = LeaseFileId::new();

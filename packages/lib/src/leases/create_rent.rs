@@ -2,9 +2,10 @@ use async_graphql::InputObject;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;
 use trankeel_data::LeaseId;
+use validator::Validate;
 
-#[derive(InputObject)]
-pub struct RentInput {
+#[derive(InputObject, Validate)]
+pub struct CreateRentInput {
     amount: Amount,
     charges_amount: Option<Amount>,
     lease_id: LeaseId,

@@ -22,10 +22,7 @@ use trankeel_data::RentStatus;
 use trankeel_data::TransactionType;
 use validator::Validate;
 
-// # Input
-
 #[derive(InputObject, Validate)]
-#[graphql(name = "RentReceiptInput")]
 pub struct CreateReceiptsInput {
     rent_ids: Vec<RentId>,
     date: Option<DateTime>,
@@ -37,9 +34,7 @@ pub struct SendReceiptsInput {
     pub rent_ids: Vec<RentId>,
 }
 
-// # Operation
-
-pub async fn create_receipts(
+pub(crate) async fn create_receipts(
     ctx: &Context,
     _auth_id: &AuthId,
     input: CreateReceiptsInput,
@@ -63,8 +58,6 @@ pub fn send_receipts(input: SendReceiptsInput) -> Result<Vec<Event>> {
         .map(|rent_id| ReceiptSent { rent_id }.into())
         .collect())
 }
-
-// # Utils
 
 fn setlle_rents(ctx: &Context, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
     let db = ctx.db();

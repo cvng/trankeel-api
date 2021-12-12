@@ -17,18 +17,13 @@ use trankeel_data::Rent;
 use trankeel_data::RentId;
 use validator::Validate;
 
-// # Input
-
 #[derive(InputObject, Validate)]
-#[graphql(name = "SendPaymentNoticeInput")]
 pub struct CreateNoticesInput {
     rent_ids: Vec<RentId>,
     date: Option<DateTime>,
 }
 
-// # Operation
-
-pub async fn create_notices(
+pub(crate) async fn create_notices(
     ctx: &Context,
     auth_id: &AuthId,
     input: CreateNoticesInput,
@@ -41,8 +36,6 @@ pub async fn create_notices(
 
     Ok(notices)
 }
-
-// # Utils
 
 fn find_rents(ctx: &Context, _auth_id: &AuthId, rent_ids: Vec<RentId>) -> Result<Vec<Rent>> {
     let db = ctx.db();

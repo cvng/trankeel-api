@@ -34,6 +34,7 @@ use trankeel::CreateFileInput;
 use trankeel::CreateFurnishedLeaseInput;
 use trankeel::CreateNakedLeaseInput;
 use trankeel::CreateNoticesInput;
+use trankeel::CreatePaymentInput;
 use trankeel::CreatePropertyInput;
 use trankeel::CreateReceiptsInput;
 use trankeel::CreateTenantInput;
@@ -48,7 +49,6 @@ use trankeel::PropertyId;
 use trankeel::PushMessageInput;
 use trankeel::SignupUserFromInviteInput;
 use trankeel::TenantId;
-use trankeel::TransactionInput;
 use trankeel::UpdateAccountInput;
 use trankeel::UpdateAdvertisementInput;
 use trankeel::UpdateFurnishedLeaseInput;
@@ -260,7 +260,7 @@ impl Mutation {
             .into())
     }
 
-    async fn transaction_create(&self, _input: TransactionInput) -> Result<Payment> {
+    async fn transaction_create(&self, _input: CreatePaymentInput) -> Result<Payment> {
         Err(wip())
     }
 
