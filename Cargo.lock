@@ -2803,7 +2803,6 @@ name = "trankeel"
 version = "0.3.0"
 dependencies = [
  "async-graphql",
- "async-trait",
  "chrono",
  "log",
  "serde",

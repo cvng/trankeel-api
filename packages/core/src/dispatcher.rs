@@ -8,14 +8,6 @@ use trankeel_data::File;
 use trankeel_data::Payment;
 use trankeel_data::Step;
 
-#[async_trait]
-pub trait AsyncCommand {
-    type Input;
-    type Payload;
-
-    async fn run(&self, input: Self::Input) -> Result<Self::Payload>;
-}
-
 pub trait Command {
     type Input;
     type Payload;

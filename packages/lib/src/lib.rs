@@ -1,7 +1,5 @@
 #[macro_use]
 extern crate async_graphql;
-#[macro_use]
-extern crate async_trait;
 
 mod auth;
 mod candidacies;
