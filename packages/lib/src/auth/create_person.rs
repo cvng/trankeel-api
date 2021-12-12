@@ -3,8 +3,9 @@ use async_graphql::InputObject;
 use trankeel_data::Email;
 use trankeel_data::Person;
 use trankeel_data::PhoneNumber;
+use validator::Validate;
 
-#[derive(InputObject)]
+#[derive(InputObject, Validate)]
 pub struct CreatePersonInput {
     pub email: Email,
     pub first_name: String,

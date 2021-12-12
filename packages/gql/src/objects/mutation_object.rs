@@ -5,7 +5,6 @@ use super::File;
 use super::Lease;
 use super::Lender;
 use super::Payment;
-use super::Person;
 use super::Task;
 use crate::payloads::AddExistingLeasePayload;
 use crate::payloads::CompleteStepPayload;
@@ -17,14 +16,14 @@ use crate::payloads::CreateTenantPayload;
 use crate::payloads::CreateUserWithAccountPayload;
 use crate::payloads::DeleteDiscussionPayload;
 use crate::payloads::PushMessagePayload;
+use crate::payloads::SignupUserFromInvitePayload;
 use crate::payloads::UpdateAdvertisementPayload;
 use crate::payloads::UpdatePropertyPayload;
 use crate::payloads::UpdateTenantPayload;
 use async_graphql::Context;
 use async_graphql::Result;
 use trankeel::AcceptCandidacyInput;
-use trankeel::AccountActivatePlanInput;
-use trankeel::AccountUpdateInput;
+use trankeel::ActivateAccountPlanInput;
 use trankeel::AddExistingLeaseInput;
 use trankeel::AuthId;
 use trankeel::Client;
@@ -50,6 +49,7 @@ use trankeel::PushMessageInput;
 use trankeel::SignupUserFromInviteInput;
 use trankeel::TenantId;
 use trankeel::TransactionInput;
+use trankeel::UpdateAccountInput;
 use trankeel::UpdateAdvertisementInput;
 use trankeel::UpdateFurnishedLeaseInput;
 use trankeel::UpdateIndividualLenderInput;
@@ -77,7 +77,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: SignupUserFromInviteInput,
-    ) -> Result<Person> {
+    ) -> Result<SignupUserFromInvitePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .signup_user_from_invite(input)
@@ -85,11 +85,11 @@ impl Mutation {
             .into())
     }
 
-    async fn account_update_payment_method(&self, _input: AccountUpdateInput) -> Result<Account> {
+    async fn account_update_payment_method(&self, _input: UpdateAccountInput) -> Result<Account> {
         Err(wip())
     }
 
-    async fn account_activate_plan(&self, _input: AccountActivatePlanInput) -> Result<Account> {
+    async fn account_activate_plan(&self, _input: ActivateAccountPlanInput) -> Result<Account> {
         Err(wip())
     }
 
