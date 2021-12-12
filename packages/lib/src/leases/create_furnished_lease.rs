@@ -1,15 +1,9 @@
 use crate::error::Result;
 use crate::files::CreateFileInput;
-use trankeel_core::context::Context;
-use trankeel_core::database::Db;
-use trankeel_core::dispatcher::dispatch;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::error::Error;
-use trankeel_core::handlers::LeaseAffected;
-use trankeel_core::handlers::LeaseCreated;
-use trankeel_core::handlers::TenantUpdated;
-use trankeel_data::Advertisement;
+use trankeel_data::Account;
 use trankeel_data::Amount;
-use trankeel_data::AuthId;
 use trankeel_data::DateTime;
 use trankeel_data::FurnishedLeaseDetails;
 use trankeel_data::FurnishedLeaseDuration;
@@ -20,17 +14,15 @@ use trankeel_data::LeaseRentReferenceIrl;
 use trankeel_data::LeaseType;
 use trankeel_data::NakedLeaseDuration;
 use trankeel_data::PropertyId;
+use trankeel_data::Rent;
 use trankeel_data::RentChargesRecuperationMode;
 use trankeel_data::RentPaymentMethod;
 use trankeel_data::Tenant;
 use trankeel_data::TenantId;
 use validator::Validate;
 
-// # Input
-
-#[derive(Clone, InputObject, Validate)]
-#[graphql(name = "LeaseFurnishedDataInput")]
-pub struct CreateFurnishedLeaseDetailsInput {
+#[derive(InputObject, Validate)]
+pub struct FurnishedLeaseDetailsInput {
     pub charges_recuperation_mode: Option<RentChargesRecuperationMode>,
     pub charges_revision_method: Option<String>,
     pub colocation_insurance_lender: Option<bool>,
@@ -71,10 +63,8 @@ pub struct CreateFurnishedLeaseDetailsInput {
 }
 
 #[derive(InputObject, Validate)]
-#[graphql(name = "LeaseFurnishedInput")]
 pub struct CreateFurnishedLeaseInput {
-    #[graphql(name = "data")]
-    pub details: Option<CreateFurnishedLeaseDetailsInput>,
+    pub details: Option<FurnishedLeaseDetailsInput>,
     pub deposit_amount: Amount,
     pub effect_date: DateTime,
     pub renew_date: Option<DateTime>,
@@ -86,133 +76,101 @@ pub struct CreateFurnishedLeaseInput {
     pub tenant_ids: Vec<TenantId>,
 }
 
-// TODO: naked lease
 #[derive(InputObject, Validate)]
-#[graphql(name = "LeaseNakedDataInput")]
-pub struct CreateNakedLeaseDetailsInput {
+pub struct NakedLeaseDetailsInput {
     pub duration: Option<NakedLeaseDuration>,
 }
 
-// TODO: naked lease
 #[derive(InputObject, Validate)]
-#[graphql(name = "LeaseNakedInput")]
 pub struct CreateNakedLeaseInput {
-    #[graphql(name = "data")]
-    pub details: Option<CreateNakedLeaseDetailsInput>,
+    pub details: Option<NakedLeaseDetailsInput>,
 }
 
-// # Operation
+pub struct CreateFurnishedLeasePayload {
+    pub lease: Lease,
+    pub rents: Vec<Rent>,
+    pub tenants: Vec<Tenant>,
+}
 
-pub fn create_furnished_lease(
-    ctx: &Context,
-    auth_id: &AuthId,
-    input: CreateFurnishedLeaseInput,
-) -> Result<Lease> {
-    let db = ctx.db();
+pub(crate) struct CreateFurnishedLease {
+    account: Account,
+    tenants: Vec<Tenant>,
+}
 
-    input.validate()?;
-
-    let account = db.accounts().by_auth_id(auth_id)?;
-    let tenants = input
-        .tenant_ids
-        .iter()
-        .map(|&tenant_id| db.tenants().by_id(&tenant_id))
-        .collect::<Result<Vec<_>>>()?;
-
-    if let Some(signature_date) = input.signature_date {
-        if input.effect_date.inner() > signature_date.inner() {
-            return Err(Error::msg("effect date must be anterior to signature date"));
+impl CreateFurnishedLease {
+    pub fn new(account: &Account, tenants: &[Tenant]) -> Self {
+        Self {
+            account: account.clone(),
+            tenants: tenants.to_vec(),
         }
     }
+}
 
-    // Compute duration.
-    let duration = input
-        .details
-        .clone()
-        .and_then(|details| details.duration)
-        .unwrap_or_default();
+impl Command for CreateFurnishedLease {
+    type Input = CreateFurnishedLeaseInput;
+    type Payload = CreateFurnishedLeasePayload;
 
-    let lease = Lease {
-        id: LeaseId::new(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-        details: input.details.map(Into::into),
-        account_id: account.id,
-        deposit_amount: input.deposit_amount,
-        effect_date: input.effect_date,
-        duration,
-        signature_date: input.signature_date,
-        rent_amount: input.rent_amount,
-        rent_charges_amount: input.rent_charges_amount,
-        type_: LeaseType::Furnished,
-        lease_id: None,
-        property_id: input.property_id,
-        expired_at: None,
-        renew_date: None,
-    };
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+        input.validate()?;
 
-    // Generate lease rents.
-    let rents = lease.rents();
+        let Self { account, tenants } = self;
 
-    // Update status for existing tenants.
-    let tenants = tenants.into_iter().map(|tenant| Tenant {
-        lease_id: Some(lease.id),
-        ..tenant
-    });
-
-    dispatch(
-        ctx,
-        vec![LeaseCreated {
-            lease: lease.clone(),
-            rents,
+        // Check signature date.
+        if let Some(signature_date) = input.signature_date {
+            if input.effect_date.inner() > signature_date.inner() {
+                return Err(Error::msg("effect date must be anterior to signature date"));
+            }
         }
-        .into()]
-        .into_iter()
-        .chain(
-            tenants
-                .clone()
-                .map(|tenant| TenantUpdated { tenant }.into())
-                .collect::<Vec<_>>(),
-        )
-        .chain(
-            tenants
-                .map(|tenant| LeaseAffected { tenant }.into())
-                .collect::<Vec<_>>(),
-        )
-        .collect(),
-    )?;
 
-    Ok(lease)
-}
+        // Compute duration.
+        let duration = input
+            .details
+            .as_ref()
+            .and_then(|details| details.duration)
+            .unwrap_or_default();
 
-// # Utils
-
-pub(crate) fn create_lease_from_advertisement(
-    ctx: &Context,
-    auth_id: &AuthId,
-    advertisement: &Advertisement,
-    tenants: Vec<Tenant>,
-) -> Result<Lease> {
-    create_furnished_lease(
-        ctx,
-        auth_id,
-        CreateFurnishedLeaseInput {
-            details: None,
-            deposit_amount: advertisement.deposit_amount,
-            effect_date: advertisement.effect_date,
+        // Create lease.
+        let lease = Lease {
+            id: LeaseId::new(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            details: input.details.map(Into::into),
+            account_id: account.id,
+            deposit_amount: input.deposit_amount,
+            effect_date: input.effect_date,
+            duration,
+            signature_date: input.signature_date,
+            rent_amount: input.rent_amount,
+            rent_charges_amount: input.rent_charges_amount,
+            type_: LeaseType::Furnished,
+            lease_id: None,
+            property_id: input.property_id,
+            expired_at: None,
             renew_date: None,
-            file: None,
-            property_id: advertisement.property_id,
-            rent_amount: advertisement.rent_amount,
-            rent_charges_amount: advertisement.rent_charges_amount,
-            signature_date: None,
-            tenant_ids: tenants.into_iter().map(|tenant| tenant.id).collect(),
-        },
-    )
+        };
+
+        // Generate rents.
+        let rents = lease.rents();
+
+        // Update status for existing tenants.
+        let tenants = tenants
+            .into_iter()
+            .map(|tenant| Tenant {
+                lease_id: Some(lease.id),
+                ..tenant
+            })
+            .collect();
+
+        Ok(Self::Payload {
+            lease,
+            rents,
+            tenants,
+        })
+    }
 }
 
-impl From<CreateFurnishedLeaseDetailsInput> for FurnishedLeaseDetails {
-    fn from(item: CreateFurnishedLeaseDetailsInput) -> Self {
+impl From<FurnishedLeaseDetailsInput> for FurnishedLeaseDetails {
+    fn from(item: FurnishedLeaseDetailsInput) -> Self {
         Self {
             charges_recuperation_mode: item.charges_recuperation_mode,
             charges_revision_method: item.charges_revision_method,

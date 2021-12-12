@@ -11,16 +11,25 @@ use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
 use crate::candidacies::CreateCandidacyPayload;
 use crate::error::Result;
-use crate::leases::send_receipts;
-use crate::leases::AddExistingLease;
-use crate::leases::AddExistingLeaseInput;
-use crate::leases::AddExistingLeasePayload;
+use crate::leases::CreateFurnishedLease;
 use crate::leases::CreateFurnishedLeaseInput;
+use crate::leases::CreateFurnishedLeasePayload;
+use crate::leases::CreateLease;
+use crate::leases::CreateLeaseInput;
+use crate::leases::CreateLeasePayload;
+use crate::leases::CreateNotices;
 use crate::leases::CreateNoticesInput;
+use crate::leases::CreateNoticesPayload;
+use crate::leases::CreateReceipts;
 use crate::leases::CreateReceiptsInput;
+use crate::leases::CreateReceiptsPayload;
+use crate::leases::DeleteLease;
 use crate::leases::DeleteLeaseInput;
+use crate::leases::SendReceipts;
 use crate::leases::SendReceiptsInput;
+use crate::leases::UpdateFurnishedLease;
 use crate::leases::UpdateFurnishedLeaseInput;
+use crate::leases::UpdateFurnishedLeasePayload;
 use crate::lenders::UpdateIndividualLender;
 use crate::lenders::UpdateIndividualLenderInput;
 use crate::lenders::UpdateIndividualLenderPayload;
@@ -88,6 +97,7 @@ use trankeel_core::handlers::LeaseAffected;
 use trankeel_core::handlers::LeaseCreated;
 use trankeel_core::handlers::PropertyCreated;
 use trankeel_core::handlers::PropertyUpdated;
+use trankeel_core::handlers::ReceiptSent;
 use trankeel_core::handlers::TenantCreated;
 use trankeel_core::handlers::TenantUpdated;
 use trankeel_core::mailer::IntoMail;
@@ -494,21 +504,17 @@ impl<'a> Client {
         Ok(advertisement)
     }
 
-    pub async fn add_existing_lease(
-        &self,
-        auth_id: &AuthId,
-        input: AddExistingLeaseInput,
-    ) -> Result<Lease> {
+    pub async fn create_lease(&self, auth_id: &AuthId, input: CreateLeaseInput) -> Result<Lease> {
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
         let (lender, ..) = self.0.db().lenders().by_account_id_first(&account.id)?;
 
-        let AddExistingLeasePayload {
+        let CreateLeasePayload {
             lease,
             rents,
             property,
             tenants_with_identities,
-        } = AddExistingLease::new(&account, &account_owner, &lender).run(input)?;
+        } = CreateLease::new(&account, &account_owner, &lender).run(input)?;
 
         dispatcher::dispatch(
             &self.0,
@@ -553,19 +559,66 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        crate::leases::create_furnished_lease(&self.0, auth_id, input)
+        let account = self.0.db().accounts().by_auth_id(auth_id)?;
+        let tenants = input
+            .tenant_ids
+            .iter()
+            .map(|&tenant_id| self.0.db().tenants().by_id(&tenant_id))
+            .collect::<Result<Vec<_>>>()?;
+
+        let CreateFurnishedLeasePayload {
+            lease,
+            rents,
+            tenants,
+        } = CreateFurnishedLease::new(&account, &tenants).run(input)?;
+
+        dispatcher::dispatch(
+            &self.0,
+            vec![LeaseCreated {
+                lease: lease.clone(),
+                rents,
+            }
+            .into()]
+            .into_iter()
+            .chain(
+                tenants
+                    .clone()
+                    .into_iter()
+                    .map(|tenant| TenantUpdated { tenant }.into())
+                    .collect::<Vec<_>>(),
+            )
+            .chain(
+                tenants
+                    .into_iter()
+                    .map(|tenant| LeaseAffected { tenant }.into())
+                    .collect::<Vec<_>>(),
+            )
+            .collect(),
+        )?;
+
+        Ok(lease)
     }
 
     pub fn update_furnished_lease(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: UpdateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        crate::leases::update_furnished_lease(self.0.db(), auth_id, input)
+        let lease = self.0.db().leases().by_id(&input.id)?;
+
+        let UpdateFurnishedLeasePayload { lease } = UpdateFurnishedLease::new(&lease).run(input)?;
+
+        self.0.db().leases().update(&lease)?;
+
+        Ok(lease)
     }
 
-    pub fn delete_lease(&self, auth_id: &AuthId, input: DeleteLeaseInput) -> Result<LeaseId> {
-        crate::leases::delete_lease(self.0.db(), auth_id, input)
+    pub fn delete_lease(&self, _auth_id: &AuthId, input: DeleteLeaseInput) -> Result<LeaseId> {
+        let lease_id = DeleteLease.run(input)?;
+
+        self.0.db().leases().delete(&lease_id)?;
+
+        Ok(lease_id)
     }
 
     pub fn update_individual_lender(
@@ -589,24 +642,37 @@ impl<'a> Client {
 
     pub async fn create_receipts(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: CreateReceiptsInput,
     ) -> Result<Vec<Receipt>> {
-        crate::leases::create_receipts(&self.0, auth_id, input).await
+        let CreateReceiptsPayload { receipts } = CreateReceipts::new(&self.0).run(input).await?;
+
+        Ok(receipts)
     }
 
     pub async fn send_receipts(&self, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
-        dispatcher::dispatch_async(&self.0, send_receipts(input)?).await?;
+        let rent_ids = SendReceipts.run(input)?;
+
+        dispatcher::dispatch_async(
+            &self.0,
+            rent_ids
+                .into_iter()
+                .map(|rent_id| ReceiptSent { rent_id }.into())
+                .collect(),
+        )
+        .await?;
 
         Ok(vec![])
     }
 
     pub async fn create_notices(
         &self,
-        auth_id: &AuthId,
+        _auth_id: &AuthId,
         input: CreateNoticesInput,
     ) -> Result<Vec<Notice>> {
-        crate::leases::create_notices(&self.0, auth_id, input).await
+        let CreateNoticesPayload { notices } = CreateNotices::new(&self.0).run(input).await?;
+
+        Ok(notices)
     }
 
     pub fn delete_discussion(

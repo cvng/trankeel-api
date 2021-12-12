@@ -6,9 +6,9 @@ use super::Lease;
 use super::Lender;
 use super::Payment;
 use super::Task;
-use crate::payloads::AddExistingLeasePayload;
 use crate::payloads::CompleteStepPayload;
 use crate::payloads::CreateAdvertisementPayload;
+use crate::payloads::CreateLeasePayload;
 use crate::payloads::CreateNoticesPayload;
 use crate::payloads::CreatePropertyPayload;
 use crate::payloads::CreateReceiptsPayload;
@@ -24,7 +24,6 @@ use async_graphql::Context;
 use async_graphql::Result;
 use trankeel::AcceptCandidacyInput;
 use trankeel::ActivateAccountPlanInput;
-use trankeel::AddExistingLeaseInput;
 use trankeel::AuthId;
 use trankeel::Client;
 use trankeel::CompleteStepInput;
@@ -32,8 +31,10 @@ use trankeel::CreateAdvertisementInput;
 use trankeel::CreateCandidacyInput;
 use trankeel::CreateFileInput;
 use trankeel::CreateFurnishedLeaseInput;
+use trankeel::CreateLeaseInput;
 use trankeel::CreateNakedLeaseInput;
 use trankeel::CreateNoticesInput;
+use trankeel::CreatePaymentInput;
 use trankeel::CreatePropertyInput;
 use trankeel::CreateReceiptsInput;
 use trankeel::CreateTenantInput;
@@ -48,7 +49,6 @@ use trankeel::PropertyId;
 use trankeel::PushMessageInput;
 use trankeel::SignupUserFromInviteInput;
 use trankeel::TenantId;
-use trankeel::TransactionInput;
 use trankeel::UpdateAccountInput;
 use trankeel::UpdateAdvertisementInput;
 use trankeel::UpdateFurnishedLeaseInput;
@@ -179,11 +179,11 @@ impl Mutation {
     async fn lease_add_existing(
         &self,
         ctx: &Context<'_>,
-        input: AddExistingLeaseInput,
-    ) -> Result<AddExistingLeasePayload> {
+        input: CreateLeaseInput,
+    ) -> Result<CreateLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .add_existing_lease(ctx.data::<AuthId>()?, input)
+            .create_lease(ctx.data::<AuthId>()?, input)
             .await?
             .into())
     }
@@ -260,7 +260,7 @@ impl Mutation {
             .into())
     }
 
-    async fn transaction_create(&self, _input: TransactionInput) -> Result<Payment> {
+    async fn transaction_create(&self, _input: CreatePaymentInput) -> Result<Payment> {
         Err(wip())
     }
 

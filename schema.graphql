@@ -17,17 +17,6 @@ input ActivateAccountPlanInput {
 	name: String!
 	planCode: PlanCode!
 }
-input AddExistingLeaseInput {
-	effectDate: DateTime!
-	rentAmount: Decimal!
-	rentChargesAmount: Decimal
-	type: LeaseType!
-	property: CreatePropertyInput!
-	tenants: [CreateTenantInput!]!
-}
-type AddExistingLeasePayload {
-	lease: Lease!
-}
 type Address {
 	city: String!
 	country: String
@@ -142,6 +131,18 @@ input CreateFileInput {
 	downloadUrl: URL!
 	type: FileType!
 }
+input CreateFurnishedLeaseInput {
+	details: FurnishedLeaseDetailsInput
+	depositAmount: Decimal!
+	effectDate: DateTime!
+	renewDate: DateTime
+	file: CreateFileInput
+	propertyId: ID!
+	rentAmount: Decimal!
+	rentChargesAmount: Decimal
+	signatureDate: DateTime
+	tenantIds: [ID!]!
+}
 input CreateIndividualWarrantInput {
 	email: String!
 	firstName: String!
@@ -149,9 +150,34 @@ input CreateIndividualWarrantInput {
 	address: AddressInput
 	phoneNumber: PhoneNumber
 }
+input CreateLeaseInput {
+	effectDate: DateTime!
+	rentAmount: Decimal!
+	rentChargesAmount: Decimal
+	type: LeaseType!
+	property: CreatePropertyInput!
+	tenants: [CreateTenantInput!]!
+}
+type CreateLeasePayload {
+	lease: Lease!
+}
+input CreateNakedLeaseInput {
+	details: NakedLeaseDetailsInput
+}
+input CreateNoticesInput {
+	rentIds: [ID!]!
+	date: DateTime
+}
 type CreateNoticesPayload {
 	errors: [Error!]
 	notices: [File!]
+}
+input CreatePaymentInput {
+	rentId: ID!
+	amount: Decimal!
+	date: DateTime!
+	type: TransactionType!
+	label: String
 }
 input CreateProfessionalWarrantInput {
 	name: String!
@@ -183,6 +209,11 @@ input CreatePropertyInput {
 }
 type CreatePropertyPayload {
 	property: Property!
+}
+input CreateReceiptsInput {
+	rentIds: [ID!]!
+	date: DateTime
+	sendMail: Boolean
 }
 type CreateReceiptsPayload {
 	errors: [Error!]
@@ -305,6 +336,45 @@ enum FileType {
 	PAYMENT_NOTICE
 	RENT_RECEIPT
 }
+input FurnishedLeaseDetailsInput {
+	chargesRecuperationMode: RentChargesRecuperationMode
+	chargesRevisionMethod: String
+	colocationInsuranceLender: Boolean
+	colocationInsuranceMonthlyAmount: Decimal
+	colocationInsuranceTotalAmount: Decimal
+	duration: LeaseFurnishedDuration
+	lenderFeeCap: Decimal
+	lenderFeeCapOther: String
+	lenderFeeCapPrestations: Decimal
+	otherConditions: String
+	rentComplement: Decimal
+	rentComplementPropertyJustification: String
+	rentFirstAmount: Decimal
+	rentIrl: LeaseRentReferenceIrl
+	rentIrlRevisionDate: DateTime
+	rentMajDecreeIncreasedAmount: Decimal
+	rentMajDecreeReferenceAmount: Decimal
+	rentMajorationDecree: Boolean
+	rentMaxEvolutionRelocation: Boolean
+	rentPaymentDate: DateTime
+	rentPaymentMethod: RentPaymentMethod
+	rentPaymentPlace: String
+	rentPeriodicity: LeaseRentPeriodicity
+	rentUnderestimatedMethod: String
+	rentUnderestimatedMonthlyVariation: Decimal
+	resolutaryClause: String
+	solidarityClause: String
+	tenantFeeCapNewRental: Decimal
+	tenantFeeCapPrestations: Decimal
+	tenantFeeCapReportByMeter: Decimal
+	tenantFeeCapReportPrestations: Decimal
+	tenantLastRentAmount: Decimal
+	tenantLastRentReceivedDate: DateTime
+	tenantLastRentRevisionDate: DateTime
+	worksDecenceSinceLastRental: String
+	worksRentDecreaseTenant: String
+	worksRentIncreaseLender: String
+}
 enum ImportSource {
 	RENTILA
 }
@@ -382,75 +452,13 @@ type LeaseFurnishedData {
 	worksRentDecreaseTenant: String
 	worksRentIncreaseLender: String
 }
-input LeaseFurnishedDataInput {
-	chargesRecuperationMode: RentChargesRecuperationMode
-	chargesRevisionMethod: String
-	colocationInsuranceLender: Boolean
-	colocationInsuranceMonthlyAmount: Decimal
-	colocationInsuranceTotalAmount: Decimal
-	duration: LeaseFurnishedDuration
-	lenderFeeCap: Decimal
-	lenderFeeCapOther: String
-	lenderFeeCapPrestations: Decimal
-	otherConditions: String
-	rentComplement: Decimal
-	rentComplementPropertyJustification: String
-	rentFirstAmount: Decimal
-	rentIrl: LeaseRentReferenceIrl
-	rentIrlRevisionDate: DateTime
-	rentMajDecreeIncreasedAmount: Decimal
-	rentMajDecreeReferenceAmount: Decimal
-	rentMajorationDecree: Boolean
-	rentMaxEvolutionRelocation: Boolean
-	rentPaymentDate: DateTime
-	rentPaymentMethod: RentPaymentMethod
-	rentPaymentPlace: String
-	rentPeriodicity: LeaseRentPeriodicity
-	rentUnderestimatedMethod: String
-	rentUnderestimatedMonthlyVariation: Decimal
-	resolutaryClause: String
-	solidarityClause: String
-	tenantFeeCapNewRental: Decimal
-	tenantFeeCapPrestations: Decimal
-	tenantFeeCapReportByMeter: Decimal
-	tenantFeeCapReportPrestations: Decimal
-	tenantLastRentAmount: Decimal
-	tenantLastRentReceivedDate: DateTime
-	tenantLastRentRevisionDate: DateTime
-	worksDecenceSinceLastRental: String
-	worksRentDecreaseTenant: String
-	worksRentIncreaseLender: String
-}
 enum LeaseFurnishedDuration {
 	NINE_MONTHS
 	ONE_YEAR
 }
-input LeaseFurnishedInput {
-	data: LeaseFurnishedDataInput
-	depositAmount: Decimal!
-	effectDate: DateTime!
-	renewDate: DateTime
-	file: CreateFileInput
-	propertyId: ID!
-	rentAmount: Decimal!
-	rentChargesAmount: Decimal
-	signatureDate: DateTime
-	tenantIds: [ID!]!
-}
-input LeaseFurnishedUpdateInput {
-	data: LeaseFurnishedDataInput
-	file: CreateFileInput
-	id: ID!
-}
-input LeaseNakedDataInput {
-	duration: LeaseNakedDuration
-}
 enum LeaseNakedDuration {
 	THREE_YEARS
 	SIX_YEARS
-}
-input LeaseNakedInput {
-	data: LeaseNakedDataInput
 }
 enum LeaseRentPeriodicity {
 	ANNUALY
@@ -525,25 +533,28 @@ type Mutation {
 	propertyDelete(id: ID!): ID!
 	createAdvertisement(input: CreateAdvertisementInput!): CreateAdvertisementPayload!
 	updateAdvertisement(input: UpdateAdvertisementInput!): UpdateAdvertisementPayload!
-	leaseAddExisting(input: AddExistingLeaseInput!): AddExistingLeasePayload!
-	leaseFurnishedCreate(input: LeaseFurnishedInput!): Lease!
-	leaseFurnishedUpdate(input: LeaseFurnishedUpdateInput!): Lease!
-	leaseNakedCreate(input: LeaseNakedInput!): Lease!
+	leaseAddExisting(input: CreateLeaseInput!): CreateLeasePayload!
+	leaseFurnishedCreate(input: CreateFurnishedLeaseInput!): Lease!
+	leaseFurnishedUpdate(input: UpdateFurnishedLeaseInput!): Lease!
+	leaseNakedCreate(input: CreateNakedLeaseInput!): Lease!
 	leaseDelete(id: ID!): ID!
 	lenderIndividualUpdate(input: UpdateIndividualLenderInput!): Lender!
 	candidacyCreate(input: CreateCandidacyInput!): Candidacy!
 	candidacyAccept(input: AcceptCandidacyInput!): Candidacy!
-	transactionCreate(input: TransactionInput!): Transaction!
+	transactionCreate(input: CreatePaymentInput!): Transaction!
 	transactionDelete(id: ID!): ID!
 	fileUpload(input: CreateFileInput!): File!
 	importUpload(input: UploadImportInput!): Task!
-	createReceipts(input: RentReceiptInput!): CreateReceiptsPayload!
-	createNotices(input: SendPaymentNoticeInput!): CreateNoticesPayload!
+	createReceipts(input: CreateReceiptsInput!): CreateReceiptsPayload!
+	createNotices(input: CreateNoticesInput!): CreateNoticesPayload!
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+input NakedLeaseDetailsInput {
+	duration: LeaseNakedDuration
+}
+type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
@@ -722,11 +733,6 @@ enum RentPaymentMethod {
 	AFTER
 	BEFORE
 }
-input RentReceiptInput {
-	rentIds: [ID!]!
-	date: DateTime
-	sendMail: Boolean
-}
 enum RentStatus {
 	PARTIAL
 	PENDING
@@ -739,10 +745,6 @@ type Requirement {
 }
 enum RequirementType {
 	DATE
-}
-input SendPaymentNoticeInput {
-	rentIds: [ID!]!
-	date: DateTime
 }
 input SignupUserFromInviteInput {
 	authId: AuthenticationID!
@@ -850,12 +852,6 @@ type Transaction {
 	label: String
 	lease: Lease!
 }
-input TransactionInput {
-	amount: Decimal!
-	leaseId: ID!
-	date: DateTime!
-	type: TransactionType
-}
 enum TransactionType {
 	INSURANCE_HAB
 	INSURANCE_PNO
@@ -885,6 +881,11 @@ input UpdateAdvertisementInput {
 }
 type UpdateAdvertisementPayload {
 	advertisement: Advertisement!
+}
+input UpdateFurnishedLeaseInput {
+	details: FurnishedLeaseDetailsInput
+	file: CreateFileInput
+	id: ID!
 }
 input UpdateIndividualLenderInput {
 	id: ID!
