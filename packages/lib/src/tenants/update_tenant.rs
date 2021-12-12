@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::tenants::CreateWarrantInput;
+use crate::warrants::CreateWarrantInput;
 use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;

@@ -82,9 +82,9 @@ impl Command for CreateWarrant {
                     updated_at: Default::default(),
                     type_: WarrantType::Person,
                     tenant_id,
+                    candidacy_id,
                     individual_id: None,
                     professional_id: None,
-                    candidacy_id,
                 },
                 WarrantIdentity::Individual(Person {
                     id: PersonId::new(),
@@ -108,9 +108,9 @@ impl Command for CreateWarrant {
                     updated_at: Default::default(),
                     type_: WarrantType::Visale,
                     tenant_id,
+                    candidacy_id,
                     individual_id: None,
                     professional_id: None,
-                    candidacy_id,
                 },
                 WarrantIdentity::Professional(ProfessionalWarrant {
                     id: ProfessionalWarrantId::new(),
@@ -127,9 +127,9 @@ impl Command for CreateWarrant {
                     updated_at: Default::default(),
                     type_: WarrantType::Company,
                     tenant_id,
+                    candidacy_id,
                     individual_id: None,
                     professional_id: None,
-                    candidacy_id,
                 },
                 WarrantIdentity::Professional(ProfessionalWarrant {
                     id: ProfessionalWarrantId::new(),
