@@ -17,17 +17,6 @@ input ActivateAccountPlanInput {
 	name: String!
 	planCode: PlanCode!
 }
-input AddExistingLeaseInput {
-	effectDate: DateTime!
-	rentAmount: Decimal!
-	rentChargesAmount: Decimal
-	type: LeaseType!
-	property: CreatePropertyInput!
-	tenants: [CreateTenantInput!]!
-}
-type AddExistingLeasePayload {
-	lease: Lease!
-}
 type Address {
 	city: String!
 	country: String
@@ -160,6 +149,17 @@ input CreateIndividualWarrantInput {
 	lastName: String!
 	address: AddressInput
 	phoneNumber: PhoneNumber
+}
+input CreateLeaseInput {
+	effectDate: DateTime!
+	rentAmount: Decimal!
+	rentChargesAmount: Decimal
+	type: LeaseType!
+	property: CreatePropertyInput!
+	tenants: [CreateTenantInput!]!
+}
+type CreateLeasePayload {
+	lease: Lease!
 }
 input CreateNakedLeaseInput {
 	details: NakedLeaseDetailsInput
@@ -533,7 +533,7 @@ type Mutation {
 	propertyDelete(id: ID!): ID!
 	createAdvertisement(input: CreateAdvertisementInput!): CreateAdvertisementPayload!
 	updateAdvertisement(input: UpdateAdvertisementInput!): UpdateAdvertisementPayload!
-	leaseAddExisting(input: AddExistingLeaseInput!): AddExistingLeasePayload!
+	leaseAddExisting(input: CreateLeaseInput!): CreateLeasePayload!
 	leaseFurnishedCreate(input: CreateFurnishedLeaseInput!): Lease!
 	leaseFurnishedUpdate(input: UpdateFurnishedLeaseInput!): Lease!
 	leaseNakedCreate(input: CreateNakedLeaseInput!): Lease!
@@ -554,7 +554,7 @@ type Mutation {
 input NakedLeaseDetailsInput {
 	duration: LeaseNakedDuration
 }
-type Person implements PersonInterface & LegalIdentityInterface {
+type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
