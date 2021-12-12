@@ -1,3 +1,3 @@
-mod invite_create;
+mod create_invite;
 
-pub use invite_create::*;
+pub use create_invite::*;
