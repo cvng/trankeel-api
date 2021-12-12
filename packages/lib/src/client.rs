@@ -4,9 +4,12 @@ use crate::auth::CreateUserWithAccountPayload;
 use crate::auth::SignupUserFromInvite;
 use crate::auth::SignupUserFromInviteInput;
 use crate::auth::SignupUserFromInvitePayload;
+use crate::candidacies::AcceptCandidacy;
 use crate::candidacies::AcceptCandidacyInput;
+use crate::candidacies::AcceptCandidacyPayload;
 use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
+use crate::candidacies::CreateCandidacyPayload;
 use crate::error::Result;
 use crate::leases::send_receipts;
 use crate::leases::AddExistingLease;
@@ -76,7 +79,6 @@ use trankeel_core::database::TenantStore;
 use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
 use trankeel_core::dispatcher;
-use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
@@ -97,6 +99,7 @@ use trankeel_core::providers::Pdfmonkey;
 use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
 use trankeel_core::providers::Stripe;
+use trankeel_core::templates::CandidacyCreatedMail;
 use trankeel_data::Account;
 use trankeel_data::Advertisement;
 use trankeel_data::AuthId;
@@ -288,7 +291,39 @@ impl<'a> Client {
     }
 
     pub async fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
-        Ok(CreateCandidacy::new(&self.0).run(input).await?.candidacy)
+        let account = self
+            .0
+            .db()
+            .accounts()
+            .by_advertisement_id(&input.advertisement_id)?;
+        let account_owner = self.0.db().persons().by_account_id_first(&account.id)?;
+
+        let CreateCandidacyPayload {
+            candidacy,
+            candidate,
+            warrants,
+            discussion,
+            messages,
+        } = CreateCandidacy::new(&account, &account_owner).run(input)?;
+
+        self.0.db().transaction(|| {
+            self.0.db().persons().create(&candidate)?;
+            self.0.db().candidacies().create(&candidacy)?;
+            if let Some(warrants) = &warrants {
+                self.0.db().warrants().create_many(warrants)?;
+            }
+            self.0.db().discussions().create(&discussion)?;
+            self.0.db().messages().create_many(&messages)?;
+            dispatcher::dispatch(&self.0, vec![Event::CandidacyCreated(candidacy.clone())])?;
+            Ok(())
+        })?;
+
+        self.0
+            .mailer()
+            .batch(vec![CandidacyCreatedMail::try_new(&candidacy, &candidate)?])
+            .await?;
+
+        Ok(candidacy)
     }
 
     pub async fn accept_candidacy(
@@ -296,7 +331,10 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        crate::candidacies::accept_candidacy(&self.0, auth_id, input).await
+        let AcceptCandidacyPayload { candidacy } =
+            AcceptCandidacy::new(&self.0, auth_id).run(input).await?;
+
+        Ok(candidacy)
     }
 
     pub async fn create_tenant(

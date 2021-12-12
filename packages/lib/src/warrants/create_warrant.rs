@@ -1,6 +1,6 @@
-use crate::auth::CreatePersonInput;
 use crate::error::Error;
 use crate::error::Result;
+use crate::AddressInput;
 use async_graphql::InputObject;
 use trankeel_core::dispatcher::Command;
 use trankeel_data::Account;
@@ -8,6 +8,7 @@ use trankeel_data::Candidacy;
 use trankeel_data::Person;
 use trankeel_data::PersonId;
 use trankeel_data::PersonRole;
+use trankeel_data::PhoneNumber;
 use trankeel_data::ProfessionalWarrant;
 use trankeel_data::ProfessionalWarrantId;
 use trankeel_data::Tenant;
@@ -19,6 +20,15 @@ use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]
+pub struct CreateIndividualWarrantInput {
+    pub email: String, // Email,
+    pub first_name: String,
+    pub last_name: String,
+    pub address: Option<AddressInput>,
+    pub phone_number: Option<PhoneNumber>,
+}
+
+#[derive(InputObject, Validate)]
 pub struct CreateProfessionalWarrantInput {
     pub name: String,
     pub identifier: String,
@@ -27,7 +37,7 @@ pub struct CreateProfessionalWarrantInput {
 #[derive(InputObject, Validate)]
 pub struct CreateWarrantInput {
     pub type_: WarrantType,
-    pub individual: Option<CreatePersonInput>,
+    pub individual: Option<CreateIndividualWarrantInput>,
     pub company: Option<CreateProfessionalWarrantInput>,
 }
 
@@ -92,7 +102,7 @@ impl Command for CreateWarrant {
                     updated_at: Default::default(),
                     account_id: account.id,
                     auth_id: None,
-                    email: individual_input.email,
+                    email: individual_input.email.into(),
                     first_name: individual_input.first_name,
                     last_name: individual_input.last_name,
                     address: individual_input.address.map(Into::into),
@@ -159,6 +169,18 @@ impl From<WarrantWithIdentity> for CreateWarrantInput {
                 individual: None,
                 company: Some(professional.into()),
             },
+        }
+    }
+}
+
+impl From<Person> for CreateIndividualWarrantInput {
+    fn from(item: Person) -> Self {
+        Self {
+            email: item.email.inner().to_string(),
+            first_name: item.first_name,
+            last_name: item.last_name,
+            address: item.address.map(Into::into),
+            phone_number: item.phone_number,
         }
     }
 }

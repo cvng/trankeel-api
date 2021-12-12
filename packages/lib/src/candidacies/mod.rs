@@ -1,7 +1,7 @@
-mod candidacy_accept;
-mod candidacy_create;
+mod accept_candidacy;
+mod create_candidacy;
 mod reject_candidacy;
 
-pub use candidacy_accept::*;
-pub use candidacy_create::*;
+pub use accept_candidacy::*;
+pub use create_candidacy::*;
 pub use reject_candidacy::*;

@@ -142,16 +142,16 @@ input CreateFileInput {
 	downloadUrl: URL!
 	type: FileType!
 }
-type CreateNoticesPayload {
-	errors: [Error!]
-	notices: [File!]
-}
-input CreatePersonInput {
-	email: Email!
+input CreateIndividualWarrantInput {
+	email: String!
 	firstName: String!
 	lastName: String!
 	address: AddressInput
 	phoneNumber: PhoneNumber
+}
+type CreateNoticesPayload {
+	errors: [Error!]
+	notices: [File!]
 }
 input CreateProfessionalWarrantInput {
 	name: String!
@@ -219,7 +219,7 @@ type CreateUserWithAccountPayload {
 }
 input CreateWarrantInput {
 	type: WarrantType!
-	individual: CreatePersonInput
+	individual: CreateIndividualWarrantInput
 	company: CreateProfessionalWarrantInput
 }
 scalar Date
@@ -543,7 +543,7 @@ type Mutation {
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 }
-type Person implements LegalIdentityInterface & PersonInterface {
+type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
 	createdAt: DateTime
 	updatedAt: DateTime
