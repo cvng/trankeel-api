@@ -56,6 +56,6 @@ impl Command for CreateAdvertisement {
             description: input.description,
         };
 
-        Ok(CreateAdvertisementPayload { advertisement })
+        Ok(Self::Payload { advertisement })
     }
 }

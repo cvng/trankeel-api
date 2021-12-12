@@ -70,7 +70,7 @@ impl Command for AddExistingLease {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let AddExistingLease {
+        let Self {
             account,
             account_owner,
             lender,
@@ -125,7 +125,7 @@ impl Command for AddExistingLease {
             )
             .collect();
 
-        Ok(AddExistingLeasePayload {
+        Ok(Self::Payload {
             lease,
             rents,
             property,

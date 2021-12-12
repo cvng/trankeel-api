@@ -42,7 +42,7 @@ impl Command for CreateLease {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let CreateLease { account } = self;
+        let Self { account } = self;
 
         let lease = Lease {
             id: LeaseId::new(),
@@ -67,6 +67,6 @@ impl Command for CreateLease {
 
         let lease = (lease, rents);
 
-        Ok(CreateLeasePayload { lease })
+        Ok(Self::Payload { lease })
     }
 }

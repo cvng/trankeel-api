@@ -6,9 +6,11 @@ use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
 use crate::leases::create_lease_from_advertisement;
 use crate::tenants::CreateTenant;
-use crate::workflows::complete_step;
-use crate::workflows::create_workflow;
+use crate::workflows::CompleteStep;
+use crate::workflows::CompleteStepPayload;
+use crate::workflows::CreateWorkflow;
 use crate::workflows::CreateWorkflowInput;
+use crate::workflows::CreateWorkflowPayload;
 use crate::CompleteStepInput;
 use crate::CreateTenantInput;
 use crate::CreateTenantPayload;
@@ -41,6 +43,7 @@ use trankeel_data::Person;
 use trankeel_data::PersonRole;
 use trankeel_data::Tenant;
 use trankeel_data::WorkflowType;
+use trankeel_data::Workflowable;
 use validator::Validate;
 
 // # Input
@@ -171,24 +174,22 @@ pub(crate) async fn accept_candidacy(
     })?;
 
     // Init candidacy workflow.
-    let workflow = create_workflow(
-        db,
-        CreateWorkflowInput {
+    let workflowable = Workflowable::Candidacy(candidacy.clone());
+    let CreateWorkflowPayload { workflow, steps } = CreateWorkflow::new(&workflowable) //
+        .run(CreateWorkflowInput {
             type_: WorkflowType::Candidacy,
             workflowable_id: candidacy.id,
-        },
-    )?;
+        })?;
+    db.workflows().create(&workflow)?;
+    db.steps().create_many(&steps)?;
 
     // Mark first step as completed (candidacy_accepted)
-    let steps = db.steps().by_workflow_id(&workflow.id)?;
-
-    complete_step(
-        ctx,
-        CompleteStepInput {
-            id: steps.first().ok_or_else(|| no("workflow.first_step"))?.id,
-            requirements: None,
-        },
-    )?;
+    let step = steps.first().ok_or_else(|| no("workflow.first_step"))?;
+    let CompleteStepPayload { step } = CompleteStep::new(step).run(CompleteStepInput {
+        id: step.id,
+        requirements: None,
+    })?;
+    dispatch(ctx, vec![Event::StepCompleted(step.clone())])?;
 
     mailer
         .batch(vec![CandidacyAcceptedMail::try_new(

@@ -48,7 +48,7 @@ impl Command for UpdateAdvertisement {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let UpdateAdvertisement { advertisement } = self;
+        let Self { advertisement } = self;
 
         let advertisement = Advertisement {
             id: input.id,
@@ -66,6 +66,6 @@ impl Command for UpdateAdvertisement {
             ..advertisement
         };
 
-        Ok(UpdateAdvertisementPayload { advertisement })
+        Ok(Self::Payload { advertisement })
     }
 }

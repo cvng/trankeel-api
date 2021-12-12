@@ -69,7 +69,7 @@ impl Command for CreateProperty {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let CreateProperty { account, lender } = self;
+        let Self { account, lender } = self;
 
         let property = Property {
             id: PropertyId::new(),
@@ -99,6 +99,6 @@ impl Command for CreateProperty {
             water_heating_method: input.water_heating_method,
         };
 
-        Ok(CreatePropertyPayload { property })
+        Ok(Self::Payload { property })
     }
 }

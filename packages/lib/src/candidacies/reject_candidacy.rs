@@ -87,7 +87,7 @@ impl Command for RejectCandidacy {
             },
         )?;
 
-        Ok(RejectCandidacyPayload {
+        Ok(Self::Payload {
             candidacy,
             message,
             discussion,

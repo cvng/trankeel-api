@@ -16,7 +16,7 @@ pub fn delete_discussion(
 ) -> Result<DiscussionId> {
     input.validate()?;
 
-    db.discussions().delete(input.id)?;
+    db.discussions().delete(&input.id)?;
 
     Ok(input.id)
 }

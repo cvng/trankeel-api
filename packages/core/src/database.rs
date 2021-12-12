@@ -161,7 +161,7 @@ pub trait PropertyStore {
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Property>>;
     fn by_advertisement_id(&mut self, advertisement_id: &AdvertisementId) -> Result<Property>;
     fn create(&mut self, data: &Property) -> Result<Property>;
-    fn delete(&mut self, data: PropertyId) -> Result<Executed>;
+    fn delete(&mut self, data: &PropertyId) -> Result<Executed>;
     fn update(&mut self, data: &Property) -> Result<Property>;
 }
 
@@ -174,7 +174,7 @@ pub trait TenantStore {
     fn by_person_id(&mut self, person_id: &PersonId) -> Result<Tenant>;
     fn create(&mut self, data: &Tenant) -> Result<Tenant>;
     fn create_many(&mut self, data: &[Tenant]) -> Result<Vec<Tenant>>;
-    fn delete(&mut self, data: TenantId) -> Result<Executed>;
+    fn delete(&mut self, data: &TenantId) -> Result<Executed>;
     fn update(&mut self, data: &Tenant) -> Result<Tenant>;
 }
 
@@ -198,7 +198,7 @@ pub trait LeaseStore {
     fn by_person_id(&mut self, person_id: &PersonId) -> Result<Lease>;
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Lease>>;
     fn create(&mut self, data: &Lease) -> Result<Lease>;
-    fn delete(&mut self, data: LeaseId) -> Result<Executed>;
+    fn delete(&mut self, data: &LeaseId) -> Result<Executed>;
     fn update(&mut self, data: &Lease) -> Result<Lease>;
 }
 
@@ -251,7 +251,7 @@ pub trait DiscussionStore {
     fn create(&mut self, data: &Discussion) -> Result<Discussion>;
     fn create_many(&mut self, data: &[Discussion]) -> Result<Vec<Discussion>>;
     fn update(&mut self, data: &Discussion) -> Result<Discussion>;
-    fn delete(&mut self, data: DiscussionId) -> Result<Executed>;
+    fn delete(&mut self, data: &DiscussionId) -> Result<Executed>;
     fn related_items(&mut self, id: &DiscussionId) -> Result<Vec<DiscussionItem>>;
     fn touch(&mut self, data: DiscussionId) -> Result<Executed>;
 }
@@ -284,5 +284,6 @@ pub trait StepStore {
     fn by_id(&mut self, id: &StepId) -> Result<Step>;
     fn by_workflow_id(&mut self, workflow_id: &WorkflowId) -> Result<Vec<Step>>;
     fn create(&mut self, data: &Step) -> Result<Step>;
+    fn create_many(&mut self, data: &[Step]) -> Result<Vec<Step>>;
     fn update(&mut self, data: &Step) -> Result<Step>;
 }

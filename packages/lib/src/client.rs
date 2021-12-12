@@ -33,11 +33,14 @@ use crate::properties::UpdatePropertyInput;
 use crate::properties::UpdatePropertyPayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
+use crate::tenants::DeleteTenant;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenant;
 use crate::tenants::UpdateTenantInput;
 use crate::tenants::UpdateTenantPayload;
+use crate::workflows::CompleteStep;
 use crate::workflows::CompleteStepInput;
+use crate::workflows::CompleteStepPayload;
 use crate::AddExistingLeaseInput;
 use crate::CreateTenantPayload;
 use crate::PushMessagePayload;
@@ -66,6 +69,7 @@ use trankeel_core::database::WorkflowStore;
 use trankeel_core::dispatcher;
 use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
 use trankeel_core::handlers::AdvertisementCreated;
 use trankeel_core::handlers::AdvertisementUpdated;
@@ -274,8 +278,12 @@ impl<'a> Client {
         Ok(tenant)
     }
 
-    pub fn delete_tenant(&self, auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
-        crate::tenants::delete_tenant(self.0.db(), auth_id, input)
+    pub fn delete_tenant(&self, _auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
+        let tenant_id = DeleteTenant.run(input)?;
+
+        self.0.db().tenants().delete(&tenant_id)?;
+
+        Ok(tenant_id)
     }
 
     pub async fn create_property(
@@ -491,7 +499,13 @@ impl<'a> Client {
     }
 
     pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
-        crate::workflows::complete_step(&self.0, input)
+        let step = self.0.db().steps().by_id(&input.id)?;
+
+        let CompleteStepPayload { step } = CompleteStep::new(&step).run(input)?;
+
+        dispatcher::dispatch(&self.0, vec![Event::StepCompleted(step.clone())])?;
+
+        Ok(step)
     }
 
     pub async fn batch_mails(&self, mails: Vec<impl IntoMail>) -> Result<Vec<Mail>> {

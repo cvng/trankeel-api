@@ -102,11 +102,15 @@ type Company implements LegalIdentityInterface {
 }
 input CompleteStepInput {
 	id: ID!
-	requirements: [RequirementInput!]
+	requirements: [CompleteStepRequirementInput!]
 }
 type CompleteStepPayload {
 	errors: [Error!]
 	step: Step
+}
+input CompleteStepRequirementInput {
+	name: String!
+	value: String!
 }
 input CreateAdvertisementInput {
 	published: Boolean!
@@ -736,10 +740,6 @@ type Requirement {
 	name: String!
 	type: RequirementType!
 	value: String
-}
-input RequirementInput {
-	name: String!
-	value: String!
 }
 enum RequirementType {
 	DATE
