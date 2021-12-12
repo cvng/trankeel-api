@@ -4,7 +4,9 @@ use crate::auth::CreateUserWithAccountPayload;
 use crate::auth::SignupUserFromInvite;
 use crate::auth::SignupUserFromInviteInput;
 use crate::auth::SignupUserFromInvitePayload;
+use crate::candidacies::AcceptCandidacy;
 use crate::candidacies::AcceptCandidacyInput;
+use crate::candidacies::AcceptCandidacyPayload;
 use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
 use crate::candidacies::CreateCandidacyPayload;
@@ -329,7 +331,10 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        crate::candidacies::accept_candidacy(&self.0, auth_id, input).await
+        let AcceptCandidacyPayload { candidacy } =
+            AcceptCandidacy::new(&self.0, auth_id).run(input).await?;
+
+        Ok(candidacy)
     }
 
     pub async fn create_tenant(
