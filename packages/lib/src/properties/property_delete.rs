@@ -20,7 +20,7 @@ pub fn delete_property(
 ) -> Result<PropertyId> {
     input.validate()?;
 
-    db.properties().delete(input.id)?;
+    db.properties().delete(&input.id)?;
 
     Ok(input.id)
 }

@@ -33,6 +33,7 @@ use crate::properties::UpdatePropertyInput;
 use crate::properties::UpdatePropertyPayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
+use crate::tenants::DeleteTenant;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenant;
 use crate::tenants::UpdateTenantInput;
@@ -277,8 +278,12 @@ impl<'a> Client {
         Ok(tenant)
     }
 
-    pub fn delete_tenant(&self, auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
-        crate::tenants::delete_tenant(self.0.db(), auth_id, input)
+    pub fn delete_tenant(&self, _auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
+        let tenant_id = DeleteTenant.run(input)?;
+
+        self.0.db().tenants().delete(&tenant_id)?;
+
+        Ok(tenant_id)
     }
 
     pub async fn create_property(

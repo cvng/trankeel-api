@@ -16,7 +16,7 @@ pub struct DeleteLeaseInput {
 pub fn delete_lease(db: &impl Db, _auth_id: &AuthId, input: DeleteLeaseInput) -> Result<LeaseId> {
     input.validate()?;
 
-    db.leases().delete(input.id)?;
+    db.leases().delete(&input.id)?;
 
     Ok(input.id)
 }

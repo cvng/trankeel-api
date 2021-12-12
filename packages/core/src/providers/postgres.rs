@@ -542,7 +542,7 @@ impl database::TenantStore for TenantStore<'_> {
             .get_results(&self.0.get()?)?)
     }
 
-    fn delete(&mut self, data: TenantId) -> Result<Executed> {
+    fn delete(&mut self, data: &TenantId) -> Result<Executed> {
         Ok(delete(tenants::table)
             .filter(tenants::id.eq(data))
             .execute(&self.0.get()?)?)
@@ -850,7 +850,7 @@ impl database::PropertyStore for PropertyStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
-    fn delete(&mut self, data: PropertyId) -> Result<Executed> {
+    fn delete(&mut self, data: &PropertyId) -> Result<Executed> {
         Ok(delete(properties::table)
             .filter(properties::id.eq(data))
             .execute(&self.0.get()?)?)
@@ -933,7 +933,7 @@ impl database::LeaseStore for LeaseStore<'_> {
             .get_result(&self.0.get()?)?)
     }
 
-    fn delete(&mut self, data: LeaseId) -> Result<Executed> {
+    fn delete(&mut self, data: &LeaseId) -> Result<Executed> {
         Ok(delete(leases::table)
             .filter(leases::id.eq(data))
             .execute(&self.0.get()?)?)
@@ -1162,7 +1162,7 @@ impl database::DiscussionStore for DiscussionStore<'_> {
         Ok(update(data).set(data).get_result(&self.0.get()?)?)
     }
 
-    fn delete(&mut self, data: DiscussionId) -> Result<Executed> {
+    fn delete(&mut self, data: &DiscussionId) -> Result<Executed> {
         Ok(delete(discussions::table)
             .filter(discussions::id.eq(data))
             .execute(&self.0.get()?)?)
