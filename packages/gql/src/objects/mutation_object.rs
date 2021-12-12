@@ -5,7 +5,6 @@ use super::File;
 use super::Lease;
 use super::Lender;
 use super::Payment;
-use super::Person;
 use super::Task;
 use crate::payloads::AddExistingLeasePayload;
 use crate::payloads::CompleteStepPayload;
@@ -17,6 +16,7 @@ use crate::payloads::CreateTenantPayload;
 use crate::payloads::CreateUserWithAccountPayload;
 use crate::payloads::DeleteDiscussionPayload;
 use crate::payloads::PushMessagePayload;
+use crate::payloads::SignupUserFromInvitePayload;
 use crate::payloads::UpdateAdvertisementPayload;
 use crate::payloads::UpdatePropertyPayload;
 use crate::payloads::UpdateTenantPayload;
@@ -77,7 +77,7 @@ impl Mutation {
         &self,
         ctx: &Context<'_>,
         input: SignupUserFromInviteInput,
-    ) -> Result<Person> {
+    ) -> Result<SignupUserFromInvitePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .signup_user_from_invite(input)
