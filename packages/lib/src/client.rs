@@ -7,6 +7,7 @@ use crate::candidacies::CreateCandidacyInput;
 use crate::error::Result;
 use crate::leases;
 use crate::leases::AddExistingLease;
+use crate::leases::AddExistingLeasePayload;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateNoticesInput;
 use crate::leases::CreateReceiptsInput;
@@ -19,20 +20,26 @@ use crate::messaging::PushMessageInput;
 use crate::owners::UpdateIndividualLenderInput;
 use crate::properties::CreateAdvertisement;
 use crate::properties::CreateAdvertisementInput;
+use crate::properties::CreateAdvertisementPayload;
 use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
+use crate::properties::CreatePropertyPayload;
 use crate::properties::DeletePropertyInput;
 use crate::properties::UpdateAdvertisement;
 use crate::properties::UpdateAdvertisementInput;
+use crate::properties::UpdateAdvertisementPayload;
 use crate::properties::UpdateProperty;
 use crate::properties::UpdatePropertyInput;
+use crate::properties::UpdatePropertyPayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenant;
 use crate::tenants::UpdateTenantInput;
+use crate::tenants::UpdateTenantPayload;
 use crate::workflows::CompleteStepInput;
 use crate::AddExistingLeaseInput;
+use crate::CreateTenantPayload;
 use crate::PushMessagePayload;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
@@ -60,6 +67,14 @@ use trankeel_core::dispatcher;
 use trankeel_core::dispatcher::AsyncCommand;
 use trankeel_core::dispatcher::Command;
 use trankeel_core::error::Error;
+use trankeel_core::handlers::AdvertisementCreated;
+use trankeel_core::handlers::AdvertisementUpdated;
+use trankeel_core::handlers::LeaseAffected;
+use trankeel_core::handlers::LeaseCreated;
+use trankeel_core::handlers::PropertyCreated;
+use trankeel_core::handlers::PropertyUpdated;
+use trankeel_core::handlers::TenantCreated;
+use trankeel_core::handlers::TenantUpdated;
 use trankeel_core::mailer::IntoMail;
 use trankeel_core::mailer::Mail;
 use trankeel_core::mailer::Mailer;
@@ -70,7 +85,6 @@ use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
 use trankeel_core::providers::Stripe;
 use trankeel_data::Advertisement;
-use trankeel_data::AdvertisementId;
 use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::DiscussionId;
@@ -216,17 +230,28 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreateTenantInput,
     ) -> Result<Tenant> {
-        let tenant_id = TenantId::new();
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
-        let identity = None;
+
+        let CreateTenantPayload {
+            tenant,
+            identity,
+            warrants,
+            discussion,
+        } = CreateTenant::new(&account, &account_owner, None).run(input)?;
 
         dispatcher::dispatch(
             &self.0,
-            CreateTenant::new(tenant_id, account, account_owner, identity).run(input)?,
+            vec![TenantCreated {
+                tenant: tenant.clone(),
+                identity,
+                warrants,
+                discussion,
+            }
+            .into()],
         )?;
 
-        self.0.db().tenants().by_id(&tenant_id)
+        Ok(tenant)
     }
 
     pub async fn update_tenant(
@@ -234,12 +259,19 @@ impl<'a> Client {
         _auth_id: &AuthId,
         input: UpdateTenantInput,
     ) -> Result<Tenant> {
-        let tenant_id = input.id;
-        let tenant = self.0.db().tenants().by_id(&tenant_id)?;
+        let tenant = self.0.db().tenants().by_id(&input.id)?;
 
-        dispatcher::dispatch(&self.0, UpdateTenant::new(tenant).run(input)?)?;
+        let UpdateTenantPayload { tenant } = UpdateTenant::new(&tenant).run(input)?;
 
-        self.0.db().tenants().by_id(&tenant_id)
+        dispatcher::dispatch(
+            &self.0,
+            vec![TenantUpdated {
+                tenant: tenant.clone(),
+            }
+            .into()],
+        )?;
+
+        Ok(tenant)
     }
 
     pub fn delete_tenant(&self, auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
@@ -251,7 +283,6 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: CreatePropertyInput,
     ) -> Result<Property> {
-        let property_id = PropertyId::new();
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let (lender, ..) = self
             .0
@@ -262,12 +293,18 @@ impl<'a> Client {
             .cloned()
             .ok_or_else(|| Error::msg("lender_not_found"))?;
 
+        let CreatePropertyPayload { property } =
+            CreateProperty::new(&account, &lender).run(input)?;
+
         dispatcher::dispatch(
             &self.0,
-            CreateProperty::new(property_id, account, lender).run(input)?,
+            vec![PropertyCreated {
+                property: property.clone(),
+            }
+            .into()],
         )?;
 
-        self.0.db().properties().by_id(&property_id)
+        Ok(property)
     }
 
     pub fn update_property(
@@ -276,11 +313,18 @@ impl<'a> Client {
         input: UpdatePropertyInput,
     ) -> Result<Property> {
         let property = self.0.db().properties().by_id(&input.id)?;
-        let property_id = property.id;
 
-        dispatcher::dispatch(&self.0, UpdateProperty::new(property).run(input)?)?;
+        let UpdatePropertyPayload { property } = UpdateProperty::new(&property).run(input)?;
 
-        self.0.db().properties().by_id(&property_id)
+        dispatcher::dispatch(
+            &self.0,
+            vec![PropertyUpdated {
+                property: property.clone(),
+            }
+            .into()],
+        )?;
+
+        Ok(property)
     }
 
     pub fn delete_property(
@@ -296,14 +340,17 @@ impl<'a> Client {
         _auth_id: &AuthId,
         input: CreateAdvertisementInput,
     ) -> Result<Advertisement> {
-        let advertisement_id = AdvertisementId::new();
+        let CreateAdvertisementPayload { advertisement } = CreateAdvertisement.run(input)?;
 
         dispatcher::dispatch(
             &self.0,
-            CreateAdvertisement::new(advertisement_id).run(input)?,
+            vec![AdvertisementCreated {
+                advertisement: advertisement.clone(),
+            }
+            .into()],
         )?;
 
-        self.0.db().advertisements().by_id(&advertisement_id)
+        Ok(advertisement)
     }
 
     pub fn update_advertisement(
@@ -311,12 +358,20 @@ impl<'a> Client {
         _auth_id: &AuthId,
         input: UpdateAdvertisementInput,
     ) -> Result<Advertisement> {
-        let advertisement_id = input.id;
-        let advertisement = self.0.db().advertisements().by_id(&advertisement_id)?;
+        let advertisement = self.0.db().advertisements().by_id(&input.id)?;
 
-        dispatcher::dispatch(&self.0, UpdateAdvertisement::new(advertisement).run(input)?)?;
+        let UpdateAdvertisementPayload { advertisement } =
+            UpdateAdvertisement::new(&advertisement).run(input)?;
 
-        self.0.db().advertisements().by_id(&advertisement_id)
+        dispatcher::dispatch(
+            &self.0,
+            vec![AdvertisementUpdated {
+                advertisement: advertisement.clone(),
+            }
+            .into()],
+        )?;
+
+        Ok(advertisement)
     }
 
     pub async fn add_existing_lease(
@@ -324,17 +379,53 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: AddExistingLeaseInput,
     ) -> Result<Lease> {
-        let lease_id = LeaseId::new();
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
         let (lender, ..) = self.0.db().lenders().by_account_id_first(&account.id)?;
 
+        let AddExistingLeasePayload {
+            lease,
+            rents,
+            property,
+            tenants_with_identities,
+        } = AddExistingLease::new(&account, &account_owner, &lender).run(input)?;
+
         dispatcher::dispatch(
             &self.0,
-            AddExistingLease::new(lease_id, account, account_owner, lender).run(input)?,
+            vec![
+                PropertyCreated { property }.into(),
+                LeaseCreated {
+                    lease: lease.clone(),
+                    rents,
+                }
+                .into(),
+            ]
+            .into_iter()
+            .chain(
+                tenants_with_identities
+                    .clone()
+                    .into_iter()
+                    .map(|(tenant, identity, discussion, warrants)| {
+                        TenantCreated {
+                            tenant,
+                            identity,
+                            discussion,
+                            warrants,
+                        }
+                        .into()
+                    })
+                    .collect::<Vec<_>>(),
+            )
+            .chain(
+                tenants_with_identities
+                    .into_iter()
+                    .map(|(tenant, ..)| LeaseAffected { tenant }.into())
+                    .collect::<Vec<_>>(),
+            )
+            .collect(),
         )?;
 
-        self.0.db().leases().by_id(&lease_id)
+        Ok(lease)
     }
 
     pub fn create_furnished_lease(

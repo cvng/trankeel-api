@@ -517,7 +517,7 @@ type Mutation {
 	accountUpdatePaymentMethod(input: AccountUpdateInput!): Account!
 	accountActivatePlan(input: AccountActivatePlanInput!): Account!
 	tenantCreate(input: CreateTenantInput!): CreateTenantPayload!
-	tenantUpdate(input: TenantUpdateInput!): UpdateTenantPayload!
+	tenantUpdate(input: UpdateTenantInput!): UpdateTenantPayload!
 	tenantDelete(id: ID!): ID!
 	propertyCreate(input: CreatePropertyInput!): CreatePropertyPayload!
 	propertyUpdate(input: UpdatePropertyInput!): UpdatePropertyPayload!
@@ -840,18 +840,6 @@ enum TenantStatus {
 	NEW
 	UPTODATE
 }
-input TenantUpdateInput {
-	birthdate: Date
-	birthplace: String
-	email: String
-	id: ID!
-	firstName: String
-	lastName: String
-	note: String
-	phoneNumber: PhoneNumber
-	isStudent: Boolean
-	warrants: [CreateWarrantInput!]
-}
 type Transaction {
 	id: ID!
 	createdAt: DateTime
@@ -920,6 +908,18 @@ input UpdatePropertyInput {
 }
 type UpdatePropertyPayload {
 	property: Property!
+}
+input UpdateTenantInput {
+	birthdate: Date
+	birthplace: String
+	email: String
+	id: ID!
+	firstName: String
+	lastName: String
+	note: String
+	phoneNumber: PhoneNumber
+	isStudent: Boolean
+	warrants: [CreateWarrantInput!]
 }
 type UpdateTenantPayload {
 	tenant: Tenant!

@@ -2,8 +2,6 @@ use crate::auth::AddressInput;
 use crate::error::Result;
 use async_graphql::InputObject;
 use trankeel_core::dispatcher::Command;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::PropertyCreated;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::Lender;
@@ -46,33 +44,35 @@ pub struct CreatePropertyInput {
     pub water_heating_method: Option<PropertyUsageType>,
 }
 
+pub struct CreatePropertyPayload {
+    pub property: Property,
+}
+
 pub(crate) struct CreateProperty {
-    property_id: PropertyId,
     account: Account,
     lender: Lender,
 }
 
 impl CreateProperty {
-    pub fn new(property_id: PropertyId, account: Account, lender: Lender) -> Self {
+    pub fn new(account: &Account, lender: &Lender) -> Self {
         Self {
-            property_id,
-            account,
-            lender,
+            account: account.clone(),
+            lender: lender.clone(),
         }
     }
+}
 
-    pub fn create_property(self, input: CreatePropertyInput) -> Result<Property> {
+impl Command for CreateProperty {
+    type Input = CreatePropertyInput;
+    type Payload = CreatePropertyPayload;
+
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let CreateProperty {
-            property_id,
-            account,
-            lender,
-            ..
-        } = self;
+        let CreateProperty { account, lender } = self;
 
         let property = Property {
-            id: property_id,
+            id: PropertyId::new(),
             created_at: Default::default(),
             updated_at: Default::default(),
             account_id: account.id,
@@ -99,16 +99,6 @@ impl CreateProperty {
             water_heating_method: input.water_heating_method,
         };
 
-        Ok(property)
-    }
-}
-
-impl Command for CreateProperty {
-    type Input = CreatePropertyInput;
-
-    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
-        let property = self.create_property(input)?;
-
-        Ok(vec![PropertyCreated { property }.into()])
+        Ok(CreatePropertyPayload { property })
     }
 }

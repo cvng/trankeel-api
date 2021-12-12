@@ -4,14 +4,11 @@ use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
 use trankeel_core::dispatcher::Command;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::TenantUpdated;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantId;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]
-#[graphql(name = "TenantUpdateInput")]
 pub struct UpdateTenantInput {
     pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
@@ -26,20 +23,27 @@ pub struct UpdateTenantInput {
     pub warrants: Option<Vec<CreateWarrantInput>>, // TODO
 }
 
-pub struct UpdateTenant {
+pub struct UpdateTenantPayload {
     pub tenant: Tenant,
 }
 
+pub(crate) struct UpdateTenant {
+    tenant: Tenant,
+}
+
 impl UpdateTenant {
-    pub fn new(tenant: Tenant) -> Self {
-        Self { tenant }
+    pub fn new(tenant: &Tenant) -> Self {
+        Self {
+            tenant: tenant.clone(),
+        }
     }
 }
 
 impl Command for UpdateTenant {
     type Input = UpdateTenantInput;
+    type Payload = UpdateTenantPayload;
 
-    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
         let UpdateTenant { tenant } = self;
@@ -57,6 +61,6 @@ impl Command for UpdateTenant {
             ..tenant
         };
 
-        Ok(vec![TenantUpdated { tenant }.into()])
+        Ok(UpdateTenantPayload { tenant })
     }
 }

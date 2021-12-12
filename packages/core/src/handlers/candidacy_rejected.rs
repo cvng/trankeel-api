@@ -14,6 +14,12 @@ pub struct CandidacyRejected {
     pub message: Message,
 }
 
+impl From<CandidacyRejected> for Event {
+    fn from(item: CandidacyRejected) -> Self {
+        Self::CandidacyRejected(item)
+    }
+}
+
 pub fn candidacy_rejected(ctx: &Context, event: CandidacyRejected) -> Result<()> {
     let db = ctx.db();
 

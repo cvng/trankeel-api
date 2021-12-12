@@ -1,29 +1,34 @@
 use super::CreateLease;
 use super::CreateLeaseInput;
+use super::CreateLeasePayload;
 use crate::properties::CreateProperty;
+use crate::properties::CreatePropertyPayload;
 use crate::tenants::CreateTenant;
 use crate::CreatePropertyInput;
 use crate::CreateTenantInput;
 use crate::CreateTenantPayload;
 use crate::Result;
 use trankeel_core::dispatcher::Command;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::LeaseAffected;
-use trankeel_core::handlers::LeaseCreated;
-use trankeel_core::handlers::PropertyCreated;
-use trankeel_core::handlers::TenantCreated;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;
+use trankeel_data::Discussion;
 use trankeel_data::Lease;
-use trankeel_data::LeaseId;
 use trankeel_data::LeaseType;
 use trankeel_data::Lender;
 use trankeel_data::Person;
-use trankeel_data::PropertyId;
+use trankeel_data::Property;
+use trankeel_data::Rent;
 use trankeel_data::Tenant;
-use trankeel_data::TenantId;
+use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
+
+type TenantWithIdentityExtended = (
+    Tenant,
+    Person,
+    Option<Discussion>,
+    Option<Vec<WarrantWithIdentity>>,
+);
 
 #[derive(InputObject, Validate)]
 pub struct AddExistingLeaseInput {
@@ -35,50 +40,56 @@ pub struct AddExistingLeaseInput {
     pub tenants: Vec<CreateTenantInput>,
 }
 
+pub struct AddExistingLeasePayload {
+    pub lease: Lease,
+    pub rents: Vec<Rent>,
+    pub property: Property,
+    pub tenants_with_identities: Vec<TenantWithIdentityExtended>,
+}
+
 pub(crate) struct AddExistingLease {
-    pub lease_id: LeaseId,
-    pub account: Account,
-    pub account_owner: Person,
-    pub lender: Lender,
+    account: Account,
+    account_owner: Person,
+    lender: Lender,
 }
 
 impl AddExistingLease {
-    pub fn new(lease_id: LeaseId, account: Account, account_owner: Person, lender: Lender) -> Self {
+    pub fn new(account: &Account, account_owner: &Person, lender: &Lender) -> Self {
         Self {
-            lease_id,
-            account,
-            account_owner,
-            lender,
+            account: account.clone(),
+            account_owner: account_owner.clone(),
+            lender: lender.clone(),
         }
     }
 }
 
 impl Command for AddExistingLease {
     type Input = AddExistingLeaseInput;
+    type Payload = AddExistingLeasePayload;
 
-    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
         let AddExistingLease {
-            lease_id,
             account,
             account_owner,
             lender,
         } = self;
 
         // Create property.
-        let property = CreateProperty::new(PropertyId::new(), account.clone(), lender)
-            .create_property(input.property)?;
+        let CreatePropertyPayload { property } = CreateProperty::new(&account, &lender) //
+            .run(input.property)?;
 
         // Create lease.
-        let (lease, rents) = CreateLease::new(lease_id, account.clone()) //
-            .create_lease(CreateLeaseInput {
-                effect_date: input.effect_date,
-                rent_amount: input.rent_amount,
-                rent_charges_amount: input.rent_charges_amount,
-                type_: input.type_,
-                property_id: property.id,
-            })?;
+        let CreateLeasePayload {
+            lease: (lease, rents),
+        } = CreateLease::new(&account).run(CreateLeaseInput {
+            effect_date: input.effect_date,
+            rent_amount: input.rent_amount,
+            rent_charges_amount: input.rent_charges_amount,
+            type_: input.type_,
+            property_id: property.id,
+        })?;
 
         // Make the lease active by using a signature date.
         let lease = Lease {
@@ -90,15 +101,7 @@ impl Command for AddExistingLease {
         let tenants_with_identities = input
             .tenants
             .into_iter()
-            .map(|tenant_input| {
-                CreateTenant::new(
-                    TenantId::new(),
-                    account.clone(),
-                    account_owner.clone(),
-                    None,
-                )
-                .create_tenant(tenant_input)
-            })
+            .map(|tenant_input| CreateTenant::new(&account, &account_owner, None).run(tenant_input))
             .collect::<Result<Vec<_>>>()?
             .into_iter()
             .map(
@@ -111,7 +114,7 @@ impl Command for AddExistingLease {
                     (
                         // Attach tenant to lease.
                         Tenant {
-                            lease_id: Some(lease_id),
+                            lease_id: Some(lease.id),
                             ..tenant
                         },
                         identity,
@@ -119,32 +122,14 @@ impl Command for AddExistingLease {
                         warrants,
                     )
                 },
-            );
+            )
+            .collect();
 
-        Ok(vec![
-            PropertyCreated { property }.into(),
-            LeaseCreated { lease, rents }.into(),
-        ]
-        .into_iter()
-        .chain(
-            tenants_with_identities
-                .clone()
-                .map(|(tenant, identity, discussion, warrants)| {
-                    TenantCreated {
-                        tenant,
-                        identity,
-                        discussion,
-                        warrants,
-                    }
-                    .into()
-                })
-                .collect::<Vec<_>>(),
-        )
-        .chain(
-            tenants_with_identities
-                .map(|(tenant, ..)| LeaseAffected { tenant }.into())
-                .collect::<Vec<_>>(),
-        )
-        .collect())
+        Ok(AddExistingLeasePayload {
+            lease,
+            rents,
+            property,
+            tenants_with_identities,
+        })
     }
 }
