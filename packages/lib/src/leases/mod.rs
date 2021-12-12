@@ -1,4 +1,3 @@
-mod add_existing_lease;
 mod create_furnished_lease;
 mod create_lease;
 mod create_notices;
@@ -9,7 +8,6 @@ mod delete_lease;
 mod send_receipts;
 mod update_furnished_lease;
 
-pub use add_existing_lease::*;
 pub use create_furnished_lease::*;
 pub use create_lease::*;
 pub use create_notices::*;
