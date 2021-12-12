@@ -6,7 +6,8 @@ use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
 use crate::leases::create_lease_from_advertisement;
 use crate::tenants::CreateTenant;
-use crate::workflows::complete_step;
+use crate::workflows::CompleteStep;
+use crate::workflows::CompleteStepPayload;
 use crate::workflows::CreateWorkflow;
 use crate::workflows::CreateWorkflowInput;
 use crate::workflows::CreateWorkflowPayload;
@@ -183,13 +184,12 @@ pub(crate) async fn accept_candidacy(
     db.steps().create_many(&steps)?;
 
     // Mark first step as completed (candidacy_accepted)
-    complete_step(
-        ctx,
-        CompleteStepInput {
-            id: steps.first().ok_or_else(|| no("workflow.first_step"))?.id,
-            requirements: None,
-        },
-    )?;
+    let step = steps.first().ok_or_else(|| no("workflow.first_step"))?;
+    let CompleteStepPayload { step } = CompleteStep::new(step).run(CompleteStepInput {
+        id: step.id,
+        requirements: None,
+    })?;
+    dispatch(ctx, vec![Event::StepCompleted(step.clone())])?;
 
     mailer
         .batch(vec![CandidacyAcceptedMail::try_new(
