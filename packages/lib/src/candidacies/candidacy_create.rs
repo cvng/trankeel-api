@@ -1,12 +1,11 @@
 use crate::auth::CreatePersonInput;
 use crate::error::Result;
 use crate::files::CreateFileInput;
-use crate::messaging;
+use crate::messaging::CreateDiscussion;
+use crate::messaging::CreateDiscussionInput;
 use crate::messaging::CreateDiscussionPayload;
-use crate::messaging::CreateDiscussionState;
 use crate::warrants::CreateWarrant;
 use crate::warrants::CreateWarrantInput;
-use crate::CreateDiscussionInput;
 use async_graphql::InputObject;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
@@ -177,14 +176,11 @@ pub(crate) fn create_candidacy(
     let CreateDiscussionPayload {
         discussion,
         message,
-    } = messaging::create_discussion(
-        CreateDiscussionState { account },
-        CreateDiscussionInput {
-            recipient_id: account_owner.id,
-            initiator_id: candidate.id,
-            message: Some(candidacy.description.clone()),
-        },
-    )?;
+    } = CreateDiscussion::new(&account).run(CreateDiscussionInput {
+        recipient_id: account_owner.id,
+        initiator_id: candidate.id,
+        message: Some(candidacy.description.clone()),
+    })?;
 
     let messages = vec![message].into_iter().flatten().collect();
 

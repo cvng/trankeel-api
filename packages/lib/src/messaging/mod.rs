@@ -1,7 +1,7 @@
-mod discussion_create;
-mod discussion_delete;
-mod message_push;
+mod create_discussion;
+mod delete_discussion;
+mod push_message;
 
-pub use discussion_create::*;
-pub use discussion_delete::*;
-pub use message_push::*;
+pub use create_discussion::*;
+pub use delete_discussion::*;
+pub use push_message::*;
