@@ -1,7 +1,5 @@
 use crate::error::Result;
 use trankeel_core::dispatcher::Command;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::LeaseCreated;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;
@@ -21,23 +19,33 @@ pub struct CreateLeaseInput {
     pub property_id: PropertyId,
 }
 
+pub struct CreateLeasePayload {
+    pub lease: LeaseWithRents,
+}
+
 pub(crate) struct CreateLease {
-    pub lease_id: LeaseId,
-    pub account: Account,
+    account: Account,
 }
 
 impl CreateLease {
-    pub fn new(lease_id: LeaseId, account: Account) -> Self {
-        Self { lease_id, account }
+    pub fn new(account: &Account) -> Self {
+        Self {
+            account: account.clone(),
+        }
     }
+}
 
-    pub fn create_lease(self, input: CreateLeaseInput) -> Result<LeaseWithRents> {
+impl Command for CreateLease {
+    type Input = CreateLeaseInput;
+    type Payload = CreateLeasePayload;
+
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let CreateLease { lease_id, account } = self;
+        let CreateLease { account } = self;
 
         let lease = Lease {
-            id: lease_id,
+            id: LeaseId::new(),
             created_at: Default::default(),
             updated_at: Default::default(),
             account_id: account.id,
@@ -57,16 +65,8 @@ impl CreateLease {
 
         let rents = lease.rents();
 
-        Ok((lease, rents))
-    }
-}
+        let lease = (lease, rents);
 
-impl Command for CreateLease {
-    type Input = CreateLeaseInput;
-
-    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
-        let (lease, rents) = self.create_lease(input)?;
-
-        Ok(vec![LeaseCreated { lease, rents }.into()])
+        Ok(CreateLeasePayload { lease })
     }
 }

@@ -1,8 +1,6 @@
 use crate::error::Result;
 use async_graphql::InputObject;
 use trankeel_core::dispatcher::Command;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::AdvertisementUpdated;
 use trankeel_data::Advertisement;
 use trankeel_data::AdvertisementId;
 use trankeel_data::Amount;
@@ -27,20 +25,27 @@ pub struct UpdateAdvertisementInput {
     pub description: Option<String>,
 }
 
-pub(crate) struct UpdateAdvertisement {
+pub struct UpdateAdvertisementPayload {
     pub advertisement: Advertisement,
 }
 
+pub(crate) struct UpdateAdvertisement {
+    advertisement: Advertisement,
+}
+
 impl UpdateAdvertisement {
-    pub fn new(advertisement: Advertisement) -> Self {
-        Self { advertisement }
+    pub fn new(advertisement: &Advertisement) -> Self {
+        Self {
+            advertisement: advertisement.clone(),
+        }
     }
 }
 
 impl Command for UpdateAdvertisement {
     type Input = UpdateAdvertisementInput;
+    type Payload = UpdateAdvertisementPayload;
 
-    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
         let UpdateAdvertisement { advertisement } = self;
@@ -61,6 +66,6 @@ impl Command for UpdateAdvertisement {
             ..advertisement
         };
 
-        Ok(vec![AdvertisementUpdated { advertisement }.into()])
+        Ok(UpdateAdvertisementPayload { advertisement })
     }
 }

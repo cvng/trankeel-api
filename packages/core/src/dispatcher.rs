@@ -18,8 +18,9 @@ pub trait AsyncCommand {
 
 pub trait Command {
     type Input;
+    type Payload;
 
-    fn run(self, input: Self::Input) -> Result<Vec<Event>>;
+    fn run(self, input: Self::Input) -> Result<Self::Payload>;
 }
 
 #[allow(clippy::large_enum_variant)]

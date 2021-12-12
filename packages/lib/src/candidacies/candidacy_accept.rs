@@ -1,5 +1,6 @@
 use super::RejectCandidacy;
 use super::RejectCandidacyInput;
+use super::RejectCandidacyPayload;
 use crate::error::Result;
 use crate::invites::create_invite;
 use crate::invites::CreateInviteInput;
@@ -17,9 +18,10 @@ use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher;
 use trankeel_core::dispatcher::dispatch;
-use trankeel_core::dispatcher::AsyncCommand;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::no;
+use trankeel_core::handlers::CandidacyRejected;
 use trankeel_core::mailer::Mailer;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_core::templates::CandidacyAcceptedMail;
@@ -38,7 +40,6 @@ use trankeel_data::LeaseFileId;
 use trankeel_data::Person;
 use trankeel_data::PersonRole;
 use trankeel_data::Tenant;
-use trankeel_data::TenantId;
 use trankeel_data::WorkflowType;
 use validator::Validate;
 
@@ -81,8 +82,23 @@ pub(crate) async fn accept_candidacy(
         let discussion = db.discussions().by_candidacy_id(&candidacy.id)?;
         RejectCandidacy::new(&candidacy, &candidate, &account_owner, &discussion)
             .run(RejectCandidacyInput { id: candidacy.id })
-            .await
-            .and_then(|events| dispatcher::dispatch(ctx, events))?;
+            .and_then(
+                |RejectCandidacyPayload {
+                     candidacy,
+                     discussion,
+                     message,
+                 }| {
+                    dispatcher::dispatch(
+                        ctx,
+                        vec![CandidacyRejected {
+                            candidacy,
+                            discussion,
+                            message,
+                        }
+                        .into()],
+                    )
+                },
+            )?;
     }
 
     // Accept given candidacy.
@@ -201,13 +217,7 @@ fn promote_tenant(
         identity,
         warrants,
         discussion,
-    } = CreateTenant::new(
-        TenantId::new(),
-        account.clone(),
-        account_owner.clone(),
-        Some(candidate.clone()),
-    )
-    .create_tenant(CreateTenantInput {
+    } = CreateTenant::new(account, account_owner, Some(candidate)).run(CreateTenantInput {
         birthdate: candidacy.birthdate,
         birthplace: candidacy.birthplace.clone(),
         email: candidate.email.inner().to_string(),

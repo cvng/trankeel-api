@@ -11,8 +11,6 @@ use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
 use trankeel_core::dispatcher::Command;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::TenantCreated;
 use trankeel_data::Account;
 use trankeel_data::Discussion;
 use trankeel_data::Person;
@@ -46,32 +44,29 @@ pub struct CreateTenantPayload {
 }
 
 pub(crate) struct CreateTenant {
-    pub tenant_id: TenantId,
-    pub account: Account,
-    pub account_owner: Person,
-    pub identity: Option<Person>,
+    account: Account,
+    account_owner: Person,
+    identity: Option<Person>,
 }
 
 impl CreateTenant {
-    pub fn new(
-        tenant_id: TenantId,
-        account: Account,
-        account_owner: Person,
-        identity: Option<Person>,
-    ) -> Self {
+    pub fn new(account: &Account, account_owner: &Person, identity: Option<&Person>) -> Self {
         Self {
-            tenant_id,
-            account,
-            account_owner,
-            identity,
+            account: account.clone(),
+            account_owner: account_owner.clone(),
+            identity: identity.cloned(),
         }
     }
+}
 
-    pub fn create_tenant(self, input: CreateTenantInput) -> Result<CreateTenantPayload> {
+impl Command for CreateTenant {
+    type Input = CreateTenantInput;
+    type Payload = CreateTenantPayload;
+
+    fn run(self, input: CreateTenantInput) -> Result<CreateTenantPayload> {
         input.validate()?;
 
         let CreateTenant {
-            tenant_id,
             account,
             account_owner,
             identity,
@@ -97,7 +92,7 @@ impl CreateTenant {
 
         // Create tenant profile.
         let tenant = Tenant {
-            id: tenant_id,
+            id: TenantId::new(),
             created_at: Default::default(),
             updated_at: Default::default(),
             account_id: account.id,
@@ -156,26 +151,5 @@ impl CreateTenant {
             warrants,
             discussion,
         })
-    }
-}
-
-impl Command for CreateTenant {
-    type Input = CreateTenantInput;
-
-    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
-        let CreateTenantPayload {
-            tenant,
-            identity,
-            warrants,
-            discussion,
-        } = self.create_tenant(input)?;
-
-        Ok(vec![TenantCreated {
-            tenant,
-            identity,
-            discussion,
-            warrants,
-        }
-        .into()])
     }
 }

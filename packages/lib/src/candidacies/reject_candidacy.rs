@@ -4,15 +4,14 @@ use crate::messaging::PushMessageState;
 use crate::PushMessageInput;
 use crate::PushMessagePayload;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::AsyncCommand;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::CandidacyRejected;
+use trankeel_core::dispatcher::Command;
 use trankeel_core::templates::CandidacyRejectedMail;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
+use trankeel_data::Message;
 use trankeel_data::Person;
 use validator::Validate;
 
@@ -21,39 +20,57 @@ pub struct RejectCandidacyInput {
     pub id: CandidacyId,
 }
 
-pub(crate) struct RejectCandidacy<'a> {
-    candidacy: &'a Candidacy,
-    candidate: &'a Person,
-    account_owner: &'a Person,
-    discussion: &'a Discussion,
+pub struct RejectCandidacyPayload {
+    pub candidacy: Candidacy,
+    pub message: Message,
+    pub discussion: Discussion,
 }
 
-impl<'a> RejectCandidacy<'a> {
+pub(crate) struct RejectCandidacy {
+    candidacy: Candidacy,
+    candidate: Person,
+    account_owner: Person,
+    discussion: Discussion,
+}
+
+impl RejectCandidacy {
     pub fn new(
-        candidacy: &'a Candidacy,
-        candidate: &'a Person,
-        account_owner: &'a Person,
-        discussion: &'a Discussion,
+        candidacy: &Candidacy,
+        candidate: &Person,
+        account_owner: &Person,
+        discussion: &Discussion,
     ) -> Self {
         Self {
+            candidacy: candidacy.clone(),
+            candidate: candidate.clone(),
+            account_owner: account_owner.clone(),
+            discussion: discussion.clone(),
+        }
+    }
+}
+
+impl Command for RejectCandidacy {
+    type Input = RejectCandidacyInput;
+    type Payload = RejectCandidacyPayload;
+
+    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+        input.validate()?;
+
+        let Self {
             candidacy,
             candidate,
             account_owner,
             discussion,
-        }
-    }
-
-    pub fn reject_candidacy(&self, input: RejectCandidacyInput) -> Result<CandidacyRejected> {
-        input.validate()?;
+        } = self;
 
         let candidacy = Candidacy {
             status: CandidacyStatus::Rejected,
-            ..self.candidacy.clone()
+            ..candidacy
         };
 
         let discussion = Discussion {
             status: DiscussionStatus::default(),
-            ..self.discussion.clone()
+            ..discussion
         };
 
         let PushMessagePayload {
@@ -65,27 +82,15 @@ impl<'a> RejectCandidacy<'a> {
             },
             PushMessageInput {
                 discussion_id: discussion.id,
-                sender_id: self.account_owner.id,
-                message: CandidacyRejectedMail::try_new(self.candidate)?.to_string(),
+                sender_id: account_owner.id,
+                message: CandidacyRejectedMail::try_new(&candidate)?.to_string(),
             },
         )?;
 
-        Ok(CandidacyRejected {
+        Ok(RejectCandidacyPayload {
             candidacy,
             message,
             discussion,
         })
-    }
-}
-
-#[async_trait]
-impl<'a> AsyncCommand for RejectCandidacy<'a> {
-    type Input = RejectCandidacyInput;
-    type Payload = Vec<Event>;
-
-    async fn run(&self, input: Self::Input) -> Result<Self::Payload> {
-        let payload = self.reject_candidacy(input)?;
-
-        Ok(vec![Event::CandidacyRejected(payload)])
     }
 }
