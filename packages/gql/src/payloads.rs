@@ -1,6 +1,6 @@
 use crate::objects::Account;
 use crate::objects::Advertisement;
-use crate::objects::Error;
+use crate::objects::Candidacy;
 use crate::objects::File;
 use crate::objects::Lease;
 use crate::objects::Lender;
@@ -10,6 +10,9 @@ use crate::objects::Property;
 use crate::objects::Step;
 use crate::objects::Tenant;
 use trankeel::DiscussionId;
+use trankeel::LeaseId;
+use trankeel::PropertyId;
+use trankeel::TenantId;
 
 #[derive(SimpleObject)]
 pub struct CreateUserWithAccountPayload {
@@ -43,85 +46,49 @@ impl From<trankeel::Person> for SignupUserFromInvitePayload {
 
 #[derive(SimpleObject)]
 pub struct CompleteStepPayload {
-    errors: Option<Vec<Error>>,
-    step: Option<Step>,
+    step: Step,
 }
 
-impl From<trankeel::Result<trankeel::Step>> for CompleteStepPayload {
-    fn from(item: trankeel::Result<trankeel::Step>) -> Self {
-        match item {
-            Ok(res) => Self {
-                errors: None,
-                step: Some(res.into()),
-            },
-            Err(err) => Self {
-                errors: Some(vec![err.into()]),
-                step: None,
-            },
-        }
+impl From<trankeel::Step> for CompleteStepPayload {
+    fn from(item: trankeel::Step) -> Self {
+        Self { step: item.into() }
     }
 }
 
 #[derive(SimpleObject)]
 pub struct CreateNoticesPayload {
-    errors: Option<Vec<Error>>,
-    notices: Option<Vec<File>>,
+    notices: Vec<File>,
 }
 
-impl From<trankeel::Result<Vec<trankeel::Notice>>> for CreateNoticesPayload {
-    fn from(item: trankeel::Result<Vec<trankeel::Notice>>) -> Self {
-        match item {
-            Ok(res) => Self {
-                errors: None,
-                notices: Some(res.into_iter().map(Into::into).collect()),
-            },
-            Err(err) => Self {
-                errors: Some(vec![err.into()]),
-                notices: None,
-            },
+impl From<Vec<trankeel::Notice>> for CreateNoticesPayload {
+    fn from(item: Vec<trankeel::Notice>) -> Self {
+        Self {
+            notices: item.into_iter().map(Into::into).collect(),
         }
     }
 }
 
 #[derive(SimpleObject)]
 pub struct CreateReceiptsPayload {
-    errors: Option<Vec<Error>>,
-    receipts: Option<Vec<File>>,
+    receipts: Vec<File>,
 }
 
-impl From<trankeel::Result<Vec<trankeel::Receipt>>> for CreateReceiptsPayload {
-    fn from(item: trankeel::Result<Vec<trankeel::Receipt>>) -> Self {
-        match item {
-            Ok(res) => Self {
-                errors: None,
-                receipts: Some(res.into_iter().map(Into::into).collect()),
-            },
-            Err(err) => Self {
-                errors: Some(vec![err.into()]),
-                receipts: None,
-            },
+impl From<Vec<trankeel::Receipt>> for CreateReceiptsPayload {
+    fn from(item: Vec<trankeel::Receipt>) -> Self {
+        Self {
+            receipts: item.into_iter().map(Into::into).collect(),
         }
     }
 }
 
 #[derive(SimpleObject)]
 pub struct DeleteDiscussionPayload {
-    errors: Option<Vec<Error>>,
-    id: Option<DiscussionId>,
+    id: DiscussionId,
 }
 
-impl From<trankeel::Result<trankeel::DiscussionId>> for DeleteDiscussionPayload {
-    fn from(item: trankeel::Result<trankeel::DiscussionId>) -> Self {
-        match item {
-            Ok(res) => Self {
-                errors: None,
-                id: Some(res),
-            },
-            Err(err) => Self {
-                errors: Some(vec![err.into()]),
-                id: None,
-            },
-        }
+impl From<trankeel::DiscussionId> for DeleteDiscussionPayload {
+    fn from(item: trankeel::DiscussionId) -> Self {
+        Self { id: item }
     }
 }
 
@@ -222,6 +189,100 @@ pub struct CreateLeasePayload {
 }
 
 impl From<trankeel::Lease> for CreateLeasePayload {
+    fn from(item: trankeel::Lease) -> Self {
+        Self { lease: item.into() }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct DeleteTenantPayload {
+    id: TenantId,
+}
+
+impl From<trankeel::TenantId> for DeleteTenantPayload {
+    fn from(item: trankeel::TenantId) -> Self {
+        Self { id: item }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct DeletePropertyPayload {
+    id: PropertyId,
+}
+
+impl From<trankeel::PropertyId> for DeletePropertyPayload {
+    fn from(item: trankeel::PropertyId) -> Self {
+        Self { id: item }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct DeleteLeasePayload {
+    id: LeaseId,
+}
+
+impl From<trankeel::LeaseId> for DeleteLeasePayload {
+    fn from(item: trankeel::LeaseId) -> Self {
+        Self { id: item }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct CreateCandidacyPayload {
+    candidacy: Candidacy,
+}
+
+impl From<trankeel::Candidacy> for CreateCandidacyPayload {
+    fn from(item: trankeel::Candidacy) -> Self {
+        Self {
+            candidacy: item.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct AcceptCandidacyPayload {
+    candidacy: Candidacy,
+}
+
+impl From<trankeel::Candidacy> for AcceptCandidacyPayload {
+    fn from(item: trankeel::Candidacy) -> Self {
+        Self {
+            candidacy: item.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct UpdateIndividualLenderPayload {
+    lender: Lender,
+}
+
+impl From<trankeel::Lender> for UpdateIndividualLenderPayload {
+    fn from(item: trankeel::Lender) -> Self {
+        Self {
+            lender: item.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct CreateFurnishedLeasePayload {
+    lease: Lease,
+}
+
+impl From<trankeel::Lease> for CreateFurnishedLeasePayload {
+    fn from(item: trankeel::Lease) -> Self {
+        Self { lease: item.into() }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct UpdateFurnishedLeasePayload {
+    lease: Lease,
+}
+
+impl From<trankeel::Lease> for UpdateFurnishedLeasePayload {
     fn from(item: trankeel::Lease) -> Self {
         Self { lease: item.into() }
     }

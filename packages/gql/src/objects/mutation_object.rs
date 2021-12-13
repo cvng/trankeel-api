@@ -1,13 +1,8 @@
-use super::wip;
-use super::Account;
-use super::Candidacy;
-use super::File;
-use super::Lease;
-use super::Lender;
-use super::Payment;
-use super::Task;
+use crate::payloads::AcceptCandidacyPayload;
 use crate::payloads::CompleteStepPayload;
 use crate::payloads::CreateAdvertisementPayload;
+use crate::payloads::CreateCandidacyPayload;
+use crate::payloads::CreateFurnishedLeasePayload;
 use crate::payloads::CreateLeasePayload;
 use crate::payloads::CreateNoticesPayload;
 use crate::payloads::CreatePropertyPayload;
@@ -15,26 +10,27 @@ use crate::payloads::CreateReceiptsPayload;
 use crate::payloads::CreateTenantPayload;
 use crate::payloads::CreateUserWithAccountPayload;
 use crate::payloads::DeleteDiscussionPayload;
+use crate::payloads::DeleteLeasePayload;
+use crate::payloads::DeletePropertyPayload;
+use crate::payloads::DeleteTenantPayload;
 use crate::payloads::PushMessagePayload;
 use crate::payloads::SignupUserFromInvitePayload;
 use crate::payloads::UpdateAdvertisementPayload;
+use crate::payloads::UpdateFurnishedLeasePayload;
+use crate::payloads::UpdateIndividualLenderPayload;
 use crate::payloads::UpdatePropertyPayload;
 use crate::payloads::UpdateTenantPayload;
 use async_graphql::Context;
 use async_graphql::Result;
 use trankeel::AcceptCandidacyInput;
-use trankeel::ActivateAccountPlanInput;
 use trankeel::AuthId;
 use trankeel::Client;
 use trankeel::CompleteStepInput;
 use trankeel::CreateAdvertisementInput;
 use trankeel::CreateCandidacyInput;
-use trankeel::CreateFileInput;
 use trankeel::CreateFurnishedLeaseInput;
 use trankeel::CreateLeaseInput;
-use trankeel::CreateNakedLeaseInput;
 use trankeel::CreateNoticesInput;
-use trankeel::CreatePaymentInput;
 use trankeel::CreatePropertyInput;
 use trankeel::CreateReceiptsInput;
 use trankeel::CreateTenantInput;
@@ -43,25 +39,19 @@ use trankeel::DeleteDiscussionInput;
 use trankeel::DeleteLeaseInput;
 use trankeel::DeletePropertyInput;
 use trankeel::DeleteTenantInput;
-use trankeel::LeaseId;
-use trankeel::PaymentId;
-use trankeel::PropertyId;
 use trankeel::PushMessageInput;
 use trankeel::SignupUserFromInviteInput;
-use trankeel::TenantId;
-use trankeel::UpdateAccountInput;
 use trankeel::UpdateAdvertisementInput;
 use trankeel::UpdateFurnishedLeaseInput;
 use trankeel::UpdateIndividualLenderInput;
 use trankeel::UpdatePropertyInput;
 use trankeel::UpdateTenantInput;
-use trankeel::UploadImportInput;
 
 pub struct Mutation;
 
 #[async_graphql::Object]
 impl Mutation {
-    async fn user_create_with_account(
+    async fn create_user_with_account(
         &self,
         ctx: &Context<'_>,
         input: CreateUserWithAccountInput,
@@ -85,15 +75,7 @@ impl Mutation {
             .into())
     }
 
-    async fn account_update_payment_method(&self, _input: UpdateAccountInput) -> Result<Account> {
-        Err(wip())
-    }
-
-    async fn account_activate_plan(&self, _input: ActivateAccountPlanInput) -> Result<Account> {
-        Err(wip())
-    }
-
-    async fn tenant_create(
+    async fn create_tenant(
         &self,
         ctx: &Context<'_>,
         input: CreateTenantInput,
@@ -105,7 +87,7 @@ impl Mutation {
             .into())
     }
 
-    async fn tenant_update(
+    async fn update_tenant(
         &self,
         ctx: &Context<'_>,
         input: UpdateTenantInput,
@@ -117,14 +99,18 @@ impl Mutation {
             .into())
     }
 
-    async fn tenant_delete(&self, ctx: &Context<'_>, id: TenantId) -> Result<TenantId> {
-        let input = DeleteTenantInput { id };
+    async fn delete_tenant(
+        &self,
+        ctx: &Context<'_>,
+        input: DeleteTenantInput,
+    ) -> Result<DeleteTenantPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_tenant(ctx.data::<AuthId>()?, input)?)
+            .delete_tenant(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
-    async fn property_create(
+    async fn create_property(
         &self,
         ctx: &Context<'_>,
         input: CreatePropertyInput,
@@ -136,7 +122,7 @@ impl Mutation {
             .into())
     }
 
-    async fn property_update(
+    async fn update_property(
         &self,
         ctx: &Context<'_>,
         input: UpdatePropertyInput,
@@ -147,11 +133,15 @@ impl Mutation {
             .into())
     }
 
-    async fn property_delete(&self, ctx: &Context<'_>, id: PropertyId) -> Result<PropertyId> {
-        let input = DeletePropertyInput { id };
+    async fn delete_property(
+        &self,
+        ctx: &Context<'_>,
+        input: DeletePropertyInput,
+    ) -> Result<DeletePropertyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_property(ctx.data::<AuthId>()?, input)?)
+            .delete_property(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
     async fn create_advertisement(
@@ -176,7 +166,7 @@ impl Mutation {
             .into())
     }
 
-    async fn lease_add_existing(
+    async fn create_lease(
         &self,
         ctx: &Context<'_>,
         input: CreateLeaseInput,
@@ -188,59 +178,55 @@ impl Mutation {
             .into())
     }
 
-    async fn lease_furnished_create(
+    async fn create_furnished_lease(
         &self,
         ctx: &Context<'_>,
         input: CreateFurnishedLeaseInput,
-    ) -> Result<Lease> {
+    ) -> Result<CreateFurnishedLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_furnished_lease(ctx.data::<AuthId>()?, input)?
             .into())
     }
 
-    async fn lease_furnished_update(
+    async fn update_furnished_lease(
         &self,
         ctx: &Context<'_>,
         input: UpdateFurnishedLeaseInput,
-    ) -> Result<Lease> {
+    ) -> Result<UpdateFurnishedLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .update_furnished_lease(ctx.data::<AuthId>()?, input)?
             .into())
     }
 
-    async fn lease_naked_create(
+    async fn delete_lease(
         &self,
-        _ctx: &Context<'_>,
-        _input: CreateNakedLeaseInput,
-    ) -> Result<Lease> {
-        Err(wip())
-    }
-
-    async fn lease_delete(&self, ctx: &Context<'_>, id: LeaseId) -> Result<LeaseId> {
-        let input = DeleteLeaseInput { id };
+        ctx: &Context<'_>,
+        input: DeleteLeaseInput,
+    ) -> Result<DeleteLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_lease(ctx.data::<AuthId>()?, input)?)
+            .delete_lease(ctx.data::<AuthId>()?, input)?
+            .into())
     }
 
-    async fn lender_individual_update(
+    async fn update_individual_lender(
         &self,
         ctx: &Context<'_>,
         input: UpdateIndividualLenderInput,
-    ) -> Result<Lender> {
+    ) -> Result<UpdateIndividualLenderPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .update_individual_lender(ctx.data::<AuthId>()?, input)?
             .into())
     }
 
-    async fn candidacy_create(
+    async fn create_candidacy(
         &self,
         ctx: &Context<'_>,
         input: CreateCandidacyInput,
-    ) -> Result<Candidacy> {
+    ) -> Result<CreateCandidacyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_candidacy(input)
@@ -248,32 +234,16 @@ impl Mutation {
             .into())
     }
 
-    async fn candidacy_accept(
+    async fn accept_candidacy(
         &self,
         ctx: &Context<'_>,
         input: AcceptCandidacyInput,
-    ) -> Result<Candidacy> {
+    ) -> Result<AcceptCandidacyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
             .accept_candidacy(ctx.data::<AuthId>()?, input)
             .await?
             .into())
-    }
-
-    async fn transaction_create(&self, _input: CreatePaymentInput) -> Result<Payment> {
-        Err(wip())
-    }
-
-    async fn transaction_delete(&self, _id: PaymentId) -> Result<PaymentId> {
-        Err(wip())
-    }
-
-    async fn file_upload(&self, _input: CreateFileInput) -> Result<File> {
-        Err(wip())
-    }
-
-    async fn import_upload(&self, _input: UploadImportInput) -> Result<Task> {
-        Err(wip())
     }
 
     async fn create_receipts(
@@ -284,7 +254,7 @@ impl Mutation {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_receipts(ctx.data::<AuthId>()?, input)
-            .await
+            .await?
             .into())
     }
 
@@ -296,7 +266,7 @@ impl Mutation {
         Ok(ctx
             .data_unchecked::<Client>()
             .create_notices(ctx.data::<AuthId>()?, input)
-            .await
+            .await?
             .into())
     }
 
@@ -319,7 +289,7 @@ impl Mutation {
     ) -> Result<DeleteDiscussionPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_discussion(ctx.data::<AuthId>()?, input)
+            .delete_discussion(ctx.data::<AuthId>()?, input)?
             .into())
     }
 
@@ -328,6 +298,6 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CompleteStepInput,
     ) -> Result<CompleteStepPayload> {
-        Ok(ctx.data_unchecked::<Client>().complete_step(input).into())
+        Ok(ctx.data_unchecked::<Client>().complete_step(input)?.into())
     }
 }

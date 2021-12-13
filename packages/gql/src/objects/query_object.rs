@@ -1,15 +1,10 @@
-use super::wip;
 use super::Advertisement;
 use super::Candidacy;
 use super::Discussion;
 use super::Event;
-use super::File;
-use super::Invoice;
 use super::Lease;
 use super::Lender;
-use super::Payment;
 use super::Person;
-use super::Plan;
 use super::Property;
 use super::Rent;
 use super::Tenant;
@@ -23,7 +18,6 @@ use trankeel::DateTime;
 use trankeel::DiscussionId;
 use trankeel::LeaseId;
 use trankeel::LenderId;
-use trankeel::PaymentId;
 use trankeel::PropertyId;
 use trankeel::Summary;
 use trankeel::TenantId;
@@ -227,25 +221,5 @@ impl Query {
                 .map(Into::into)
                 .collect())
         }
-    }
-
-    async fn transactions(
-        &self,
-        _ctx: &Context<'_>,
-        _id: Option<PaymentId>,
-    ) -> Result<Vec<Payment>> {
-        Err(wip())
-    }
-
-    async fn invoices(&self, _ctx: &Context<'_>) -> Result<Vec<Invoice>> {
-        Err(wip())
-    }
-
-    async fn plans(&self, _ctx: &Context<'_>) -> Result<Vec<Plan>> {
-        Err(wip())
-    }
-
-    async fn files(&self, _ctx: &Context<'_>) -> Result<Vec<File>> {
-        Err(wip())
     }
 }
