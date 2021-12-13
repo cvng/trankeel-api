@@ -4,6 +4,8 @@ use crate::Date;
 use crate::Tenant;
 use async_graphql::InputObject;
 use trankeel_core::dispatcher::Command;
+use trankeel_core::dispatcher::Event;
+use trankeel_core::handlers::TenantUpdated;
 use trankeel_data::PhoneNumber;
 use trankeel_data::TenantId;
 use validator::Validate;
@@ -23,10 +25,6 @@ pub struct UpdateTenantInput {
     pub warrants: Option<Vec<CreateWarrantInput>>, // TODO
 }
 
-pub struct UpdateTenantPayload {
-    pub tenant: Tenant,
-}
-
 pub(crate) struct UpdateTenant {
     tenant: Tenant,
 }
@@ -41,7 +39,7 @@ impl UpdateTenant {
 
 impl Command for UpdateTenant {
     type Input = UpdateTenantInput;
-    type Payload = UpdateTenantPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -61,6 +59,6 @@ impl Command for UpdateTenant {
             ..tenant
         };
 
-        Ok(Self::Payload { tenant })
+        Ok(vec![TenantUpdated { tenant }.into()])
     }
 }

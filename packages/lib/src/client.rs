@@ -59,7 +59,6 @@ use crate::tenants::DeleteTenant;
 use crate::tenants::DeleteTenantInput;
 use crate::tenants::UpdateTenant;
 use crate::tenants::UpdateTenantInput;
-use crate::tenants::UpdateTenantPayload;
 use crate::workflows::CompleteStep;
 use crate::workflows::CompleteStepInput;
 use crate::workflows::CompleteStepPayload;
@@ -142,6 +141,10 @@ impl<'a> Client {
         Self(context::Context::new(
             pg, pdfmonkey, sendinblue, messagerie, stripe,
         ))
+    }
+
+    pub fn db(&self) -> &Pg {
+        self.0.db()
     }
 
     // Stores
@@ -381,19 +384,11 @@ impl<'a> Client {
         _auth_id: &AuthId,
         input: UpdateTenantInput,
     ) -> Result<Tenant> {
-        let tenant = self.0.db().tenants().by_id(&input.id)?;
+        let tenant = Client::db(self).tenants().by_id(&input.id)?;
 
-        let UpdateTenantPayload { tenant } = UpdateTenant::new(&tenant).run(input)?;
+        dispatcher::dispatch(&self.0, UpdateTenant::new(&tenant).run(input)?)?;
 
-        dispatcher::dispatch(
-            &self.0,
-            vec![TenantUpdated {
-                tenant: tenant.clone(),
-            }
-            .into()],
-        )?;
-
-        Ok(tenant)
+        Client::db(self).tenants().by_id(&tenant.id)
     }
 
     pub fn delete_tenant(&self, _auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
