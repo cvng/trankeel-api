@@ -1,6 +1,9 @@
 input AcceptCandidacyInput {
 	id: ID!
 }
+type AcceptCandidacyPayload {
+	candidacy: Candidacy!
+}
 type Account {
 	id: ID!
 	createdAt: DateTime
@@ -11,11 +14,6 @@ type Account {
 	stripeSubscriptionId: String
 	trialEnd: DateTime
 	plan: Plan
-}
-input ActivateAccountPlanInput {
-	id: ID!
-	name: String!
-	planCode: PlanCode!
 }
 type Address {
 	city: String!
@@ -90,8 +88,7 @@ input CompleteStepInput {
 	requirements: [CompleteStepRequirementInput!]
 }
 type CompleteStepPayload {
-	errors: [Error!]
-	step: Step
+	step: Step!
 }
 input CompleteStepRequirementInput {
 	name: String!
@@ -127,6 +124,9 @@ input CreateCandidacyInput {
 	files: [CreateFileInput!]
 	warrants: [CreateWarrantInput!]
 }
+type CreateCandidacyPayload {
+	candidacy: Candidacy!
+}
 input CreateFileInput {
 	downloadUrl: URL!
 	type: FileType!
@@ -142,6 +142,9 @@ input CreateFurnishedLeaseInput {
 	rentChargesAmount: Decimal
 	signatureDate: DateTime
 	tenantIds: [ID!]!
+}
+type CreateFurnishedLeasePayload {
+	lease: Lease!
 }
 input CreateIndividualWarrantInput {
 	email: String!
@@ -161,23 +164,12 @@ input CreateLeaseInput {
 type CreateLeasePayload {
 	lease: Lease!
 }
-input CreateNakedLeaseInput {
-	details: NakedLeaseDetailsInput
-}
 input CreateNoticesInput {
 	rentIds: [ID!]!
 	date: DateTime
 }
 type CreateNoticesPayload {
-	errors: [Error!]
-	notices: [File!]
-}
-input CreatePaymentInput {
-	rentId: ID!
-	amount: Decimal!
-	date: DateTime!
-	type: TransactionType!
-	label: String
+	notices: [File!]!
 }
 input CreateProfessionalWarrantInput {
 	name: String!
@@ -216,8 +208,7 @@ input CreateReceiptsInput {
 	sendMail: Boolean
 }
 type CreateReceiptsPayload {
-	errors: [Error!]
-	receipts: [File!]
+	receipts: [File!]!
 }
 input CreateTenantInput {
 	birthdate: Date
@@ -260,8 +251,25 @@ input DeleteDiscussionInput {
 	id: ID!
 }
 type DeleteDiscussionPayload {
-	errors: [Error!]
-	id: ID
+	id: ID!
+}
+input DeleteLeaseInput {
+	id: ID!
+}
+type DeleteLeasePayload {
+	id: ID!
+}
+input DeletePropertyInput {
+	id: ID!
+}
+type DeletePropertyPayload {
+	id: ID!
+}
+input DeleteTenantInput {
+	id: ID!
+}
+type DeleteTenantPayload {
+	id: ID!
 }
 type Discussion {
 	id: ID!
@@ -281,9 +289,6 @@ enum DiscussionStatus {
 	CANDIDACY
 }
 scalar Email
-type Error {
-	message: String!
-}
 type Event {
 	id: ID!
 	createdAt: DateTime
@@ -375,19 +380,7 @@ input FurnishedLeaseDetailsInput {
 	worksRentDecreaseTenant: String
 	worksRentIncreaseLender: String
 }
-enum ImportSource {
-	RENTILA
-}
 scalar InviteToken
-type Invoice {
-	id: ID!
-	number: Int!
-	amountPaid: Decimal!
-	invoicePdf: String!
-	periodEnd: DateTime!
-	status: String!
-	planCode: PlanCode!
-}
 type Lease {
 	id: ID!
 	createdAt: DateTime
@@ -456,10 +449,6 @@ enum LeaseFurnishedDuration {
 	NINE_MONTHS
 	ONE_YEAR
 }
-enum LeaseNakedDuration {
-	THREE_YEARS
-	SIX_YEARS
-}
 enum LeaseRentPeriodicity {
 	ANNUALY
 	MONTHLY
@@ -521,38 +510,28 @@ type Message {
 	event: Event
 }
 type Mutation {
-	userCreateWithAccount(input: CreateUserWithAccountInput!): CreateUserWithAccountPayload!
+	createUserWithAccount(input: CreateUserWithAccountInput!): CreateUserWithAccountPayload!
 	signupUserFromInvite(input: SignupUserFromInviteInput!): SignupUserFromInvitePayload!
-	accountUpdatePaymentMethod(input: UpdateAccountInput!): Account!
-	accountActivatePlan(input: ActivateAccountPlanInput!): Account!
-	tenantCreate(input: CreateTenantInput!): CreateTenantPayload!
-	tenantUpdate(input: UpdateTenantInput!): UpdateTenantPayload!
-	tenantDelete(id: ID!): ID!
-	propertyCreate(input: CreatePropertyInput!): CreatePropertyPayload!
-	propertyUpdate(input: UpdatePropertyInput!): UpdatePropertyPayload!
-	propertyDelete(id: ID!): ID!
+	createTenant(input: CreateTenantInput!): CreateTenantPayload!
+	updateTenant(input: UpdateTenantInput!): UpdateTenantPayload!
+	deleteTenant(input: DeleteTenantInput!): DeleteTenantPayload!
+	createProperty(input: CreatePropertyInput!): CreatePropertyPayload!
+	updateProperty(input: UpdatePropertyInput!): UpdatePropertyPayload!
+	deleteProperty(input: DeletePropertyInput!): DeletePropertyPayload!
 	createAdvertisement(input: CreateAdvertisementInput!): CreateAdvertisementPayload!
 	updateAdvertisement(input: UpdateAdvertisementInput!): UpdateAdvertisementPayload!
-	leaseAddExisting(input: CreateLeaseInput!): CreateLeasePayload!
-	leaseFurnishedCreate(input: CreateFurnishedLeaseInput!): Lease!
-	leaseFurnishedUpdate(input: UpdateFurnishedLeaseInput!): Lease!
-	leaseNakedCreate(input: CreateNakedLeaseInput!): Lease!
-	leaseDelete(id: ID!): ID!
-	lenderIndividualUpdate(input: UpdateIndividualLenderInput!): Lender!
-	candidacyCreate(input: CreateCandidacyInput!): Candidacy!
-	candidacyAccept(input: AcceptCandidacyInput!): Candidacy!
-	transactionCreate(input: CreatePaymentInput!): Transaction!
-	transactionDelete(id: ID!): ID!
-	fileUpload(input: CreateFileInput!): File!
-	importUpload(input: UploadImportInput!): Task!
+	createLease(input: CreateLeaseInput!): CreateLeasePayload!
+	createFurnishedLease(input: CreateFurnishedLeaseInput!): CreateFurnishedLeasePayload!
+	updateFurnishedLease(input: UpdateFurnishedLeaseInput!): UpdateFurnishedLeasePayload!
+	deleteLease(input: DeleteLeaseInput!): DeleteLeasePayload!
+	updateIndividualLender(input: UpdateIndividualLenderInput!): UpdateIndividualLenderPayload!
+	createCandidacy(input: CreateCandidacyInput!): CreateCandidacyPayload!
+	acceptCandidacy(input: AcceptCandidacyInput!): AcceptCandidacyPayload!
 	createReceipts(input: CreateReceiptsInput!): CreateReceiptsPayload!
 	createNotices(input: CreateNoticesInput!): CreateNoticesPayload!
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
-}
-input NakedLeaseDetailsInput {
-	duration: LeaseNakedDuration
 }
 type Person implements LegalIdentityInterface & PersonInterface {
 	id: ID!
@@ -701,10 +680,6 @@ type Query {
 	summary(since: DateTime!, until: DateTime!): Summary!
 	events: [Event!]!
 	discussions(id: ID): [Discussion!]!
-	transactions(id: ID): [Transaction!]!
-	invoices: [Invoice!]!
-	plans: [Plan!]!
-	files: [File!]!
 }
 type Rent {
 	id: ID!
@@ -805,11 +780,6 @@ type Summary {
 	paymentRate: Float!
 	occupationRate: Float!
 }
-type Task {
-	id: ID!
-	status: String!
-	progress: Int!
-}
 type Tenant implements PersonInterface {
 	id: ID!
 	createdAt: DateTime
@@ -862,10 +832,6 @@ enum TransactionType {
 	RENT
 }
 scalar URL
-input UpdateAccountInput {
-	id: ID!
-	paymentMethodId: String!
-}
 input UpdateAdvertisementInput {
 	id: ID!
 	published: Boolean
@@ -887,9 +853,15 @@ input UpdateFurnishedLeaseInput {
 	file: CreateFileInput
 	id: ID!
 }
+type UpdateFurnishedLeasePayload {
+	lease: Lease!
+}
 input UpdateIndividualLenderInput {
 	id: ID!
 	individual: UpdatePersonInput!
+}
+type UpdateIndividualLenderPayload {
+	lender: Lender!
 }
 input UpdatePersonInput {
 	address: AddressInput
@@ -936,10 +908,6 @@ input UpdateTenantInput {
 }
 type UpdateTenantPayload {
 	tenant: Tenant!
-}
-input UploadImportInput {
-	files: [CreateFileInput!]!
-	source: ImportSource!
 }
 enum UserRole {
 	ADMIN

@@ -53,7 +53,3 @@ pub use task_object::*;
 pub use tenant_object::*;
 pub use warrant_object::*;
 pub use workflow_object::*;
-
-fn wip() -> async_graphql::Error {
-    async_graphql::Error::new("wip!()")
-}
