@@ -143,10 +143,6 @@ impl<'a> Client {
         ))
     }
 
-    pub fn db(&self) -> &Pg {
-        self.0.db()
-    }
-
     // Stores
 
     pub fn accounts(&self) -> Box<dyn AccountStore + '_> {
@@ -384,11 +380,11 @@ impl<'a> Client {
         _auth_id: &AuthId,
         input: UpdateTenantInput,
     ) -> Result<Tenant> {
-        let tenant = Client::db(self).tenants().by_id(&input.id)?;
+        let tenant = self.0.db().tenants().by_id(&input.id)?;
 
         dispatcher::dispatch(&self.0, UpdateTenant::new(&tenant).run(input)?)?;
 
-        Client::db(self).tenants().by_id(&tenant.id)
+        self.0.db().tenants().by_id(&tenant.id)
     }
 
     pub fn delete_tenant(&self, _auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
