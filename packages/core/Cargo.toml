@@ -9,6 +9,7 @@ edition = "2021"
 doctest = false
 
 [dependencies]
+async-recursion = "0.3.2"
 async-stripe = { version = "0.13.0-rc3", default-features = false, features = ["runtime-tokio-hyper", "billing"] }
 async-trait = "0.1.52"
 chrono = { version = "0.4.19", features = ["serde"] }

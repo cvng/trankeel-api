@@ -9,6 +9,7 @@ use diesel::result::Error::NotFound;
 use trankeel_data::locale;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
+use trankeel_data::EventType;
 use trankeel_data::Eventable;
 use trankeel_data::Lease;
 use trankeel_data::Name;
@@ -16,9 +17,22 @@ use trankeel_data::Person;
 use trankeel_data::Step;
 use trankeel_data::StepEvent;
 
-pub fn step_completed(ctx: &Context, event: &Event, step: &Step) -> Result<()> {
+#[derive(Clone)]
+pub struct StepCompleted {
+    pub step: Step,
+}
+
+impl From<StepCompleted> for Event {
+    fn from(item: StepCompleted) -> Self {
+        Self::StepCompleted(item)
+    }
+}
+
+pub fn step_completed(ctx: &Context, event: StepCompleted) -> Result<()> {
     let db = ctx.db();
     let messenger = ctx.messenger();
+
+    let StepCompleted { step } = event;
 
     let account = db.accounts().by_step_id(&step.id)?;
     let participant = db.persons().by_step_id(&step.id)?;
@@ -68,16 +82,17 @@ pub fn step_completed(ctx: &Context, event: &Event, step: &Step) -> Result<()> {
                     ..discussion
                 })?;
             }
+            _ => (),
         }
     }
 
     let tenant = db.tenants().by_person_id(&participant.id)?;
     let lease = db.leases().by_tenant_id(&tenant.id)?; // TODO: match workflowable
-    let message = render_step_message(step.clone(), participant.clone(), lease)?;
+    let message = render_step_message(step, participant.clone(), lease)?;
 
     messenger.message(
         db,
-        event.clone().into(),
+        EventType::StepCompleted,
         eventable.id(),
         account.id,
         sender.id,

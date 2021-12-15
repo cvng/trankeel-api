@@ -3,6 +3,7 @@ use crate::DateTime;
 use crate::ExternalId;
 use crate::Id;
 use crate::Lease;
+use crate::LeaseFileId;
 use crate::Rent;
 use crate::Url;
 
@@ -46,6 +47,24 @@ pub struct File {
 }
 
 // # Impls
+
+impl File {
+    pub fn lease_document(lease: &Lease) -> Self {
+        let id = LeaseFileId::new();
+
+        Self {
+            id,
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            download_url: None,
+            external_id: None,
+            filename: Some(lease_filename(&id, lease)),
+            preview_url: None,
+            status: Some(FileStatus::Pending),
+            type_: FileType::LeaseDocument,
+        }
+    }
+}
 
 impl Default for FileStatus {
     fn default() -> Self {

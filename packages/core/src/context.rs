@@ -4,6 +4,7 @@ use crate::providers::Pg;
 use crate::providers::Sendinblue;
 use crate::providers::Stripe;
 
+#[derive(Clone)]
 pub struct Context {
     db: Pg,
     pdfmaker: Pdfmonkey,

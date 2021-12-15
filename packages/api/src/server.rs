@@ -15,10 +15,11 @@ pub fn server() -> Result<Rocket<Build>> {
 
     let schema = trankeel_graphql::build_schema()
         .extension(ApolloTracing)
-        .data(client)
+        .data(client.clone())
         .finish();
 
     let server = rocket::build()
+        .manage(client)
         .manage(schema)
         .mount(
             "/",

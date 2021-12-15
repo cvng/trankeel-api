@@ -102,6 +102,7 @@ use trankeel_data::WorkflowableId;
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 
+#[derive(Clone)]
 pub struct Pg(PgPool);
 
 impl Pg {
@@ -1243,6 +1244,9 @@ impl database::WorkflowableStore for WorkflowableStore<'_> {
         match &data {
             Workflowable::Candidacy(candidacy) => insert_into(workflowables::table)
                 .values(workflowables::candidacy_id.eq(candidacy.id))
+                .on_conflict(workflowables::id)
+                .do_update()
+                .set(workflowables::candidacy_id.eq(candidacy.id))
                 .execute(&self.0.get()?)?,
         };
         Ok(data.clone())

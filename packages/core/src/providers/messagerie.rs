@@ -9,6 +9,7 @@ use trankeel_data::Message;
 use trankeel_data::MessageId;
 use trankeel_data::PersonId;
 
+#[derive(Clone)]
 pub struct Messagerie;
 
 impl Messagerie {

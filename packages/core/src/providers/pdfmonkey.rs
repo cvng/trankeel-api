@@ -10,6 +10,7 @@ use crate::pdfmaker::Pdfmaker;
 use async_trait::async_trait;
 use trankeel_data::Document;
 
+#[derive(Clone)]
 pub struct Pdfmonkey(pdfmonkey::Pdfmonkey);
 
 impl Pdfmonkey {

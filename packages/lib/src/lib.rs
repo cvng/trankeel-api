@@ -56,5 +56,6 @@ pub use crate::warrants::CreateProfessionalWarrantInput;
 pub use crate::warrants::CreateWarrantInput;
 pub use crate::workflows::CompleteStepInput;
 
+pub use trankeel_core::handlers;
 pub use trankeel_core::templates;
 pub use trankeel_data::*;

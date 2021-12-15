@@ -1,10 +1,12 @@
-use super::candidacy_accepted::candidacy_accepted;
 use crate::context::Context;
 use crate::database::Db;
 use crate::dispatcher::Event;
 use crate::error::Result;
+use crate::messenger::Messenger;
 use trankeel_data::Candidacy;
 use trankeel_data::Discussion;
+use trankeel_data::EventType;
+use trankeel_data::Eventable;
 use trankeel_data::Message;
 
 #[derive(Clone)]
@@ -22,14 +24,32 @@ impl From<CandidacyRejected> for Event {
 
 pub fn candidacy_rejected(ctx: &Context, event: CandidacyRejected) -> Result<()> {
     let db = ctx.db();
+    let messenger = ctx.messenger();
 
-    db.candidacies().update(&event.candidacy)?;
-    db.discussions().update(&event.discussion)?;
-    db.messages().create(&event.message)?;
+    let CandidacyRejected {
+        candidacy,
+        discussion,
+        message,
+    } = event;
 
-    candidacy_accepted(
-        ctx,
-        &Event::CandidacyRejected(event.clone()),
-        &event.candidacy,
-    )
+    db.candidacies().update(&candidacy)?;
+    db.discussions().update(&discussion)?;
+    db.messages().create(&message)?;
+
+    let account = db.accounts().by_candidacy_id(&candidacy.id)?;
+    let participant = db.persons().by_candidacy_id(&candidacy.id)?;
+    let sender = db.persons().by_account_id_first(&account.id)?;
+    let eventable = Eventable::Candidacy(candidacy);
+
+    messenger.message(
+        db,
+        EventType::CandidacyRejected,
+        eventable.id(),
+        account.id,
+        sender.id,
+        participant.id,
+        None,
+    )?;
+
+    Ok(())
 }

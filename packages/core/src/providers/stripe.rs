@@ -8,6 +8,7 @@ use trankeel_data::Subscription;
 
 // # Provider
 
+#[derive(Clone)]
 pub struct Stripe(stripe::Client);
 
 impl Stripe {

@@ -24,6 +24,7 @@ impl std::fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
+#[derive(Clone)]
 pub struct Pdfmonkey {
     pub(crate) config: Configuration,
 }
