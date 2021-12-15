@@ -6,7 +6,6 @@ use crate::auth::SignupUserFromInviteInput;
 use crate::auth::SignupUserFromInvitePayload;
 use crate::candidacies::AcceptCandidacy;
 use crate::candidacies::AcceptCandidacyInput;
-use crate::candidacies::AcceptCandidacyPayload;
 use crate::candidacies::CreateCandidacy;
 use crate::candidacies::CreateCandidacyInput;
 use crate::candidacies::CreateCandidacyPayload;
@@ -93,11 +92,13 @@ use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
 use trankeel_core::handlers::AdvertisementCreated;
 use trankeel_core::handlers::AdvertisementUpdated;
+use trankeel_core::handlers::CandidacyAccepted;
 use trankeel_core::handlers::LeaseAffected;
 use trankeel_core::handlers::LeaseCreated;
 use trankeel_core::handlers::PropertyCreated;
 use trankeel_core::handlers::PropertyUpdated;
 use trankeel_core::handlers::ReceiptSent;
+use trankeel_core::handlers::StepCompleted;
 use trankeel_core::handlers::TenantCreated;
 use trankeel_core::handlers::TenantUpdated;
 use trankeel_core::mailer::IntoMail;
@@ -129,6 +130,7 @@ use trankeel_data::Step;
 use trankeel_data::Tenant;
 use trankeel_data::TenantId;
 
+#[derive(Clone)]
 pub struct Client(context::Context);
 
 impl<'a> Client {
@@ -341,10 +343,68 @@ impl<'a> Client {
         auth_id: &AuthId,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        let AcceptCandidacyPayload { candidacy } =
-            AcceptCandidacy::new(&self.0, auth_id).run(input).await?;
+        let account = self.accounts().by_auth_id(auth_id)?;
+        let account_owner = self.persons().by_auth_id(auth_id)?;
+        let advertisement = self.advertisements().by_candidacy_id(&input.id)?;
+        let candidacy = self.candidacies().by_id(&input.id)?;
+        let candidacy_warrants = self.warrants().by_candidacy_id(&candidacy.id)?;
+        let candidate = self.persons().by_candidacy_id(&candidacy.id)?;
+        let discussion = self.discussions().by_candidacy_id(&candidacy.id)?;
+        let other_candidacies = self
+            .candidacies()
+            .by_advertisement_id(&advertisement.id)?
+            .into_iter()
+            .filter(|candidacy| candidacy.id != input.id);
+        let other_candidacies = other_candidacies
+            .clone()
+            .map(|candidacy| self.discussions().by_candidacy_id(&candidacy.id))
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .zip(other_candidacies);
+        let other_candidacies = other_candidacies
+            .clone()
+            .map(|(_, candidacy)| self.persons().by_candidacy_id(&candidacy.id))
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .zip(other_candidacies)
+            .map(|(person, (discussion, candidacy))| (candidacy, person, discussion))
+            .collect::<Vec<_>>();
 
-        Ok(candidacy)
+        dispatcher::dispatch_async(
+            &self.0,
+            vec![AcceptCandidacy::new(
+                &candidacy,
+                &account,
+                &account_owner,
+                &advertisement,
+                &candidacy_warrants,
+                &candidate,
+                &discussion,
+                &other_candidacies,
+            )
+            .run(input)
+            .map(|payload| {
+                Event::CandidacyAccepted(CandidacyAccepted {
+                    candidacy: payload.candidacy,
+                    rejected_candidacies: payload.rejected_candidacies,
+                    tenant: payload.tenant,
+                    identity: payload.identity,
+                    warrants: payload.warrants,
+                    discussion: payload.discussion,
+                    lease: payload.lease,
+                    rents: payload.rents,
+                    lease_file: payload.lease_file,
+                    workflow: payload.workflow,
+                    workflowable: payload.workflowable,
+                    steps: payload.steps,
+                    candidacy_accepted_step: payload.candidacy_accepted_step,
+                    invite: payload.invite,
+                })
+            })?],
+        )
+        .await?;
+
+        self.candidacies().by_id(&candidacy.id)
     }
 
     pub async fn create_tenant(
@@ -709,13 +769,19 @@ impl<'a> Client {
 
         let CompleteStepPayload { step } = CompleteStep::new(&step).run(input)?;
 
-        dispatcher::dispatch(&self.0, vec![Event::StepCompleted(step.clone())])?;
+        dispatcher::dispatch(&self.0, vec![StepCompleted { step: step.clone() }.into()])?;
 
         Ok(step)
     }
 
     pub async fn batch_mails(&self, mails: Vec<impl IntoMail>) -> Result<Vec<Mail>> {
         self.0.mailer().batch(mails).await
+    }
+
+    // Expose internal dispatcher
+
+    pub async fn dispatch(&self, events: Vec<Event>) -> Result<()> {
+        dispatcher::dispatch_async(&self.0, events).await
     }
 }
 
