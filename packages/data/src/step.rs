@@ -7,7 +7,9 @@ use crate::WorkflowId;
 
 pub type StepId = Id;
 
+#[derive(PartialEq)]
 pub enum StepEvent {
+    CandidacyAccepted,
     LeaseSigned,
     LeaseConfirmed,
     LeaseActivated,
@@ -16,6 +18,7 @@ pub enum StepEvent {
 impl From<String> for StepEvent {
     fn from(item: String) -> Self {
         match item.as_str() {
+            "candidacy_accepted" => Self::CandidacyAccepted,
             "lease_signed" => Self::LeaseSigned,
             "lease_confirmed" => Self::LeaseConfirmed,
             "lease_activated" => Self::LeaseActivated,
@@ -38,4 +41,10 @@ pub struct Step {
     pub confirmation: Option<String>,
     pub requirements: Option<RequirementOuter>,
     pub event: Option<String>,
+}
+
+impl Step {
+    pub fn as_event(&self) -> Option<StepEvent> {
+        self.event.clone().map(Into::into)
+    }
 }
