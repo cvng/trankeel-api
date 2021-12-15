@@ -1,6 +1,6 @@
 [[steps]]
 label = "Acceptation de la candidature"
-event = ""
+event = "candidacy_accepted"
 confirmation = """
 Bonjour {{ tenant_name }},
 Votre candidature a été retenue, vous allez recevoir un mail pour créer votre espace membre sur trankeel.com et un deuxième mail pour procéder à la signature électronique du bail.
