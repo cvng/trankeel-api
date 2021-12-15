@@ -13,6 +13,7 @@ const DEFAULT_SENDER_NAME: &str = "Trankeel";
 
 const DEFAULT_SENDER_EMAIL: &str = "support@trankeel.com";
 
+#[derive(Clone)]
 pub struct Sendinblue(sendinblue::Sendinblue);
 
 impl Sendinblue {
