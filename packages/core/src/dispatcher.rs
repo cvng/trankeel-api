@@ -6,7 +6,6 @@ use trankeel_data::Candidacy;
 use trankeel_data::EventType;
 use trankeel_data::File;
 use trankeel_data::Payment;
-use trankeel_data::Step;
 
 pub trait Command {
     type Input;
@@ -20,9 +19,10 @@ pub trait Command {
 pub enum Event {
     AdvertisementCreated(AdvertisementCreated),
     AdvertisementUpdated(AdvertisementUpdated),
-    CandidacyAccepted(Candidacy),
+    CandidacyAccepted(CandidacyAccepted),
     CandidacyCreated(Candidacy),
     CandidacyRejected(CandidacyRejected),
+    DocumentGenerated(DocumentGenerated),
     LeaseAffected(LeaseAffected),
     LeaseCreated(LeaseCreated),
     NoticeCreated(File),
@@ -31,7 +31,7 @@ pub enum Event {
     PropertyUpdated(PropertyUpdated),
     ReceiptCreated(File),
     ReceiptSent(ReceiptSent),
-    StepCompleted(Step),
+    StepCompleted(StepCompleted),
     TenantCreated(TenantCreated),
     TenantUpdated(TenantUpdated),
 }
@@ -44,6 +44,7 @@ impl From<Event> for EventType {
             Event::CandidacyAccepted(_) => Self::CandidacyAccepted,
             Event::CandidacyCreated(_) => Self::CandidacyCreated,
             Event::CandidacyRejected(_) => Self::CandidacyRejected,
+            Event::DocumentGenerated(_) => unimplemented!(),
             Event::LeaseAffected(_) => unimplemented!(),
             Event::LeaseCreated(_) => Self::LeaseCreated,
             Event::NoticeCreated(_) => Self::NoticeCreated,
@@ -64,9 +65,10 @@ pub fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
         events.iter().try_for_each(|event| match event {
             Event::AdvertisementCreated(event) => advertisement_created(ctx, event.clone()),
             Event::AdvertisementUpdated(event) => advertisement_updated(ctx, event.clone()),
-            Event::CandidacyAccepted(candidacy) => candidacy_accepted(ctx, event, candidacy),
+            Event::CandidacyAccepted(_) => unimplemented!(),
             Event::CandidacyCreated(candidacy) => candidacy_created(ctx, event, candidacy),
             Event::CandidacyRejected(event) => candidacy_rejected(ctx, event.clone()),
+            Event::DocumentGenerated(_) => unimplemented!(),
             Event::LeaseAffected(event) => lease_affected(ctx, event.clone()),
             Event::LeaseCreated(event) => lease_created(ctx, event.clone()),
             Event::NoticeCreated(notice) => notice_created(ctx, event, notice),
@@ -75,7 +77,7 @@ pub fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
             Event::PropertyUpdated(event) => property_updated(ctx, event.clone()),
             Event::ReceiptCreated(receipt) => receipt_created(ctx, event, receipt),
             Event::ReceiptSent(_) => unimplemented!(),
-            Event::StepCompleted(step) => step_completed(ctx, event, step),
+            Event::StepCompleted(event) => step_completed(ctx, event.clone()),
             Event::TenantCreated(event) => tenant_created(ctx, event.clone()),
             Event::TenantUpdated(event) => tenant_updated(ctx, event.clone()),
         })
@@ -84,9 +86,12 @@ pub fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     Ok(())
 }
 
+#[async_recursion]
 pub async fn dispatch_async(ctx: &Context, events: Vec<Event>) -> Result<()> {
     for event in events {
         match event {
+            Event::CandidacyAccepted(event) => candidacy_accepted(ctx, event).await?,
+            Event::DocumentGenerated(event) => document_generated(ctx, event).await?,
             Event::ReceiptSent(event) => receipt_sent(ctx, event).await?,
             _ => unimplemented!(),
         }
