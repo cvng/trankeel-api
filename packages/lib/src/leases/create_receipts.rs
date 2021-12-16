@@ -4,7 +4,8 @@ use chrono::Utc;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher;
-use trankeel_core::dispatcher::Event;
+use trankeel_core::handlers::PaymentCreated;
+use trankeel_core::handlers::ReceiptCreated;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_core::templates::ReceiptDocument;
 use trankeel_data::receipt_filename;
@@ -74,7 +75,7 @@ impl<'a> CreateReceipts<'a> {
 
             rents.push(rent);
 
-            dispatcher::dispatch(ctx, vec![Event::PaymentCreated(payment)])?;
+            dispatcher::dispatch(ctx, vec![PaymentCreated { payment }.into()]).await?;
         }
 
         // Generate receipts.
@@ -131,7 +132,7 @@ impl<'a> CreateReceipts<'a> {
 
             receipts.push(receipt.clone());
 
-            dispatcher::dispatch(ctx, vec![Event::ReceiptCreated(receipt)])?;
+            dispatcher::dispatch(ctx, vec![ReceiptCreated { receipt }.into()]).await?;
         }
 
         Ok(CreateReceiptsPayload { receipts })
