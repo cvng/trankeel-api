@@ -4,7 +4,7 @@ use chrono::Utc;
 use trankeel_core::context::Context;
 use trankeel_core::database::Db;
 use trankeel_core::dispatcher;
-use trankeel_core::dispatcher::Event;
+use trankeel_core::handlers::NoticeCreated;
 use trankeel_core::pdfmaker::Pdfmaker;
 use trankeel_core::templates::NoticeDocument;
 use trankeel_data::notice_filename;
@@ -106,7 +106,7 @@ impl<'a> CreateNotices<'a> {
 
             notices.push(notice.clone());
 
-            dispatcher::dispatch(ctx, vec![Event::NoticeCreated(notice)])?;
+            dispatcher::dispatch(ctx, vec![NoticeCreated { notice }.into()]).await?;
         }
 
         Ok(CreateNoticesPayload { notices })
