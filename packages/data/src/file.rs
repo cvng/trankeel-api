@@ -5,6 +5,7 @@ use crate::Id;
 use crate::Lease;
 use crate::LeaseFileId;
 use crate::NoticeId;
+use crate::ReceiptId;
 use crate::Rent;
 use crate::Url;
 
@@ -83,7 +84,7 @@ impl File {
     }
 
     pub fn receipt_document(rent: &Rent) -> Self {
-        let id = NoticeId::new();
+        let id = ReceiptId::new();
 
         Self {
             id,
