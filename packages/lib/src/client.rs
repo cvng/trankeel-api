@@ -93,6 +93,7 @@ use trankeel_core::error::Error;
 use trankeel_core::handlers::AdvertisementCreated;
 use trankeel_core::handlers::AdvertisementUpdated;
 use trankeel_core::handlers::CandidacyAccepted;
+use trankeel_core::handlers::CandidacyCreated;
 use trankeel_core::handlers::LeaseAffected;
 use trankeel_core::handlers::LeaseCreated;
 use trankeel_core::handlers::PropertyCreated;
@@ -133,7 +134,7 @@ use trankeel_data::TenantId;
 #[derive(Clone)]
 pub struct Client(context::Context);
 
-impl<'a> Client {
+impl Client {
     pub fn new(
         pg: Pg,
         pdfmonkey: Pdfmonkey,
@@ -326,9 +327,17 @@ impl<'a> Client {
             }
             self.0.db().discussions().create(&discussion)?;
             self.0.db().messages().create_many(&messages)?;
-            dispatcher::dispatch(&self.0, vec![Event::CandidacyCreated(candidacy.clone())])?;
             Ok(())
         })?;
+
+        dispatcher::dispatch(
+            &self.0,
+            vec![CandidacyCreated {
+                candidacy: candidacy.clone(),
+            }
+            .into()],
+        )
+        .await?;
 
         self.0
             .mailer()
@@ -370,7 +379,7 @@ impl<'a> Client {
             .map(|(person, (discussion, candidacy))| (candidacy, person, discussion))
             .collect::<Vec<_>>();
 
-        dispatcher::dispatch_async(
+        dispatcher::dispatch(
             &self.0,
             vec![AcceptCandidacy::new(
                 &candidacy,
@@ -384,7 +393,7 @@ impl<'a> Client {
             )
             .run(input)
             .map(|payload| {
-                Event::CandidacyAccepted(CandidacyAccepted {
+                CandidacyAccepted {
                     candidacy: payload.candidacy,
                     rejected_candidacies: payload.rejected_candidacies,
                     tenant: payload.tenant,
@@ -399,7 +408,8 @@ impl<'a> Client {
                     steps: payload.steps,
                     candidacy_accepted_step: payload.candidacy_accepted_step,
                     invite: payload.invite,
-                })
+                }
+                .into()
             })?],
         )
         .await?;
@@ -431,7 +441,8 @@ impl<'a> Client {
                 discussion,
             }
             .into()],
-        )?;
+        )
+        .await?;
 
         Ok(tenant)
     }
@@ -451,7 +462,8 @@ impl<'a> Client {
                 tenant: tenant.clone(),
             }
             .into()],
-        )?;
+        )
+        .await?;
 
         Ok(tenant)
     }
@@ -488,12 +500,13 @@ impl<'a> Client {
                 property: property.clone(),
             }
             .into()],
-        )?;
+        )
+        .await?;
 
         Ok(property)
     }
 
-    pub fn update_property(
+    pub async fn update_property(
         &self,
         _auth_id: &AuthId,
         input: UpdatePropertyInput,
@@ -508,7 +521,8 @@ impl<'a> Client {
                 property: property.clone(),
             }
             .into()],
-        )?;
+        )
+        .await?;
 
         Ok(property)
     }
@@ -525,7 +539,7 @@ impl<'a> Client {
         Ok(property_id)
     }
 
-    pub fn create_advertisement(
+    pub async fn create_advertisement(
         &self,
         _auth_id: &AuthId,
         input: CreateAdvertisementInput,
@@ -538,12 +552,13 @@ impl<'a> Client {
                 advertisement: advertisement.clone(),
             }
             .into()],
-        )?;
+        )
+        .await?;
 
         Ok(advertisement)
     }
 
-    pub fn update_advertisement(
+    pub async fn update_advertisement(
         &self,
         _auth_id: &AuthId,
         input: UpdateAdvertisementInput,
@@ -559,7 +574,8 @@ impl<'a> Client {
                 advertisement: advertisement.clone(),
             }
             .into()],
-        )?;
+        )
+        .await?;
 
         Ok(advertisement)
     }
@@ -609,12 +625,13 @@ impl<'a> Client {
                     .collect::<Vec<_>>(),
             )
             .collect(),
-        )?;
+        )
+        .await?;
 
         Ok(lease)
     }
 
-    pub fn create_furnished_lease(
+    pub async fn create_furnished_lease(
         &self,
         auth_id: &AuthId,
         input: CreateFurnishedLeaseInput,
@@ -654,7 +671,8 @@ impl<'a> Client {
                     .collect::<Vec<_>>(),
             )
             .collect(),
-        )?;
+        )
+        .await?;
 
         Ok(lease)
     }
@@ -713,7 +731,7 @@ impl<'a> Client {
     pub async fn send_receipts(&self, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
         let rent_ids = SendReceipts.run(input)?;
 
-        dispatcher::dispatch_async(
+        dispatcher::dispatch(
             &self.0,
             rent_ids
                 .into_iter()
@@ -764,12 +782,12 @@ impl<'a> Client {
         Ok(message)
     }
 
-    pub fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
+    pub async fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
         let step = self.0.db().steps().by_id(&input.id)?;
 
         let CompleteStepPayload { step } = CompleteStep::new(&step).run(input)?;
 
-        dispatcher::dispatch(&self.0, vec![StepCompleted { step: step.clone() }.into()])?;
+        dispatcher::dispatch(&self.0, vec![StepCompleted { step: step.clone() }.into()]).await?;
 
         Ok(step)
     }
@@ -778,10 +796,8 @@ impl<'a> Client {
         self.0.mailer().batch(mails).await
     }
 
-    // Expose internal dispatcher
-
     pub async fn dispatch(&self, events: Vec<Event>) -> Result<()> {
-        dispatcher::dispatch_async(&self.0, events).await
+        dispatcher::dispatch(&self.0, events).await
     }
 }
 
