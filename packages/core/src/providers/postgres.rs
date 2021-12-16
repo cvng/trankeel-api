@@ -4,6 +4,7 @@ use crate::database::Executed;
 use crate::database::Result;
 use crate::error::Error;
 use diesel::delete;
+use diesel::dsl::any;
 use diesel::dsl::now;
 use diesel::insert_into;
 use diesel::prelude::*;
@@ -948,6 +949,12 @@ impl database::LeaseStore for LeaseStore<'_> {
 impl database::RentStore for RentStore<'_> {
     fn by_id(&mut self, id: &RentId) -> Result<Rent> {
         Ok(rents::table.find(id).first(&self.0.get()?)?)
+    }
+
+    fn by_id_many(&mut self, ids: &[RentId]) -> Result<Vec<Rent>> {
+        Ok(rents::table
+            .filter(rents::id.eq(any(ids)))
+            .get_results(&self.0.get()?)?)
     }
 
     fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<Rent>> {

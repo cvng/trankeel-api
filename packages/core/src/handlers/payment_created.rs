@@ -24,6 +24,8 @@ pub fn payment_created(ctx: &Context, event: PaymentCreated) -> Result<()> {
 
     let PaymentCreated { payment } = event;
 
+    db.payments().create(&payment)?;
+
     let account = db.accounts().by_payment_id(&payment.id)?;
     let participant = db.persons().by_payment_id(&payment.id)?;
     let eventable = db.eventables().create(&Eventable::Payment(payment))?;
