@@ -129,7 +129,8 @@ impl Mutation {
     ) -> Result<UpdatePropertyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .update_property(ctx.data::<AuthId>()?, input)?
+            .update_property(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -151,7 +152,8 @@ impl Mutation {
     ) -> Result<CreateAdvertisementPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .create_advertisement(ctx.data::<AuthId>()?, input)?
+            .create_advertisement(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -162,7 +164,8 @@ impl Mutation {
     ) -> Result<UpdateAdvertisementPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .update_advertisement(ctx.data::<AuthId>()?, input)?
+            .update_advertisement(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -185,7 +188,8 @@ impl Mutation {
     ) -> Result<CreateFurnishedLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .create_furnished_lease(ctx.data::<AuthId>()?, input)?
+            .create_furnished_lease(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -298,6 +302,10 @@ impl Mutation {
         ctx: &Context<'_>,
         input: CompleteStepInput,
     ) -> Result<CompleteStepPayload> {
-        Ok(ctx.data_unchecked::<Client>().complete_step(input)?.into())
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .complete_step(input)
+            .await?
+            .into())
     }
 }
