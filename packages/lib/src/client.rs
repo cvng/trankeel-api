@@ -18,10 +18,8 @@ use crate::leases::CreateLeaseInput;
 use crate::leases::CreateLeasePayload;
 use crate::leases::CreateNotices;
 use crate::leases::CreateNoticesInput;
-use crate::leases::CreateNoticesPayload;
 use crate::leases::CreateReceipts;
 use crate::leases::CreateReceiptsInput;
-use crate::leases::CreateReceiptsPayload;
 use crate::leases::DeleteLease;
 use crate::leases::DeleteLeaseInput;
 use crate::leases::SendReceipts;
@@ -96,8 +94,10 @@ use trankeel_core::handlers::CandidacyAccepted;
 use trankeel_core::handlers::CandidacyCreated;
 use trankeel_core::handlers::LeaseAffected;
 use trankeel_core::handlers::LeaseCreated;
+use trankeel_core::handlers::NoticeCreated;
 use trankeel_core::handlers::PropertyCreated;
 use trankeel_core::handlers::PropertyUpdated;
+use trankeel_core::handlers::ReceiptCreated;
 use trankeel_core::handlers::ReceiptSent;
 use trankeel_core::handlers::StepCompleted;
 use trankeel_core::handlers::TenantCreated;
@@ -723,9 +723,28 @@ impl Client {
         _auth_id: &AuthId,
         input: CreateReceiptsInput,
     ) -> Result<Vec<Receipt>> {
-        let CreateReceiptsPayload { receipts } = CreateReceipts::new(&self.0).run(input).await?;
+        let rents = self.rents().by_id_many(&input.rent_ids)?;
 
-        Ok(receipts)
+        dispatcher::dispatch(
+            &self.0,
+            CreateReceipts::new(&rents).run(input).map(|payload| {
+                payload
+                    .receipts
+                    .into_iter()
+                    .map(|(receipt, rent, payment)| {
+                        ReceiptCreated {
+                            receipt,
+                            rent,
+                            payment,
+                        }
+                        .into()
+                    })
+                    .collect()
+            })?,
+        )
+        .await?;
+
+        Ok(vec![])
     }
 
     pub async fn send_receipts(&self, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
@@ -748,9 +767,21 @@ impl Client {
         _auth_id: &AuthId,
         input: CreateNoticesInput,
     ) -> Result<Vec<Notice>> {
-        let CreateNoticesPayload { notices } = CreateNotices::new(&self.0).run(input).await?;
+        let rents = self.rents().by_id_many(&input.rent_ids)?;
 
-        Ok(notices)
+        dispatcher::dispatch(
+            &self.0,
+            CreateNotices::new(&rents).run(input).map(|payload| {
+                payload
+                    .notices
+                    .into_iter()
+                    .map(|(notice, rent)| NoticeCreated { notice, rent }.into())
+                    .collect()
+            })?,
+        )
+        .await?;
+
+        Ok(vec![])
     }
 
     pub fn delete_discussion(

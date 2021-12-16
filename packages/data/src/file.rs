@@ -4,6 +4,8 @@ use crate::ExternalId;
 use crate::Id;
 use crate::Lease;
 use crate::LeaseFileId;
+use crate::NoticeId;
+use crate::ReceiptId;
 use crate::Rent;
 use crate::Url;
 
@@ -62,6 +64,38 @@ impl File {
             preview_url: None,
             status: Some(FileStatus::Pending),
             type_: FileType::LeaseDocument,
+        }
+    }
+
+    pub fn notice_document(rent: &Rent) -> Self {
+        let id = NoticeId::new();
+
+        Self {
+            id,
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            download_url: None,
+            external_id: None,
+            filename: Some(notice_filename(&id, rent)),
+            preview_url: None,
+            status: Some(FileStatus::Pending),
+            type_: FileType::PaymentNotice,
+        }
+    }
+
+    pub fn receipt_document(rent: &Rent) -> Self {
+        let id = ReceiptId::new();
+
+        Self {
+            id,
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            download_url: None,
+            external_id: None,
+            filename: Some(receipt_filename(&id, rent)),
+            preview_url: None,
+            status: Some(FileStatus::Pending),
+            type_: FileType::RentReceipt,
         }
     }
 }
