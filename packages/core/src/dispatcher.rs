@@ -2,6 +2,9 @@ use crate::context::Context;
 use crate::error::Result;
 use crate::handlers;
 use crate::providers::Pg;
+use futures::stream;
+use futures::stream::StreamExt;
+use futures::stream::TryStreamExt;
 
 pub trait Command {
     type Input;
@@ -55,14 +58,17 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
         })
     })?;
 
-    for evt in events {
-        match evt {
-            Event::CandidacyAccepted(evt) => handlers::candidacy_accepted_async(ctx, evt).await?,
-            Event::DocumentGenerated(evt) => handlers::document_generated_async(ctx, evt).await?,
-            Event::ReceiptSent(evt) => handlers::receipt_sent_async(ctx, evt).await?,
-            _ => (),
-        };
-    }
+    stream::iter(events)
+        .map(Ok)
+        .try_for_each_concurrent(2, |evt| async {
+            match evt {
+                Event::CandidacyAccepted(evt) => handlers::candidacy_accepted_async(ctx, evt).await,
+                Event::DocumentGenerated(evt) => handlers::document_generated_async(ctx, evt).await,
+                Event::ReceiptSent(evt) => handlers::receipt_sent_async(ctx, evt).await,
+                _ => Ok(()),
+            }
+        })
+        .await?;
 
     Ok(())
 }
