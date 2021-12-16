@@ -39,13 +39,10 @@ pub fn candidacy_rejected(ctx: &Context, event: CandidacyRejected) -> Result<()>
     let account = db.accounts().by_candidacy_id(&candidacy.id)?;
     let participant = db.persons().by_candidacy_id(&candidacy.id)?;
     let sender = db.persons().by_account_id_first(&account.id)?;
-    let eventable = Eventable::Candidacy(candidacy);
 
     messenger.message(
-        db,
         EventType::CandidacyRejected,
-        eventable.id(),
-        account.id,
+        Eventable::Candidacy(candidacy),
         sender.id,
         participant.id,
         None,

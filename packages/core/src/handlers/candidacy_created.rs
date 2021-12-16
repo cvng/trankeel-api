@@ -24,15 +24,11 @@ pub fn candidacy_created(ctx: &Context, event: CandidacyCreated) -> Result<()> {
 
     let CandidacyCreated { candidacy } = event;
 
-    let account = db.accounts().by_candidacy_id(&candidacy.id)?;
     let participant = db.persons().by_candidacy_id(&candidacy.id)?;
-    let eventable = db.eventables().create(&Eventable::Candidacy(candidacy))?;
 
     messenger.message(
-        db,
         EventType::CandidacyCreated,
-        eventable.id(),
-        account.id,
+        Eventable::Candidacy(candidacy),
         participant.id,
         participant.id,
         None,

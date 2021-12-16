@@ -26,15 +26,11 @@ pub fn payment_created(ctx: &Context, event: PaymentCreated) -> Result<()> {
 
     db.payments().create(&payment)?;
 
-    let account = db.accounts().by_payment_id(&payment.id)?;
     let participant = db.persons().by_payment_id(&payment.id)?;
-    let eventable = db.eventables().create(&Eventable::Payment(payment))?;
 
     messenger.message(
-        db,
         EventType::PaymentCreated,
-        eventable.id(),
-        account.id,
+        Eventable::Payment(payment),
         participant.id,
         participant.id,
         None,

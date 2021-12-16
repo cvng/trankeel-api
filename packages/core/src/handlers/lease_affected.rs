@@ -32,13 +32,10 @@ pub fn lease_affected(ctx: &Context, event: LeaseAffected) -> Result<()> {
     let account = db.accounts().by_lease_id(&lease.id)?;
     let participant = db.persons().by_tenant_id(&tenant.id)?;
     let sender = db.persons().by_account_id_first(&account.id)?;
-    let eventable = db.eventables().create(&Eventable::Lease(lease))?;
 
     messenger.message(
-        db,
         EventType::LeaseCreated, // Use "LeaseCreated" as message event type.
-        eventable.id(),
-        account.id,
+        Eventable::Lease(lease),
         sender.id,
         participant.id,
         None,
