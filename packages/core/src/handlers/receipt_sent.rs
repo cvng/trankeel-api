@@ -19,7 +19,11 @@ impl From<ReceiptSent> for Event {
     }
 }
 
-pub async fn receipt_sent(ctx: &Context, event: ReceiptSent) -> Result<()> {
+pub fn receipt_sent(_ctx: &Context, _event: ReceiptSent) -> Result<()> {
+    Ok(())
+}
+
+pub async fn receipt_sent_async(ctx: &Context, event: ReceiptSent) -> Result<()> {
     let db = ctx.db();
     let mailer = ctx.mailer();
 

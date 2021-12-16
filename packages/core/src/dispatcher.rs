@@ -1,11 +1,10 @@
 use crate::context::Context;
 use crate::error::Result;
-use crate::handlers::*;
+use crate::handlers;
 use crate::providers::Pg;
-use trankeel_data::Candidacy;
-use trankeel_data::EventType;
-use trankeel_data::File;
-use trankeel_data::Payment;
+use futures::stream;
+use futures::stream::StreamExt;
+use futures::stream::TryStreamExt;
 
 pub trait Command {
     type Input;
@@ -17,85 +16,59 @@ pub trait Command {
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone)]
 pub enum Event {
-    AdvertisementCreated(AdvertisementCreated),
-    AdvertisementUpdated(AdvertisementUpdated),
-    CandidacyAccepted(CandidacyAccepted),
-    CandidacyCreated(Candidacy),
-    CandidacyRejected(CandidacyRejected),
-    DocumentGenerated(DocumentGenerated),
-    LeaseAffected(LeaseAffected),
-    LeaseCreated(LeaseCreated),
-    NoticeCreated(File),
-    PaymentCreated(Payment),
-    PropertyCreated(PropertyCreated),
-    PropertyUpdated(PropertyUpdated),
-    ReceiptCreated(File),
-    ReceiptSent(ReceiptSent),
-    StepCompleted(StepCompleted),
-    TenantCreated(TenantCreated),
-    TenantUpdated(TenantUpdated),
+    AdvertisementCreated(handlers::AdvertisementCreated),
+    AdvertisementUpdated(handlers::AdvertisementUpdated),
+    CandidacyAccepted(handlers::CandidacyAccepted),
+    CandidacyCreated(handlers::CandidacyCreated),
+    CandidacyRejected(handlers::CandidacyRejected),
+    DocumentGenerated(handlers::DocumentGenerated),
+    LeaseAffected(handlers::LeaseAffected),
+    LeaseCreated(handlers::LeaseCreated),
+    NoticeCreated(handlers::NoticeCreated),
+    PaymentCreated(handlers::PaymentCreated),
+    PropertyCreated(handlers::PropertyCreated),
+    PropertyUpdated(handlers::PropertyUpdated),
+    ReceiptCreated(handlers::ReceiptCreated),
+    ReceiptSent(handlers::ReceiptSent),
+    StepCompleted(handlers::StepCompleted),
+    TenantCreated(handlers::TenantCreated),
+    TenantUpdated(handlers::TenantUpdated),
 }
 
-impl From<Event> for EventType {
-    fn from(item: Event) -> Self {
-        match item {
-            Event::AdvertisementCreated(_) => unimplemented!(),
-            Event::AdvertisementUpdated(_) => unimplemented!(),
-            Event::CandidacyAccepted(_) => Self::CandidacyAccepted,
-            Event::CandidacyCreated(_) => Self::CandidacyCreated,
-            Event::CandidacyRejected(_) => Self::CandidacyRejected,
-            Event::DocumentGenerated(_) => unimplemented!(),
-            Event::LeaseAffected(_) => unimplemented!(),
-            Event::LeaseCreated(_) => Self::LeaseCreated,
-            Event::NoticeCreated(_) => Self::NoticeCreated,
-            Event::PaymentCreated(_) => Self::PaymentCreated,
-            Event::PropertyCreated(_) => unimplemented!(),
-            Event::PropertyUpdated(_) => unimplemented!(),
-            Event::ReceiptCreated(_) => Self::ReceiptCreated,
-            Event::ReceiptSent(_) => Self::ReceiptSent,
-            Event::StepCompleted(_) => Self::StepCompleted,
-            Event::TenantCreated(_) => unimplemented!(),
-            Event::TenantUpdated(_) => unimplemented!(),
-        }
-    }
-}
-
-pub fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
+pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     Pg::transaction(ctx.db(), || {
-        events.iter().try_for_each(|event| match event {
-            Event::AdvertisementCreated(event) => advertisement_created(ctx, event.clone()),
-            Event::AdvertisementUpdated(event) => advertisement_updated(ctx, event.clone()),
-            Event::CandidacyAccepted(_) => unimplemented!(),
-            Event::CandidacyCreated(candidacy) => candidacy_created(ctx, event, candidacy),
-            Event::CandidacyRejected(event) => candidacy_rejected(ctx, event.clone()),
-            Event::DocumentGenerated(_) => unimplemented!(),
-            Event::LeaseAffected(event) => lease_affected(ctx, event.clone()),
-            Event::LeaseCreated(event) => lease_created(ctx, event.clone()),
-            Event::NoticeCreated(notice) => notice_created(ctx, event, notice),
-            Event::PaymentCreated(payment) => payment_created(ctx, event, payment),
-            Event::PropertyCreated(event) => property_created(ctx, event.clone()),
-            Event::PropertyUpdated(event) => property_updated(ctx, event.clone()),
-            Event::ReceiptCreated(receipt) => receipt_created(ctx, event, receipt),
-            Event::ReceiptSent(_) => unimplemented!(),
-            Event::StepCompleted(event) => step_completed(ctx, event.clone()),
-            Event::TenantCreated(event) => tenant_created(ctx, event.clone()),
-            Event::TenantUpdated(event) => tenant_updated(ctx, event.clone()),
+        events.clone().into_iter().try_for_each(|evt| match evt {
+            Event::AdvertisementCreated(evt) => handlers::advertisement_created(ctx, evt),
+            Event::AdvertisementUpdated(evt) => handlers::advertisement_updated(ctx, evt),
+            Event::CandidacyAccepted(evt) => handlers::candidacy_accepted(ctx, evt),
+            Event::CandidacyCreated(evt) => handlers::candidacy_created(ctx, evt),
+            Event::CandidacyRejected(evt) => handlers::candidacy_rejected(ctx, evt),
+            Event::DocumentGenerated(evt) => handlers::document_generated(ctx, evt),
+            Event::LeaseAffected(evt) => handlers::lease_affected(ctx, evt),
+            Event::LeaseCreated(evt) => handlers::lease_created(ctx, evt),
+            Event::NoticeCreated(evt) => handlers::notice_created(ctx, evt),
+            Event::PaymentCreated(evt) => handlers::payment_created(ctx, evt),
+            Event::PropertyCreated(evt) => handlers::property_created(ctx, evt),
+            Event::PropertyUpdated(evt) => handlers::property_updated(ctx, evt),
+            Event::ReceiptCreated(evt) => handlers::receipt_created(ctx, evt),
+            Event::ReceiptSent(evt) => handlers::receipt_sent(ctx, evt),
+            Event::StepCompleted(evt) => handlers::step_completed(ctx, evt),
+            Event::TenantCreated(evt) => handlers::tenant_created(ctx, evt),
+            Event::TenantUpdated(evt) => handlers::tenant_updated(ctx, evt),
         })
     })?;
 
-    Ok(())
-}
-
-#[async_recursion]
-pub async fn dispatch_async(ctx: &Context, events: Vec<Event>) -> Result<()> {
-    for event in events {
-        match event {
-            Event::CandidacyAccepted(event) => candidacy_accepted(ctx, event).await?,
-            Event::DocumentGenerated(event) => document_generated(ctx, event).await?,
-            Event::ReceiptSent(event) => receipt_sent(ctx, event).await?,
-            _ => unimplemented!(),
-        }
-    }
+    stream::iter(events)
+        .map(Ok)
+        .try_for_each_concurrent(2, |evt| async {
+            match evt {
+                Event::CandidacyAccepted(evt) => handlers::candidacy_accepted_async(ctx, evt).await,
+                Event::DocumentGenerated(evt) => handlers::document_generated_async(ctx, evt).await,
+                Event::ReceiptSent(evt) => handlers::receipt_sent_async(ctx, evt).await,
+                _ => Ok(()),
+            }
+        })
+        .await?;
 
     Ok(())
 }

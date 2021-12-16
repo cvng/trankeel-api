@@ -154,6 +154,7 @@ async fn seed() {
                 tenant_ids: vec![tenant.id],
             },
         )
+        .await
         .unwrap();
 
     let advertisement = client
@@ -173,6 +174,7 @@ async fn seed() {
                 description: "Description".into(),
             },
         )
+        .await
         .unwrap();
 
     let candidacy = client

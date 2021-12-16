@@ -1,9 +1,11 @@
+use super::candidacy_rejected;
+use super::lease_affected;
+use super::step_completed;
 use super::CandidacyRejected;
 use super::LeaseAffected;
 use super::StepCompleted;
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher;
 use crate::dispatcher::Event;
 use crate::error::Result;
 use crate::mailer::Mailer;
@@ -53,11 +55,9 @@ impl From<CandidacyAccepted> for Event {
     }
 }
 
-pub async fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
+pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
     let db = ctx.db();
-    let mailer = ctx.mailer();
     let messenger = ctx.messenger();
-    let pdfmaker = ctx.pdfmaker();
 
     let CandidacyAccepted {
         candidacy,
@@ -73,7 +73,7 @@ pub async fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Resu
         workflowable,
         steps,
         candidacy_accepted_step,
-        invite,
+        invite: _invite,
     } = event;
 
     db.candidacies().update(&candidacy)?;
@@ -90,29 +90,21 @@ pub async fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Resu
         db.warrants().create_many(warrants)?;
     }
 
-    dispatcher::dispatch(
-        ctx,
-        vec![
-            // LeaseCreated { lease, rents }.into(),
-            // TenantUpdated { tenant: tenant.clone() }.into(),
-            LeaseAffected { tenant }.into(),
-        ],
-    )?;
+    lease_affected(ctx, LeaseAffected { tenant })?;
 
     for (candidacy, (discussion, message)) in rejected_candidacies {
-        dispatcher::dispatch(
+        candidacy_rejected(
             ctx,
-            vec![CandidacyRejected {
+            CandidacyRejected {
                 candidacy,
                 discussion,
                 message,
-            }
-            .into()],
+            },
         )?;
     }
 
     if let Some(step) = candidacy_accepted_step {
-        dispatcher::dispatch(ctx, vec![StepCompleted { step }.into()])?;
+        step_completed(ctx, StepCompleted { step })?;
     }
 
     let account = db.accounts().by_candidacy_id(&candidacy.id)?;
@@ -123,7 +115,7 @@ pub async fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Resu
         .first()
         .cloned()
         .ok_or(NotFound)?;
-    let eventable = Eventable::Candidacy(candidacy.clone());
+    let eventable = Eventable::Candidacy(candidacy);
 
     messenger.message(
         db,
@@ -134,6 +126,23 @@ pub async fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Resu
         participant.id,
         None,
     )?;
+
+    Ok(())
+}
+
+pub async fn candidacy_accepted_async(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
+    let db = ctx.db();
+    let mailer = ctx.mailer();
+    let pdfmaker = ctx.pdfmaker();
+
+    let CandidacyAccepted {
+        candidacy,
+        identity,
+        lease,
+        lease_file,
+        invite,
+        ..
+    } = event;
 
     // Generate lease document (PDF) and assign document external ID to lease file.
     let document = pdfmaker

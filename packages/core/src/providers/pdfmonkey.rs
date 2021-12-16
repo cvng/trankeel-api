@@ -7,7 +7,6 @@ use super::pdfmonkey::lib as pdfmonkey;
 use crate::error::Error;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
-use async_trait::async_trait;
 use trankeel_data::Document;
 
 #[derive(Clone)]

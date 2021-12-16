@@ -1,12 +1,9 @@
 use crate::billing::BillingProvider;
 use crate::error::Context;
 use crate::error::Error;
-use async_trait::async_trait;
 use std::env;
 use trankeel_data::Email;
 use trankeel_data::Subscription;
-
-// # Provider
 
 #[derive(Clone)]
 pub struct Stripe(stripe::Client);
