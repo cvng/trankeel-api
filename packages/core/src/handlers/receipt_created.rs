@@ -42,15 +42,11 @@ pub fn receipt_created(ctx: &Context, event: ReceiptCreated) -> Result<()> {
 
     payment_created(ctx, PaymentCreated { payment })?;
 
-    let account = db.accounts().by_receipt_id(&receipt.id)?;
     let participant = db.persons().by_receipt_id(&receipt.id)?;
-    let eventable = db.eventables().create(&Eventable::File(receipt))?;
 
     messenger.message(
-        db,
         EventType::ReceiptCreated,
-        eventable.id(),
-        account.id,
+        Eventable::File(receipt),
         participant.id,
         participant.id,
         None,

@@ -115,13 +115,10 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
         .first()
         .cloned()
         .ok_or(NotFound)?;
-    let eventable = Eventable::Candidacy(candidacy);
 
     messenger.message(
-        db,
         EventType::CandidacyAccepted,
-        eventable.id(),
-        account.id,
+        Eventable::Candidacy(candidacy),
         sender.id,
         participant.id,
         None,

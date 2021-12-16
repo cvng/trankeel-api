@@ -32,15 +32,11 @@ pub fn notice_created(ctx: &Context, event: NoticeCreated) -> Result<()> {
     db.files().create(&notice)?;
     db.rents().update(&rent)?;
 
-    let account = db.accounts().by_notice_id(&notice.id)?;
     let participant = db.persons().by_notice_id(&notice.id)?;
-    let eventable = db.eventables().create(&Eventable::File(notice))?;
 
     messenger.message(
-        db,
         EventType::NoticeCreated,
-        eventable.id(),
-        account.id,
+        Eventable::File(notice),
         participant.id,
         participant.id,
         None,

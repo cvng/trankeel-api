@@ -833,11 +833,11 @@ impl Client {
 }
 
 pub fn init() -> Result<Client> {
-    Ok(Client::new(
-        providers::Pg::init(),
-        providers::Pdfmonkey::init(),
-        providers::Sendinblue::init(),
-        providers::Messagerie::init(),
-        providers::Stripe::init(),
-    ))
+    let pg = providers::Pg::init();
+    let pdfmonkey = providers::Pdfmonkey::init();
+    let sendinblue = providers::Sendinblue::init();
+    let messagerie = providers::Messagerie::init(pg.clone());
+    let stripe = providers::Stripe::init();
+
+    Ok(Client::new(pg, pdfmonkey, sendinblue, messagerie, stripe))
 }

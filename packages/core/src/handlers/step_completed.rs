@@ -42,7 +42,6 @@ pub fn step_completed(ctx: &Context, event: StepCompleted) -> Result<()> {
         .first()
         .cloned()
         .ok_or(NotFound)?;
-    let eventable = db.eventables().create(&Eventable::Step(step.clone()))?;
 
     if let Some(step_event) = step.event.clone() {
         match step_event.into() {
@@ -88,13 +87,11 @@ pub fn step_completed(ctx: &Context, event: StepCompleted) -> Result<()> {
 
     let tenant = db.tenants().by_person_id(&participant.id)?;
     let lease = db.leases().by_tenant_id(&tenant.id)?; // TODO: match workflowable
-    let message = render_step_message(step, participant.clone(), lease)?;
+    let message = render_step_message(step.clone(), participant.clone(), lease)?;
 
     messenger.message(
-        db,
         EventType::StepCompleted,
-        eventable.id(),
-        account.id,
+        Eventable::Step(step),
         sender.id,
         participant.id,
         message,
