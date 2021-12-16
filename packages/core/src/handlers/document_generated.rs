@@ -1,7 +1,7 @@
+use super::receipt_sent_async;
 use super::ReceiptSent;
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher;
 use crate::dispatcher::Event;
 use crate::error::Result;
 use crate::mailer::Mailer;
@@ -23,7 +23,11 @@ impl From<DocumentGenerated> for Event {
     }
 }
 
-pub async fn document_generated(ctx: &Context, event: DocumentGenerated) -> Result<()> {
+pub fn document_generated(_ctx: &Context, _event: DocumentGenerated) -> Result<()> {
+    Ok(())
+}
+
+pub async fn document_generated_async(ctx: &Context, event: DocumentGenerated) -> Result<()> {
     println!("Document generated: {:?}", event);
 
     let db = ctx.db();
@@ -79,5 +83,7 @@ async fn receipt_or_notice_document_created(ctx: &Context, receipt_or_notice: &F
         _ => unimplemented!(),
     };
 
-    dispatcher::dispatch_async(ctx, vec![ReceiptSent { rent_id: rent.id }.into()]).await
+    receipt_sent_async(ctx, ReceiptSent { rent_id: rent.id }).await?;
+
+    Ok(())
 }
