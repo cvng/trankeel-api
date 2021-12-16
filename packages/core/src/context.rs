@@ -30,16 +30,6 @@ impl Context {
         }
     }
 
-    pub fn env() -> Self {
-        Self {
-            db: Pg::init(),
-            pdfmaker: Pdfmonkey::init(),
-            mailer: Sendinblue::init(),
-            messenger: Messagerie::init(),
-            billing_provider: Stripe::init(),
-        }
-    }
-
     pub fn db(&self) -> &Pg {
         &self.db
     }
