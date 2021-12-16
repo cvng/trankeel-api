@@ -2841,6 +2841,7 @@ dependencies = [
  "diesel",
  "erased-serde",
  "eyre",
+ "futures",
  "liquid",
  "reqwest 0.11.7",
  "sendinblue",
