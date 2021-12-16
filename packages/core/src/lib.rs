@@ -1,8 +1,6 @@
 #![allow(dead_code)]
 
 #[macro_use]
-extern crate async_recursion;
-#[macro_use]
 extern crate async_trait;
 #[macro_use]
 extern crate serde;
