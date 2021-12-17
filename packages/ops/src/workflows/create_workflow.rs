@@ -1,6 +1,5 @@
 use crate::error::Result;
 use crate::Command;
-use trankeel_data::Step;
 use trankeel_data::Workflow;
 use trankeel_data::WorkflowId;
 use trankeel_data::WorkflowType;
@@ -16,7 +15,6 @@ pub struct CreateWorkflowInput {
 
 pub struct CreateWorkflowPayload {
     pub workflow: Workflow,
-    pub steps: Vec<Step>,
 }
 
 pub struct CreateWorkflow {
@@ -49,8 +47,6 @@ impl Command for CreateWorkflow {
             completed: Default::default(),
         };
 
-        let steps = vec![]; // TODO: config::workflow_steps(&workflow).into_iter().collect(); // IO.
-
-        Ok(Self::Payload { workflow, steps })
+        Ok(Self::Payload { workflow })
     }
 }
