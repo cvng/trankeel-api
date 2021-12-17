@@ -31,6 +31,7 @@ use trankeel_data::InviteReason;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
 use trankeel_data::Message;
+use trankeel_data::MessageContent;
 use trankeel_data::Person;
 use trankeel_data::Rent;
 use trankeel_data::Step;
@@ -72,7 +73,7 @@ pub struct AcceptCandidacy {
     candidacy_warrants: Vec<WarrantWithIdentity>,
     candidate: Person,
     discussion: Discussion,
-    other_candidacies: Vec<(Candidacy, Person, Discussion)>,
+    other_candidacies: Vec<(Candidacy, Discussion, MessageContent)>,
 }
 
 impl AcceptCandidacy {
@@ -85,7 +86,7 @@ impl AcceptCandidacy {
         candidacy_warrants: &[WarrantWithIdentity],
         candidate: &Person,
         discussion: &Discussion,
-        other_candidacies: &[(Candidacy, Person, Discussion)],
+        other_candidacies: &[(Candidacy, Discussion, MessageContent)],
     ) -> Self {
         Self {
             candidacy: candidacy.clone(),
@@ -127,8 +128,8 @@ impl Command for AcceptCandidacy {
         // Make other candidacies rejected.
         let rejected_candidacies = other_candidacies
             .into_iter()
-            .map(|(candidacy, candidate, discussion)| {
-                RejectCandidacy::new(&candidacy, &candidate, &account_owner, &discussion)
+            .map(|(candidacy, discussion, message)| {
+                RejectCandidacy::new(&candidacy, &account_owner, &discussion, &message)
                     .run(RejectCandidacyInput { id: candidacy.id })
             })
             .collect::<Result<Vec<_>>>()?
