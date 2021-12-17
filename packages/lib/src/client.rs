@@ -404,8 +404,6 @@ impl Client {
                     lease_file: payload.lease_file,
                     workflow: payload.workflow,
                     workflowable: payload.workflowable,
-                    steps: payload.steps,
-                    candidacy_accepted_step: payload.candidacy_accepted_step,
                     invite: payload.invite,
                 }
                 .into()
