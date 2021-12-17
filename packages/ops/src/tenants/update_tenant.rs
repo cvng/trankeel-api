@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::warrants::CreateWarrantInput;
-use async_graphql::InputObject;
 use crate::Command;
+use async_graphql::InputObject;
 use trankeel_data::Date;
 use trankeel_data::PhoneNumber;
 use trankeel_data::Tenant;
