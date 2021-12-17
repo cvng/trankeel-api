@@ -1,6 +1,7 @@
 use crate::billing::BillingProvider;
 use crate::error::Context;
 use crate::error::Error;
+use log::info;
 use std::env;
 use trankeel_data::Email;
 use trankeel_data::Subscription;
@@ -88,6 +89,8 @@ impl BillingProvider for Stripe {
         let subscription = stripe::Subscription::create(&self.0, subscription_params)
             .await
             .unwrap();
+
+        info!("Created subscription {}", subscription.id);
 
         Ok(subscription.into())
     }
