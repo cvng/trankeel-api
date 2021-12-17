@@ -2851,6 +2851,7 @@ dependencies = [
  "tokio 0.2.25",
  "toml",
  "trankeel-data",
+ "trankeel-ops",
 ]
 
 [[package]]
@@ -2888,10 +2889,10 @@ version = "0.3.0"
 dependencies = [
  "async-graphql",
  "chrono",
+ "eyre",
  "serde",
  "serde_json",
  "thiserror",
- "trankeel-core",
  "trankeel-data",
  "validator",
 ]

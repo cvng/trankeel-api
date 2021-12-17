@@ -2,9 +2,8 @@ use crate::error::Result;
 use crate::messaging::PushMessage;
 use crate::messaging::PushMessageInput;
 use crate::messaging::PushMessagePayload;
+use crate::Command;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::Command;
-use trankeel_core::templates::CandidacyRejectedMail;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
@@ -57,7 +56,7 @@ impl Command for RejectCandidacy {
 
         let Self {
             candidacy,
-            candidate,
+            candidate: _candidate,
             account_owner,
             discussion,
         } = self;
@@ -78,7 +77,7 @@ impl Command for RejectCandidacy {
         } = PushMessage::new(&discussion).run(PushMessageInput {
             discussion_id: discussion.id,
             sender_id: account_owner.id,
-            message: CandidacyRejectedMail::try_new(&candidate)?.to_string(),
+            message: Default::default(), // TODO: CandidacyRejectedMail::try_new(&candidate)?.to_string(),
         })?;
 
         Ok(Self::Payload {

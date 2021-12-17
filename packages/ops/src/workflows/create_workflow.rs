@@ -1,6 +1,5 @@
 use crate::error::Result;
-use trankeel_core::config;
-use trankeel_core::dispatcher::Command;
+use crate::Command;
 use trankeel_data::Step;
 use trankeel_data::Workflow;
 use trankeel_data::WorkflowId;
@@ -50,7 +49,7 @@ impl Command for CreateWorkflow {
             completed: Default::default(),
         };
 
-        let steps = config::workflow_steps(&workflow).into_iter().collect(); // IO.
+        let steps = vec![]; // TODO: config::workflow_steps(&workflow).into_iter().collect(); // IO.
 
         Ok(Self::Payload { workflow, steps })
     }

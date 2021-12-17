@@ -22,7 +22,6 @@ use trankeel_core::database::TenantStore;
 use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
 use trankeel_core::dispatcher;
-use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
 use trankeel_core::handlers::AdvertisementCreated;
@@ -129,6 +128,7 @@ use trankeel_ops::tenants::UpdateTenantPayload;
 use trankeel_ops::workflows::CompleteStep;
 use trankeel_ops::workflows::CompleteStepInput;
 use trankeel_ops::workflows::CompleteStepPayload;
+use trankeel_ops::Command;
 
 #[derive(Clone)]
 pub struct Client(context::Context);

@@ -1,6 +1,6 @@
 use crate::error::Result;
+use crate::Command;
 use chrono::Utc;
-use trankeel_core::dispatcher::Command;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Message;
