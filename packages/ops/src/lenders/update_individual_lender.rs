@@ -1,8 +1,8 @@
 use crate::auth::UpdatePersonInput;
 use crate::error::Error;
 use crate::error::Result;
-use async_graphql::InputObject;
 use crate::Command;
+use async_graphql::InputObject;
 use trankeel_data::LegalIdentity;
 use trankeel_data::LenderId;
 use trankeel_data::LenderWithIdentity;
