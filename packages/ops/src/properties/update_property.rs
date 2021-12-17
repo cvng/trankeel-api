@@ -1,7 +1,7 @@
 use crate::auth::AddressInput;
 use crate::error::Result;
-use async_graphql::InputObject;
 use crate::Command;
+use async_graphql::InputObject;
 use trankeel_data::Amount;
 use trankeel_data::Property;
 use trankeel_data::PropertyBuildPeriodType;
