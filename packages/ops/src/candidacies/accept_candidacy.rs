@@ -11,14 +11,11 @@ use crate::leases::CreateFurnishedLeasePayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::tenants::CreateTenantPayload;
-use crate::workflows::CompleteStep;
-use crate::workflows::CompleteStepInput;
-use crate::workflows::CompleteStepPayload;
 use crate::workflows::CreateWorkflow;
 use crate::workflows::CreateWorkflowInput;
 use crate::workflows::CreateWorkflowPayload;
+use crate::Command;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::Command;
 use trankeel_data::Account;
 use trankeel_data::Advertisement;
 use trankeel_data::Candidacy;
@@ -31,10 +28,9 @@ use trankeel_data::InviteReason;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
 use trankeel_data::Message;
+use trankeel_data::MessageContent;
 use trankeel_data::Person;
 use trankeel_data::Rent;
-use trankeel_data::Step;
-use trankeel_data::StepEvent;
 use trankeel_data::Tenant;
 use trankeel_data::WarrantWithIdentity;
 use trankeel_data::Workflow;
@@ -59,8 +55,6 @@ pub struct AcceptCandidacyPayload {
     pub lease_file: LeaseFile,
     pub workflow: Workflow,
     pub workflowable: Workflowable,
-    pub steps: Vec<Step>,
-    pub candidacy_accepted_step: Option<Step>,
     pub invite: Invite,
 }
 
@@ -72,7 +66,7 @@ pub struct AcceptCandidacy {
     candidacy_warrants: Vec<WarrantWithIdentity>,
     candidate: Person,
     discussion: Discussion,
-    other_candidacies: Vec<(Candidacy, Person, Discussion)>,
+    other_candidacies: Vec<(Candidacy, Discussion, MessageContent)>,
 }
 
 impl AcceptCandidacy {
@@ -85,7 +79,7 @@ impl AcceptCandidacy {
         candidacy_warrants: &[WarrantWithIdentity],
         candidate: &Person,
         discussion: &Discussion,
-        other_candidacies: &[(Candidacy, Person, Discussion)],
+        other_candidacies: &[(Candidacy, Discussion, MessageContent)],
     ) -> Self {
         Self {
             candidacy: candidacy.clone(),
@@ -127,8 +121,8 @@ impl Command for AcceptCandidacy {
         // Make other candidacies rejected.
         let rejected_candidacies = other_candidacies
             .into_iter()
-            .map(|(candidacy, candidate, discussion)| {
-                RejectCandidacy::new(&candidacy, &candidate, &account_owner, &discussion)
+            .map(|(candidacy, discussion, message)| {
+                RejectCandidacy::new(&candidacy, &account_owner, &discussion, &message)
                     .run(RejectCandidacyInput { id: candidacy.id })
             })
             .collect::<Result<Vec<_>>>()?
@@ -212,29 +206,11 @@ impl Command for AcceptCandidacy {
         let workflowable = Workflowable::Candidacy(candidacy.clone());
 
         // Setup candidacy workflow.
-        let CreateWorkflowPayload { workflow, steps } = CreateWorkflow::new(&workflowable) //
+        let CreateWorkflowPayload { workflow } = CreateWorkflow::new(&workflowable) //
             .run(CreateWorkflowInput {
                 type_: WorkflowType::Candidacy,
                 workflowable_id: candidacy.id,
             })?;
-
-        // Take first step from workflow (candidacy_accepted).
-        let candidacy_accepted_step = steps
-            .iter()
-            .find(|step| step.as_event() == Some(StepEvent::CandidacyAccepted))
-            .cloned();
-
-        // Mark step as completed if found.
-        let candidacy_accepted_step = if let Some(step) = candidacy_accepted_step {
-            CompleteStep::new(&step)
-                .run(CompleteStepInput {
-                    id: step.id,
-                    requirements: None,
-                })
-                .map(|CompleteStepPayload { step }| Some(step))?
-        } else {
-            None
-        };
 
         Ok(Self::Payload {
             candidacy,
@@ -248,8 +224,6 @@ impl Command for AcceptCandidacy {
             lease_file,
             workflow,
             workflowable,
-            steps,
-            candidacy_accepted_step,
             invite,
         })
     }

@@ -1,5 +1,4 @@
 use crate::billing::BillingProvider;
-use crate::error::Context;
 use crate::error::Error;
 use log::info;
 use std::env;
@@ -19,7 +18,7 @@ impl Stripe {
 #[async_trait]
 impl BillingProvider for Stripe {
     async fn create_subscription_with_customer(&self, email: Email) -> Result<Subscription, Error> {
-        let price_id = env::var("STRIPE_DEFAULT_PRICE_ID").context("STRIPE_DEFAULT_PRICE_ID")?;
+        let price_id = env::var("STRIPE_DEFAULT_PRICE_ID").expect("STRIPE_DEFAULT_PRICE_ID");
 
         // https://stripe.com/docs/api/customers/create
         let customer_params = stripe::CreateCustomer {

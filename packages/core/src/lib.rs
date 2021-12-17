@@ -17,4 +17,3 @@ pub mod messenger;
 pub mod pdfmaker;
 pub mod providers;
 pub mod templates;
-pub mod testing;

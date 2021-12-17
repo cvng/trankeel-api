@@ -4,6 +4,7 @@ use super::step_completed;
 use super::CandidacyRejected;
 use super::LeaseAffected;
 use super::StepCompleted;
+use crate::config;
 use crate::context::Context;
 use crate::database::Db;
 use crate::dispatcher::Event;
@@ -25,11 +26,15 @@ use trankeel_data::LeaseFile;
 use trankeel_data::Message;
 use trankeel_data::Person;
 use trankeel_data::Rent;
-use trankeel_data::Step;
+use trankeel_data::StepEvent;
 use trankeel_data::Tenant;
 use trankeel_data::WarrantWithIdentity;
 use trankeel_data::Workflow;
 use trankeel_data::Workflowable;
+use trankeel_ops::workflows::CompleteStep;
+use trankeel_ops::workflows::CompleteStepInput;
+use trankeel_ops::workflows::CompleteStepPayload;
+use trankeel_ops::Command;
 
 #[derive(Clone)]
 pub struct CandidacyAccepted {
@@ -44,8 +49,6 @@ pub struct CandidacyAccepted {
     pub lease_file: LeaseFile,
     pub workflow: Workflow,
     pub workflowable: Workflowable,
-    pub steps: Vec<Step>,
-    pub candidacy_accepted_step: Option<Step>,
     pub invite: Invite,
 }
 
@@ -71,10 +74,28 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
         lease_file,
         workflow,
         workflowable,
-        steps,
-        candidacy_accepted_step,
         invite: _invite,
     } = event;
+
+    let steps = config::workflow_steps(&workflow);
+
+    // Take first step from workflow (candidacy_accepted).
+    let candidacy_accepted_step = steps
+        .iter()
+        .find(|step| step.as_event() == Some(StepEvent::CandidacyAccepted))
+        .cloned();
+
+    // Mark step as completed if found.
+    let candidacy_accepted_step = if let Some(step) = candidacy_accepted_step {
+        CompleteStep::new(&step)
+            .run(CompleteStepInput {
+                id: step.id,
+                requirements: None,
+            })
+            .map(|CompleteStepPayload { step }| Some(step))?
+    } else {
+        None
+    };
 
     db.candidacies().update(&candidacy)?;
     db.persons().update(&identity)?;

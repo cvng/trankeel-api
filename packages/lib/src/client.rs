@@ -22,7 +22,6 @@ use trankeel_core::database::TenantStore;
 use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
 use trankeel_core::dispatcher;
-use trankeel_core::dispatcher::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::error::Error;
 use trankeel_core::handlers::AdvertisementCreated;
@@ -49,6 +48,7 @@ use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
 use trankeel_core::providers::Stripe;
 use trankeel_core::templates::CandidacyCreatedMail;
+use trankeel_core::templates::CandidacyRejectedMail;
 use trankeel_data::Account;
 use trankeel_data::Advertisement;
 use trankeel_data::AuthId;
@@ -129,6 +129,7 @@ use trankeel_ops::tenants::UpdateTenantPayload;
 use trankeel_ops::workflows::CompleteStep;
 use trankeel_ops::workflows::CompleteStepInput;
 use trankeel_ops::workflows::CompleteStepPayload;
+use trankeel_ops::Command;
 
 #[derive(Clone)]
 pub struct Client(context::Context);
@@ -370,8 +371,11 @@ impl Client {
             .map(|(_, candidacy)| self.persons().by_candidacy_id(&candidacy.id))
             .collect::<Result<Vec<_>>>()?
             .into_iter()
+            .map(|candidate| CandidacyRejectedMail::try_new(&candidate))
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
             .zip(other_candidacies)
-            .map(|(person, (discussion, candidacy))| (candidacy, person, discussion))
+            .map(|(message, (discussion, candidacy))| (candidacy, discussion, message.to_string()))
             .collect::<Vec<_>>();
 
         dispatcher::dispatch(
@@ -400,8 +404,6 @@ impl Client {
                     lease_file: payload.lease_file,
                     workflow: payload.workflow,
                     workflowable: payload.workflowable,
-                    steps: payload.steps,
-                    candidacy_accepted_step: payload.candidacy_accepted_step,
                     invite: payload.invite,
                 }
                 .into()

@@ -1,5 +1,5 @@
 use crate::error::Result;
-use trankeel_core::dispatcher::Command;
+use crate::Command;
 use trankeel_data::LeaseId;
 use validator::Validate;
 

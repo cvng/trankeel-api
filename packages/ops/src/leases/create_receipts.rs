@@ -1,7 +1,7 @@
 use crate::error::Result;
+use crate::Command;
 use async_graphql::InputObject;
 use chrono::Utc;
-use trankeel_core::dispatcher::Command;
 use trankeel_data::DateTime;
 use trankeel_data::Payment;
 use trankeel_data::PaymentId;

@@ -2,15 +2,15 @@ use crate::error::Result;
 use crate::messaging::PushMessage;
 use crate::messaging::PushMessageInput;
 use crate::messaging::PushMessagePayload;
+use crate::Command;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::Command;
-use trankeel_core::templates::CandidacyRejectedMail;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
 use trankeel_data::Message;
+use trankeel_data::MessageContent;
 use trankeel_data::Person;
 use validator::Validate;
 
@@ -27,23 +27,23 @@ pub struct RejectCandidacyPayload {
 
 pub struct RejectCandidacy {
     candidacy: Candidacy,
-    candidate: Person,
     account_owner: Person,
     discussion: Discussion,
+    candidacy_rejected_message: MessageContent,
 }
 
 impl RejectCandidacy {
     pub fn new(
         candidacy: &Candidacy,
-        candidate: &Person,
         account_owner: &Person,
         discussion: &Discussion,
+        candidacy_rejected_message: &str,
     ) -> Self {
         Self {
             candidacy: candidacy.clone(),
-            candidate: candidate.clone(),
             account_owner: account_owner.clone(),
             discussion: discussion.clone(),
+            candidacy_rejected_message: candidacy_rejected_message.to_string(),
         }
     }
 }
@@ -57,9 +57,9 @@ impl Command for RejectCandidacy {
 
         let Self {
             candidacy,
-            candidate,
             account_owner,
             discussion,
+            candidacy_rejected_message,
         } = self;
 
         let candidacy = Candidacy {
@@ -78,7 +78,7 @@ impl Command for RejectCandidacy {
         } = PushMessage::new(&discussion).run(PushMessageInput {
             discussion_id: discussion.id,
             sender_id: account_owner.id,
-            message: CandidacyRejectedMail::try_new(&candidate)?.to_string(),
+            message: candidacy_rejected_message,
         })?;
 
         Ok(Self::Payload {

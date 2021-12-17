@@ -1,7 +1,7 @@
 use super::AddressInput;
 use crate::error::Result;
+use crate::Command;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::Command;
 use trankeel_data::Account;
 use trankeel_data::Email;
 use trankeel_data::Person;

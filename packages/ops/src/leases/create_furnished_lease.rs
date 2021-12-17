@@ -1,7 +1,7 @@
+use crate::error::Error;
 use crate::error::Result;
 use crate::files::CreateFileInput;
-use trankeel_core::dispatcher::Command;
-use trankeel_core::error::Error;
+use crate::Command;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;

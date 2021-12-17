@@ -13,3 +13,10 @@ pub mod properties;
 pub mod tenants;
 pub mod warrants;
 pub mod workflows;
+
+pub trait Command {
+    type Input;
+    type Payload;
+
+    fn run(self, input: Self::Input) -> crate::error::Result<Self::Payload>;
+}

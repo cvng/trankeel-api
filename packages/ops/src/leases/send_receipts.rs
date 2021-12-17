@@ -1,6 +1,6 @@
 use crate::error::Result;
+use crate::Command;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::Command;
 use trankeel_data::RentId;
 use validator::Validate;
 

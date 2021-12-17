@@ -5,7 +5,7 @@ use crate::properties::CreatePropertyPayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::tenants::CreateTenantPayload;
-use trankeel_core::dispatcher::Command;
+use crate::Command;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;

@@ -1,8 +1,8 @@
 use super::FurnishedLeaseDetailsInput;
 use crate::error::Result;
 use crate::files::CreateFileInput;
+use crate::Command;
 use async_graphql::InputObject;
-use trankeel_core::dispatcher::Command;
 use trankeel_data::Lease;
 use trankeel_data::LeaseId;
 use validator::Validate;
