@@ -9,7 +9,7 @@ edition = "2021"
 doctest = false
 
 [dependencies]
-async-graphql = "3.0.13"
+async-graphql = "3.0.17"
 chrono = "0.4.19"
 eyre = "0.6.5"
 thiserror = "1.0.30"
