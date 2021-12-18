@@ -18,6 +18,7 @@ use trankeel_core::database::PlanStore;
 use trankeel_core::database::PropertyStore;
 use trankeel_core::database::RentStore;
 use trankeel_core::database::ReportStore;
+use trankeel_core::database::StepStore;
 use trankeel_core::database::TenantStore;
 use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
@@ -36,6 +37,7 @@ use trankeel_core::handlers::PropertyUpdated;
 use trankeel_core::handlers::ReceiptCreated;
 use trankeel_core::handlers::ReceiptSent;
 use trankeel_core::handlers::StepCompleted;
+use trankeel_core::handlers::StepCompletedRequirement;
 use trankeel_core::handlers::TenantCreated;
 use trankeel_core::handlers::TenantUpdated;
 use trankeel_core::mailer::IntoMail;
@@ -126,9 +128,7 @@ use trankeel_ops::tenants::DeleteTenantInput;
 use trankeel_ops::tenants::UpdateTenant;
 use trankeel_ops::tenants::UpdateTenantInput;
 use trankeel_ops::tenants::UpdateTenantPayload;
-use trankeel_ops::workflows::CompleteStep;
 use trankeel_ops::workflows::CompleteStepInput;
-use trankeel_ops::workflows::CompleteStepPayload;
 use trankeel_ops::Command;
 
 #[derive(Clone)]
@@ -227,6 +227,10 @@ impl Client {
 
     pub fn workflows(&self) -> Box<dyn WorkflowStore + '_> {
         self.0.db().workflows()
+    }
+
+    pub fn steps(&self) -> Box<dyn StepStore + '_> {
+        self.0.db().steps()
     }
 
     // Operations
@@ -811,13 +815,25 @@ impl Client {
     }
 
     pub async fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
-        let step = self.0.db().steps().by_id(&input.id)?;
+        dispatcher::dispatch(
+            &self.0,
+            vec![StepCompleted {
+                step_id: input.id,
+                requirements: input.requirements.map(|requirements| {
+                    requirements
+                        .into_iter()
+                        .map(|requirement| StepCompletedRequirement {
+                            name: requirement.name,
+                            value: requirement.value,
+                        })
+                        .collect()
+                }),
+            }
+            .into()],
+        )
+        .await?;
 
-        let CompleteStepPayload { step } = CompleteStep::new(&step).run(input)?;
-
-        dispatcher::dispatch(&self.0, vec![StepCompleted { step: step.clone() }.into()]).await?;
-
-        Ok(step)
+        self.steps().by_id(&input.id)
     }
 
     pub async fn batch_mails(&self, mails: Vec<impl IntoMail>) -> Result<Vec<Mail>> {

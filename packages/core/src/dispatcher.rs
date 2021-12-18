@@ -60,6 +60,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
                 Event::NoticeCreated(evt) => handlers::notice_created_async(ctx, evt).await,
                 Event::ReceiptCreated(evt) => handlers::receipt_created_async(ctx, evt).await,
                 Event::ReceiptSent(evt) => handlers::receipt_sent_async(ctx, evt).await,
+                Event::StepCompleted(evt) => handlers::step_completed_async(ctx, evt).await,
                 _ => Ok(()),
             }
         })

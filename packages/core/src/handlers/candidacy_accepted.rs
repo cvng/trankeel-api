@@ -87,12 +87,18 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
 
     // Mark step as completed if found.
     let candidacy_accepted_step = if let Some(step) = candidacy_accepted_step {
-        CompleteStep::new(&step)
+        CompleteStep::new(&step, &lease, &discussion)
             .run(CompleteStepInput {
                 id: step.id,
                 requirements: None,
             })
-            .map(|CompleteStepPayload { step }| Some(step))?
+            .map(
+                |CompleteStepPayload {
+                     step,
+                     lease: _lease,
+                     discussion: _discussion,
+                 }| Some(step),
+            )?
     } else {
         None
     };
@@ -125,7 +131,13 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
     }
 
     if let Some(step) = candidacy_accepted_step {
-        step_completed(ctx, StepCompleted { step })?;
+        step_completed(
+            ctx,
+            StepCompleted {
+                step_id: step.id,
+                requirements: None,
+            },
+        )?;
     }
 
     let account = db.accounts().by_candidacy_id(&candidacy.id)?;
