@@ -3,23 +3,31 @@ use crate::database::Db;
 use crate::dispatcher::Event;
 use crate::error::Result;
 use crate::messenger::Messenger;
-use chrono::DateTime;
-use chrono::Utc;
-use diesel::result::Error::NotFound;
+use crate::templates;
 use trankeel_data::locale;
-use trankeel_data::Discussion;
-use trankeel_data::DiscussionStatus;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
 use trankeel_data::Lease;
 use trankeel_data::Name;
 use trankeel_data::Person;
 use trankeel_data::Step;
-use trankeel_data::StepEvent;
+use trankeel_data::StepId;
+use trankeel_ops::workflows::CompleteStep;
+use trankeel_ops::workflows::CompleteStepInput;
+use trankeel_ops::workflows::CompleteStepPayload;
+use trankeel_ops::workflows::CompleteStepRequirementInput;
+use trankeel_ops::Command;
+
+#[derive(Clone)]
+pub struct StepCompletedRequirement {
+    pub name: String,
+    pub value: String,
+}
 
 #[derive(Clone)]
 pub struct StepCompleted {
-    pub step: Step,
+    pub step_id: StepId,
+    pub requirements: Option<Vec<StepCompletedRequirement>>,
 }
 
 impl From<StepCompleted> for Event {
@@ -30,87 +38,75 @@ impl From<StepCompleted> for Event {
 
 pub fn step_completed(ctx: &Context, event: StepCompleted) -> Result<()> {
     let db = ctx.db();
+
+    let StepCompleted {
+        step_id,
+        requirements,
+    } = event;
+
+    let step = db.steps().by_id(&step_id)?;
+    let participant = db.persons().by_step_id(&step.id)?;
+    let lease = db.leases().by_person_id(&participant.id)?;
+    let discussion = db.discussions().by_initiator_id(&participant.id)?;
+
+    let CompleteStepPayload {
+        step,
+        lease,
+        discussion,
+    } = CompleteStep::new(&step, &lease, &discussion).run(CompleteStepInput {
+        id: step.id,
+        requirements: requirements.map(|requirements| {
+            requirements
+                .into_iter()
+                .map(|requirement| CompleteStepRequirementInput {
+                    name: requirement.name,
+                    value: requirement.value,
+                })
+                .collect()
+        }),
+    })?;
+
+    db.steps().update(&step)?;
+    db.leases().update(&lease)?;
+    db.discussions().update(&discussion)?;
+
+    Ok(())
+}
+
+pub async fn step_completed_async(ctx: &Context, event: StepCompleted) -> Result<()> {
+    let db = ctx.db();
     let messenger = ctx.messenger();
 
-    let StepCompleted { step } = event;
+    let StepCompleted { step_id, .. } = event;
 
+    let step = db.steps().by_id(&step_id)?;
     let account = db.accounts().by_step_id(&step.id)?;
     let participant = db.persons().by_step_id(&step.id)?;
-    let sender = db
-        .persons()
-        .by_account_id(&account.id)?
-        .first()
-        .cloned()
-        .ok_or(NotFound)?;
-
-    if let Some(step_event) = step.event.clone() {
-        match step_event.into() {
-            StepEvent::LeaseSigned => {
-                let lease = db.leases().by_person_id(&participant.id)?;
-                db.leases().update(&Lease {
-                    id: lease.id,
-                    signature_date: Some(Utc::now().into()), // TODO: match workflowable
-                    ..lease
-                })?;
-            }
-            StepEvent::LeaseConfirmed => {
-                let step_requirements = match step.clone().requirements {
-                    Some(step_requirements) => step_requirements.requirements,
-                    None => vec![],
-                };
-
-                let effect_date = step_requirements
-                    .into_iter()
-                    .find(|sr| sr.name == "effect_date")
-                    .and_then(|sr| sr.value);
-
-                if let Some(effect_date) = effect_date {
-                    let lease = db.leases().by_person_id(&participant.id)?;
-                    db.leases().update(&Lease {
-                        id: lease.id,
-                        effect_date: effect_date.parse::<DateTime<Utc>>()?.into(), // TODO: match workflowable
-                        ..lease
-                    })?;
-                }
-            }
-            StepEvent::LeaseActivated => {
-                let discussion = db.discussions().by_initiator_id(&participant.id)?;
-                db.discussions().update(&Discussion {
-                    id: discussion.id,
-                    status: DiscussionStatus::Active,
-                    ..discussion
-                })?;
-            }
-            _ => (),
-        }
-    }
-
+    let sender = db.persons().by_account_id_first(&account.id)?;
     let tenant = db.tenants().by_person_id(&participant.id)?;
     let lease = db.leases().by_tenant_id(&tenant.id)?; // TODO: match workflowable
-    let message = render_step_message(step.clone(), participant.clone(), lease)?;
 
     messenger.message(
         EventType::StepCompleted,
-        Eventable::Step(step),
+        Eventable::Step(step.clone()),
         sender.id,
         participant.id,
-        message,
+        render_step_message(&step, &participant, &lease)?,
     )?;
 
     Ok(())
 }
 
-// # Utils
-
-fn render_step_message(step: Step, participant: Person, lease: Lease) -> Result<Option<String>> {
-    let message = step.confirmation.map(|message| {
-        message
-            .replace("{{ tenant_name }}", &participant.display_name())
-            .replace("{{ effect_date }}", &lease.effect_date.inner().to_rfc3339())
-            .replace(
-                "{{ deposit_amount }}",
-                &locale::currency(&lease.deposit_amount.inner().round_dp(2).to_string()),
-            )
+fn render_step_message(step: &Step, participant: &Person, lease: &Lease) -> Result<Option<String>> {
+    let message = step.confirmation.clone().map(|message| {
+        templates::parse_template(&message)
+            .unwrap()
+            .render(&liquid::object!({
+                "tenant_name": participant.display_name(),
+                "effect_date": lease.effect_date.inner().to_rfc3339(),
+                "deposit_amount": locale::currency(&lease.deposit_amount.inner().round_dp(2).to_string()),
+            }))
+            .unwrap()
     });
 
     Ok(message)

@@ -1,8 +1,14 @@
 use crate::error::Result;
 use crate::Command;
+use chrono::DateTime;
+use chrono::Utc;
+use trankeel_data::Discussion;
+use trankeel_data::DiscussionStatus;
+use trankeel_data::Lease;
 use trankeel_data::Requirement;
 use trankeel_data::RequirementOuter;
 use trankeel_data::Step;
+use trankeel_data::StepEvent;
 use trankeel_data::StepId;
 use validator::Validate;
 
@@ -20,15 +26,23 @@ pub struct CompleteStepInput {
 
 pub struct CompleteStepPayload {
     pub step: Step,
+    pub lease: Lease,
+    pub discussion: Discussion,
 }
 
 pub struct CompleteStep {
     step: Step,
+    lease: Lease,
+    discussion: Discussion,
 }
 
 impl CompleteStep {
-    pub fn new(step: &Step) -> Self {
-        Self { step: step.clone() }
+    pub fn new(step: &Step, lease: &Lease, discussion: &Discussion) -> Self {
+        Self {
+            step: step.clone(),
+            lease: lease.clone(),
+            discussion: discussion.clone(),
+        }
     }
 }
 
@@ -39,7 +53,11 @@ impl Command for CompleteStep {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let Self { step } = self;
+        let Self {
+            step,
+            lease,
+            discussion,
+        } = self;
 
         let step = Step {
             id: step.id,
@@ -48,7 +66,54 @@ impl Command for CompleteStep {
             ..step
         };
 
-        Ok(Self::Payload { step })
+        let (lease, discussion) = if let Some(step_event) = step.event.clone() {
+            match step_event.into() {
+                StepEvent::LeaseSigned => {
+                    let lease = Lease {
+                        signature_date: Some(Utc::now().into()), // TODO: match workflowable
+                        ..lease
+                    };
+                    (lease, discussion)
+                }
+                StepEvent::LeaseConfirmed => {
+                    let step_requirements = match step.clone().requirements {
+                        Some(step_requirements) => step_requirements.requirements,
+                        None => vec![],
+                    };
+
+                    let effect_date = step_requirements
+                        .into_iter()
+                        .find(|sr| sr.name == "effect_date")
+                        .and_then(|sr| sr.value);
+
+                    if let Some(effect_date) = effect_date {
+                        let lease = Lease {
+                            effect_date: effect_date.parse::<DateTime<Utc>>()?.into(), // TODO: match workflowable
+                            ..lease
+                        };
+                        (lease, discussion)
+                    } else {
+                        (lease, discussion)
+                    }
+                }
+                StepEvent::LeaseActivated => {
+                    let discussion = Discussion {
+                        status: DiscussionStatus::Active,
+                        ..discussion
+                    };
+                    (lease, discussion)
+                }
+                _ => (lease, discussion),
+            }
+        } else {
+            (lease, discussion)
+        };
+
+        Ok(Self::Payload {
+            step,
+            lease,
+            discussion,
+        })
     }
 }
 
