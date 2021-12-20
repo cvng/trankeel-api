@@ -11,7 +11,7 @@ name = "trankeel-cli"
 path = "src/bin/cli.rs"
 
 [dependencies]
-async-graphql-rocket = "3.0.15"
+async-graphql-rocket = "3.0.17"
 chrono = "0.4.19"
 dotenv = "0.15.0"
 jsonwebtoken = "7.2.0"
