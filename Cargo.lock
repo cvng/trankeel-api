@@ -1918,9 +1918,9 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.11.7"
+version = "0.11.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07bea77bc708afa10e59905c3d4af7c8fd43c9214251673095ff8b14345fcbc5"
+checksum = "7c4e0a76dc12a116108933f6301b95e83634e0c47b0afbed6abbaa0601e99258"
 dependencies = [
  "base64 0.13.0",
  "bytes 1.0.1",
@@ -2215,7 +2215,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "546b9b6f76c26c60ffbcf0b7136e15169fe13d43949b4aadb7c1edc1c3f3a26f"
 dependencies = [
  "httpdate 1.0.1",
- "reqwest 0.11.7",
+ "reqwest 0.11.8",
  "sentry-backtrace",
  "sentry-contexts",
  "sentry-core",
@@ -2833,7 +2833,7 @@ dependencies = [
  "futures",
  "liquid",
  "log",
- "reqwest 0.11.7",
+ "reqwest 0.11.8",
  "sendinblue",
  "serde",
  "serde_json",
