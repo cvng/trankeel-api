@@ -787,7 +787,7 @@ impl Client {
 
         dispatcher::dispatch(&self.0, DeleteDiscussionCommand.run(input)?)
             .await
-            .and_then(|_| Ok(discussion_id))
+            .map(|_| discussion_id)
     }
 
     pub async fn push_message(&self, input: PushMessageInput) -> Result<Message> {
