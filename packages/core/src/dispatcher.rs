@@ -10,7 +10,7 @@ pub trait Handler {
     type Event;
     type Payload;
 
-    fn run(self, event: Self::Event) -> Result<Self::Payload>;
+    fn run(self, event: Self::Event) -> crate::error::Result<Self::Payload>;
 }
 
 #[allow(clippy::large_enum_variant)]
