@@ -34,9 +34,9 @@ pub struct StepCompleted {
 }
 
 impl StepCompleted {
-    pub fn with(step_id: &StepId, requirements: Option<Vec<StepCompletedRequirement>>) -> Event {
+    pub fn with(step_id: StepId, requirements: Option<Vec<StepCompletedRequirement>>) -> Event {
         Event::StepCompleted(Self {
-            step_id: *step_id,
+            step_id,
             requirements,
         })
     }

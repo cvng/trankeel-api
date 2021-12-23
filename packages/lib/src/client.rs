@@ -99,7 +99,7 @@ use trankeel_ops::lenders::UpdateIndividualLender;
 use trankeel_ops::lenders::UpdateIndividualLenderInput;
 use trankeel_ops::lenders::UpdateIndividualLenderPayload;
 use trankeel_ops::messaging::push_message2::PushMessageCommand;
-use trankeel_ops::messaging::DeleteDiscussion;
+use trankeel_ops::messaging::DeleteDiscussionCommand;
 use trankeel_ops::messaging::DeleteDiscussionInput;
 use trankeel_ops::messaging::PushMessageInput;
 use trankeel_ops::properties::CreateAdvertisement;
@@ -782,16 +782,12 @@ impl Client {
         Ok(vec![])
     }
 
-    pub fn delete_discussion(
-        &self,
-        _auth_id: &AuthId,
-        input: DeleteDiscussionInput,
-    ) -> Result<DiscussionId> {
-        let discussion_id = DeleteDiscussion.run(input)?;
+    pub async fn delete_discussion(&self, input: DeleteDiscussionInput) -> Result<DiscussionId> {
+        let discussion_id = input.id;
 
-        self.0.db().discussions().delete(&discussion_id)?;
-
-        Ok(discussion_id)
+        dispatcher::dispatch(&self.0, DeleteDiscussionCommand.run(input)?)
+            .await
+            .and_then(|_| Ok(discussion_id))
     }
 
     pub async fn push_message(&self, input: PushMessageInput) -> Result<Message> {

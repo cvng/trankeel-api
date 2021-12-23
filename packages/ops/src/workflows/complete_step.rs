@@ -39,7 +39,7 @@ impl Command for CompleteStepCommand {
         let Self { step } = self;
 
         let events = vec![StepCompleted::with(
-            &step.id,
+            step.id,
             input.requirements.map(|requirements| {
                 requirements
                     .into_iter()
