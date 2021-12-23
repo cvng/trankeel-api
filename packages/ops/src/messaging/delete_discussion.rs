@@ -1,5 +1,7 @@
 use crate::error::Result;
 use crate::Command;
+use trankeel_core::dispatcher::Event;
+use trankeel_core::handlers::DiscussionDeleted;
 use trankeel_data::DiscussionId;
 use validator::Validate;
 
@@ -8,15 +10,15 @@ pub struct DeleteDiscussionInput {
     pub id: DiscussionId,
 }
 
-pub struct DeleteDiscussion;
+pub struct DeleteDiscussionCommand;
 
-impl Command for DeleteDiscussion {
+impl Command for DeleteDiscussionCommand {
     type Input = DeleteDiscussionInput;
-    type Payload = DiscussionId;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        Ok(input.id)
+        Ok(vec![DiscussionDeleted::with(input.id)])
     }
 }

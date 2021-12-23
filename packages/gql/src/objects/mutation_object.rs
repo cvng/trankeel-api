@@ -293,7 +293,8 @@ impl Mutation {
     ) -> Result<DeleteDiscussionPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_discussion(ctx.data::<AuthId>()?, input)?
+            .delete_discussion(input)
+            .await?
             .into())
     }
 
