@@ -124,7 +124,7 @@ use trankeel_ops::tenants::DeleteTenantInput;
 use trankeel_ops::tenants::UpdateTenant;
 use trankeel_ops::tenants::UpdateTenantInput;
 use trankeel_ops::tenants::UpdateTenantPayload;
-use trankeel_ops::workflows::CompleteStep;
+use trankeel_ops::workflows::CompleteStepCommand;
 use trankeel_ops::workflows::CompleteStepInput;
 use trankeel_ops::Command;
 
@@ -805,7 +805,7 @@ impl Client {
     pub async fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
         let step = self.steps().by_id(&input.id)?;
 
-        dispatcher::dispatch(&self.0, CompleteStep::new(&step).run(input)?)
+        dispatcher::dispatch(&self.0, CompleteStepCommand::new(&step).run(input)?)
             .await
             .and_then(|_| self.steps().by_id(&step.id))
     }

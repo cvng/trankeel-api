@@ -3,8 +3,6 @@ use crate::Command;
 use trankeel_core::dispatcher::Event;
 use trankeel_core::handlers::StepCompleted;
 use trankeel_core::handlers::StepCompletedRequirement;
-use trankeel_data::Discussion;
-use trankeel_data::Lease;
 use trankeel_data::Step;
 use trankeel_data::StepId;
 use validator::Validate;
@@ -21,23 +19,17 @@ pub struct CompleteStepInput {
     pub requirements: Option<Vec<CompleteStepRequirementInput>>,
 }
 
-pub struct CompleteStepPayload {
-    pub step: Step,
-    pub lease: Lease,
-    pub discussion: Discussion,
-}
-
-pub struct CompleteStep {
+pub struct CompleteStepCommand {
     step: Step,
 }
 
-impl CompleteStep {
+impl CompleteStepCommand {
     pub fn new(step: &Step) -> Self {
         Self { step: step.clone() }
     }
 }
 
-impl Command for CompleteStep {
+impl Command for CompleteStepCommand {
     type Input = CompleteStepInput;
     type Payload = Vec<Event>;
 
