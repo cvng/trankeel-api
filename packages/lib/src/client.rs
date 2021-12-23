@@ -98,7 +98,7 @@ use trankeel_ops::leases::UpdateFurnishedLeasePayload;
 use trankeel_ops::lenders::UpdateIndividualLender;
 use trankeel_ops::lenders::UpdateIndividualLenderInput;
 use trankeel_ops::lenders::UpdateIndividualLenderPayload;
-use trankeel_ops::messaging::push_message2::PushMessage;
+use trankeel_ops::messaging::push_message2::PushMessageCommand;
 use trankeel_ops::messaging::DeleteDiscussion;
 use trankeel_ops::messaging::DeleteDiscussionInput;
 use trankeel_ops::messaging::PushMessageInput;
@@ -797,7 +797,7 @@ impl Client {
     pub async fn push_message(&self, input: PushMessageInput) -> Result<Message> {
         let message_id = MessageId::new();
 
-        dispatcher::dispatch(&self.0, PushMessage::new(&message_id).run(input)?)
+        dispatcher::dispatch(&self.0, PushMessageCommand::new(&message_id).run(input)?)
             .await
             .and_then(|_| self.messages().by_id(&message_id))
     }
