@@ -6,6 +6,13 @@ use futures::stream;
 use futures::stream::StreamExt;
 use futures::stream::TryStreamExt;
 
+pub trait Handler {
+    type Event;
+    type Payload;
+
+    fn run(self, event: Self::Event) -> crate::error::Result<Self::Payload>;
+}
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone)]
 pub enum Event {

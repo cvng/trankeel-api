@@ -4,10 +4,13 @@ use super::step_completed;
 use super::CandidacyRejected;
 use super::LeaseAffected;
 use super::StepCompleted;
+use super::StepCompletedHandler;
+use super::StepCompletedPayload;
 use crate::config;
 use crate::context::Context;
 use crate::database::Db;
 use crate::dispatcher::Event;
+use crate::dispatcher::Handler;
 use crate::error::Result;
 use crate::mailer::Mailer;
 use crate::messenger::Messenger;
@@ -31,10 +34,6 @@ use trankeel_data::Tenant;
 use trankeel_data::WarrantWithIdentity;
 use trankeel_data::Workflow;
 use trankeel_data::Workflowable;
-use trankeel_ops::workflows::CompleteStep;
-use trankeel_ops::workflows::CompleteStepInput;
-use trankeel_ops::workflows::CompleteStepPayload;
-use trankeel_ops::Command;
 
 #[derive(Clone)]
 pub struct CandidacyAccepted {
@@ -87,13 +86,13 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
 
     // Mark step as completed if found.
     let candidacy_accepted_step = if let Some(step) = candidacy_accepted_step {
-        CompleteStep::new(&step, &lease, &discussion)
-            .run(CompleteStepInput {
-                id: step.id,
+        StepCompletedHandler::new(&step, &lease, &discussion)
+            .run(StepCompleted {
+                step_id: step.id,
                 requirements: None,
             })
             .map(
-                |CompleteStepPayload {
+                |StepCompletedPayload {
                      step,
                      lease: _lease,
                      discussion: _discussion,

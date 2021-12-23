@@ -36,12 +36,8 @@ use trankeel_core::handlers::PropertyCreated;
 use trankeel_core::handlers::PropertyUpdated;
 use trankeel_core::handlers::ReceiptCreated;
 use trankeel_core::handlers::ReceiptSent;
-use trankeel_core::handlers::StepCompleted;
-use trankeel_core::handlers::StepCompletedRequirement;
 use trankeel_core::handlers::TenantCreated;
 use trankeel_core::handlers::TenantUpdated;
-use trankeel_core::mailer::IntoMail;
-use trankeel_core::mailer::Mail;
 use trankeel_core::mailer::Mailer;
 use trankeel_core::providers;
 use trankeel_core::providers::Messagerie;
@@ -128,6 +124,7 @@ use trankeel_ops::tenants::DeleteTenantInput;
 use trankeel_ops::tenants::UpdateTenant;
 use trankeel_ops::tenants::UpdateTenantInput;
 use trankeel_ops::tenants::UpdateTenantPayload;
+use trankeel_ops::workflows::CompleteStep;
 use trankeel_ops::workflows::CompleteStepInput;
 use trankeel_ops::Command;
 
@@ -815,29 +812,11 @@ impl Client {
     }
 
     pub async fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
-        dispatcher::dispatch(
-            &self.0,
-            vec![StepCompleted {
-                step_id: input.id,
-                requirements: input.requirements.map(|requirements| {
-                    requirements
-                        .into_iter()
-                        .map(|requirement| StepCompletedRequirement {
-                            name: requirement.name,
-                            value: requirement.value,
-                        })
-                        .collect()
-                }),
-            }
-            .into()],
-        )
-        .await?;
+        let step = self.steps().by_id(&input.id)?;
 
-        self.steps().by_id(&input.id)
-    }
-
-    pub async fn batch_mails(&self, mails: Vec<impl IntoMail>) -> Result<Vec<Mail>> {
-        self.0.mailer().batch(mails).await
+        dispatcher::dispatch(&self.0, CompleteStep::new(&step).run(input)?)
+            .await
+            .and_then(|_| self.steps().by_id(&step.id))
     }
 
     pub async fn dispatch(&self, events: Vec<Event>) -> Result<()> {
