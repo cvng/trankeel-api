@@ -141,17 +141,14 @@ pub fn step_completed(ctx: &Context, event: StepCompleted) -> Result<()> {
     let lease = db.leases().by_person_id(&participant.id)?;
     let discussion = db.discussions().by_initiator_id(&participant.id)?;
 
-    let StepCompletedPayload {
-        step,
-        lease,
-        discussion,
-    } = StepCompletedHandler::new(&step, &lease, &discussion).run(event)?;
-
-    db.steps().update(&step)?;
-    db.leases().update(&lease)?;
-    db.discussions().update(&discussion)?;
-
-    Ok(())
+    StepCompletedHandler::new(&step, &lease, &discussion)
+        .run(event)
+        .and_then(|payload| {
+            db.steps().update(&payload.step)?;
+            db.leases().update(&payload.lease)?;
+            db.discussions().update(&payload.discussion)?;
+            Ok(())
+        })
 }
 
 pub async fn step_completed_async(ctx: &Context, event: StepCompleted) -> Result<()> {
