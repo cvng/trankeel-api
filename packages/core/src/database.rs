@@ -28,6 +28,7 @@ use trankeel_data::Lender;
 use trankeel_data::LenderId;
 use trankeel_data::LenderWithIdentity;
 use trankeel_data::Message;
+use trankeel_data::MessageId;
 use trankeel_data::NoticeId;
 use trankeel_data::Payment;
 use trankeel_data::PaymentId;
@@ -258,6 +259,7 @@ pub trait DiscussionStore {
 }
 
 pub trait MessageStore {
+    fn by_id(&mut self, id: &MessageId) -> Result<Message>;
     fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Vec<Message>>;
     fn create(&mut self, data: &Message) -> Result<Message>;
     fn create_many(&mut self, data: &[Message]) -> Result<Vec<Message>>;

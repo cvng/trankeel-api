@@ -57,6 +57,7 @@ use trankeel_data::LeaseId;
 use trankeel_data::LegalIdentity;
 use trankeel_data::Lender;
 use trankeel_data::Message;
+use trankeel_data::MessageId;
 use trankeel_data::Notice;
 use trankeel_data::Person;
 use trankeel_data::Property;
@@ -97,11 +98,10 @@ use trankeel_ops::leases::UpdateFurnishedLeasePayload;
 use trankeel_ops::lenders::UpdateIndividualLender;
 use trankeel_ops::lenders::UpdateIndividualLenderInput;
 use trankeel_ops::lenders::UpdateIndividualLenderPayload;
+use trankeel_ops::messaging::push_message2::PushMessageCommand;
 use trankeel_ops::messaging::DeleteDiscussion;
 use trankeel_ops::messaging::DeleteDiscussionInput;
-use trankeel_ops::messaging::PushMessage;
 use trankeel_ops::messaging::PushMessageInput;
-use trankeel_ops::messaging::PushMessagePayload;
 use trankeel_ops::properties::CreateAdvertisement;
 use trankeel_ops::properties::CreateAdvertisementInput;
 use trankeel_ops::properties::CreateAdvertisementPayload;
@@ -124,7 +124,7 @@ use trankeel_ops::tenants::DeleteTenantInput;
 use trankeel_ops::tenants::UpdateTenant;
 use trankeel_ops::tenants::UpdateTenantInput;
 use trankeel_ops::tenants::UpdateTenantPayload;
-use trankeel_ops::workflows::CompleteStep;
+use trankeel_ops::workflows::CompleteStepCommand;
 use trankeel_ops::workflows::CompleteStepInput;
 use trankeel_ops::Command;
 
@@ -795,26 +795,17 @@ impl Client {
     }
 
     pub async fn push_message(&self, input: PushMessageInput) -> Result<Message> {
-        let discussion = self.0.db().discussions().by_id(&input.discussion_id)?;
+        let message_id = MessageId::new();
 
-        let PushMessagePayload {
-            message,
-            discussion,
-        } = PushMessage::new(&discussion).run(input)?;
-
-        self.0.db().transaction(|| {
-            self.0.db().messages().create(&message)?;
-            self.0.db().discussions().update(&discussion)?;
-            Ok(())
-        })?;
-
-        Ok(message)
+        dispatcher::dispatch(&self.0, PushMessageCommand::new(&message_id).run(input)?)
+            .await
+            .and_then(|_| self.messages().by_id(&message_id))
     }
 
     pub async fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
         let step = self.steps().by_id(&input.id)?;
 
-        dispatcher::dispatch(&self.0, CompleteStep::new(&step).run(input)?)
+        dispatcher::dispatch(&self.0, CompleteStepCommand::new(&step).run(input)?)
             .await
             .and_then(|_| self.steps().by_id(&step.id))
     }

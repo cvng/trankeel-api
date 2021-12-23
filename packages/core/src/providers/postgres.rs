@@ -71,6 +71,7 @@ use trankeel_data::Lender;
 use trankeel_data::LenderId;
 use trankeel_data::LenderWithIdentity;
 use trankeel_data::Message;
+use trankeel_data::MessageId;
 use trankeel_data::NoticeId;
 use trankeel_data::Payment;
 use trankeel_data::PaymentId;
@@ -1208,6 +1209,10 @@ impl database::DiscussionStore for DiscussionStore<'_> {
 }
 
 impl database::MessageStore for MessageStore<'_> {
+    fn by_id(&mut self, id: &MessageId) -> Result<Message> {
+        Ok(messages::table.find(id).first(&self.0.get()?)?)
+    }
+
     fn by_discussion_id(&mut self, discussion_id: &DiscussionId) -> Result<Vec<Message>> {
         Ok(messages::table
             .filter(messages::discussion_id.eq(discussion_id))
