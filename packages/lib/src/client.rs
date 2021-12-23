@@ -814,9 +814,9 @@ impl Client {
     pub async fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
         let step = self.steps().by_id(&input.id)?;
 
-        dispatcher::dispatch(&self.0, CompleteStep::new(&step).run(input)?).await?;
-
-        self.steps().by_id(&step.id)
+        dispatcher::dispatch(&self.0, CompleteStep::new(&step).run(input)?)
+            .await
+            .and_then(|_| self.steps().by_id(&step.id))
     }
 
     pub async fn dispatch(&self, events: Vec<Event>) -> Result<()> {
