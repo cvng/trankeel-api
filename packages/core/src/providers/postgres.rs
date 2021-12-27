@@ -1095,21 +1095,39 @@ impl database::EventableStore for EventableStore<'_> {
         match &data {
             Eventable::File(inner) => insert_into(eventables::table)
                 .values(eventables::file_id.eq(inner.id))
+                .on_conflict(eventables::id)
+                .do_update()
+                .set(eventables::file_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
             Eventable::Rent(inner) => insert_into(eventables::table)
                 .values(eventables::rent_id.eq(inner.id))
+                .on_conflict(eventables::id)
+                .do_update()
+                .set(eventables::file_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
             Eventable::Step(inner) => insert_into(eventables::table)
                 .values(eventables::step_id.eq(inner.id))
+                .on_conflict(eventables::id)
+                .do_update()
+                .set(eventables::file_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
             Eventable::Lease(inner) => insert_into(eventables::table)
                 .values(eventables::lease_id.eq(inner.id))
+                .on_conflict(eventables::id)
+                .do_update()
+                .set(eventables::file_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
             Eventable::Payment(inner) => insert_into(eventables::table)
                 .values(eventables::payment_id.eq(inner.id))
+                .on_conflict(eventables::id)
+                .do_update()
+                .set(eventables::file_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
             Eventable::Candidacy(inner) => insert_into(eventables::table)
                 .values(eventables::candidacy_id.eq(inner.id))
+                .on_conflict(eventables::id)
+                .do_update()
+                .set(eventables::file_id.eq(inner.id))
                 .execute(&self.0.get()?)?,
         };
         Ok(data.clone())

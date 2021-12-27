@@ -75,7 +75,8 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
                 _ => Ok(()),
             }
         })
-        .await?;
+        .await
+        .ok();
 
     Ok(())
 }
