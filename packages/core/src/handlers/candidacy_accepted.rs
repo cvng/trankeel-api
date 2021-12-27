@@ -59,7 +59,6 @@ impl From<CandidacyAccepted> for Event {
 
 pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
     let db = ctx.db();
-    let messenger = ctx.messenger();
 
     let CandidacyAccepted {
         candidacy,
@@ -139,8 +138,17 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
         )?;
     }
 
-    let account = db.accounts().by_candidacy_id(&candidacy.id)?;
-    let participant = db.persons().by_candidacy_id(&candidacy.id)?;
+    Ok(())
+}
+
+pub async fn candidacy_accepted_async(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
+    let db = ctx.db();
+    let mailer = ctx.mailer();
+    let pdfmaker = ctx.pdfmaker();
+    let messenger = ctx.messenger();
+
+    let account = db.accounts().by_candidacy_id(&event.candidacy.id)?;
+    let participant = db.persons().by_candidacy_id(&event.candidacy.id)?;
     let sender = db
         .persons()
         .by_account_id(&account.id)?
@@ -150,46 +158,31 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
 
     messenger.message(
         EventType::CandidacyAccepted,
-        Eventable::Candidacy(candidacy),
+        Eventable::Candidacy(event.candidacy.clone()),
         sender.id,
         participant.id,
         None,
     )?;
 
-    Ok(())
-}
-
-pub async fn candidacy_accepted_async(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
-    let db = ctx.db();
-    let mailer = ctx.mailer();
-    let pdfmaker = ctx.pdfmaker();
-
-    let CandidacyAccepted {
-        candidacy,
-        identity,
-        lease,
-        lease_file,
-        invite,
-        ..
-    } = event;
-
     // Generate lease document (PDF) and assign document external ID to lease file.
     let document = pdfmaker
         .generate(LeaseDocument::try_new(
-            &lease,
-            &lease_file,
+            &event.lease,
+            &event.lease_file,
             Utc::now().into(),
         )?)
         .await?;
 
     db.files().update(&LeaseFile {
         external_id: Some(document.id),
-        ..lease_file
+        ..event.lease_file
     })?;
 
     mailer
         .batch(vec![CandidacyAcceptedMail::try_new(
-            &candidacy, &identity, &invite,
+            &event.candidacy,
+            &event.identity,
+            &event.invite,
         )?])
         .await?;
 
