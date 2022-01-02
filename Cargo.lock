@@ -55,6 +55,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71938f30533e4d95a6d17aa530939da3842c2ab6f4f84b9dae68447e4129f74a"
 
 [[package]]
+name = "ascii_utils"
+version = "0.9.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71938f30533e4d95a6d17aa530939da3842c2ab6f4f84b9dae68447e4129f74a"
+
+[[package]]
 name = "async-graphql"
 version = "3.0.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -116,9 +122,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-rocket"
-version = "3.0.17"
+version = "3.0.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c2d21a0c4ea5695552d89a0e425a3f950b43513fdd4e4cf2c92971f20145983"
+checksum = "f7992aee4abc21b4b58d416eaedcbac8aa2c76386f915399822738f0e502c418"
 dependencies = [
  "async-graphql",
  "rocket",
