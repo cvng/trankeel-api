@@ -16,7 +16,7 @@ diesel = { version = "1.4.8", features = ["postgres", "r2d2", "uuidv07", "serde_
 erased-serde = "0.3"
 eyre = "0.6.5"
 futures = { version = "0.3.19", default-features = false }
-liquid = "0.23.0"
+liquid = "0.23.1"
 log = "0.4.14"
 reqwest = { version = "0.11.8", features = ["json"] }
 sendinblue = "0.2.1"
