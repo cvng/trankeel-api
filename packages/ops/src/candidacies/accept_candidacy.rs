@@ -22,7 +22,6 @@ use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
-use trankeel_data::DiscussionStatus;
 use trankeel_data::Invite;
 use trankeel_data::InviteReason;
 use trankeel_data::Lease;
