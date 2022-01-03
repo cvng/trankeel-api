@@ -22,7 +22,6 @@ use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
-use trankeel_data::DiscussionStatus;
 use trankeel_data::Invite;
 use trankeel_data::InviteReason;
 use trankeel_data::Lease;
@@ -155,12 +154,6 @@ impl Command for AcceptCandidacy {
                 warrants: Some(candidacy_warrants.into_iter().map(Into::into).collect()),
             },
         )?;
-
-        // Make discussion active now.
-        let discussion = Discussion {
-            status: DiscussionStatus::Active,
-            ..discussion
-        };
 
         // Create invite for new tenant.
         let CreateInvitePayload { invite } = CreateInvite::new(&identity) //
