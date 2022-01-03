@@ -113,6 +113,7 @@ impl Handler for StepCompletedHandler {
                     }
                 }
                 StepEvent::LeaseActivated => {
+                    // Make discussion active now.
                     let discussion = Discussion {
                         status: DiscussionStatus::Active,
                         ..discussion

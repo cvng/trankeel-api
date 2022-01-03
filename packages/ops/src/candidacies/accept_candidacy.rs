@@ -156,12 +156,6 @@ impl Command for AcceptCandidacy {
             },
         )?;
 
-        // Make discussion active now.
-        let discussion = Discussion {
-            status: DiscussionStatus::Active,
-            ..discussion
-        };
-
         // Create invite for new tenant.
         let CreateInvitePayload { invite } = CreateInvite::new(&identity) //
             .run(CreateInviteInput {
