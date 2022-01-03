@@ -110,7 +110,9 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
     db.discussions().update(&discussion)?;
     db.workflowables().create(&workflowable)?;
     db.workflows().create(&workflow)?;
-    db.steps().create_many(&steps)?;
+    for step in steps {
+        db.steps().create(&step)?;
+    }
     if let Some(warrants) = &warrants {
         db.warrants().create_many(warrants)?;
     }

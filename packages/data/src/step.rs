@@ -13,6 +13,8 @@ pub enum StepEvent {
     LeaseSigned,
     LeaseConfirmed,
     LeaseActivated,
+    InsuranceOk,
+    DepositAmountOk,
 }
 
 impl From<String> for StepEvent {
@@ -22,6 +24,8 @@ impl From<String> for StepEvent {
             "lease_signed" => Self::LeaseSigned,
             "lease_confirmed" => Self::LeaseConfirmed,
             "lease_activated" => Self::LeaseActivated,
+            "insurance_ok" => Self::InsuranceOk,
+            "deposit_amount_ok" => Self::DepositAmountOk,
             _ => unimplemented!(),
         }
     }

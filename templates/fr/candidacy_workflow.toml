@@ -18,14 +18,14 @@ Cordialement."""
 
 [[steps]]
 label = "Récupération de l'attestation d'assurance"
-event = ""
+event = "insurance_ok"
 confirmation = """
 Merci, nous avons bien reçu votre attestation d'assurance.
 Cordialement."""
 
 [[steps]]
 label = "Encaissement du dépôt de garantie"
-event = ""
+event = "deposit_amount_ok"
 confirmation = """
 Merci, nous avons bien encaissé {{ deposit_amount }} pour règlement de votre dépôt de garantie.
 Cordialement."""
