@@ -10,12 +10,18 @@ use trankeel_data::Tenant;
 
 #[derive(Clone)]
 pub struct LeaseAffected {
-    pub tenant: Tenant,
+    tenant: Tenant,
 }
 
-impl From<LeaseAffected> for Event {
-    fn from(item: LeaseAffected) -> Self {
-        Self::LeaseAffected(item)
+impl LeaseAffected {
+    pub fn new(tenant: &Tenant) -> Self {
+        Self {
+            tenant: tenant.clone(),
+        }
+    }
+
+    pub fn with(tenant: &Tenant) -> Event {
+        Event::LeaseAffected(Self::new(tenant))
     }
 }
 

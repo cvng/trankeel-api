@@ -1,7 +1,6 @@
 use crate::context::Context;
 use crate::database::Db;
 use crate::dispatcher::Event;
-use crate::dispatcher::Handler;
 use crate::error::Result;
 use crate::messenger::Messenger;
 use crate::templates;
@@ -29,11 +28,18 @@ pub struct StepCompletedRequirement {
 
 #[derive(Clone)]
 pub struct StepCompleted {
-    pub step_id: StepId,
-    pub requirements: Option<Vec<StepCompletedRequirement>>,
+    step_id: StepId,
+    requirements: Option<Vec<StepCompletedRequirement>>,
 }
 
 impl StepCompleted {
+    pub fn new(step_id: StepId, requirements: Option<Vec<StepCompletedRequirement>>) -> Self {
+        Self {
+            step_id,
+            requirements,
+        }
+    }
+
     pub fn with(step_id: StepId, requirements: Option<Vec<StepCompletedRequirement>>) -> Event {
         Event::StepCompleted(Self {
             step_id,
@@ -42,113 +48,73 @@ impl StepCompleted {
     }
 }
 
-pub struct StepCompletedPayload {
-    pub step: Step,
-    pub lease: Lease,
-    pub discussion: Discussion,
-}
-
-pub struct StepCompletedHandler {
-    pub step: Step,
-    pub lease: Lease,
-    pub discussion: Discussion,
-}
-
-impl StepCompletedHandler {
-    pub fn new(step: &Step, lease: &Lease, discussion: &Discussion) -> Self {
-        Self {
-            step: step.clone(),
-            lease: lease.clone(),
-            discussion: discussion.clone(),
-        }
-    }
-}
-
-impl Handler for StepCompletedHandler {
-    type Event = StepCompleted;
-    type Payload = StepCompletedPayload;
-
-    fn run(self, event: Self::Event) -> Result<Self::Payload> {
-        let Self {
-            step,
-            lease,
-            discussion,
-        } = self;
-
-        let step = Step {
-            id: step.id,
-            completed: !step.completed,
-            requirements: match_requirements(&step, event),
-            ..step
-        };
-
-        let (lease, discussion) = if let Some(step_event) = step.event.clone() {
-            match step_event.into() {
-                StepEvent::LeaseSigned => {
-                    let lease = Lease {
-                        signature_date: Some(Utc::now().into()), // TODO: match workflowable
-                        ..lease
-                    };
-                    (lease, discussion)
-                }
-                StepEvent::LeaseConfirmed => {
-                    let step_requirements = match step.clone().requirements {
-                        Some(step_requirements) => step_requirements.requirements,
-                        None => vec![],
-                    };
-
-                    let effect_date = step_requirements
-                        .into_iter()
-                        .find(|sr| sr.name == "effect_date")
-                        .and_then(|sr| sr.value);
-
-                    if let Some(effect_date) = effect_date {
-                        let lease = Lease {
-                            effect_date: effect_date.parse::<DateTime<Utc>>()?.into(), // TODO: match workflowable
-                            ..lease
-                        };
-                        (lease, discussion)
-                    } else {
-                        (lease, discussion)
-                    }
-                }
-                StepEvent::LeaseActivated => {
-                    let discussion = Discussion {
-                        status: DiscussionStatus::Active,
-                        ..discussion
-                    };
-                    (lease, discussion)
-                }
-                _ => (lease, discussion),
-            }
-        } else {
-            (lease, discussion)
-        };
-
-        Ok(Self::Payload {
-            step,
-            lease,
-            discussion,
-        })
-    }
-}
-
 pub fn step_completed(ctx: &Context, event: StepCompleted) -> Result<()> {
     let db = ctx.db();
 
-    let step = db.steps().by_id(&event.step_id)?;
+    let StepCompleted {
+        step_id,
+        requirements: _requirements,
+    } = event.clone();
+
+    let step = db.steps().by_id(&step_id)?;
     let participant = db.persons().by_step_id(&step.id)?;
     let lease = db.leases().by_person_id(&participant.id)?;
     let discussion = db.discussions().by_initiator_id(&participant.id)?;
 
-    StepCompletedHandler::new(&step, &lease, &discussion)
-        .run(event)
-        .and_then(|payload| {
-            db.steps().update(&payload.step)?;
-            db.leases().update(&payload.lease)?;
-            db.discussions().update(&payload.discussion)?;
-            Ok(())
-        })
+    let step = Step {
+        completed: !step.completed,
+        requirements: match_requirements(&step, event),
+        ..step
+    };
+
+    let (lease, discussion) = if let Some(step_event) = step.event.clone() {
+        match step_event.into() {
+            StepEvent::LeaseSigned => {
+                let lease = Lease {
+                    signature_date: Some(Utc::now().into()), // TODO: match workflowable
+                    ..lease
+                };
+                (lease, discussion)
+            }
+            StepEvent::LeaseConfirmed => {
+                let step_requirements = match step.clone().requirements {
+                    Some(step_requirements) => step_requirements.requirements,
+                    None => vec![],
+                };
+
+                let effect_date = step_requirements
+                    .into_iter()
+                    .find(|sr| sr.name == "effect_date")
+                    .and_then(|sr| sr.value);
+
+                if let Some(effect_date) = effect_date {
+                    let lease = Lease {
+                        effect_date: effect_date.parse::<DateTime<Utc>>()?.into(), // TODO: match workflowable
+                        ..lease
+                    };
+                    (lease, discussion)
+                } else {
+                    (lease, discussion)
+                }
+            }
+            StepEvent::LeaseActivated => {
+                let discussion = Discussion {
+                    status: DiscussionStatus::Active,
+                    ..discussion
+                };
+                (lease, discussion)
+            }
+            _ => (lease, discussion),
+        }
+    } else {
+        (lease, discussion)
+    };
+
+    db.steps().update(&step)?;
+    db.leases().update(&lease)?;
+    db.discussions().update(&discussion)?;
+
+    Ok(())
 }
 
 pub async fn step_completed_async(ctx: &Context, event: StepCompleted) -> Result<()> {

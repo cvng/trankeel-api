@@ -4,13 +4,10 @@ use super::step_completed;
 use super::CandidacyRejected;
 use super::LeaseAffected;
 use super::StepCompleted;
-use super::StepCompletedHandler;
-use super::StepCompletedPayload;
 use crate::config;
 use crate::context::Context;
 use crate::database::Db;
 use crate::dispatcher::Event;
-use crate::dispatcher::Handler;
 use crate::error::Result;
 use crate::mailer::Mailer;
 use crate::messenger::Messenger;
@@ -85,18 +82,8 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
 
     // Mark step as completed if found.
     let candidacy_accepted_step = if let Some(step) = candidacy_accepted_step {
-        StepCompletedHandler::new(&step, &lease, &discussion)
-            .run(StepCompleted {
-                step_id: step.id,
-                requirements: None,
-            })
-            .map(
-                |StepCompletedPayload {
-                     step,
-                     lease: _lease,
-                     discussion: _discussion,
-                 }| Some(step),
-            )?
+        step_completed(ctx, StepCompleted::new(step.id, None))?;
+        Some(step)
     } else {
         None
     };
@@ -115,7 +102,7 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
         db.warrants().create_many(warrants)?;
     }
 
-    lease_affected(ctx, LeaseAffected { tenant })?;
+    lease_affected(ctx, LeaseAffected::new(&tenant))?;
 
     for (candidacy, (discussion, message)) in rejected_candidacies {
         candidacy_rejected(
@@ -129,13 +116,7 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
     }
 
     if let Some(step) = candidacy_accepted_step {
-        step_completed(
-            ctx,
-            StepCompleted {
-                step_id: step.id,
-                requirements: None,
-            },
-        )?;
+        step_completed(ctx, StepCompleted::new(step.id, None))?;
     }
 
     Ok(())

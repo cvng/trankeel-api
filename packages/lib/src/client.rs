@@ -619,7 +619,7 @@ impl Client {
             .chain(
                 tenants_with_identities
                     .into_iter()
-                    .map(|(tenant, ..)| LeaseAffected { tenant }.into())
+                    .map(|(tenant, ..)| LeaseAffected::with(&tenant))
                     .collect::<Vec<_>>(),
             )
             .collect(),
@@ -665,7 +665,7 @@ impl Client {
             .chain(
                 tenants
                     .into_iter()
-                    .map(|tenant| LeaseAffected { tenant }.into())
+                    .map(|tenant| LeaseAffected::with(&tenant))
                     .collect::<Vec<_>>(),
             )
             .collect(),
