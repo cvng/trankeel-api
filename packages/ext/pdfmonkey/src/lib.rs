@@ -1,12 +1,12 @@
-// #![allow(dead_code)]
+#![allow(dead_code)]
 
-// mod adapter;
-// mod configuration;
-// mod document;
+mod adapter;
+mod configuration;
+mod document;
 
-pub use super::adapter::Adapter;
-pub use super::configuration::Configuration;
-pub use super::document::Document;
+pub use crate::adapter::Adapter;
+pub use crate::configuration::Configuration;
+pub use crate::document::Document;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -24,7 +24,7 @@ impl std::fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Pdfmonkey {
     pub(crate) config: Configuration,
 }

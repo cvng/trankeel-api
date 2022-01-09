@@ -1,4 +1,4 @@
-use super::lib::Pdfmonkey;
+use crate::Pdfmonkey;
 use std::env;
 
 #[derive(Clone)]

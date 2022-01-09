@@ -1562,6 +1562,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "pdfmonkey"
+version = "0.1.0"
+dependencies = [
+ "reqwest 0.11.8",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "pear"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2946,6 +2955,7 @@ dependencies = [
  "futures",
  "liquid",
  "log",
+ "pdfmonkey",
  "reqwest 0.11.8",
  "sendinblue",
  "serde",

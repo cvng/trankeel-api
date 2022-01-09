@@ -1,6 +1,6 @@
-use super::lib::Configuration;
-use super::lib::Error;
-use super::lib::Result;
+use crate::Configuration;
+use crate::Error;
+use crate::Result;
 use reqwest::header::HeaderMap;
 use reqwest::Response;
 use reqwest::StatusCode;
