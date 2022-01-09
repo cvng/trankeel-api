@@ -1,6 +1,6 @@
-use super::adapter::Adapter;
-use super::adapter::Resource;
-use super::lib::Result;
+use crate::adapter::Adapter;
+use crate::adapter::Resource;
+use crate::Result;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::to_string as to_json;

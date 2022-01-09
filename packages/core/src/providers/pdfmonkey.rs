@@ -1,12 +1,7 @@
-mod adapter;
-mod configuration;
-mod document;
-mod lib;
-
-use super::pdfmonkey::lib as pdfmonkey;
 use crate::error::Error;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
+use pdfmonkey;
 use trankeel_data::Document;
 
 #[derive(Clone)]
