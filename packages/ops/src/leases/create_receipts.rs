@@ -69,6 +69,12 @@ impl Command for CreateReceipts {
                 // Create new receipt.
                 let receipt = Receipt::receipt_document(&rent);
 
+                // Link receipt with rent.
+                let rent = Rent {
+                    receipt_id: Some(receipt.id),
+                    ..rent
+                };
+
                 (receipt, rent, payment)
             })
             .collect();
