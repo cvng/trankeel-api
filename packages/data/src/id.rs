@@ -4,6 +4,7 @@ use async_graphql::ScalarType;
 use async_graphql::Value;
 use std::fmt;
 use std::fmt::Display;
+use std::str::FromStr;
 
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Default, DieselNewType,
@@ -19,6 +20,14 @@ impl Id {
 impl Display for Id {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
+    }
+}
+
+impl FromStr for Id {
+    type Err = uuid::Error;
+
+    fn from_str(uuid_str: &str) -> Result<Self, Self::Err> {
+        Ok(Self(uuid::Uuid::parse_str(uuid_str)?))
     }
 }
 

@@ -57,7 +57,7 @@ pub async fn notice_created_async(ctx: &Context, event: NoticeCreated) -> Result
     let lender = db.lenders().by_id(&property.lender_id)?;
 
     // Try to generate notice document (PDF).
-    let document = pdfmaker
+    pdfmaker
         .generate(NoticeDocument::try_new(
             notice.clone(),
             rent.clone(),
@@ -67,11 +67,6 @@ pub async fn notice_created_async(ctx: &Context, event: NoticeCreated) -> Result
             Utc::now().into(),
         )?)
         .await?;
-
-    db.files().update(&Notice {
-        external_id: Some(document.id),
-        ..notice
-    })?;
 
     Ok(())
 }

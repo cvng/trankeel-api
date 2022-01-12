@@ -3,11 +3,14 @@ use super::ReceiptSent;
 use crate::context::Context;
 use crate::database::Db;
 use crate::dispatcher::Event;
+use crate::error::no;
 use crate::error::Result;
 use crate::mailer::Mailer;
 use crate::templates::LeaseCreatedMail;
+use serde_json::Value;
 use trankeel_data::Document;
 use trankeel_data::File;
+use trankeel_data::FileId;
 use trankeel_data::FileStatus;
 use trankeel_data::FileType;
 use trankeel_data::LeaseFile;
@@ -25,12 +28,6 @@ impl DocumentGenerated {
     }
 }
 
-impl From<DocumentGenerated> for Event {
-    fn from(item: DocumentGenerated) -> Self {
-        Self::DocumentGenerated(item)
-    }
-}
-
 pub fn document_generated(_ctx: &Context, _event: DocumentGenerated) -> Result<()> {
     Ok(())
 }
@@ -41,11 +38,18 @@ pub async fn document_generated_async(ctx: &Context, event: DocumentGenerated) -
     let DocumentGenerated { document } = event;
 
     // General processing for any document.
-    let file = db.files().by_external_id(&document.id)?;
+    let payload: Value = serde_json::from_str(&document.payload)?;
+    let file_id = payload
+        .get("id")
+        .ok_or_else(|| no("payload.id"))?
+        .as_str()
+        .ok_or_else(|| no("payload.id (malformed)"))?
+        .parse::<FileId>()?;
+    let file = db.files().by_id(&file_id)?;
     let file = db.files().update(&File {
-        id: file.id,
+        external_id: Some(document.id),
         status: Some(document.status),
-        download_url: document.download_url.clone(),
+        download_url: Some(document.download_url.clone()),
         preview_url: Some(document.preview_url.clone()),
         ..file
     })?;

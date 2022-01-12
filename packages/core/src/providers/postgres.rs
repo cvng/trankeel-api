@@ -58,7 +58,6 @@ use trankeel_data::EventId;
 use trankeel_data::EventWithEventable;
 use trankeel_data::Eventable;
 use trankeel_data::EventableRow;
-use trankeel_data::ExternalId;
 use trankeel_data::File;
 use trankeel_data::FileId;
 use trankeel_data::Invite;
@@ -997,12 +996,6 @@ impl database::RentStore for RentStore<'_> {
 }
 
 impl database::FileStore for FileStore<'_> {
-    fn by_external_id(&mut self, external_id: &ExternalId) -> Result<File> {
-        Ok(files::table
-            .filter(files::external_id.eq(external_id))
-            .first(&self.0.get()?)?)
-    }
-
     fn by_id(&mut self, id: &FileId) -> Result<File> {
         Ok(files::table.find(id).first(&self.0.get()?)?)
     }

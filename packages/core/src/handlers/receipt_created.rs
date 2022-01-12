@@ -67,7 +67,7 @@ pub async fn receipt_created_async(ctx: &Context, event: ReceiptCreated) -> Resu
     let lender = db.lenders().by_id(&property.lender_id)?;
 
     // Try to generate receipt document (PDF).
-    let document = pdfmaker
+    pdfmaker
         .generate(ReceiptDocument::try_new(
             receipt.clone(),
             rent.clone(),
@@ -77,11 +77,6 @@ pub async fn receipt_created_async(ctx: &Context, event: ReceiptCreated) -> Resu
             Utc::now().into(),
         )?)
         .await?;
-
-    db.files().update(&Receipt {
-        external_id: Some(document.id),
-        ..receipt
-    })?;
 
     Ok(())
 }
