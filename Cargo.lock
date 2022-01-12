@@ -3252,7 +3252,6 @@ version = "0.4.0"
 dependencies = [
  "async-graphql-rocket",
  "chrono",
- "colored_json",
  "dotenv",
  "jsonwebtoken",
  "load-dotenv",
@@ -3275,6 +3274,7 @@ dependencies = [
  "async-stripe",
  "async-trait",
  "chrono",
+ "colored_json",
  "diesel",
  "erased-serde",
  "eyre",

@@ -1,3 +1,4 @@
+use colored_json::ToColoredJson;
 use serde::Deserialize;
 use serde_json::to_string;
 use serde_json::Value;

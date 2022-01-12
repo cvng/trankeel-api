@@ -16,7 +16,6 @@ pdfmonkey = ["trankeel/pdfmonkey"]
 [dependencies]
 async-graphql-rocket = "3.0.20"
 chrono = "0.4.19"
-colored_json = "2.1.0"
 dotenv = "0.15.0"
 jsonwebtoken = "7.2.0"
 load-dotenv = "0.1.2"

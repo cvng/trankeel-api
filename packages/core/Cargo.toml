@@ -12,6 +12,7 @@ doctest = false
 async-stripe = { version = "0.13.0-rc3", default-features = false, features = ["runtime-tokio-hyper", "billing"] }
 async-trait = "0.1.52"
 chrono = { version = "0.4.19", features = ["serde"] }
+colored_json = "2.1.0"
 diesel = { version = "1.4.8", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }
 erased-serde = "0.3"
 eyre = "0.6.5"
