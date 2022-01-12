@@ -20,8 +20,8 @@ jobs:
 
       - uses: swatinem/rust-cache@v1
 
-      - run: cargo build --release --locked
+      - run: cargo build --release --locked --all-features
 
-      - run: cargo clippy --release --locked -- --deny warnings
+      - run: cargo clippy --release --locked --all-features -- --deny warnings
 
-      - run: cargo test --release --locked
+      - run: cargo test --release --locked --all-features

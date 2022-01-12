@@ -7,7 +7,7 @@ pub type DocumentTemplateId = ExternalId;
 
 pub type DocumentId = ExternalId;
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Document {
     pub id: DocumentId,
     pub status: FileStatus,

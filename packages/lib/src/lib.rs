@@ -2,7 +2,9 @@ mod client;
 
 pub use crate::client::init;
 pub use crate::client::Client;
+pub use trankeel_core::config;
 pub use trankeel_core::handlers;
+pub use trankeel_core::providers;
 pub use trankeel_core::templates;
 pub use trankeel_data::*;
 pub use trankeel_ops::auth::ActivateAccountPlanInput;

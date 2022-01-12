@@ -7,6 +7,9 @@ mod webhooks;
 
 use rocket::launch;
 
+#[cfg(debug_assertions)]
+load_dotenv::load_dotenv!();
+
 #[launch]
 fn rocket() -> _ {
     dotenv::dotenv().ok();

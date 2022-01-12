@@ -1,16 +1,19 @@
-use crate::routes::graphql_playground;
-use crate::routes::graphql_request;
-use crate::webhooks::pdfmonkey_request;
+use crate::routes;
+#[cfg(debug_assertions)]
+use crate::routes::dev_routes;
+use crate::webhooks;
 use rocket::routes;
 use rocket::Build;
 use rocket::Rocket;
+use rocket_cors::CorsOptions;
+use rocket_dyn_templates::Template;
 use trankeel::Result;
 use trankeel_graphql::extensions::ApolloTracing;
 
-/// Build Trankeel Web server. https://rocket.rs
+/// Build Trankeel Web server.
+///
+/// https://rocket.rs
 pub fn server() -> Result<Rocket<Build>> {
-    let cors = rocket_cors::CorsOptions::default().to_cors()?;
-
     let client = trankeel::init()?;
 
     let schema = trankeel_graphql::build_schema()
@@ -23,9 +26,22 @@ pub fn server() -> Result<Rocket<Build>> {
         .manage(schema)
         .mount(
             "/",
-            routes![graphql_playground, graphql_request, pdfmonkey_request],
+            routes![
+                routes::graphql_playground,
+                routes::graphql_request,
+                webhooks::pdfmonkey_request
+            ],
         )
-        .attach(cors);
+        .attach(CorsOptions::default().to_cors()?)
+        .attach(Template::fairing());
+
+    #[cfg(debug_assertions)]
+    let server = mount_dev_routes(server);
 
     Ok(server)
+}
+
+#[cfg(debug_assertions)]
+fn mount_dev_routes(server: Rocket<Build>) -> Rocket<Build> {
+    server.mount("/dev", routes![dev_routes::preview_request])
 }
