@@ -1,10 +1,10 @@
 [routes]
 candidacy_url = "/candidacy/:id"
-invite_url = "/invite?email=:email&token=:token" # TODO: fix in web
+invite_url = "/invite?email=:email&token=:token"
 
 [templates]
 lease_document = { id = "FD82781A-EB44-4C23-8EB4-DB15CBBB1223", path = "templates/fr/lease_document.html" }
-receipt_document = { id = "8269E571-7ECE-4F0D-BC37-854D77999E0D", path = "templates/fr/receipt_document.html" }
+receipt_document = { id = "8269E571-7ECE-4F0D-BC37-854D77999E0D", path = "templates/fr/receipt_document.html.tera" }
 receipt_created_mail = { id = "1", path = "templates/fr/receipt_created_mail.html" }
 candidacy_created_mail = { id = "2", path = "templates/fr/candidacy_created_mail.html" }
 candidacy_accepted_mail = { id = "3", path = "templates/fr/candidacy_accepted_mail.html" }

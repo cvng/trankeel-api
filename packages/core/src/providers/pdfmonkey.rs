@@ -1,4 +1,4 @@
-use crate::error::Error;
+use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
 use pdfmonkey;
@@ -15,10 +15,7 @@ impl Pdfmonkey {
 
 #[async_trait]
 impl Pdfmaker for Pdfmonkey {
-    async fn generate(
-        &self,
-        document: impl IntoDocument + 'async_trait,
-    ) -> Result<Document, Error> {
+    async fn generate(&self, document: impl IntoDocument + 'async_trait) -> Result<Document> {
         println!("Pdfmaker.generate: {:?}", document);
 
         let document = pdfmonkey::Document::generate(

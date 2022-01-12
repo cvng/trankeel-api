@@ -17,6 +17,14 @@ pub struct DocumentGenerated {
     pub document: Document,
 }
 
+impl DocumentGenerated {
+    pub fn with(document: &Document) -> Event {
+        Event::DocumentGenerated(Self {
+            document: document.clone(),
+        })
+    }
+}
+
 impl From<DocumentGenerated> for Event {
     fn from(item: DocumentGenerated) -> Self {
         Self::DocumentGenerated(item)
@@ -28,8 +36,6 @@ pub fn document_generated(_ctx: &Context, _event: DocumentGenerated) -> Result<(
 }
 
 pub async fn document_generated_async(ctx: &Context, event: DocumentGenerated) -> Result<()> {
-    println!("Document generated: {:?}", event);
-
     let db = ctx.db();
 
     let DocumentGenerated { document } = event;
@@ -46,7 +52,6 @@ pub async fn document_generated_async(ctx: &Context, event: DocumentGenerated) -
 
     // If not success, stop processing.
     if file.status != Some(FileStatus::Success) {
-        println!("Document errors: {:?}", document.errors);
         return Ok(());
     }
 

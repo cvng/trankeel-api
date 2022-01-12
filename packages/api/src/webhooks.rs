@@ -1,25 +1,20 @@
+use colored_json::ToColoredJson;
 use rocket::http::Status;
 use rocket::post;
 use rocket::serde::json::Json;
-use rocket::serde::Deserialize;
 use rocket::State;
+use serde::Serialize;
+use trankeel::config;
 use trankeel::handlers::DocumentGenerated;
+use trankeel::providers::PdfmonkeyInput;
 use trankeel::Client;
-use trankeel::Document;
 
-/// https://www.pdfmonkey.io/fr/doc/api/webhooks
-#[derive(Debug, Deserialize)]
-pub struct PdfmonkeyPayload {
-    pub document: Document,
-}
+#[post("/webhooks/pdfmonkey", data = "<input>", format = "application/json")]
+pub async fn pdfmonkey_request(client: &State<Client>, input: Json<PdfmonkeyInput>) -> Status {
+    config::log_json(&payload.to_owned());
 
-#[post("/webhooks/pdfmonkey", data = "<request>", format = "application/json")]
-pub async fn pdfmonkey_request(client: &State<Client>, request: Json<PdfmonkeyPayload>) -> Status {
     client
-        .dispatch(vec![DocumentGenerated {
-            document: request.document.clone(),
-        }
-        .into()])
+        .dispatch(vec![DocumentGenerated::with(&payload.document)])
         .await
         .map(|_| Status::Ok)
         .unwrap()

@@ -23,7 +23,10 @@ pub fn build_schema() -> SchemaBuilder<Query, Mutation, EmptySubscription> {
 /// Print the GraphQL schema in SDL format.
 ///
 /// https://async-graphql.github.io/async-graphql/en/sdl_export.html
-pub fn write_schema<P: AsRef<Path>>(path: P) -> io::Result<()> {
+pub fn write_schema<P>(path: P) -> io::Result<()>
+where
+    P: AsRef<Path>,
+{
     let schema = build_schema().finish();
 
     let mut file = File::create(path)?;

@@ -1,9 +1,12 @@
 use serde::Deserialize;
 use serde_json::to_string;
+use serde_json::Value;
 use std::collections::BTreeMap;
 use std::env;
 use std::fs;
+use std::fs::File;
 use std::io;
+use std::path::Path;
 use trankeel_data::Candidacy;
 use trankeel_data::Email;
 use trankeel_data::Invite;
@@ -87,11 +90,35 @@ pub struct Requirement {
     pub type_: String,
 }
 
+impl From<Requirement> for trankeel_data::Requirement {
+    fn from(item: Requirement) -> Self {
+        Self {
+            name: item.name,
+            type_: item.type_.into(),
+            value: None,
+        }
+    }
+}
+
 pub fn config() -> Config {
     toml::from_str::<Config>(CONFIG).unwrap()
 }
 
 // # Utils
+
+pub fn template_by_id(template_id: &str) -> Option<Template> {
+    config()
+        .templates
+        .into_iter()
+        .find_map(|(_key, template)| match template.id == template_id {
+            true => Some(template),
+            false => None,
+        })
+}
+
+pub fn base_url() -> String {
+    format!("http://localhost:{}", 8000)
+}
 
 pub fn candidacy_url(candidacy: &Candidacy) -> Url {
     config()
@@ -134,12 +161,34 @@ pub fn workflow_steps(workflow: &trankeel_data::Workflow) -> Vec<trankeel_data::
         .collect()
 }
 
-impl From<Requirement> for trankeel_data::Requirement {
-    fn from(item: Requirement) -> Self {
-        Self {
-            name: item.name,
-            type_: item.type_.into(),
-            value: None,
-        }
-    }
+pub fn write_json<P, T>(path: P, json: &T) -> io::Result<()>
+where
+    P: AsRef<Path>,
+    T: serde::Serialize,
+{
+    let path = env::temp_dir().join(path);
+    fs::create_dir_all(path.parent().unwrap())?;
+    fs::write(path, &serde_json::to_string_pretty(&json)?)
+}
+
+pub fn read_json<P>(path: P) -> io::Result<Value>
+where
+    P: AsRef<Path>,
+{
+    let path = env::temp_dir().join(path);
+    let file = File::open(path)?;
+    Ok(serde_json::from_reader(file).unwrap())
+}
+
+pub fn log_json<P>(payload: &P)
+where
+    P: serde::Serialize,
+{
+    println!(
+        "{}",
+        serde_json::to_string(&payload)
+            .unwrap()
+            .to_colored_json_auto()
+            .unwrap()
+    );
 }

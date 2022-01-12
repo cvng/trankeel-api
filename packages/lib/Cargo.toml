@@ -8,6 +8,9 @@ edition = "2021"
 [lib]
 doctest = false
 
+[features]
+pdfmonkey = ["trankeel-core/pdfmonkey"]
+
 [dependencies]
 trankeel-core = { path = "../core" }
 trankeel-data = { path = "../data" }

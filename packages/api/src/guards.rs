@@ -49,7 +49,7 @@ impl<'r> FromRequest<'r> for AuthGuard {
                 }
             }
             None => {
-                // Try ID token fallback from env in development (debug).
+                // Try ID token fallback from env in development (dev).
                 match env::var(AUTH_ID_KEY) {
                     Ok(text) if cfg!(debug_assertions) => text,
                     _ => return Outcome::Success(Self(None)),
