@@ -14,7 +14,7 @@ pub struct Document {
     pub document_template_id: DocumentTemplateId,
     pub payload: String,
     pub checksum: String,
-    pub download_url: Option<Url>,
+    pub download_url: Url,
     pub preview_url: Url,
     pub meta: Option<String>,
     pub errors: Option<Vec<String>>,

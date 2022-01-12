@@ -41,6 +41,7 @@ pub struct ReceiptDocument {
     period_end: DateTime,
 
     date: DateTime,
+    id: String,
     _filename: String,
 }
 
@@ -100,6 +101,7 @@ impl ReceiptDocument {
             period_end: rent.period_end,
 
             date,
+            id: receipt.id.to_string(),
             _filename: receipt.filename.ok_or_else(|| no("receipt.filename"))?,
         })
     }

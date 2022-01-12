@@ -16,7 +16,6 @@ use trankeel_data::Event;
 use trankeel_data::EventId;
 use trankeel_data::EventWithEventable;
 use trankeel_data::Eventable;
-use trankeel_data::ExternalId;
 use trankeel_data::File;
 use trankeel_data::FileId;
 use trankeel_data::Invite;
@@ -216,8 +215,6 @@ pub trait RentStore {
 
 pub trait FileStore {
     fn by_id(&mut self, id: &FileId) -> Result<File>;
-    #[allow(clippy::ptr_arg)]
-    fn by_external_id(&mut self, external_id: &ExternalId) -> Result<File>;
     fn create(&mut self, data: &File) -> Result<File>;
     fn update(&mut self, data: &File) -> Result<File>;
 }
