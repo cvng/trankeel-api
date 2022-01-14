@@ -39,7 +39,7 @@ impl Mailer for Sendinblue {
 
                 let response = match result {
                     Ok(response) => response,
-                    Err(err) => {
+                    Err(_err) => {
                         continue;
                     }
                 };
