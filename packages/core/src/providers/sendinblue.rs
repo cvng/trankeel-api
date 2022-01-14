@@ -1,4 +1,4 @@
-use crate::error::Error;
+use crate::error::Result;
 use crate::mailer::IntoMail;
 use crate::mailer::Mail;
 use crate::mailer::Mailer;
@@ -24,9 +24,7 @@ impl Sendinblue {
 
 #[async_trait]
 impl Mailer for Sendinblue {
-    async fn batch(&self, mails: Vec<impl IntoMail + 'async_trait>) -> Result<Vec<Mail>, Error> {
-        println!("Mailer.batch: {:?}", mails);
-
+    async fn batch(&self, mails: Vec<impl IntoMail + 'async_trait>) -> Result<Vec<Mail>> {
         let mut rt = Runtime::new()?;
         let transactionals = mails.iter().map(to_transactional_body).collect::<Vec<_>>();
         let mut mails = vec![];
@@ -41,8 +39,7 @@ impl Mailer for Sendinblue {
 
                 let response = match result {
                     Ok(response) => response,
-                    Err(err) => {
-                        eprintln!("{:#?}", err);
+                    Err(_err) => {
                         continue;
                     }
                 };
