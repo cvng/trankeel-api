@@ -11,7 +11,9 @@ name = "trankeel-cli"
 path = "src/bin/cli.rs"
 
 [features]
+release = ["pdfmonkey", "sendinblue"]
 pdfmonkey = ["trankeel/pdfmonkey"]
+sendinblue = ["trankeel/sendinblue"]
 
 [dependencies]
 async-graphql-rocket = "3.0.20"
