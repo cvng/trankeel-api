@@ -10,6 +10,7 @@ doctest = false
 
 [features]
 pdfmonkey = ["trankeel-core/pdfmonkey"]
+sendinblue = ["trankeel-core/sendinblue"]
 
 [dependencies]
 trankeel-core = { path = "../core" }
