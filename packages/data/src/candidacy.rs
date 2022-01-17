@@ -1,11 +1,11 @@
-use crate::schema::candidacies;
+use crate::sql_schema::candidacies;
 use crate::AdvertisementId;
 use crate::Date;
 use crate::DateTime;
 use crate::Id;
 use crate::PersonId;
-
-// # Types
+use crate::Url;
+use trankeel_kit::config;
 
 pub type CandidacyId = Id;
 
@@ -37,4 +37,12 @@ pub struct Candidacy {
     pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
     pub is_student: Option<bool>,
+}
+
+pub fn candidacy_url(candidacy: &Candidacy) -> Url {
+    config::config()
+        .routes("candidacy_url")
+        .unwrap()
+        .replace(":id", &candidacy.id.to_string())
+        .into()
 }

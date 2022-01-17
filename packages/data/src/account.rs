@@ -1,4 +1,4 @@
-use crate::schema::accounts;
+use crate::sql_schema::accounts;
 use crate::CustomerId;
 use crate::DateTime;
 use crate::Id;

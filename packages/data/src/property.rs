@@ -1,4 +1,4 @@
-use crate::schema::properties;
+use crate::sql_schema::properties;
 use crate::AccountId;
 use crate::Address;
 use crate::Amount;

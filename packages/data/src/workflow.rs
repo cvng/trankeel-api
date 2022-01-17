@@ -1,8 +1,11 @@
-use crate::schema::workflows;
+use crate::sql_schema::workflows;
 use crate::DateTime;
 use crate::Id;
+use crate::RequirementOuter;
 use crate::Step;
+use crate::StepId;
 use crate::WorkflowableId;
+use trankeel_kit::config;
 
 pub type WorkflowId = Id;
 
@@ -32,4 +35,26 @@ pub struct WorkflowData {
     pub workflowable_id: Option<WorkflowableId>,
     pub type_: Option<WorkflowType>,
     pub completed: Option<bool>,
+}
+
+pub fn workflow_steps(workflow: &Workflow) -> Vec<Step> {
+    config::config()
+        .workflows(&serde_json::to_string(&workflow.type_).unwrap())
+        .unwrap()
+        .parse()
+        .into_iter()
+        .map(|step| Step {
+            id: StepId::new(),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            workflow_id: workflow.id,
+            label: step.label,
+            event: Some(step.event),
+            completed: Default::default(),
+            confirmation: Some(step.confirmation),
+            requirements: step.requirements.map(|requirements| RequirementOuter {
+                requirements: requirements.into_iter().map(Into::into).collect(),
+            }),
+        })
+        .collect()
 }

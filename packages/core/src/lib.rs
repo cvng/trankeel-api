@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+#![deny(clippy::disallowed_method)]
 
 #[macro_use]
 extern crate async_trait;
@@ -6,7 +6,6 @@ extern crate async_trait;
 extern crate serde;
 
 pub mod billing;
-pub mod config;
 pub mod context;
 pub mod database;
 pub mod dispatcher;

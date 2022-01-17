@@ -1,4 +1,4 @@
-use crate::schema::warrants;
+use crate::sql_schema::warrants;
 use crate::CandidacyId;
 use crate::DateTime;
 use crate::Id;

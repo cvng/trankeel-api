@@ -1,4 +1,4 @@
-use crate::schema::professional_warrants;
+use crate::sql_schema::professional_warrants;
 use crate::DateTime;
 use crate::Id;
 

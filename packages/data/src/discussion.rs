@@ -1,4 +1,4 @@
-use crate::schema::discussions;
+use crate::sql_schema::discussions;
 use crate::AccountId;
 use crate::Candidacy;
 use crate::DateTime;

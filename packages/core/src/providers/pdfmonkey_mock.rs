@@ -1,5 +1,4 @@
 use super::types::PdfmonkeyInput;
-use crate::config;
 use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
@@ -9,6 +8,7 @@ use serde_json::json;
 use trankeel_data::Document;
 use trankeel_data::FileId;
 use trankeel_data::FileStatus;
+use trankeel_kit::config;
 
 #[derive(Clone)]
 pub struct Pdfmonkey;
@@ -62,8 +62,8 @@ where
         document_template_id: document_template_id.clone(),
         payload: serde_json::to_string(&payload)?,
         checksum: Default::default(),
-        download_url: format!("{}/dev/download/{}", config::base_url(), document_id).into(),
-        preview_url: format!("{}/dev/preview/{}", config::base_url(), document_id).into(),
+        download_url: format!("{}/debug/download/{}", config::base_url(), document_id).into(),
+        preview_url: format!("{}/debug/preview/{}", config::base_url(), document_id).into(),
         meta: Some(serde_json::to_string(&meta)?),
         errors: None,
         created_at: Utc::now().to_rfc3339(),

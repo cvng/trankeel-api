@@ -1,4 +1,4 @@
-use crate::schema::steps;
+use crate::sql_schema::steps;
 use crate::DateTime;
 use crate::Id;
 use crate::RequirementOuter;

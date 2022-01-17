@@ -13,32 +13,31 @@ use diesel::r2d2::Pool;
 use diesel::result::Error::NotFound;
 use diesel::update;
 use diesel::PgConnection;
-use std::env;
 use trankeel_data::balances;
 use trankeel_data::reports;
-use trankeel_data::schema::accounts;
-use trankeel_data::schema::advertisements;
-use trankeel_data::schema::candidacies;
-use trankeel_data::schema::companies;
-use trankeel_data::schema::discussions;
-use trankeel_data::schema::eventables;
-use trankeel_data::schema::events;
-use trankeel_data::schema::files;
-use trankeel_data::schema::invites;
-use trankeel_data::schema::leases;
-use trankeel_data::schema::lenders;
-use trankeel_data::schema::messages;
-use trankeel_data::schema::payments;
-use trankeel_data::schema::persons;
-use trankeel_data::schema::plans;
-use trankeel_data::schema::professional_warrants;
-use trankeel_data::schema::properties;
-use trankeel_data::schema::rents;
-use trankeel_data::schema::steps;
-use trankeel_data::schema::tenants;
-use trankeel_data::schema::warrants;
-use trankeel_data::schema::workflowables;
-use trankeel_data::schema::workflows;
+use trankeel_data::sql_schema::accounts;
+use trankeel_data::sql_schema::advertisements;
+use trankeel_data::sql_schema::candidacies;
+use trankeel_data::sql_schema::companies;
+use trankeel_data::sql_schema::discussions;
+use trankeel_data::sql_schema::eventables;
+use trankeel_data::sql_schema::events;
+use trankeel_data::sql_schema::files;
+use trankeel_data::sql_schema::invites;
+use trankeel_data::sql_schema::leases;
+use trankeel_data::sql_schema::lenders;
+use trankeel_data::sql_schema::messages;
+use trankeel_data::sql_schema::payments;
+use trankeel_data::sql_schema::persons;
+use trankeel_data::sql_schema::plans;
+use trankeel_data::sql_schema::professional_warrants;
+use trankeel_data::sql_schema::properties;
+use trankeel_data::sql_schema::rents;
+use trankeel_data::sql_schema::steps;
+use trankeel_data::sql_schema::tenants;
+use trankeel_data::sql_schema::warrants;
+use trankeel_data::sql_schema::workflowables;
+use trankeel_data::sql_schema::workflows;
 use trankeel_data::Account;
 use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
@@ -100,6 +99,7 @@ use trankeel_data::WorkflowId;
 use trankeel_data::WorkflowWithSteps;
 use trankeel_data::Workflowable;
 use trankeel_data::WorkflowableId;
+use trankeel_kit::config::Config;
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 
@@ -107,13 +107,13 @@ pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 pub struct Pg(PgPool);
 
 impl Pg {
-    pub fn init() -> Self {
-        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL");
-        let manager = ConnectionManager::<PgConnection>::new(&database_url);
+    pub fn init(config: &Config) -> Self {
         Self(
             Pool::builder()
-                .build(manager)
-                .expect("Error connecting to database"),
+                .build(ConnectionManager::<PgConnection>::new(
+                    &config.database_url.clone().unwrap(),
+                ))
+                .unwrap(),
         )
     }
 

@@ -1,24 +1,29 @@
 use crate::billing::BillingProvider;
 use crate::error::Error;
 use log::info;
-use std::env;
 use trankeel_data::Email;
 use trankeel_data::Subscription;
+use trankeel_kit::config::Config;
 
 #[derive(Clone)]
-pub struct Stripe(stripe::Client);
+pub struct Stripe {
+    client: stripe::Client,
+    default_price_id: String,
+}
 
 impl Stripe {
-    pub fn init() -> Self {
-        let secret_key = env::var("STRIPE_SECRET_KEY").expect("STRIPE_SECRET_KEY");
-        Self(stripe::Client::new(secret_key))
+    pub fn init(config: &Config) -> Self {
+        Self {
+            client: stripe::Client::new(config.stripe_secret_key.clone().unwrap()),
+            default_price_id: config.stripe_default_price_id.clone().unwrap(),
+        }
     }
 }
 
 #[async_trait]
 impl BillingProvider for Stripe {
     async fn create_subscription_with_customer(&self, email: Email) -> Result<Subscription, Error> {
-        let price_id = env::var("STRIPE_DEFAULT_PRICE_ID").expect("STRIPE_DEFAULT_PRICE_ID");
+        let price_id = self.default_price_id.clone();
 
         // https://stripe.com/docs/api/customers/create
         let customer_params = stripe::CreateCustomer {
@@ -43,7 +48,7 @@ impl BillingProvider for Stripe {
             tax_id_data: Default::default(),
         };
 
-        let customer = stripe::Customer::create(&self.0, customer_params)
+        let customer = stripe::Customer::create(&self.client, customer_params)
             .await
             .unwrap();
 
@@ -85,7 +90,7 @@ impl BillingProvider for Stripe {
             trial_period_days: Default::default(),
         };
 
-        let subscription = stripe::Subscription::create(&self.0, subscription_params)
+        let subscription = stripe::Subscription::create(&self.client, subscription_params)
             .await
             .unwrap();
 

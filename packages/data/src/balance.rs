@@ -1,5 +1,5 @@
-use crate::schema::persons;
-use crate::schema::tenants;
+use crate::sql_schema::persons;
+use crate::sql_schema::tenants;
 use crate::Amount;
 use crate::Id;
 use crate::TenantId;

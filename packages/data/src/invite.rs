@@ -1,9 +1,12 @@
-use crate::schema::invites;
+use crate::sql_schema::invites;
 use crate::AccountId;
 use crate::DateTime;
+use crate::Email;
 use crate::Id;
 use crate::InviteToken;
 use crate::PersonId;
+use crate::Url;
+use trankeel_kit::config;
 
 pub type InviteId = Id;
 
@@ -36,4 +39,13 @@ pub struct Invite {
     pub token: InviteToken,
     pub status: InviteStatus,
     pub reason: InviteReason,
+}
+
+pub fn invite_url(invite: &Invite, email: Email) -> Url {
+    config::config()
+        .routes("invite_url")
+        .unwrap()
+        .replace(":token", invite.token.inner())
+        .replace(":email", email.inner())
+        .into()
 }

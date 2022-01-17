@@ -66,6 +66,7 @@ use trankeel_data::Receipt;
 use trankeel_data::Step;
 use trankeel_data::Tenant;
 use trankeel_data::TenantId;
+use trankeel_kit::config::Config;
 use trankeel_ops::auth::CreateUserWithAccount;
 use trankeel_ops::auth::CreateUserWithAccountInput;
 use trankeel_ops::auth::CreateUserWithAccountPayload;
@@ -811,12 +812,12 @@ impl Client {
     }
 }
 
-pub fn init() -> Result<Client> {
-    let pg = providers::Pg::init();
+pub fn init(config: &Config) -> Result<Client> {
+    let pg = providers::Pg::init(config);
     let pdfmonkey = providers::Pdfmonkey::init();
-    let sendinblue = providers::Sendinblue::init();
+    let sendinblue = providers::Sendinblue::init(config);
     let messagerie = providers::Messagerie::init(pg.clone());
-    let stripe = providers::Stripe::init();
+    let stripe = providers::Stripe::init(config);
 
     Ok(Client::new(pg, pdfmonkey, sendinblue, messagerie, stripe))
 }

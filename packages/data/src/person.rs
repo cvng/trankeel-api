@@ -1,4 +1,4 @@
-use crate::schema::persons;
+use crate::sql_schema::persons;
 use crate::AccountId;
 use crate::Address;
 use crate::AuthId;

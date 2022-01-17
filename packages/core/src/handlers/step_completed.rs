@@ -7,7 +7,6 @@ use crate::messenger::Messenger;
 use crate::templates;
 use chrono::DateTime;
 use chrono::Utc;
-use trankeel_data::locale;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
 use trankeel_data::EventType;
@@ -20,6 +19,7 @@ use trankeel_data::RequirementOuter;
 use trankeel_data::Step;
 use trankeel_data::StepEvent;
 use trankeel_data::StepId;
+use trankeel_kit::locale;
 
 #[derive(Clone)]
 pub struct StepCompletedRequirement {

@@ -1,4 +1,4 @@
-use crate::schema::tenants;
+use crate::sql_schema::tenants;
 use crate::AccountId;
 use crate::Balance;
 use crate::Date;

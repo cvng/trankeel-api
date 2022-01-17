@@ -6,7 +6,6 @@ use super::LeaseAffected;
 use super::StepCompleted;
 use super::StepCompletedHandler;
 use super::StepCompletedPayload;
-use crate::config;
 use crate::context::Context;
 use crate::database::Db;
 use crate::dispatcher::Event;
@@ -19,6 +18,7 @@ use crate::templates::CandidacyAcceptedMail;
 use crate::templates::LeaseDocument;
 use chrono::Utc;
 use diesel::result::Error::NotFound;
+use trankeel_data::workflow_steps;
 use trankeel_data::Candidacy;
 use trankeel_data::Discussion;
 use trankeel_data::EventType;
@@ -75,7 +75,7 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
         invite: _invite,
     } = event;
 
-    let steps = config::workflow_steps(&workflow);
+    let steps = workflow_steps(&workflow);
 
     // Take first step from workflow (candidacy_accepted).
     let candidacy_accepted_step = steps

@@ -1,4 +1,4 @@
-use crate::schema::payments;
+use crate::sql_schema::payments;
 use crate::Amount;
 use crate::DateTime;
 use crate::Id;

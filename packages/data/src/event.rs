@@ -1,4 +1,4 @@
-use crate::schema::events;
+use crate::sql_schema::events;
 use crate::AccountId;
 use crate::DateTime;
 use crate::Eventable;

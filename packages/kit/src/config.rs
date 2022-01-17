@@ -1,6 +1,10 @@
 use colored_json::ToColoredJson;
+use figment::providers::Env;
+use figment::providers::Format;
+use figment::providers::Toml;
+use figment::Figment;
+use regex::Regex;
 use serde::Deserialize;
-use serde_json::to_string;
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::env;
@@ -8,27 +12,43 @@ use std::fs;
 use std::fs::File;
 use std::io;
 use std::path::Path;
-use trankeel_data::Candidacy;
-use trankeel_data::Email;
-use trankeel_data::Invite;
-use trankeel_data::StepId;
-use trankeel_data::Url;
 
-const CONFIG: &str = include_str!("../../../trankeel.toml");
+const CONFIG_FILE: &str = "trankeel.toml";
 
-#[derive(Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
+    author: Option<String>,
+    pub database_url: Option<String>,
+    pub debug_auth_id: Option<String>,
+    pub pdfmonkey_private_key: Option<String>,
+    pub sendinblue_api_key: Option<String>,
+    pub sentry_dsn: Option<String>,
+    pub stripe_secret_key: Option<String>,
+    pub stripe_default_price_id: Option<String>,
+    pub web_url: Option<String>,
     routes: BTreeMap<String, String>,
     templates: BTreeMap<String, Template>,
     workflows: BTreeMap<String, Workflow>,
 }
 
 impl Config {
+    pub fn new() -> Self {
+        Figment::new()
+            .merge(Toml::file(CONFIG_FILE))
+            .merge(Env::prefixed(""))
+            .extract()
+            .unwrap()
+    }
+
+    pub fn author(&self) -> Author {
+        author(self.author.clone().unwrap()).unwrap()
+    }
+
     pub fn routes(&self, key: &str) -> Option<String> {
         self.routes
             .get(key)
             .cloned()
-            .map(|route| format!("{}{}", env::var("WEB_URL").expect("WEB_URL"), route))
+            .map(|route| format!("{}{}", self.web_url.clone().unwrap(), route))
     }
 
     pub fn templates(&self, key: &str) -> Option<Template> {
@@ -40,7 +60,13 @@ impl Config {
     }
 }
 
-#[derive(Clone, Deserialize)]
+impl Default for Config {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Template {
     pub id: String,
     pub path: String,
@@ -48,12 +74,20 @@ pub struct Template {
 
 impl Template {
     pub fn as_string(&self) -> Result<String, io::Error> {
-        let manifest_dir = env!("CARGO_MANIFEST_DIR");
-        fs::read_to_string(format!("{}/../../{}", manifest_dir, self.path))
+        let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
+        fs::read_to_string(
+            manifest_dir
+                .parent()
+                .unwrap()
+                .parent()
+                .unwrap()
+                .join("templates")
+                .join(&self.path),
+        )
     }
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Workflow {
     pub path: String,
 }
@@ -91,18 +125,29 @@ pub struct Requirement {
     pub type_: String,
 }
 
-impl From<Requirement> for trankeel_data::Requirement {
-    fn from(item: Requirement) -> Self {
-        Self {
-            name: item.name,
-            type_: item.type_.into(),
-            value: None,
-        }
-    }
+pub fn config() -> Config {
+    Config::default()
 }
 
-pub fn config() -> Config {
-    toml::from_str::<Config>(CONFIG).unwrap()
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Author {
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+}
+
+fn author(text: String) -> Result<Author, regex::Error> {
+    let caps = Regex::new(r"(?P<first_name>\w+) (?P<last_name>\w+) <(?P<email>.*)>")?
+        .captures(&text)
+        .ok_or_else(|| {
+            regex::Error::Syntax("format: \"Dev TRANKEEL <hello@trankeel.dev>\"".into())
+        })?;
+
+    Ok(Author {
+        first_name: caps["first_name"].into(),
+        last_name: caps["last_name"].into(),
+        email: caps["email"].into(),
+    })
 }
 
 // # Utils
@@ -119,47 +164,6 @@ pub fn template_by_id(template_id: &str) -> Option<Template> {
 
 pub fn base_url() -> String {
     format!("http://localhost:{}", 8000)
-}
-
-pub fn candidacy_url(candidacy: &Candidacy) -> Url {
-    config()
-        .routes("candidacy_url")
-        .unwrap()
-        .replace(":id", &candidacy.id.to_string())
-        .into()
-}
-
-pub fn invite_url(invite: &Invite, email: Email) -> Url {
-    config()
-        .routes("invite_url")
-        .unwrap()
-        .replace(":token", invite.token.inner())
-        .replace(":email", email.inner())
-        .into()
-}
-
-pub fn workflow_steps(workflow: &trankeel_data::Workflow) -> Vec<trankeel_data::Step> {
-    config()
-        .workflows(&to_string(&workflow.type_).unwrap())
-        .unwrap()
-        .parse()
-        .into_iter()
-        .map(|step| trankeel_data::Step {
-            id: StepId::new(),
-            created_at: Default::default(),
-            updated_at: Default::default(),
-            workflow_id: workflow.id,
-            label: step.label,
-            event: Some(step.event),
-            completed: Default::default(),
-            confirmation: Some(step.confirmation),
-            requirements: step
-                .requirements
-                .map(|requirements| trankeel_data::RequirementOuter {
-                    requirements: requirements.into_iter().map(Into::into).collect(),
-                }),
-        })
-        .collect()
 }
 
 pub fn write_json<P, T>(path: P, json: &T) -> io::Result<()>

@@ -15,4 +15,5 @@ sendinblue = ["trankeel-core/sendinblue"]
 [dependencies]
 trankeel-core = { path = "../core" }
 trankeel-data = { path = "../data" }
+trankeel-kit = { path = "../kit" }
 trankeel-ops = { path = "../ops" }

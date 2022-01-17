@@ -1,4 +1,3 @@
-use crate::config;
 use crate::error::no;
 use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
@@ -12,6 +11,7 @@ use trankeel_data::Property;
 use trankeel_data::Receipt;
 use trankeel_data::Rent;
 use trankeel_data::Tenant;
+use trankeel_kit::config;
 
 pub type NoticeDocument = ReceiptDocument; // alias for a ReceiptDocument
 

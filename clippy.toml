@@ -1,3 +1,9 @@
 # https://rust-lang.github.io/rust-clippy/stable/index.html
 
-disallowed-types = ["async_graphql::ID"]
+disallowed-methods = [
+    { path = "std::env::var", reason = "use trankeel_core::config::config" },
+]
+
+disallowed-types = [
+    { path = "async_graphql::ID", reason = "use trankeel_data::Id" },
+]

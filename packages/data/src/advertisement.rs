@@ -1,4 +1,4 @@
-use crate::schema::advertisements;
+use crate::sql_schema::advertisements;
 use crate::Amount;
 use crate::DateTime;
 use crate::Id;

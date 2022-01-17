@@ -1,20 +1,21 @@
 use crate::routes;
 #[cfg(debug_assertions)]
-use crate::routes::dev_routes;
+use crate::routes::debug_routes;
 use crate::webhooks;
 use rocket::routes;
 use rocket::Build;
 use rocket::Rocket;
 use rocket_cors::CorsOptions;
 use rocket_dyn_templates::Template;
+use trankeel::config::Config;
 use trankeel::Result;
 use trankeel_graphql::extensions::ApolloTracing;
 
-/// Build Trankeel Web server.
+/// Build Trankeel web server.
 ///
 /// https://rocket.rs
-pub fn server() -> Result<Rocket<Build>> {
-    let client = trankeel::init()?;
+pub fn server(config: &Config) -> Result<Rocket<Build>> {
+    let client = trankeel::init(config)?;
 
     let schema = trankeel_graphql::build_schema()
         .extension(ApolloTracing)
@@ -22,6 +23,8 @@ pub fn server() -> Result<Rocket<Build>> {
         .finish();
 
     let server = rocket::build()
+        .attach(CorsOptions::default().to_cors()?)
+        .attach(Template::fairing())
         .manage(client)
         .manage(schema)
         .mount(
@@ -31,17 +34,15 @@ pub fn server() -> Result<Rocket<Build>> {
                 routes::graphql_request,
                 webhooks::pdfmonkey_request
             ],
-        )
-        .attach(CorsOptions::default().to_cors()?)
-        .attach(Template::fairing());
+        );
 
     #[cfg(debug_assertions)]
-    let server = mount_dev_routes(server);
+    let server = mount_debug_routes(server);
 
     Ok(server)
 }
 
 #[cfg(debug_assertions)]
-fn mount_dev_routes(server: Rocket<Build>) -> Rocket<Build> {
-    server.mount("/dev", routes![dev_routes::preview_request])
+fn mount_debug_routes(server: Rocket<Build>) -> Rocket<Build> {
+    server.mount("/debug", routes![debug_routes::preview_request])
 }

@@ -1,4 +1,4 @@
-use crate::schema::rents;
+use crate::sql_schema::rents;
 use crate::Amount;
 use crate::DateTime;
 use crate::Id;

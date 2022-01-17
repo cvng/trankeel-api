@@ -1,4 +1,4 @@
-use crate::schema::messages;
+use crate::sql_schema::messages;
 use crate::DateTime;
 use crate::DiscussionId;
 use crate::EventId;
