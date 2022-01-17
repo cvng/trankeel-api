@@ -3289,6 +3289,7 @@ dependencies = [
  "tokio 0.2.25",
  "trankeel-data",
  "trankeel-kit",
+ "trankeel-ops",
 ]
 
 [[package]]
@@ -3344,7 +3345,6 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
- "trankeel-core",
  "trankeel-data",
  "validator",
 ]

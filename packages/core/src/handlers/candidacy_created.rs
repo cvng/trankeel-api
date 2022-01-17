@@ -1,22 +1,10 @@
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::error::Result;
 use crate::messenger::Messenger;
-use trankeel_data::Candidacy;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
-
-#[derive(Clone)]
-pub struct CandidacyCreated {
-    pub candidacy: Candidacy,
-}
-
-impl From<CandidacyCreated> for Event {
-    fn from(item: CandidacyCreated) -> Self {
-        Event::CandidacyCreated(item)
-    }
-}
+use trankeel_ops::event::CandidacyCreated;
 
 pub fn candidacy_created(ctx: &Context, event: CandidacyCreated) -> Result<()> {
     let db = ctx.db();

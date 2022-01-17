@@ -1,7 +1,7 @@
 use crate::error::Result;
+use crate::event::DiscussionDeleted;
+use crate::event::Event;
 use crate::Command;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::DiscussionDeleted;
 use trankeel_data::DiscussionId;
 use validator::Validate;
 

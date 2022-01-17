@@ -4,6 +4,7 @@ extern crate async_graphql;
 pub mod auth;
 pub mod candidacies;
 pub mod error;
+pub mod event;
 pub mod files;
 pub mod invites;
 pub mod leases;
@@ -20,3 +21,5 @@ pub trait Command {
 
     fn run(self, input: Self::Input) -> crate::error::Result<Self::Payload>;
 }
+
+pub trait DomainEvent: Clone {}

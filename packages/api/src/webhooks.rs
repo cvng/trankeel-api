@@ -3,7 +3,7 @@ use rocket::post;
 use rocket::serde::json::Json;
 use rocket::State;
 use trankeel::config;
-use trankeel::handlers::DocumentGenerated;
+use trankeel::event::DocumentGenerated;
 use trankeel::providers::PdfmonkeyInput;
 use trankeel::Client;
 

@@ -1,19 +1,7 @@
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::error::Result;
-use trankeel_data::Advertisement;
-
-#[derive(Clone)]
-pub struct AdvertisementUpdated {
-    pub advertisement: Advertisement,
-}
-
-impl From<AdvertisementUpdated> for Event {
-    fn from(item: AdvertisementUpdated) -> Self {
-        Event::AdvertisementUpdated(item)
-    }
-}
+use trankeel_ops::event::AdvertisementUpdated;
 
 pub fn advertisement_updated(ctx: &Context, event: AdvertisementUpdated) -> Result<()> {
     let db = ctx.db();

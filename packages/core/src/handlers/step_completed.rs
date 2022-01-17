@@ -1,6 +1,5 @@
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::dispatcher::Handler;
 use crate::error::Result;
 use crate::messenger::Messenger;
@@ -18,29 +17,8 @@ use trankeel_data::Requirement;
 use trankeel_data::RequirementOuter;
 use trankeel_data::Step;
 use trankeel_data::StepEvent;
-use trankeel_data::StepId;
 use trankeel_kit::locale;
-
-#[derive(Clone)]
-pub struct StepCompletedRequirement {
-    pub name: String,
-    pub value: String,
-}
-
-#[derive(Clone)]
-pub struct StepCompleted {
-    pub step_id: StepId,
-    pub requirements: Option<Vec<StepCompletedRequirement>>,
-}
-
-impl StepCompleted {
-    pub fn with(step_id: StepId, requirements: Option<Vec<StepCompletedRequirement>>) -> Event {
-        Event::StepCompleted(Self {
-            step_id,
-            requirements,
-        })
-    }
-}
+use trankeel_ops::event::StepCompleted;
 
 pub struct StepCompletedPayload {
     pub step: Step,

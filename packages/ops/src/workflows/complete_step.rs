@@ -1,8 +1,8 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::StepCompleted;
+use crate::event::StepCompletedRequirement;
 use crate::Command;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::StepCompleted;
-use trankeel_core::handlers::StepCompletedRequirement;
 use trankeel_data::Step;
 use trankeel_data::StepId;
 use validator::Validate;

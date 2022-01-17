@@ -1,8 +1,6 @@
 use super::payment_created;
-use super::PaymentCreated;
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::error::Result;
 use crate::messenger::Messenger;
 use crate::pdfmaker::Pdfmaker;
@@ -10,22 +8,8 @@ use crate::templates::ReceiptDocument;
 use chrono::Utc;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
-use trankeel_data::Payment;
-use trankeel_data::Receipt;
-use trankeel_data::Rent;
-
-#[derive(Clone)]
-pub struct ReceiptCreated {
-    pub receipt: Receipt,
-    pub rent: Rent,
-    pub payment: Payment,
-}
-
-impl From<ReceiptCreated> for Event {
-    fn from(item: ReceiptCreated) -> Self {
-        Event::ReceiptCreated(item)
-    }
-}
+use trankeel_ops::event::PaymentCreated;
+use trankeel_ops::event::ReceiptCreated;
 
 pub fn receipt_created(ctx: &Context, event: ReceiptCreated) -> Result<()> {
     let db = ctx.db();
