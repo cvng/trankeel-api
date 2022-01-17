@@ -1,8 +1,8 @@
 use super::PushMessageInput;
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::MessagePushed;
 use crate::Command;
-use trankeel_core::dispatcher::Event;
-use trankeel_core::handlers::MessagePushed;
 use trankeel_data::Message;
 use trankeel_data::MessageId;
 use validator::Validate;

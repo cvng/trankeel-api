@@ -18,6 +18,7 @@ pub use trankeel_ops::candidacies::AcceptCandidacyInput;
 pub use trankeel_ops::candidacies::CreateCandidacyInput;
 pub use trankeel_ops::error::Error;
 pub use trankeel_ops::error::Result;
+pub use trankeel_ops::event;
 pub use trankeel_ops::files::CreateFileInput;
 pub use trankeel_ops::files::UploadImportInput;
 pub use trankeel_ops::leases::CreateFurnishedLeaseInput;

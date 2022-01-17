@@ -1,14 +1,10 @@
 use super::candidacy_rejected;
 use super::lease_affected;
 use super::step_completed;
-use super::CandidacyRejected;
-use super::LeaseAffected;
-use super::StepCompleted;
 use super::StepCompletedHandler;
 use super::StepCompletedPayload;
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::dispatcher::Handler;
 use crate::error::Result;
 use crate::mailer::Mailer;
@@ -19,43 +15,14 @@ use crate::templates::LeaseDocument;
 use chrono::Utc;
 use diesel::result::Error::NotFound;
 use trankeel_data::workflow_steps;
-use trankeel_data::Candidacy;
-use trankeel_data::Discussion;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
-use trankeel_data::Invite;
-use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
-use trankeel_data::Message;
-use trankeel_data::Person;
-use trankeel_data::Rent;
 use trankeel_data::StepEvent;
-use trankeel_data::Tenant;
-use trankeel_data::WarrantWithIdentity;
-use trankeel_data::Workflow;
-use trankeel_data::Workflowable;
-
-#[derive(Clone)]
-pub struct CandidacyAccepted {
-    pub candidacy: Candidacy,
-    pub rejected_candidacies: Vec<(Candidacy, (Discussion, Message))>,
-    pub tenant: Tenant,
-    pub identity: Person,
-    pub warrants: Option<Vec<WarrantWithIdentity>>,
-    pub discussion: Discussion,
-    pub lease: Lease,
-    pub rents: Vec<Rent>,
-    pub lease_file: LeaseFile,
-    pub workflow: Workflow,
-    pub workflowable: Workflowable,
-    pub invite: Invite,
-}
-
-impl From<CandidacyAccepted> for Event {
-    fn from(item: CandidacyAccepted) -> Self {
-        Self::CandidacyAccepted(item)
-    }
-}
+use trankeel_ops::event::CandidacyAccepted;
+use trankeel_ops::event::CandidacyRejected;
+use trankeel_ops::event::LeaseAffected;
+use trankeel_ops::event::StepCompleted;
 
 pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
     let db = ctx.db();

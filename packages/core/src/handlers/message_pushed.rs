@@ -1,24 +1,11 @@
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::dispatcher::Handler;
 use crate::error::Result;
 use chrono::Utc;
 use trankeel_data::Discussion;
 use trankeel_data::Message;
-
-#[derive(Clone)]
-pub struct MessagePushed {
-    pub message: Message,
-}
-
-impl MessagePushed {
-    pub fn with(message: &Message) -> Event {
-        Event::MessagePushed(Self {
-            message: message.clone(),
-        })
-    }
-}
+use trankeel_ops::event::MessagePushed;
 
 pub struct MessagePushedPayload {
     pub message: Message,

@@ -1,32 +1,18 @@
 use super::receipt_sent_async;
-use super::ReceiptSent;
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::error::no;
 use crate::error::Result;
 use crate::mailer::Mailer;
 use crate::templates::LeaseCreatedMail;
 use serde_json::Value;
-use trankeel_data::Document;
 use trankeel_data::File;
 use trankeel_data::FileId;
 use trankeel_data::FileStatus;
 use trankeel_data::FileType;
 use trankeel_data::LeaseFile;
-
-#[derive(Clone, Debug)]
-pub struct DocumentGenerated {
-    pub document: Document,
-}
-
-impl DocumentGenerated {
-    pub fn with(document: &Document) -> Event {
-        Event::DocumentGenerated(Self {
-            document: document.clone(),
-        })
-    }
-}
+use trankeel_ops::event::DocumentGenerated;
+use trankeel_ops::event::ReceiptSent;
 
 pub fn document_generated(_ctx: &Context, _event: DocumentGenerated) -> Result<()> {
     Ok(())

@@ -1,23 +1,11 @@
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::error::Result;
 use crate::mailer::Mailer;
 use crate::templates::ReceiptCreatedMail;
 use chrono::Utc;
 use eyre::Error;
-use trankeel_data::RentId;
-
-#[derive(Clone)]
-pub struct ReceiptSent {
-    pub rent_id: RentId,
-}
-
-impl From<ReceiptSent> for Event {
-    fn from(item: ReceiptSent) -> Self {
-        Self::ReceiptSent(item)
-    }
-}
+use trankeel_ops::event::ReceiptSent;
 
 pub fn receipt_sent(_ctx: &Context, _event: ReceiptSent) -> Result<()> {
     Ok(())

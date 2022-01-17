@@ -1,23 +1,11 @@
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::error::Result;
 use crate::messenger::Messenger;
 use diesel::result::Error::NotFound;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
-use trankeel_data::Tenant;
-
-#[derive(Clone)]
-pub struct LeaseAffected {
-    pub tenant: Tenant,
-}
-
-impl From<LeaseAffected> for Event {
-    fn from(item: LeaseAffected) -> Self {
-        Self::LeaseAffected(item)
-    }
-}
+use trankeel_ops::event::LeaseAffected;
 
 pub fn lease_affected(ctx: &Context, event: LeaseAffected) -> Result<()> {
     let db = ctx.db();

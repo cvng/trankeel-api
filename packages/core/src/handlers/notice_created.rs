@@ -1,6 +1,5 @@
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Event;
 use crate::error::Result;
 use crate::messenger::Messenger;
 use crate::pdfmaker::Pdfmaker;
@@ -8,20 +7,7 @@ use crate::templates::NoticeDocument;
 use chrono::Utc;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
-use trankeel_data::Notice;
-use trankeel_data::Rent;
-
-#[derive(Clone)]
-pub struct NoticeCreated {
-    pub notice: Notice,
-    pub rent: Rent,
-}
-
-impl From<NoticeCreated> for Event {
-    fn from(item: NoticeCreated) -> Self {
-        Event::NoticeCreated(item)
-    }
-}
+use trankeel_ops::event::NoticeCreated;
 
 pub fn notice_created(ctx: &Context, event: NoticeCreated) -> Result<()> {
     let db = ctx.db();

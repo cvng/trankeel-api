@@ -5,36 +5,13 @@ use crate::providers::Pg;
 use futures::stream;
 use futures::stream::StreamExt;
 use futures::stream::TryStreamExt;
+use trankeel_ops::event::Event;
 
 pub trait Handler {
     type Event;
     type Payload;
 
     fn run(self, event: Self::Event) -> crate::error::Result<Self::Payload>;
-}
-
-#[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
-pub enum Event {
-    AdvertisementCreated(handlers::AdvertisementCreated),
-    AdvertisementUpdated(handlers::AdvertisementUpdated),
-    CandidacyAccepted(handlers::CandidacyAccepted),
-    CandidacyCreated(handlers::CandidacyCreated),
-    CandidacyRejected(handlers::CandidacyRejected),
-    DiscussionDeleted(handlers::DiscussionDeleted),
-    DocumentGenerated(handlers::DocumentGenerated),
-    LeaseAffected(handlers::LeaseAffected),
-    LeaseCreated(handlers::LeaseCreated),
-    MessagePushed(handlers::MessagePushed),
-    NoticeCreated(handlers::NoticeCreated),
-    PaymentCreated(handlers::PaymentCreated),
-    PropertyCreated(handlers::PropertyCreated),
-    PropertyUpdated(handlers::PropertyUpdated),
-    ReceiptCreated(handlers::ReceiptCreated),
-    ReceiptSent(handlers::ReceiptSent),
-    StepCompleted(handlers::StepCompleted),
-    TenantCreated(handlers::TenantCreated),
-    TenantUpdated(handlers::TenantUpdated),
 }
 
 pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
