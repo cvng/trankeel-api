@@ -5,24 +5,25 @@ mod routes;
 mod server;
 mod webhooks;
 
-use rocket::launch;
-
-#[cfg(debug_assertions)]
-load_dotenv::load_dotenv!();
-
-#[launch]
+#[rocket::launch]
 fn rocket() -> _ {
-    dotenv::dotenv().ok();
+    #[cfg(debug_assertions)]
+    dotenv::dotenv().unwrap();
+
+    let config = trankeel::config::config();
+
     trankeel_graphql::write_schema("schema.graphql").ok();
-    #[cfg(not(debug_assertions))]
-    let _guard = sentry();
-    server::server().unwrap()
+
+    #[cfg(feature = "sentry")]
+    let _guard = init_sentry(&config);
+
+    server::server(&config).unwrap()
 }
 
-#[allow(dead_code)]
-fn sentry() -> sentry::ClientInitGuard {
+#[cfg(feature = "sentry")]
+fn init_sentry(config: &trankeel::config::Config) -> sentry::ClientInitGuard {
     sentry::init((
-        std::env::var("SENTRY_DSN").expect("SENTRY_DSN"),
+        config.sentry_dsn.clone(),
         sentry::ClientOptions {
             release: sentry::release_name!(),
             ..Default::default()

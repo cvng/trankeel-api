@@ -1,0 +1,6 @@
+[alias]
+dev = "watch --clear --exec=run --ignore=schema.graphql"
+lint = "clippy"
+codegen = "run --bin=trankeel-cli -- codegen"
+migrate = "run --bin=trankeel-cli -- migrate"
+seed = "run --bin=trankeel-cli -- seed"

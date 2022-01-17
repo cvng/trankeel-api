@@ -1,4 +1,4 @@
-use crate::schema::lenders;
+use crate::sql_schema::lenders;
 use crate::AccountId;
 use crate::CompanyId;
 use crate::DateTime;

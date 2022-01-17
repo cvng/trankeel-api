@@ -14,8 +14,8 @@ extern crate rust_decimal_macros;
 #[macro_use]
 extern crate serde;
 
-pub mod locale;
-pub mod schema;
+pub mod sql_schema;
+pub mod sql_types;
 
 mod account;
 mod address;
@@ -53,7 +53,6 @@ mod rent;
 mod rent_receipt;
 mod rent_util;
 mod requirement;
-mod sql_types;
 mod step;
 mod subscription;
 mod summary;
@@ -99,7 +98,6 @@ pub use crate::rent::*;
 pub use crate::rent_receipt::*;
 pub use crate::rent_util::*;
 pub use crate::requirement::*;
-pub use crate::sql_types::*;
 pub use crate::step::*;
 pub use crate::subscription::*;
 pub use crate::summary::*;

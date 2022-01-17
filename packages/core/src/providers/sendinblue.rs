@@ -4,9 +4,9 @@ use crate::mailer::Mail;
 use crate::mailer::Mailer;
 use sendinblue::Mailer as Line;
 use sendinblue::TransactionalBody;
-use std::env;
 use tokio::runtime::Runtime;
 use tokio::spawn;
+use trankeel_kit::config::Config;
 
 const DEFAULT_SENDER_NAME: &str = "Trankeel";
 
@@ -16,9 +16,10 @@ const DEFAULT_SENDER_EMAIL: &str = "support@trankeel.com";
 pub struct Sendinblue(sendinblue::Sendinblue);
 
 impl Sendinblue {
-    pub fn init() -> Self {
-        let api_key = env::var("SENDINBLUE_API_KEY").expect("SENDINBLUE_API_KEY");
-        Self(sendinblue::Sendinblue::production(api_key))
+    pub fn init(config: &Config) -> Self {
+        Self(sendinblue::Sendinblue::production(
+            config.sendinblue_api_key.clone().unwrap(),
+        ))
     }
 }
 

@@ -3,12 +3,13 @@ use crate::mailer::IntoMail;
 use crate::mailer::Mail;
 use crate::mailer::Mailer;
 use trankeel_data::Id;
+use trankeel_kit::config::Config;
 
 #[derive(Clone)]
 pub struct Sendinblue;
 
 impl Sendinblue {
-    pub fn init() -> Self {
+    pub fn init(_config: &Config) -> Self {
         Self
     }
 }

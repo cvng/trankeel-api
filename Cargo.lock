@@ -1405,15 +1405,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "load-dotenv"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71abcf6d8da2a6c163554a61cdbca2438bbe9e687a9c5ebeee12e9af42864b54"
-dependencies = [
- "dotenv",
-]
-
-[[package]]
 name = "lock_api"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3243,6 +3234,7 @@ version = "0.4.0"
 dependencies = [
  "trankeel-core",
  "trankeel-data",
+ "trankeel-kit",
  "trankeel-ops",
 ]
 
@@ -3254,8 +3246,6 @@ dependencies = [
  "chrono",
  "dotenv",
  "jsonwebtoken",
- "load-dotenv",
- "regex",
  "rocket",
  "rocket_cors",
  "rocket_dyn_templates",
@@ -3268,13 +3258,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "trankeel-cli"
+version = "0.4.0"
+dependencies = [
+ "chrono",
+ "dotenv",
+ "tokio 1.15.0",
+ "trankeel",
+ "trankeel-graphql",
+]
+
+[[package]]
 name = "trankeel-core"
 version = "0.4.0"
 dependencies = [
  "async-stripe",
  "async-trait",
  "chrono",
- "colored_json",
  "diesel",
  "erased-serde",
  "eyre",
@@ -3287,8 +3287,8 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio 0.2.25",
- "toml",
  "trankeel-data",
+ "trankeel-kit",
 ]
 
 [[package]]
@@ -3308,6 +3308,7 @@ dependencies = [
  "rust_decimal_macros",
  "serde",
  "serde_json",
+ "trankeel-kit",
  "uuid",
 ]
 
@@ -3318,6 +3319,19 @@ dependencies = [
  "async-graphql",
  "serde",
  "trankeel",
+]
+
+[[package]]
+name = "trankeel-kit"
+version = "0.4.0"
+dependencies = [
+ "chrono",
+ "colored_json",
+ "figment",
+ "regex",
+ "serde",
+ "serde_json",
+ "toml",
 ]
 
 [[package]]

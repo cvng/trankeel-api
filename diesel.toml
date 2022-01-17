@@ -2,6 +2,5 @@
 # see diesel.rs/guides/configuring-diesel-cli
 
 [print_schema]
-file = "packages/data/src/schema.rs"
-import_types = ["diesel::sql_types::*", "crate::sql_types::*"]
-patch_file = "diesel.patch"
+file = "packages/data/src/sql_schema.rs"
+import_types = ["diesel::sql_types::*;\n#[allow(unused_imports)]\nuse crate::sql_types::*"]

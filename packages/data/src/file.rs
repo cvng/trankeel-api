@@ -1,4 +1,4 @@
-use crate::schema::files;
+use crate::sql_schema::files;
 use crate::DateTime;
 use crate::ExternalId;
 use crate::Id;

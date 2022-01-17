@@ -1,6 +1,4 @@
 use chrono::Utc;
-use regex::Regex;
-use std::env;
 use trankeel::AddressInput;
 use trankeel::Amount;
 use trankeel::AuthId;
@@ -16,50 +14,12 @@ use trankeel::EntryFlexibility;
 use trankeel::LeaseType;
 use trankeel::WarrantType;
 
-struct Author {
-    first_name: String,
-    last_name: String,
-    email: String,
-}
+pub async fn seed() {
+    let config = trankeel::config::config();
+    let client = trankeel::init(&config).unwrap();
 
-fn author(text: String) -> Result<Author, regex::Error> {
-    let caps = Regex::new(r"(?P<first_name>\w+) (?P<last_name>\w+) <(?P<email>.*)>")?
-        .captures(&text)
-        .ok_or_else(|| {
-            regex::Error::Syntax("format: \"Dev TRANKEEL <hello@trankeel.dev>\"".into())
-        })?;
-
-    Ok(Author {
-        first_name: caps["first_name"].into(),
-        last_name: caps["last_name"].into(),
-        email: caps["email"].into(),
-    })
-}
-
-#[tokio::main]
-async fn main() {
-    dotenv::dotenv().ok();
-
-    let args: Vec<String> = env::args().collect();
-    let cmd = args[1].as_str();
-
-    match cmd {
-        "seed" => seed().await,
-        "generate" => write_schema().await,
-        _ => eprintln!("error: invalid command"),
-    }
-}
-
-async fn write_schema() {
-    trankeel_graphql::write_schema("schema.graphql").ok();
-    println!("💫 GraphQL schema printed.");
-}
-
-async fn seed() {
-    let client = trankeel::init().unwrap();
-
-    let auth_id = AuthId::new(env::var("DEBUG_AUTH_ID").unwrap());
-    let author = author(env::var("AUTHOR").unwrap()).unwrap();
+    let auth_id = AuthId::new(config.debug_auth_id.clone().unwrap());
+    let author = config.author();
 
     let user = client
         .create_user_with_account(CreateUserWithAccountInput {

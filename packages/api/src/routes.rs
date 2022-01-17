@@ -30,7 +30,7 @@ pub async fn graphql_request(
 }
 
 #[cfg(debug_assertions)]
-pub mod dev_routes {
+pub mod debug_routes {
     use rocket::get;
     use rocket_dyn_templates::Template;
     use serde_json::Value;

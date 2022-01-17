@@ -1,10 +1,10 @@
-use crate::config;
 use crate::error::no;
 use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
 use trankeel_data::DateTime;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
+use trankeel_kit::config;
 
 #[derive(Clone, Debug, Serialize)]
 pub struct LeaseDocument {

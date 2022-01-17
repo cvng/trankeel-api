@@ -4,14 +4,12 @@ use rocket::request::Outcome;
 use rocket::Request;
 use serde::Deserialize;
 use serde::Serialize;
-use std::env;
+use trankeel::config;
 use trankeel::AuthId;
-
-const AUTH_ID_KEY: &str = "DEBUG_AUTH_ID";
 
 #[derive(Debug)]
 pub enum Error {
-    Invalid,
+    Unauthorized,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -24,7 +22,9 @@ pub struct DecodedIdToken {
     pub sub: String,
 }
 
-/// Authorization request guard. https://rocket.rs/v0.5-rc/guide/requests/#request-guards
+/// Authorization request guard.
+///
+/// https://rocket.rs/v0.5-rc/guide/requests/#request-guards
 pub struct AuthGuard(Option<AuthId>);
 
 impl AuthGuard {
@@ -45,13 +45,14 @@ impl<'r> FromRequest<'r> for AuthGuard {
                 // Verify ID token from request in production (release).
                 match jsonwebtoken::dangerous_insecure_decode::<DecodedIdToken>(token) {
                     Ok(data) => data.claims.sub,
-                    _ => return Outcome::Failure((Status::Unauthorized, Error::Invalid)),
+                    _ => return Outcome::Failure((Status::Unauthorized, Error::Unauthorized)),
                 }
             }
             None => {
-                // Try ID token fallback from env in development (dev).
-                match env::var(AUTH_ID_KEY) {
-                    Ok(text) if cfg!(debug_assertions) => text,
+                // Try ID token fallback from env in development (debug).
+                match config::config().debug_auth_id {
+                    #[cfg(debug_assertions)]
+                    Some(debug_auth_id) => debug_auth_id,
                     _ => return Outcome::Success(Self(None)),
                 }
             }

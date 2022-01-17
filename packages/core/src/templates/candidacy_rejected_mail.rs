@@ -1,4 +1,3 @@
-use crate::config;
 use crate::error::Result;
 use crate::templates::parse_template;
 use serde::Serialize;
@@ -6,6 +5,7 @@ use std::fmt;
 use std::fmt::Display;
 use trankeel_data::Name;
 use trankeel_data::Person;
+use trankeel_kit::config;
 
 #[derive(Clone, Default, Debug, Serialize)]
 pub struct CandidacyRejectedMail {

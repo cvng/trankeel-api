@@ -1,12 +1,13 @@
-use crate::config;
 use crate::error::Result;
 use crate::mailer::Contact;
 use crate::mailer::IntoMail;
 use serde::Serialize;
-use trankeel_data::locale;
+use trankeel_data::candidacy_url;
 use trankeel_data::Candidacy;
 use trankeel_data::Person;
 use trankeel_data::Url;
+use trankeel_kit::config;
+use trankeel_kit::locale;
 
 #[derive(Clone, Default, Debug, Serialize)]
 pub struct CandidacyCreatedMail {
@@ -17,7 +18,7 @@ pub struct CandidacyCreatedMail {
 impl CandidacyCreatedMail {
     pub fn try_new(candidacy: &Candidacy, candidate: &Person) -> Result<Self> {
         Ok(Self {
-            candidacy_url: config::candidacy_url(candidacy),
+            candidacy_url: candidacy_url(candidacy),
             _recipients: vec![candidate.clone().into()],
         })
     }
