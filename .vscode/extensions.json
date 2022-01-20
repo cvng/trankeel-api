@@ -2,6 +2,7 @@
   "recommendations": [
     "matklad.rust-analyzer",
     "vadimcn.vscode-lldb",
+    "usernamehw.errorlens",
     "graphql.vscode-graphql"
   ]
 }
