@@ -16,4 +16,4 @@ async fn main() {
         "seed" => seed::seed().await,
         _ => eprintln!("error: invalid command: `{command}`"),
     }
-    }
+}
