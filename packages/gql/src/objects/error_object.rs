@@ -1,3 +1,5 @@
+use async_graphql::SimpleObject;
+
 #[derive(SimpleObject)]
 pub struct Error {
     message: String,

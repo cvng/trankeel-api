@@ -1,4 +1,5 @@
 use super::Plan;
+use async_graphql::SimpleObject;
 use trankeel::AccountId;
 use trankeel::AccountStatus;
 use trankeel::CustomerId;

@@ -3,6 +3,8 @@ use crate::DateTime;
 use crate::Email;
 use crate::Id;
 use crate::PhoneNumber;
+use async_graphql::Enum;
+use diesel_derive_enum::DbEnum;
 
 // # Types
 

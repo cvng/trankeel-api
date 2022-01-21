@@ -3,6 +3,9 @@ use crate::Amount;
 use crate::DateTime;
 use crate::Id;
 use crate::RentId;
+use async_graphql::Enum;
+use async_graphql::SimpleObject;
+use diesel_derive_enum::DbEnum;
 
 // # Types
 

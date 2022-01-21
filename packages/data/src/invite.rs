@@ -6,6 +6,8 @@ use crate::Id;
 use crate::InviteToken;
 use crate::PersonId;
 use crate::Url;
+use async_graphql::Enum;
+use diesel_derive_enum::DbEnum;
 use trankeel_kit::config;
 
 pub type InviteId = Id;

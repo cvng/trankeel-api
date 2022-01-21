@@ -1,6 +1,7 @@
 use crate::objects::Company;
 use crate::objects::Person;
 use crate::objects::Tenant;
+use async_graphql::Interface;
 
 #[derive(Interface)]
 // #[graphql(field(name = "address", type = "Address"))]

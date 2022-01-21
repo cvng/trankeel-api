@@ -1,4 +1,5 @@
 use crate::error::Error;
+use async_trait::async_trait;
 use trankeel_data::Email;
 use trankeel_data::Subscription;
 

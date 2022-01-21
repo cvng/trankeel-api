@@ -1,4 +1,5 @@
 use super::Address;
+use async_graphql::SimpleObject;
 use trankeel::CompanyId;
 use trankeel::DateTime;
 use trankeel::Email;

@@ -1,5 +1,7 @@
 use crate::Amount;
 use crate::Id;
+use async_graphql::Enum;
+use diesel_derive_enum::DbEnum;
 
 // # Types
 

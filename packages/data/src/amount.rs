@@ -1,3 +1,8 @@
+use async_graphql::scalar;
+use diesel_derive_newtype::DieselNewType;
+use serde::Deserialize;
+use serde::Serialize;
+
 #[derive(Copy, Clone, Default, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct Amount(rust_decimal::Decimal);
 

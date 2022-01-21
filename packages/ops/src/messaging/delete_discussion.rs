@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::event::DiscussionDeleted;
 use crate::event::Event;
 use crate::Command;
+use async_graphql::InputObject;
 use trankeel_data::DiscussionId;
 use validator::Validate;
 

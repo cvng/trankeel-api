@@ -1,3 +1,4 @@
+use async_graphql::SimpleObject;
 use trankeel::DateTime;
 use trankeel::ExternalId;
 use trankeel::FileId;

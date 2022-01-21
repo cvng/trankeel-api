@@ -91,6 +91,7 @@ fn month_num_days(year: i32, month: u32) -> i64 {
 mod tests {
     use super::*;
     use chrono::TimeZone;
+    use rust_decimal_macros::dec;
 
     struct Rent {
         start: DateTime<Utc>,

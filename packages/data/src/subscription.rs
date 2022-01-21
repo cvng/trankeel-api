@@ -1,5 +1,6 @@
 use crate::AccountStatus;
 use crate::DateTime;
+use async_graphql::SimpleObject;
 use stripe::Expandable;
 
 pub type CustomerId = String; // stripe::CustomerId;

@@ -1,5 +1,6 @@
 use crate::billing::BillingProvider;
 use crate::error::Error;
+use async_trait::async_trait;
 use log::info;
 use trankeel_data::Email;
 use trankeel_data::Subscription;

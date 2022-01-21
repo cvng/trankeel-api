@@ -1,4 +1,5 @@
 use crate::Id;
+use async_graphql::Enum;
 
 // # Types
 

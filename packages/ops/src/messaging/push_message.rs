@@ -1,5 +1,6 @@
 use crate::error::Result;
 use crate::Command;
+use async_graphql::InputObject;
 use chrono::Utc;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;

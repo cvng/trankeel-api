@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::mailer::IntoMail;
 use crate::mailer::Mail;
 use crate::mailer::Mailer;
+use async_trait::async_trait;
 use trankeel_data::Id;
 use trankeel_kit::config::Config;
 

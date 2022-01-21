@@ -10,6 +10,9 @@ use crate::Name;
 use crate::Person;
 use crate::PersonId;
 use crate::PhoneNumber;
+use async_graphql::Enum;
+use serde::Deserialize;
+use serde::Serialize;
 
 pub type TenantId = Id;
 

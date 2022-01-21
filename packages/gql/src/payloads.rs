@@ -9,6 +9,7 @@ use crate::objects::Person;
 use crate::objects::Property;
 use crate::objects::Step;
 use crate::objects::Tenant;
+use async_graphql::SimpleObject;
 use trankeel::DiscussionId;
 use trankeel::LeaseId;
 use trankeel::PropertyId;

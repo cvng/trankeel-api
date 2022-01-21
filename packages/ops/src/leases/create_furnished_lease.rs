@@ -2,6 +2,7 @@ use crate::error::Error;
 use crate::error::Result;
 use crate::files::CreateFileInput;
 use crate::Command;
+use async_graphql::InputObject;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;

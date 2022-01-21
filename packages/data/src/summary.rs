@@ -2,10 +2,11 @@ use crate::AccountId;
 use crate::Amount;
 use crate::DateTime;
 use crate::Id;
+use async_graphql::SimpleObject;
 
 pub type SummaryId = Id;
 
-#[derive(Clone, Debug, Default, Identifiable, Queryable, SimpleObject)]
+#[derive(Clone, Default, Debug, Identifiable, Queryable, SimpleObject)]
 #[table_name = "reports"]
 pub struct Summary {
     pub id: SummaryId,

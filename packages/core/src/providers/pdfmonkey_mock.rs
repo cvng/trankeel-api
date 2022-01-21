@@ -2,6 +2,7 @@ use super::types::PdfmonkeyInput;
 use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
+use async_trait::async_trait;
 use chrono::Utc;
 use reqwest::Client;
 use serde_json::json;

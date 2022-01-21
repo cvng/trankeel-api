@@ -8,6 +8,8 @@ use crate::Id;
 use crate::Name;
 use crate::PhoneNumber;
 use crate::Url;
+use async_graphql::Enum;
+use diesel_derive_enum::DbEnum;
 use std::fmt;
 use std::fmt::Display;
 

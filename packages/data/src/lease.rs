@@ -12,7 +12,12 @@ use crate::PropertyId;
 use crate::Rent;
 use crate::RentId;
 use crate::RentStatus;
+use async_graphql::Enum;
+use async_graphql::SimpleObject;
 use chrono::Utc;
+use diesel_derive_enum::DbEnum;
+use serde::Deserialize;
+use serde::Serialize;
 use trankeel_kit::locale;
 
 pub type LeaseId = Id;
@@ -124,6 +129,7 @@ impl Lease {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rust_decimal_macros::dec;
 
     impl Default for Lease {
         fn default() -> Self {
