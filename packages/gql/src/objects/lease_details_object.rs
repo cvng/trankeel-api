@@ -1,3 +1,4 @@
+use async_graphql::SimpleObject;
 use trankeel::Amount;
 use trankeel::DateTime;
 use trankeel::FurnishedLeaseDuration;

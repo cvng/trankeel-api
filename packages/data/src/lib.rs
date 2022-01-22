@@ -1,18 +1,5 @@
 #[macro_use]
-extern crate async_graphql;
-#[macro_use]
 extern crate diesel;
-#[macro_use]
-extern crate diesel_as_jsonb;
-#[macro_use]
-extern crate diesel_derive_enum;
-#[macro_use]
-extern crate diesel_derive_newtype;
-#[allow(unused_imports)]
-#[macro_use]
-extern crate rust_decimal_macros;
-#[macro_use]
-extern crate serde;
 
 pub mod sql_schema;
 pub mod sql_types;

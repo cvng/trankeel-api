@@ -4,6 +4,7 @@ use super::Warrant;
 use super::Workflow;
 use async_graphql::Context;
 use async_graphql::Result;
+use async_graphql::SimpleObject;
 use trankeel::AdvertisementId;
 use trankeel::CandidacyId;
 use trankeel::CandidacyStatus;

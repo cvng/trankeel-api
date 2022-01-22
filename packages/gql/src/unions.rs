@@ -8,6 +8,7 @@ use crate::objects::Person;
 use crate::objects::ProfessionalWarrant;
 use crate::objects::Rent;
 use crate::objects::Step;
+use async_graphql::Union;
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Union)]

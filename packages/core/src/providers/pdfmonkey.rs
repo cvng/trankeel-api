@@ -1,6 +1,7 @@
 use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
+use async_trait::async_trait;
 use pdfmonkey;
 use trankeel_data::Document;
 

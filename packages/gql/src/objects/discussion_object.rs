@@ -3,6 +3,7 @@ use super::Person;
 use crate::unions::DiscussionItem;
 use async_graphql::Context;
 use async_graphql::Result;
+use async_graphql::SimpleObject;
 use trankeel::AccountId;
 use trankeel::Client;
 use trankeel::DateTime;

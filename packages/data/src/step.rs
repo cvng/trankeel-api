@@ -4,6 +4,7 @@ use crate::Id;
 use crate::RequirementOuter;
 use crate::Workflow;
 use crate::WorkflowId;
+use async_graphql::SimpleObject;
 
 pub type StepId = Id;
 

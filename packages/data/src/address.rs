@@ -1,4 +1,7 @@
 use crate::Inline;
+use diesel_as_jsonb::AsJsonb;
+use serde::Deserialize;
+use serde::Serialize;
 use std::fmt;
 use std::fmt::Display;
 use trankeel_kit::locale;

@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate async_graphql;
-
 pub mod auth;
 pub mod candidacies;
 pub mod error;

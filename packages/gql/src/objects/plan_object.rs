@@ -1,5 +1,6 @@
 use super::Feature;
 use async_graphql::Result;
+use async_graphql::SimpleObject;
 use trankeel::Amount;
 use trankeel::PlanCode;
 use trankeel::PlanId;

@@ -8,6 +8,11 @@ use crate::NoticeId;
 use crate::ReceiptId;
 use crate::Rent;
 use crate::Url;
+use async_graphql::Enum;
+use async_graphql::SimpleObject;
+use diesel_derive_enum::DbEnum;
+use serde::Deserialize;
+use serde::Serialize;
 
 // # Types
 

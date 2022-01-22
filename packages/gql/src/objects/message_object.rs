@@ -2,6 +2,7 @@ use super::Event;
 use super::Person;
 use async_graphql::Context;
 use async_graphql::Result;
+use async_graphql::SimpleObject;
 use trankeel::Client;
 use trankeel::DateTime;
 use trankeel::DiscussionId;

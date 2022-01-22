@@ -3,6 +3,7 @@ use crate::event::Event;
 use crate::event::StepCompleted;
 use crate::event::StepCompletedRequirement;
 use crate::Command;
+use async_graphql::InputObject;
 use trankeel_data::Step;
 use trankeel_data::StepId;
 use validator::Validate;

@@ -3,6 +3,7 @@ use super::PushMessageInput;
 use super::PushMessagePayload;
 use crate::error::Result;
 use crate::Command;
+use async_graphql::InputObject;
 use chrono::Utc;
 use trankeel_data::Account;
 use trankeel_data::Discussion;

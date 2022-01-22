@@ -5,6 +5,7 @@ use figment::providers::Toml;
 use figment::Figment;
 use regex::Regex;
 use serde::Deserialize;
+use serde::Serialize;
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::env;

@@ -1,4 +1,9 @@
-#[derive(Clone, Debug, Default, Serialize, Deserialize, DieselNewType)]
+use async_graphql::scalar;
+use diesel_derive_newtype::DieselNewType;
+use serde::Deserialize;
+use serde::Serialize;
+
+#[derive(Clone, Default, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct AuthId(String);
 
 impl AuthId {

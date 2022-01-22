@@ -5,6 +5,8 @@ use crate::Eventable;
 use crate::EventableId;
 use crate::Id;
 use crate::PersonId;
+use async_graphql::Enum;
+use diesel_derive_enum::DbEnum;
 
 pub type EventId = Id;
 

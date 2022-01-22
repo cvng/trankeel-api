@@ -3,10 +3,11 @@ use crate::sql_schema::tenants;
 use crate::Amount;
 use crate::Id;
 use crate::TenantId;
+use async_graphql::SimpleObject;
 
 pub type BalanceId = Id;
 
-#[derive(Clone, Debug, Default, Identifiable, Queryable, SimpleObject)]
+#[derive(Clone, Default, Debug, Identifiable, Queryable, SimpleObject)]
 pub struct Balance {
     pub id: BalanceId,
     pub tenant_id: TenantId,

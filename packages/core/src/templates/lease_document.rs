@@ -1,6 +1,7 @@
 use crate::error::no;
 use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
+use serde::Serialize;
 use trankeel_data::DateTime;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;

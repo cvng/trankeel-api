@@ -3,6 +3,7 @@ use super::Lease;
 use super::Warrant;
 use async_graphql::Context;
 use async_graphql::Result;
+use async_graphql::SimpleObject;
 use trankeel::AccountId;
 use trankeel::Amount;
 use trankeel::Client;

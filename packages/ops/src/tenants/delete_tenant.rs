@@ -1,5 +1,6 @@
 use crate::error::Result;
 use crate::Command;
+use async_graphql::InputObject;
 use trankeel_data::TenantId;
 use validator::Validate;
 

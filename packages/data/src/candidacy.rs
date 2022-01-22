@@ -5,6 +5,12 @@ use crate::DateTime;
 use crate::Id;
 use crate::PersonId;
 use crate::Url;
+use async_graphql::Enum;
+use async_graphql::SimpleObject;
+use diesel::Insertable;
+use diesel_derive_enum::DbEnum;
+use serde::Deserialize;
+use serde::Serialize;
 use trankeel_kit::config;
 
 pub type CandidacyId = Id;

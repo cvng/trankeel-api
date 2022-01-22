@@ -2,6 +2,7 @@ use super::Account;
 use super::Address;
 use async_graphql::Context;
 use async_graphql::Result;
+use async_graphql::SimpleObject;
 use trankeel::AccountId;
 use trankeel::AuthId;
 use trankeel::Client;

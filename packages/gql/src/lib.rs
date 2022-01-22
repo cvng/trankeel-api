@@ -1,8 +1,5 @@
 #![deny(clippy::disallowed_type)]
 
-#[macro_use]
-extern crate async_graphql;
-
 mod interfaces;
 mod objects;
 mod payloads;

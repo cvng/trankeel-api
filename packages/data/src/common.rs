@@ -1,3 +1,8 @@
+use async_graphql::scalar;
+use diesel_derive_newtype::DieselNewType;
+use serde::Deserialize;
+use serde::Serialize;
+
 pub type ExternalId = String; // ID of an external service
 
 pub trait Name {

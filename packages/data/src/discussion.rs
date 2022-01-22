@@ -6,6 +6,9 @@ use crate::Id;
 use crate::Lease;
 use crate::Message;
 use crate::PersonId;
+use async_graphql::Enum;
+use async_graphql::Union;
+use diesel_derive_enum::DbEnum;
 
 pub type DiscussionId = Id;
 

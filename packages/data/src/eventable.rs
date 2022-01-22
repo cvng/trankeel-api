@@ -6,6 +6,7 @@ use crate::Lease;
 use crate::Payment;
 use crate::Rent;
 use crate::Step;
+use async_graphql::Union;
 
 pub type EventableId = Id;
 

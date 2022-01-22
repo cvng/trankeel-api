@@ -1,6 +1,7 @@
 use crate::Candidacy;
 use crate::Id;
 use crate::Workflow;
+use async_graphql::Union;
 
 pub type WorkflowableId = Id;
 

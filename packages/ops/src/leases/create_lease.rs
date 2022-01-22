@@ -6,6 +6,7 @@ use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::tenants::CreateTenantPayload;
 use crate::Command;
+use async_graphql::InputObject;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;

@@ -5,8 +5,11 @@ use crate::Id;
 use crate::LeaseId;
 use crate::NoticeId;
 use crate::ReceiptId;
+use async_graphql::Enum;
+use async_graphql::SimpleObject;
 use chrono::Duration;
 use chrono::Utc;
+use diesel_derive_enum::DbEnum;
 
 // # Types
 

@@ -5,6 +5,9 @@ use crate::Id;
 use crate::LeaseId;
 use crate::LeaseType;
 use crate::PropertyId;
+use async_graphql::Enum;
+use diesel::Insertable;
+use diesel_derive_enum::DbEnum;
 
 // # Types
 

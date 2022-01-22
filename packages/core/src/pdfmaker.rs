@@ -1,4 +1,5 @@
 use crate::error::Error;
+use async_trait::async_trait;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Debug;
