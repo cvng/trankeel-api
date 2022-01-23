@@ -2,6 +2,8 @@ use async_graphql::scalar;
 use chrono::TimeZone;
 use chrono::Utc;
 use diesel_derive_newtype::DieselNewType;
+use fake::Dummy;
+use fake::Fake;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -14,7 +16,7 @@ impl From<chrono::NaiveDate> for Date {
     }
 }
 
-#[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType, Dummy)]
 pub struct DateTime(chrono::DateTime<Utc>);
 
 impl DateTime {

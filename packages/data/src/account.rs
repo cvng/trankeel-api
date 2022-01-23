@@ -5,7 +5,6 @@ use crate::Id;
 use crate::PlanId;
 use crate::SubscriptionId;
 use async_graphql::Enum;
-use diesel::Insertable;
 use diesel_derive_enum::DbEnum;
 
 // # Types

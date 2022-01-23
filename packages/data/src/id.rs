@@ -3,6 +3,8 @@ use async_graphql::InputValueResult;
 use async_graphql::ScalarType;
 use async_graphql::Value;
 use diesel_derive_newtype::DieselNewType;
+use fake::Dummy;
+use fake::Fake;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt;
@@ -10,7 +12,7 @@ use std::fmt::Display;
 use std::str::FromStr;
 
 #[derive(
-    Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Default, DieselNewType,
+    Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Default, DieselNewType, Dummy,
 )]
 pub struct Id(uuid::Uuid);
 

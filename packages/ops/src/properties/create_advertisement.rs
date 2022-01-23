@@ -1,4 +1,6 @@
 use crate::error::Result;
+use crate::event::AdvertisementCreated;
+use crate::event::Event;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Advertisement;
@@ -26,21 +28,25 @@ pub struct CreateAdvertisementInput {
     pub description: String,
 }
 
-pub struct CreateAdvertisementPayload {
-    pub advertisement: Advertisement,
+pub struct CreateAdvertisement {
+    advertisement_id: AdvertisementId,
 }
 
-pub struct CreateAdvertisement;
+impl CreateAdvertisement {
+    pub fn new(advertisement_id: AdvertisementId) -> Self {
+        Self { advertisement_id }
+    }
+}
 
 impl Command for CreateAdvertisement {
     type Input = CreateAdvertisementInput;
-    type Payload = CreateAdvertisementPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
         let advertisement = Advertisement {
-            id: AdvertisementId::new(),
+            id: self.advertisement_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             published: input.published,
@@ -56,6 +62,6 @@ impl Command for CreateAdvertisement {
             description: input.description,
         };
 
-        Ok(Self::Payload { advertisement })
+        Ok(vec![AdvertisementCreated { advertisement }.into()])
     }
 }

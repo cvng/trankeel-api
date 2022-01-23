@@ -7,7 +7,6 @@ use crate::PersonId;
 use crate::Url;
 use async_graphql::Enum;
 use async_graphql::SimpleObject;
-use diesel::Insertable;
 use diesel_derive_enum::DbEnum;
 use serde::Deserialize;
 use serde::Serialize;

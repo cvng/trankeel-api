@@ -35,6 +35,7 @@ use trankeel_core::templates::CandidacyCreatedMail;
 use trankeel_core::templates::CandidacyRejectedMail;
 use trankeel_data::Account;
 use trankeel_data::Advertisement;
+use trankeel_data::AdvertisementId;
 use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::DiscussionId;
@@ -65,7 +66,6 @@ use trankeel_ops::candidacies::CreateCandidacy;
 use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::candidacies::CreateCandidacyPayload;
 use trankeel_ops::error::Result;
-use trankeel_ops::event::AdvertisementCreated;
 use trankeel_ops::event::AdvertisementUpdated;
 use trankeel_ops::event::CandidacyAccepted;
 use trankeel_ops::event::CandidacyCreated;
@@ -105,7 +105,6 @@ use trankeel_ops::messaging::DeleteDiscussionInput;
 use trankeel_ops::messaging::PushMessageInput;
 use trankeel_ops::properties::CreateAdvertisement;
 use trankeel_ops::properties::CreateAdvertisementInput;
-use trankeel_ops::properties::CreateAdvertisementPayload;
 use trankeel_ops::properties::CreateProperty;
 use trankeel_ops::properties::CreatePropertyInput;
 use trankeel_ops::properties::CreatePropertyPayload;
@@ -543,18 +542,15 @@ impl Client {
         _auth_id: &AuthId,
         input: CreateAdvertisementInput,
     ) -> Result<Advertisement> {
-        let CreateAdvertisementPayload { advertisement } = CreateAdvertisement.run(input)?;
+        let advertisement_id = AdvertisementId::new();
 
         dispatcher::dispatch(
             &self.0,
-            vec![AdvertisementCreated {
-                advertisement: advertisement.clone(),
-            }
-            .into()],
+            CreateAdvertisement::new(advertisement_id).run(input)?,
         )
         .await?;
 
-        Ok(advertisement)
+        self.advertisements().by_id(&advertisement_id)
     }
 
     pub async fn update_advertisement(
