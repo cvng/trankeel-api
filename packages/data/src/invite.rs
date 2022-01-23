@@ -8,6 +8,7 @@ use crate::PersonId;
 use crate::Url;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use std::fmt;
 use trankeel_kit::config;
 
 pub type InviteId = Id;
@@ -16,6 +17,12 @@ pub type InviteId = Id;
 #[DieselType = "Invitereason"]
 pub enum InviteReason {
     CandidacyAccepted,
+}
+
+impl fmt::Display for InviteReason {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self)
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]

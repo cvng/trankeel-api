@@ -2,12 +2,14 @@ use crate::DomainEvent;
 use trankeel_data::Account;
 use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
+use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Document;
 use trankeel_data::Email;
 use trankeel_data::Invite;
+use trankeel_data::InviteToken;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
 use trankeel_data::Lender;
@@ -36,6 +38,7 @@ pub enum Event {
     CandidacyRejected(CandidacyRejected),
     DiscussionDeleted(DiscussionDeleted),
     DocumentGenerated(DocumentGenerated),
+    InviteAccepted(InviteAccepted),
     LeaseAffected(LeaseAffected),
     LeaseCreated(LeaseCreated),
     LenderCreated(LenderCreated),
@@ -68,6 +71,8 @@ impl DomainEvent for CandidacyRejected {}
 impl DomainEvent for DiscussionDeleted {}
 
 impl DomainEvent for DocumentGenerated {}
+
+impl DomainEvent for InviteAccepted {}
 
 impl DomainEvent for LeaseAffected {}
 
@@ -197,6 +202,19 @@ pub struct DocumentGenerated {
 impl From<DocumentGenerated> for Event {
     fn from(item: DocumentGenerated) -> Self {
         Self::DocumentGenerated(item)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct InviteAccepted {
+    pub invite_token: InviteToken,
+    pub auth_id: AuthId,
+    pub account_id: AccountId,
+}
+
+impl From<InviteAccepted> for Event {
+    fn from(item: InviteAccepted) -> Self {
+        Self::InviteAccepted(item)
     }
 }
 

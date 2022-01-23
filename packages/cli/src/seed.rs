@@ -1,4 +1,6 @@
 use chrono::Utc;
+use trankeel::providers::reqwest;
+use trankeel::AcceptCandidacyInput;
 use trankeel::AddressInput;
 use trankeel::Amount;
 use trankeel::AuthId;
@@ -161,6 +163,18 @@ pub async fn seed() {
         })
         .await
         .unwrap();
+
+    let candidacy = match client
+        .accept_candidacy(&auth_id, AcceptCandidacyInput { id: candidacy.id })
+        .await
+    {
+        Ok(candidacy) => Ok(candidacy),
+        Err(err) => match err.downcast_ref::<reqwest::Error>() {
+            Some(_) => Ok(client.candidacies().by_id(&candidacy.id).unwrap()),
+            None => Err(err),
+        },
+    }
+    .unwrap();
 
     println!(
         "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",

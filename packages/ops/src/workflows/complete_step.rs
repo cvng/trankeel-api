@@ -53,7 +53,7 @@ impl Command for CompleteStepCommand {
         }
         .into()];
 
-        // TODO: Dispatch step event (ex: "candidacy_accepted“).
+        // TODO: dispatch step event (ex: "candidacy_accepted“).
         if let Some(_step_event) = step.event {}
 
         Ok(events)

@@ -13,7 +13,6 @@ pub use trankeel_ops::auth::ActivateAccountPlanInput;
 pub use trankeel_ops::auth::AddressInput;
 pub use trankeel_ops::auth::CreateUserWithAccountInput;
 pub use trankeel_ops::auth::SignupUserFromInviteInput;
-pub use trankeel_ops::auth::SignupUserFromInvitePayload;
 pub use trankeel_ops::auth::UpdateAccountInput;
 pub use trankeel_ops::candidacies::AcceptCandidacyInput;
 pub use trankeel_ops::candidacies::CreateCandidacyInput;

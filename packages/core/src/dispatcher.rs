@@ -25,6 +25,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
             Event::CandidacyRejected(evt) => handlers::candidacy_rejected(ctx, evt),
             Event::DiscussionDeleted(evt) => handlers::discussion_deleted(ctx, evt),
             Event::DocumentGenerated(evt) => handlers::document_generated(ctx, evt),
+            Event::InviteAccepted(evt) => handlers::invite_accepted(ctx, evt),
             Event::LeaseAffected(evt) => handlers::lease_affected(ctx, evt),
             Event::LeaseCreated(evt) => handlers::lease_created(ctx, evt),
             Event::LenderCreated(evt) => handlers::lender_created(ctx, evt),

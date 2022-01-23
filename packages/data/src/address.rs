@@ -3,7 +3,6 @@ use diesel_as_jsonb::AsJsonb;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt;
-use std::fmt::Display;
 use trankeel_kit::locale;
 
 // # Types
@@ -42,7 +41,7 @@ impl Inline for Address {
     }
 }
 
-impl Display for Address {
+impl fmt::Display for Address {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.inline())
     }

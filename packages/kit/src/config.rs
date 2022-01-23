@@ -95,8 +95,16 @@ pub struct Workflow {
 
 impl Workflow {
     pub fn as_string(&self) -> Result<String, io::Error> {
-        let manifest_dir = env!("CARGO_MANIFEST_DIR");
-        fs::read_to_string(format!("{}/../../{}", manifest_dir, self.path))
+        let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
+        fs::read_to_string(
+            manifest_dir
+                .parent()
+                .unwrap()
+                .parent()
+                .unwrap()
+                .join("templates")
+                .join(&self.path),
+        )
     }
 
     pub fn parse(&self) -> Vec<Step> {

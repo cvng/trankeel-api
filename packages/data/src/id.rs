@@ -8,7 +8,6 @@ use fake::Fake;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt;
-use std::fmt::Display;
 use std::str::FromStr;
 
 #[derive(
@@ -22,7 +21,7 @@ impl Id {
     }
 }
 
-impl Display for Id {
+impl fmt::Display for Id {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }

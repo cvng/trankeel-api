@@ -1,4 +1,4 @@
-use crate::CreateUserWithAccountPayload;
+use crate::payloads::CreateUserWithAccountPayload;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
@@ -60,7 +60,6 @@ use trankeel_ops::auth::CreateUserWithAccount;
 use trankeel_ops::auth::CreateUserWithAccountInput;
 use trankeel_ops::auth::SignupUserFromInvite;
 use trankeel_ops::auth::SignupUserFromInviteInput;
-use trankeel_ops::auth::SignupUserFromInvitePayload;
 use trankeel_ops::candidacies::AcceptCandidacy;
 use trankeel_ops::candidacies::AcceptCandidacyInput;
 use trankeel_ops::candidacies::CreateCandidacy;
@@ -260,22 +259,10 @@ impl Client {
         input: SignupUserFromInviteInput,
     ) -> Result<Person> {
         let invite = self.0.db().invites().by_token(&input.invite_token)?;
-        let invitee = self.0.db().persons().by_id(&invite.invitee_id)?;
 
-        let SignupUserFromInvitePayload {
-            invite,
-            invitee,
-            account,
-        } = SignupUserFromInvite::new(&invite, &invitee).run(input)?;
-
-        self.0.db().transaction(|| {
-            self.0.db().accounts().create(&account)?;
-            self.0.db().persons().update(&invitee)?;
-            self.0.db().invites().update(&invite)?;
-            Ok(())
-        })?;
-
-        Ok(invitee)
+        dispatcher::dispatch(&self.0, SignupUserFromInvite::new(&invite).run(input)?)
+            .await
+            .and_then(|_| self.persons().by_id(&invite.invitee_id))
     }
 
     pub async fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
