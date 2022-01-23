@@ -1,12 +1,16 @@
 use crate::DomainEvent;
+use trankeel_data::Account;
+use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
 use trankeel_data::Candidacy;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Document;
+use trankeel_data::Email;
 use trankeel_data::Invite;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
+use trankeel_data::Lender;
 use trankeel_data::Message;
 use trankeel_data::Notice;
 use trankeel_data::Payment;
@@ -24,6 +28,7 @@ use trankeel_data::Workflowable;
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone)]
 pub enum Event {
+    AccountCreated(AccountCreated),
     AdvertisementCreated(AdvertisementCreated),
     AdvertisementUpdated(AdvertisementUpdated),
     CandidacyAccepted(CandidacyAccepted),
@@ -33,6 +38,7 @@ pub enum Event {
     DocumentGenerated(DocumentGenerated),
     LeaseAffected(LeaseAffected),
     LeaseCreated(LeaseCreated),
+    LenderCreated(LenderCreated),
     MessagePushed(MessagePushed),
     NoticeCreated(NoticeCreated),
     PaymentCreated(PaymentCreated),
@@ -42,9 +48,12 @@ pub enum Event {
     ReceiptCreated(ReceiptCreated),
     ReceiptSent(ReceiptSent),
     StepCompleted(StepCompleted),
+    SubscriptionRequested(SubscriptionRequested),
     TenantCreated(TenantCreated),
     TenantUpdated(TenantUpdated),
 }
+
+impl DomainEvent for AccountCreated {}
 
 impl DomainEvent for AdvertisementCreated {}
 
@@ -64,6 +73,8 @@ impl DomainEvent for LeaseAffected {}
 
 impl DomainEvent for LeaseCreated {}
 
+impl DomainEvent for LenderCreated {}
+
 impl DomainEvent for MessagePushed {}
 
 impl DomainEvent for NoticeCreated {}
@@ -82,9 +93,22 @@ impl DomainEvent for ReceiptSent {}
 
 impl DomainEvent for StepCompleted {}
 
+impl DomainEvent for SubscriptionRequested {}
+
 impl DomainEvent for TenantCreated {}
 
 impl DomainEvent for TenantUpdated {}
+
+#[derive(Clone)]
+pub struct AccountCreated {
+    pub account: Account,
+}
+
+impl From<AccountCreated> for Event {
+    fn from(item: AccountCreated) -> Self {
+        Self::AccountCreated(item)
+    }
+}
 
 #[derive(Clone)]
 pub struct AdvertisementCreated {
@@ -200,6 +224,17 @@ impl From<LeaseCreated> for Event {
 }
 
 #[derive(Clone)]
+pub struct LenderCreated {
+    pub lender: Lender,
+}
+
+impl From<LenderCreated> for Event {
+    fn from(item: LenderCreated) -> Self {
+        Self::LenderCreated(item)
+    }
+}
+
+#[derive(Clone)]
 pub struct MessagePushed {
     pub message: Message,
 }
@@ -305,6 +340,18 @@ pub struct StepCompleted {
 impl From<StepCompleted> for Event {
     fn from(item: StepCompleted) -> Self {
         Self::StepCompleted(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct SubscriptionRequested {
+    pub account_id: AccountId,
+    pub email: Email,
+}
+
+impl From<SubscriptionRequested> for Event {
+    fn from(item: SubscriptionRequested) -> Self {
+        Self::SubscriptionRequested(item)
     }
 }
 
