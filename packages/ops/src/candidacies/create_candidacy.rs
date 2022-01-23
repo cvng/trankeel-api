@@ -1,7 +1,8 @@
 use crate::auth::CreatePerson;
 use crate::auth::CreatePersonInput;
-use crate::auth::CreatePersonPayload;
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::PersonCreated;
 use crate::files::CreateFileInput;
 use crate::messaging::CreateDiscussion;
 use crate::messaging::CreateDiscussionInput;
@@ -78,7 +79,7 @@ impl Command for CreateCandidacy {
             account_owner,
         } = self;
 
-        let CreatePersonPayload { person: candidate } = CreatePerson::new(&account) //
+        let PersonCreated { person: candidate } = CreatePerson::new(&account) //
             .run(CreatePersonInput {
                 email: input.email.into(),
                 first_name: input.first_name,
@@ -86,7 +87,13 @@ impl Command for CreateCandidacy {
                 address: None,
                 phone_number: Some(input.phone_number),
                 role: PersonRole::Candidate,
-            })?;
+            })?
+            .into_iter()
+            .find_map(|event| match event {
+                Event::PersonCreated(event) => Some(event),
+                _ => None,
+            })
+            .unwrap();
 
         let candidacy = Candidacy {
             id: CandidacyId::new(),

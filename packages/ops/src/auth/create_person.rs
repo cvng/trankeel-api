@@ -1,5 +1,7 @@
 use super::AddressInput;
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::PersonCreated;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
@@ -20,10 +22,6 @@ pub struct CreatePersonInput {
     pub role: PersonRole,
 }
 
-pub struct CreatePersonPayload {
-    pub person: Person,
-}
-
 pub struct CreatePerson {
     account: Account,
 }
@@ -38,7 +36,7 @@ impl CreatePerson {
 
 impl Command for CreatePerson {
     type Input = CreatePersonInput;
-    type Payload = CreatePersonPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -60,6 +58,6 @@ impl Command for CreatePerson {
             phone_number: input.phone_number,
         };
 
-        Ok(Self::Payload { person })
+        Ok(vec![PersonCreated { person }.into()])
     }
 }

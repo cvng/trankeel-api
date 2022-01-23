@@ -36,6 +36,7 @@ pub enum Event {
     MessagePushed(MessagePushed),
     NoticeCreated(NoticeCreated),
     PaymentCreated(PaymentCreated),
+    PersonCreated(PersonCreated),
     PropertyCreated(PropertyCreated),
     PropertyUpdated(PropertyUpdated),
     ReceiptCreated(ReceiptCreated),
@@ -69,6 +70,8 @@ impl DomainEvent for NoticeCreated {}
 
 impl DomainEvent for PaymentCreated {}
 
+impl DomainEvent for PersonCreated {}
+
 impl DomainEvent for PropertyCreated {}
 
 impl DomainEvent for PropertyUpdated {}
@@ -90,7 +93,7 @@ pub struct AdvertisementCreated {
 
 impl From<AdvertisementCreated> for Event {
     fn from(item: AdvertisementCreated) -> Self {
-        Event::AdvertisementCreated(item)
+        Self::AdvertisementCreated(item)
     }
 }
 
@@ -101,7 +104,7 @@ pub struct AdvertisementUpdated {
 
 impl From<AdvertisementUpdated> for Event {
     fn from(item: AdvertisementUpdated) -> Self {
-        Event::AdvertisementUpdated(item)
+        Self::AdvertisementUpdated(item)
     }
 }
 
@@ -134,7 +137,7 @@ pub struct CandidacyCreated {
 
 impl From<CandidacyCreated> for Event {
     fn from(item: CandidacyCreated) -> Self {
-        Event::CandidacyCreated(item)
+        Self::CandidacyCreated(item)
     }
 }
 
@@ -156,9 +159,9 @@ pub struct DiscussionDeleted {
     pub discussion_id: DiscussionId,
 }
 
-impl DiscussionDeleted {
-    pub fn with(discussion_id: DiscussionId) -> Event {
-        Event::DiscussionDeleted(Self { discussion_id })
+impl From<DiscussionDeleted> for Event {
+    fn from(item: DiscussionDeleted) -> Self {
+        Self::DiscussionDeleted(item)
     }
 }
 
@@ -167,11 +170,9 @@ pub struct DocumentGenerated {
     pub document: Document,
 }
 
-impl DocumentGenerated {
-    pub fn with(document: &Document) -> Event {
-        Event::DocumentGenerated(Self {
-            document: document.clone(),
-        })
+impl From<DocumentGenerated> for Event {
+    fn from(item: DocumentGenerated) -> Self {
+        Self::DocumentGenerated(item)
     }
 }
 
@@ -203,11 +204,9 @@ pub struct MessagePushed {
     pub message: Message,
 }
 
-impl MessagePushed {
-    pub fn with(message: &Message) -> Event {
-        Event::MessagePushed(Self {
-            message: message.clone(),
-        })
+impl From<MessagePushed> for Event {
+    fn from(item: MessagePushed) -> Self {
+        Self::MessagePushed(item)
     }
 }
 
@@ -219,7 +218,7 @@ pub struct NoticeCreated {
 
 impl From<NoticeCreated> for Event {
     fn from(item: NoticeCreated) -> Self {
-        Event::NoticeCreated(item)
+        Self::NoticeCreated(item)
     }
 }
 
@@ -230,7 +229,18 @@ pub struct PaymentCreated {
 
 impl From<PaymentCreated> for Event {
     fn from(item: PaymentCreated) -> Self {
-        Event::PaymentCreated(item)
+        Self::PaymentCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct PersonCreated {
+    pub person: Person,
+}
+
+impl From<PersonCreated> for Event {
+    fn from(item: PersonCreated) -> Self {
+        Self::PersonCreated(item)
     }
 }
 
@@ -265,7 +275,7 @@ pub struct ReceiptCreated {
 
 impl From<ReceiptCreated> for Event {
     fn from(item: ReceiptCreated) -> Self {
-        Event::ReceiptCreated(item)
+        Self::ReceiptCreated(item)
     }
 }
 
@@ -292,12 +302,9 @@ pub struct StepCompleted {
     pub requirements: Option<Vec<StepCompletedRequirement>>,
 }
 
-impl StepCompleted {
-    pub fn with(step_id: StepId, requirements: Option<Vec<StepCompletedRequirement>>) -> Event {
-        Event::StepCompleted(Self {
-            step_id,
-            requirements,
-        })
+impl From<StepCompleted> for Event {
+    fn from(item: StepCompleted) -> Self {
+        Self::StepCompleted(item)
     }
 }
 

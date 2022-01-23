@@ -39,9 +39,9 @@ impl Command for CompleteStepCommand {
 
         let Self { step } = self;
 
-        let events = vec![StepCompleted::with(
-            step.id,
-            input.requirements.map(|requirements| {
+        let events = vec![StepCompleted {
+            step_id: step.id,
+            requirements: input.requirements.map(|requirements| {
                 requirements
                     .into_iter()
                     .map(|requirement| StepCompletedRequirement {
@@ -50,7 +50,8 @@ impl Command for CompleteStepCommand {
                     })
                     .collect()
             }),
-        )];
+        }
+        .into()];
 
         // TODO: Dispatch step event (ex: "candidacy_accepted“).
         if let Some(_step_event) = step.event {}
