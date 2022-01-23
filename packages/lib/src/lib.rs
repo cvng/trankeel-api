@@ -1,7 +1,9 @@
 mod client;
+mod payloads;
 
 pub use crate::client::init;
 pub use crate::client::Client;
+pub use crate::payloads::CreateUserWithAccountPayload;
 pub use trankeel_core::handlers;
 pub use trankeel_core::providers;
 pub use trankeel_core::templates;
@@ -10,7 +12,6 @@ pub use trankeel_kit::config;
 pub use trankeel_ops::auth::ActivateAccountPlanInput;
 pub use trankeel_ops::auth::AddressInput;
 pub use trankeel_ops::auth::CreateUserWithAccountInput;
-pub use trankeel_ops::auth::CreateUserWithAccountPayload;
 pub use trankeel_ops::auth::SignupUserFromInviteInput;
 pub use trankeel_ops::auth::SignupUserFromInvitePayload;
 pub use trankeel_ops::auth::UpdateAccountInput;

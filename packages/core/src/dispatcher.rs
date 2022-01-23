@@ -17,6 +17,7 @@ pub trait Handler {
 pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     Pg::transaction(ctx.db(), || {
         events.clone().into_iter().try_for_each(|evt| match evt {
+            Event::AccountCreated(evt) => handlers::account_created(ctx, evt),
             Event::AdvertisementCreated(evt) => handlers::advertisement_created(ctx, evt),
             Event::AdvertisementUpdated(evt) => handlers::advertisement_updated(ctx, evt),
             Event::CandidacyAccepted(evt) => handlers::candidacy_accepted(ctx, evt),
@@ -26,15 +27,17 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
             Event::DocumentGenerated(evt) => handlers::document_generated(ctx, evt),
             Event::LeaseAffected(evt) => handlers::lease_affected(ctx, evt),
             Event::LeaseCreated(evt) => handlers::lease_created(ctx, evt),
+            Event::LenderCreated(evt) => handlers::lender_created(ctx, evt),
             Event::MessagePushed(evt) => handlers::message_pushed(ctx, evt),
             Event::NoticeCreated(evt) => handlers::notice_created(ctx, evt),
             Event::PaymentCreated(evt) => handlers::payment_created(ctx, evt),
-            Event::PersonCreated(_evt) => todo!(),
+            Event::PersonCreated(evt) => handlers::person_created(ctx, evt),
             Event::PropertyCreated(evt) => handlers::property_created(ctx, evt),
             Event::PropertyUpdated(evt) => handlers::property_updated(ctx, evt),
             Event::ReceiptCreated(evt) => handlers::receipt_created(ctx, evt),
             Event::ReceiptSent(evt) => handlers::receipt_sent(ctx, evt),
             Event::StepCompleted(evt) => handlers::step_completed(ctx, evt),
+            Event::SubscriptionRequested(evt) => handlers::subscription_requested(ctx, evt),
             Event::TenantCreated(evt) => handlers::tenant_created(ctx, evt),
             Event::TenantUpdated(evt) => handlers::tenant_updated(ctx, evt),
         })
@@ -50,6 +53,9 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
                 Event::ReceiptCreated(evt) => handlers::receipt_created_async(ctx, evt).await,
                 Event::ReceiptSent(evt) => handlers::receipt_sent_async(ctx, evt).await,
                 Event::StepCompleted(evt) => handlers::step_completed_async(ctx, evt).await,
+                Event::SubscriptionRequested(evt) => {
+                    handlers::subscription_requested_async(ctx, evt).await
+                }
                 _ => Ok(()),
             }
         })

@@ -1,4 +1,4 @@
-use trankeel_core::billing::BillingProvider;
+use crate::CreateUserWithAccountPayload;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
@@ -33,7 +33,7 @@ use trankeel_core::providers::Sendinblue;
 use trankeel_core::providers::Stripe;
 use trankeel_core::templates::CandidacyCreatedMail;
 use trankeel_core::templates::CandidacyRejectedMail;
-use trankeel_data::Account;
+use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
 use trankeel_data::AdvertisementId;
 use trankeel_data::AuthId;
@@ -43,10 +43,12 @@ use trankeel_data::Lease;
 use trankeel_data::LeaseId;
 use trankeel_data::LegalIdentity;
 use trankeel_data::Lender;
+use trankeel_data::LenderId;
 use trankeel_data::Message;
 use trankeel_data::MessageId;
 use trankeel_data::Notice;
 use trankeel_data::Person;
+use trankeel_data::PersonId;
 use trankeel_data::Property;
 use trankeel_data::PropertyId;
 use trankeel_data::Receipt;
@@ -56,7 +58,6 @@ use trankeel_data::TenantId;
 use trankeel_kit::config::Config;
 use trankeel_ops::auth::CreateUserWithAccount;
 use trankeel_ops::auth::CreateUserWithAccountInput;
-use trankeel_ops::auth::CreateUserWithAccountPayload;
 use trankeel_ops::auth::SignupUserFromInvite;
 use trankeel_ops::auth::SignupUserFromInviteInput;
 use trankeel_ops::auth::SignupUserFromInvitePayload;
@@ -236,44 +237,21 @@ impl Client {
         &self,
         input: CreateUserWithAccountInput,
     ) -> Result<CreateUserWithAccountPayload> {
-        let skip_create_customer = matches!(input.skip_create_customer, Some(true));
+        let user_id = PersonId::new();
+        let lender_id = LenderId::new();
+        let account_id = AccountId::new();
 
-        let CreateUserWithAccountPayload {
-            user,
-            lender,
-            account,
-        } = CreateUserWithAccount::new().run(input)?;
-
-        self.0.db().transaction(|| {
-            self.0.db().accounts().create(&account)?;
-            self.0.db().persons().create(&user)?;
-            self.0.db().lenders().create(&lender)?;
-            Ok(())
-        })?;
-
-        if !skip_create_customer {
-            // Create subscription.
-            let subscription = self
-                .0
-                .billing_provider()
-                .create_subscription_with_customer(user.email.clone())
-                .await?;
-
-            // Update the local customer data.
-            self.0.db().accounts().update(&Account {
-                id: account.id,
-                stripe_customer_id: Some(subscription.customer_id.clone()),
-                stripe_subscription_id: Some(subscription.id.clone()),
-                status: subscription.status,
-                trial_end: subscription.trial_end,
-                ..account
-            })?;
-        }
-
-        Ok(CreateUserWithAccountPayload {
-            user,
-            lender,
-            account,
+        dispatcher::dispatch(
+            &self.0,
+            CreateUserWithAccount::new(user_id, lender_id, account_id).run(input)?,
+        )
+        .await
+        .and_then(|_| {
+            Ok(CreateUserWithAccountPayload {
+                user: self.persons().by_id(&user_id)?,
+                lender: self.lenders().by_id(&lender_id)?.0,
+                account: self.accounts().by_id(&account_id)?,
+            })
         })
     }
 
@@ -548,9 +526,8 @@ impl Client {
             &self.0,
             CreateAdvertisement::new(advertisement_id).run(input)?,
         )
-        .await?;
-
-        self.advertisements().by_id(&advertisement_id)
+        .await
+        .and_then(|_| self.advertisements().by_id(&advertisement_id))
     }
 
     pub async fn update_advertisement(

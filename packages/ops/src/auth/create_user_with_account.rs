@@ -1,4 +1,9 @@
 use crate::error::Result;
+use crate::event::AccountCreated;
+use crate::event::Event;
+use crate::event::LenderCreated;
+use crate::event::PersonCreated;
+use crate::event::SubscriptionRequested;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
@@ -34,31 +39,38 @@ pub struct CreateUserWithAccountInput {
     pub skip_create_customer: Option<bool>,
 }
 
-pub struct CreateUserWithAccountPayload {
-    pub user: Person,
-    pub lender: Lender,
-    pub account: Account,
+pub struct CreateUserWithAccount {
+    user_id: PersonId,
+    lender_id: LenderId,
+    account_id: AccountId,
 }
 
-pub struct CreateUserWithAccount;
-
 impl CreateUserWithAccount {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self
+    pub fn new(user_id: PersonId, lender_id: LenderId, account_id: AccountId) -> Self {
+        Self {
+            user_id,
+            lender_id,
+            account_id,
+        }
     }
 }
 
 impl Command for CreateUserWithAccount {
     type Input = CreateUserWithAccountInput;
-    type Payload = CreateUserWithAccountPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
+        let Self {
+            user_id,
+            lender_id,
+            account_id,
+        } = self;
+
         // Create account.
         let account = Account {
-            id: AccountId::new(),
+            id: account_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             plan_id: None,
@@ -70,7 +82,7 @@ impl Command for CreateUserWithAccount {
 
         // Create user.
         let user = Person {
-            id: PersonId::new(),
+            id: user_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             account_id: account.id,
@@ -86,7 +98,7 @@ impl Command for CreateUserWithAccount {
 
         // Create lender.
         let lender = Lender {
-            id: LenderId::new(),
+            id: lender_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             account_id: account.id,
@@ -94,11 +106,29 @@ impl Command for CreateUserWithAccount {
             company_id: None,
         };
 
-        Ok(Self::Payload {
-            user,
-            lender,
-            account,
-        })
+        let mut events = vec![
+            AccountCreated {
+                account: account.clone(),
+            }
+            .into(),
+            PersonCreated {
+                person: user.clone(),
+            }
+            .into(),
+            LenderCreated { lender }.into(),
+        ];
+
+        if !matches!(input.skip_create_customer, Some(true)) {
+            events.push(
+                SubscriptionRequested {
+                    account_id: account.id,
+                    email: user.email, // TODO: use account email for billing
+                }
+                .into(),
+            )
+        }
+
+        Ok(events)
     }
 }
 
