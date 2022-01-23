@@ -15,7 +15,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: default
-          components: rustfmt, clippy
+          # components: rustfmt, clippy
 
       - uses: swatinem/rust-cache@v1
 
