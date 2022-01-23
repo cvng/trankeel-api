@@ -29,6 +29,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
             Event::MessagePushed(evt) => handlers::message_pushed(ctx, evt),
             Event::NoticeCreated(evt) => handlers::notice_created(ctx, evt),
             Event::PaymentCreated(evt) => handlers::payment_created(ctx, evt),
+            Event::PersonCreated(_evt) => todo!(),
             Event::PropertyCreated(evt) => handlers::property_created(ctx, evt),
             Event::PropertyUpdated(evt) => handlers::property_updated(ctx, evt),
             Event::ReceiptCreated(evt) => handlers::receipt_created(ctx, evt),

@@ -21,4 +21,4 @@ pub trait Command {
     fn run(self, input: Self::Input) -> crate::error::Result<Self::Payload>;
 }
 
-pub trait DomainEvent: Clone {}
+pub trait DomainEvent: Clone + Into<crate::event::Event> {}

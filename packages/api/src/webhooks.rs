@@ -12,7 +12,10 @@ pub async fn pdfmonkey_request(client: &State<Client>, input: Json<PdfmonkeyInpu
     config::log_json(&input.to_owned());
 
     client
-        .dispatch(vec![DocumentGenerated::with(&input.document)])
+        .dispatch(vec![DocumentGenerated {
+            document: input.document.clone(),
+        }
+        .into()])
         .await
         .map(|_| Status::Ok)
         .unwrap()

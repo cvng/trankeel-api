@@ -45,8 +45,10 @@ impl Command for CreateAdvertisement {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
+        let Self { advertisement_id } = self;
+
         let advertisement = Advertisement {
-            id: self.advertisement_id,
+            id: advertisement_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             published: input.published,

@@ -20,6 +20,9 @@ impl Command for DeleteDiscussionCommand {
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        Ok(vec![DiscussionDeleted::with(input.id)])
+        Ok(vec![DiscussionDeleted {
+            discussion_id: input.id,
+        }
+        .into()])
     }
 }

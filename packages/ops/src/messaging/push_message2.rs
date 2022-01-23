@@ -38,6 +38,6 @@ impl Command for PushMessageCommand {
             event_id: None,
         };
 
-        Ok(vec![MessagePushed::with(&message)])
+        Ok(vec![MessagePushed { message }.into()])
     }
 }
