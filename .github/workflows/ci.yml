@@ -15,10 +15,11 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
-          components: clippy
+          components: rustfmt, clippy
 
       - uses: swatinem/rust-cache@v1
+
+      - run: cargo fmt --check
 
       - run: cargo build --release --locked --all-features
 
