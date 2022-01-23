@@ -16,6 +16,7 @@ use async_graphql::Enum;
 use async_graphql::SimpleObject;
 use chrono::Utc;
 use diesel_derive_enum::DbEnum;
+use fake::Dummy;
 use serde::Deserialize;
 use serde::Serialize;
 use trankeel_kit::locale;
@@ -41,7 +42,7 @@ impl Default for LeaseStatus {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Dummy, Enum)]
 #[DieselType = "Leasetype"]
 pub enum LeaseType {
     Furnished,

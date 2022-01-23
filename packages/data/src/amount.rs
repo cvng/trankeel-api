@@ -1,5 +1,8 @@
 use async_graphql::scalar;
 use diesel_derive_newtype::DieselNewType;
+use fake::Dummy;
+use fake::Fake;
+use fake::Faker;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -23,6 +26,12 @@ impl Amount {
 impl From<rust_decimal::Decimal> for Amount {
     fn from(item: rust_decimal::Decimal) -> Self {
         Self(item)
+    }
+}
+
+impl Dummy<Faker> for Amount {
+    fn dummy_with_rng<R: rand::Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
+        Self::new(Faker.fake_with_rng(rng))
     }
 }
 

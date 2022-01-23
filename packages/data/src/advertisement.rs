@@ -6,14 +6,15 @@ use crate::LeaseId;
 use crate::LeaseType;
 use crate::PropertyId;
 use async_graphql::Enum;
-use diesel::Insertable;
 use diesel_derive_enum::DbEnum;
+use fake::Dummy;
+use fake::Fake;
 
 // # Types
 
 pub type AdvertisementId = Id;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Dummy, Enum)]
 #[DieselType = "Entryflexibility"]
 #[graphql(name = "LenderFlexibility")]
 pub enum EntryFlexibility {
@@ -22,7 +23,7 @@ pub enum EntryFlexibility {
     SevenDays,
 }
 
-#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(Clone, Debug, AsChangeset, Dummy, Identifiable, Insertable, Queryable)]
 pub struct Advertisement {
     pub id: AdvertisementId,
     pub created_at: Option<DateTime>,
