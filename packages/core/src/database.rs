@@ -19,6 +19,7 @@ use trankeel_data::Eventable;
 use trankeel_data::File;
 use trankeel_data::FileId;
 use trankeel_data::Invite;
+use trankeel_data::InviteId;
 use trankeel_data::InviteToken;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFileId;
@@ -263,6 +264,7 @@ pub trait MessageStore {
 }
 
 pub trait InviteStore {
+    fn by_id(&mut self, id: &InviteId) -> Result<Invite>;
     fn by_token(&mut self, token: &InviteToken) -> Result<Invite>;
     fn create(&mut self, data: &Invite) -> Result<Invite>;
     fn update(&mut self, data: &Invite) -> Result<Invite>;

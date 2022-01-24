@@ -58,14 +58,10 @@ impl Command for SignupUserFromInvite {
         };
 
         Ok(vec![
-            AccountCreated {
-                account: account.clone(),
-            }
-            .into(),
+            AccountCreated { account }.into(),
             InviteAccepted {
-                invite_token: input.invite_token,
+                invite_id: invite.id,
                 auth_id: input.auth_id,
-                account_id: account.id,
             }
             .into(),
         ])

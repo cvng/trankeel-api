@@ -9,7 +9,7 @@ use trankeel_data::DiscussionId;
 use trankeel_data::Document;
 use trankeel_data::Email;
 use trankeel_data::Invite;
-use trankeel_data::InviteToken;
+use trankeel_data::InviteId;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
 use trankeel_data::Lender;
@@ -207,9 +207,8 @@ impl From<DocumentGenerated> for Event {
 
 #[derive(Clone, Debug)]
 pub struct InviteAccepted {
-    pub invite_token: InviteToken,
+    pub invite_id: InviteId,
     pub auth_id: AuthId,
-    pub account_id: AccountId,
 }
 
 impl From<InviteAccepted> for Event {

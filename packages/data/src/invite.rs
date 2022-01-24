@@ -43,7 +43,7 @@ pub struct Invite {
     pub id: InviteId,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
-    pub account_id: Option<AccountId>,
+    pub account_id: AccountId,
     pub invitee_id: PersonId,
     pub token: InviteToken,
     pub status: InviteStatus,
