@@ -2,7 +2,6 @@ use crate::error::Result;
 use crate::templates::parse_template;
 use serde::Serialize;
 use std::fmt;
-use std::fmt::Display;
 use trankeel_data::Name;
 use trankeel_data::Person;
 use trankeel_kit::config;
@@ -33,7 +32,7 @@ impl CandidacyRejectedMail {
     }
 }
 
-impl Display for CandidacyRejectedMail {
+impl fmt::Display for CandidacyRejectedMail {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.as_text())
     }

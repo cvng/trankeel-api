@@ -153,7 +153,7 @@ table! {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
         updated_at -> Nullable<Timestamptz>,
-        account_id -> Nullable<Uuid>,
+        account_id -> Uuid,
         invitee_id -> Uuid,
         token -> Text,
         status -> Invitestatus,

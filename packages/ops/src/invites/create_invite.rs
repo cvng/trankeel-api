@@ -1,6 +1,7 @@
 use crate::error::Result;
 use crate::Command;
 use async_graphql::InputObject;
+use trankeel_data::AccountId;
 use trankeel_data::Invite;
 use trankeel_data::InviteId;
 use trankeel_data::InviteReason;
@@ -13,6 +14,7 @@ use validator::Validate;
 #[derive(InputObject, Validate)]
 pub struct CreateInviteInput {
     pub invitee_id: PersonId,
+    pub account_id: AccountId,
     pub reason: InviteReason,
 }
 
@@ -48,7 +50,7 @@ impl Command for CreateInvite {
             id,
             created_at: Default::default(),
             updated_at: Default::default(),
-            account_id: None,
+            account_id: input.account_id,
             invitee_id: invitee.id,
             token,
             status: InviteStatus::default(),

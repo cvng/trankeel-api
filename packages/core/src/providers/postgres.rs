@@ -60,6 +60,7 @@ use trankeel_data::EventableRow;
 use trankeel_data::File;
 use trankeel_data::FileId;
 use trankeel_data::Invite;
+use trankeel_data::InviteId;
 use trankeel_data::InviteToken;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFileId;
@@ -1239,6 +1240,10 @@ impl database::MessageStore for MessageStore<'_> {
 }
 
 impl database::InviteStore for InviteStore<'_> {
+    fn by_id(&mut self, id: &InviteId) -> Result<Invite> {
+        Ok(invites::table.find(id).first(&self.0.get()?)?)
+    }
+
     fn by_token(&mut self, token: &InviteToken) -> Result<Invite> {
         Ok(invites::table
             .filter(invites::token.eq(token))

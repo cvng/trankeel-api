@@ -11,7 +11,6 @@ use crate::Url;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
 use std::fmt;
-use std::fmt::Display;
 
 // # Types
 
@@ -63,7 +62,7 @@ impl Name for Person {
     }
 }
 
-impl Display for Person {
+impl fmt::Display for Person {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", &self.display_name())
     }

@@ -159,6 +159,7 @@ impl Command for AcceptCandidacy {
         let CreateInvitePayload { invite } = CreateInvite::new(&identity) //
             .run(CreateInviteInput {
                 invitee_id: identity.id,
+                account_id: account.id,
                 reason: InviteReason::CandidacyAccepted,
             })?;
 

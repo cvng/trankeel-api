@@ -3409,6 +3409,7 @@ dependencies = [
  "sendinblue",
  "serde",
  "serde_json",
+ "thiserror",
  "tokio 0.2.25",
  "trankeel-data",
  "trankeel-kit",
