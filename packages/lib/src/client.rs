@@ -1,4 +1,5 @@
 use crate::payloads::CreateUserWithAccountPayload;
+use function_name::named;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
@@ -24,20 +25,19 @@ use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
 use trankeel_core::dispatcher;
 use trankeel_core::error::Error;
-use trankeel_core::mailer::Mailer;
 use trankeel_core::providers;
 use trankeel_core::providers::Messagerie;
 use trankeel_core::providers::Pdfmonkey;
 use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
 use trankeel_core::providers::Stripe;
-use trankeel_core::templates::CandidacyCreatedMail;
 use trankeel_core::templates::CandidacyRejectedMail;
 use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
 use trankeel_data::AdvertisementId;
 use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
+use trankeel_data::CandidacyId;
 use trankeel_data::DiscussionId;
 use trankeel_data::Lease;
 use trankeel_data::LeaseId;
@@ -64,11 +64,9 @@ use trankeel_ops::candidacies::AcceptCandidacy;
 use trankeel_ops::candidacies::AcceptCandidacyInput;
 use trankeel_ops::candidacies::CreateCandidacy;
 use trankeel_ops::candidacies::CreateCandidacyInput;
-use trankeel_ops::candidacies::CreateCandidacyPayload;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::AdvertisementUpdated;
 use trankeel_ops::event::CandidacyAccepted;
-use trankeel_ops::event::CandidacyCreated;
 use trankeel_ops::event::Event;
 use trankeel_ops::event::LeaseAffected;
 use trankeel_ops::event::LeaseCreated;
@@ -232,10 +230,13 @@ impl Client {
 
     // Operations
 
+    #[named]
     pub async fn create_user_with_account(
         &self,
         input: CreateUserWithAccountInput,
     ) -> Result<CreateUserWithAccountPayload> {
+        println!("Running command {}", function_name!());
+
         let user_id = PersonId::new();
         let lender_id = LenderId::new();
         let account_id = AccountId::new();
@@ -265,55 +266,32 @@ impl Client {
             .and_then(|_| self.persons().by_id(&invite.invitee_id))
     }
 
+    #[named]
     pub async fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
+        println!("Running command {}", function_name!());
+
+        let candidacy_id = CandidacyId::new();
         let account = self
-            .0
-            .db()
             .accounts()
             .by_advertisement_id(&input.advertisement_id)?;
-        let account_owner = self.0.db().persons().by_account_id_first(&account.id)?;
-
-        let CreateCandidacyPayload {
-            candidacy,
-            candidate,
-            warrants,
-            discussion,
-            messages,
-        } = CreateCandidacy::new(&account, &account_owner).run(input)?;
-
-        self.0.db().transaction(|| {
-            self.0.db().persons().create(&candidate)?;
-            self.0.db().candidacies().create(&candidacy)?;
-            if let Some(warrants) = &warrants {
-                self.0.db().warrants().create_many(warrants)?;
-            }
-            self.0.db().discussions().create(&discussion)?;
-            self.0.db().messages().create_many(&messages)?;
-            Ok(())
-        })?;
+        let account_owner = self.persons().by_account_id_first(&account.id)?;
 
         dispatcher::dispatch(
             &self.0,
-            vec![CandidacyCreated {
-                candidacy: candidacy.clone(),
-            }
-            .into()],
+            CreateCandidacy::new(candidacy_id, &account, &account_owner).run(input)?,
         )
-        .await?;
-
-        self.0
-            .mailer()
-            .batch(vec![CandidacyCreatedMail::try_new(&candidacy, &candidate)?])
-            .await?;
-
-        Ok(candidacy)
+        .await
+        .and_then(|_| self.candidacies().by_id(&candidacy_id))
     }
 
+    #[named]
     pub async fn accept_candidacy(
         &self,
         auth_id: &AuthId,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
+        println!("Running command {}", function_name!());
+
         let account = self.accounts().by_auth_id(auth_id)?;
         let account_owner = self.persons().by_auth_id(auth_id)?;
         let advertisement = self.advertisements().by_candidacy_id(&input.id)?;
@@ -380,11 +358,14 @@ impl Client {
         self.candidacies().by_id(&candidacy.id)
     }
 
+    #[named]
     pub async fn create_tenant(
         &self,
         auth_id: &AuthId,
         input: CreateTenantInput,
     ) -> Result<Tenant> {
+        println!("Running command {}", function_name!());
+
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
 
@@ -439,11 +420,14 @@ impl Client {
         Ok(tenant_id)
     }
 
+    #[named]
     pub async fn create_property(
         &self,
         auth_id: &AuthId,
         input: CreatePropertyInput,
     ) -> Result<Property> {
+        println!("Running command {}", function_name!());
+
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let (lender, ..) = self
             .0
@@ -502,11 +486,14 @@ impl Client {
         Ok(property_id)
     }
 
+    #[named]
     pub async fn create_advertisement(
         &self,
         _auth_id: &AuthId,
         input: CreateAdvertisementInput,
     ) -> Result<Advertisement> {
+        println!("Running command {}", function_name!());
+
         let advertisement_id = AdvertisementId::new();
 
         dispatcher::dispatch(
@@ -590,11 +577,14 @@ impl Client {
         Ok(lease)
     }
 
+    #[named]
     pub async fn create_furnished_lease(
         &self,
         auth_id: &AuthId,
         input: CreateFurnishedLeaseInput,
     ) -> Result<Lease> {
+        println!("Running command {}", function_name!());
+
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let tenants = input
             .tenant_ids

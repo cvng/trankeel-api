@@ -15,6 +15,11 @@ pub trait Handler {
 }
 
 pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
+    events
+        .clone()
+        .into_iter()
+        .for_each(|evt| println!("Handling event {}", evt));
+
     Pg::transaction(ctx.db(), || {
         events.clone().into_iter().try_for_each(|evt| match evt {
             Event::AccountCreated(evt) => handlers::account_created(ctx, evt),
@@ -23,6 +28,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
             Event::CandidacyAccepted(evt) => handlers::candidacy_accepted(ctx, evt),
             Event::CandidacyCreated(evt) => handlers::candidacy_created(ctx, evt),
             Event::CandidacyRejected(evt) => handlers::candidacy_rejected(ctx, evt),
+            Event::DiscussionCreated(evt) => handlers::discussion_created(ctx, evt),
             Event::DiscussionDeleted(evt) => handlers::discussion_deleted(ctx, evt),
             Event::DocumentGenerated(evt) => handlers::document_generated(ctx, evt),
             Event::InviteAccepted(evt) => handlers::invite_accepted(ctx, evt),
@@ -41,6 +47,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
             Event::SubscriptionRequested(evt) => handlers::subscription_requested(ctx, evt),
             Event::TenantCreated(evt) => handlers::tenant_created(ctx, evt),
             Event::TenantUpdated(evt) => handlers::tenant_updated(ctx, evt),
+            Event::WarrantCreated(evt) => handlers::warrant_created(ctx, evt),
         })
     })?;
 
@@ -49,6 +56,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
         .try_for_each_concurrent(2, |evt| async {
             match evt {
                 Event::CandidacyAccepted(evt) => handlers::candidacy_accepted_async(ctx, evt).await,
+                Event::CandidacyCreated(evt) => handlers::candidacy_created_async(ctx, evt).await,
                 Event::DocumentGenerated(evt) => handlers::document_generated_async(ctx, evt).await,
                 Event::NoticeCreated(evt) => handlers::notice_created_async(ctx, evt).await,
                 Event::ReceiptCreated(evt) => handlers::receipt_created_async(ctx, evt).await,

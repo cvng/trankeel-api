@@ -13,6 +13,7 @@ pdfmonkey = ["trankeel-core/pdfmonkey"]
 sendinblue = ["trankeel-core/sendinblue"]
 
 [dependencies]
+function_name = "0.2.0"
 trankeel-core = { path = "../core" }
 trankeel-data = { path = "../data" }
 trankeel-kit = { path = "../kit" }

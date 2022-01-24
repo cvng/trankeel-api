@@ -1,4 +1,5 @@
 use crate::DomainEvent;
+use std::fmt;
 use trankeel_data::Account;
 use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
@@ -36,6 +37,7 @@ pub enum Event {
     CandidacyAccepted(CandidacyAccepted),
     CandidacyCreated(CandidacyCreated),
     CandidacyRejected(CandidacyRejected),
+    DiscussionCreated(DiscussionCreated),
     DiscussionDeleted(DiscussionDeleted),
     DocumentGenerated(DocumentGenerated),
     InviteAccepted(InviteAccepted),
@@ -54,6 +56,44 @@ pub enum Event {
     SubscriptionRequested(SubscriptionRequested),
     TenantCreated(TenantCreated),
     TenantUpdated(TenantUpdated),
+    WarrantCreated(WarrantCreated),
+}
+
+impl fmt::Display for Event {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Event::AccountCreated(_) => "account_created",
+                Event::AdvertisementCreated(_) => "advertisement_created",
+                Event::AdvertisementUpdated(_) => "advertisement_updated",
+                Event::CandidacyAccepted(_) => "candidacy_accepted",
+                Event::CandidacyCreated(_) => "candidacy_created",
+                Event::CandidacyRejected(_) => "candidacy_rejected",
+                Event::DiscussionCreated(_) => "discussion_created",
+                Event::DiscussionDeleted(_) => "discussion_deleted",
+                Event::DocumentGenerated(_) => "document_generated",
+                Event::InviteAccepted(_) => "invite_accepted",
+                Event::LeaseAffected(_) => "lease_affected",
+                Event::LeaseCreated(_) => "lease_created",
+                Event::LenderCreated(_) => "lender_created",
+                Event::MessagePushed(_) => "message_pushed",
+                Event::NoticeCreated(_) => "notice_created",
+                Event::PaymentCreated(_) => "payment_created",
+                Event::PersonCreated(_) => "person_created",
+                Event::PropertyCreated(_) => "property_created",
+                Event::PropertyUpdated(_) => "property_updated",
+                Event::ReceiptCreated(_) => "receipt_created",
+                Event::ReceiptSent(_) => "receipt_sent",
+                Event::StepCompleted(_) => "step_completed",
+                Event::SubscriptionRequested(_) => "subscription_requested",
+                Event::TenantCreated(_) => "tenant_created",
+                Event::TenantUpdated(_) => "tenant_updated",
+                Event::WarrantCreated(_) => "warrant_created",
+            }
+        )
+    }
 }
 
 impl DomainEvent for AccountCreated {}
@@ -67,6 +107,8 @@ impl DomainEvent for CandidacyAccepted {}
 impl DomainEvent for CandidacyCreated {}
 
 impl DomainEvent for CandidacyRejected {}
+
+impl DomainEvent for DiscussionCreated {}
 
 impl DomainEvent for DiscussionDeleted {}
 
@@ -103,6 +145,8 @@ impl DomainEvent for SubscriptionRequested {}
 impl DomainEvent for TenantCreated {}
 
 impl DomainEvent for TenantUpdated {}
+
+impl DomainEvent for WarrantCreated {}
 
 #[derive(Clone)]
 pub struct AccountCreated {
@@ -180,6 +224,17 @@ pub struct CandidacyRejected {
 impl From<CandidacyRejected> for Event {
     fn from(item: CandidacyRejected) -> Self {
         Self::CandidacyRejected(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct DiscussionCreated {
+    pub discussion: Discussion,
+}
+
+impl From<DiscussionCreated> for Event {
+    fn from(item: DiscussionCreated) -> Self {
+        Self::DiscussionCreated(item)
     }
 }
 
@@ -394,5 +449,16 @@ pub struct TenantUpdated {
 impl From<TenantUpdated> for Event {
     fn from(item: TenantUpdated) -> Self {
         Self::TenantUpdated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct WarrantCreated {
+    pub warrant: WarrantWithIdentity,
+}
+
+impl From<WarrantCreated> for Event {
+    fn from(item: WarrantCreated) -> Self {
+        Self::WarrantCreated(item)
     }
 }
