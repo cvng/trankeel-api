@@ -1,8 +1,12 @@
 use crate::auth::CreatePerson;
 use crate::auth::CreatePersonInput;
 use crate::error::Result;
+use crate::event::CandidacyCreated;
+use crate::event::DiscussionCreated;
 use crate::event::Event;
+use crate::event::MessagePushed;
 use crate::event::PersonCreated;
+use crate::event::WarrantCreated;
 use crate::files::CreateFileInput;
 use crate::messaging::CreateDiscussion;
 use crate::messaging::CreateDiscussionInput;
@@ -21,11 +25,9 @@ use trankeel_data::Date;
 use trankeel_data::DateTime;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
-use trankeel_data::Message;
 use trankeel_data::Person;
 use trankeel_data::PersonRole;
 use trankeel_data::PhoneNumber;
-use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]
@@ -45,22 +47,16 @@ pub struct CreateCandidacyInput {
     pub warrants: Option<Vec<CreateWarrantInput>>,
 }
 
-pub struct CreateCandidacyPayload {
-    pub candidacy: Candidacy,
-    pub candidate: Person,
-    pub warrants: Option<Vec<WarrantWithIdentity>>,
-    pub discussion: Discussion,
-    pub messages: Vec<Message>,
-}
-
 pub struct CreateCandidacy {
+    candidacy_id: CandidacyId,
     account: Account,
     account_owner: Person,
 }
 
 impl CreateCandidacy {
-    pub fn new(account: &Account, account_owner: &Person) -> Self {
+    pub fn new(candidacy_id: CandidacyId, account: &Account, account_owner: &Person) -> Self {
         Self {
+            candidacy_id,
             account: account.clone(),
             account_owner: account_owner.clone(),
         }
@@ -69,12 +65,13 @@ impl CreateCandidacy {
 
 impl Command for CreateCandidacy {
     type Input = CreateCandidacyInput;
-    type Payload = CreateCandidacyPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
         let Self {
+            candidacy_id,
             account,
             account_owner,
         } = self;
@@ -96,7 +93,7 @@ impl Command for CreateCandidacy {
             .unwrap();
 
         let candidacy = Candidacy {
-            id: CandidacyId::new(),
+            id: candidacy_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             status: CandidacyStatus::default(),
@@ -116,7 +113,7 @@ impl Command for CreateCandidacy {
                 .collect::<Result<Vec<_>>>()?
                 .into_iter()
                 .map(|CreateWarrantPayload { warrant }| Some(warrant))
-                .collect()
+                .collect::<Option<Vec<_>>>()
         } else {
             None
         };
@@ -130,7 +127,7 @@ impl Command for CreateCandidacy {
             message: Some(candidacy.description.clone()),
         })?;
 
-        let messages = vec![message].into_iter().flatten().collect();
+        let messages = vec![message].into_iter().flatten();
 
         let discussion = Discussion {
             id: discussion.id,
@@ -138,12 +135,28 @@ impl Command for CreateCandidacy {
             ..discussion
         };
 
-        Ok(Self::Payload {
-            candidacy,
-            candidate,
-            warrants,
-            discussion,
-            messages,
-        })
+        Ok(vec![
+            PersonCreated { person: candidate }.into(),
+            CandidacyCreated { candidacy }.into(),
+            DiscussionCreated { discussion }.into(),
+        ]
+        .into_iter()
+        .chain(
+            warrants
+                .map(|warrants| {
+                    warrants
+                        .into_iter()
+                        .map(|warrant| WarrantCreated { warrant }.into())
+                        .collect()
+                })
+                .unwrap_or_else(Vec::new),
+        )
+        .chain(
+            messages
+                .into_iter()
+                .map(|message| MessagePushed { message }.into())
+                .collect::<Vec<_>>(),
+        )
+        .collect())
     }
 }

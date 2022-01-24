@@ -6,5 +6,9 @@ use trankeel_ops::event::DiscussionDeleted;
 pub fn discussion_deleted(ctx: &Context, event: DiscussionDeleted) -> Result<()> {
     let db = ctx.db();
 
-    db.discussions().delete(&event.discussion_id).map(|_| ())
+    let DiscussionDeleted { discussion_id } = event;
+
+    db.discussions().delete(&discussion_id)?;
+
+    Ok(())
 }

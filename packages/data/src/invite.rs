@@ -21,7 +21,13 @@ pub enum InviteReason {
 
 impl fmt::Display for InviteReason {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self)
+        write!(
+            f,
+            "{}",
+            match self {
+                InviteReason::CandidacyAccepted => "candidacy_accepted",
+            }
+        )
     }
 }
 
