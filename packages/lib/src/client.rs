@@ -1,4 +1,3 @@
-use crate::payloads::CreateUserWithAccountPayload;
 use function_name::named;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
@@ -58,6 +57,7 @@ use trankeel_data::TenantId;
 use trankeel_kit::config::Config;
 use trankeel_ops::auth::CreateUserWithAccount;
 use trankeel_ops::auth::CreateUserWithAccountInput;
+use trankeel_ops::auth::CreateUserWithAccountPayload;
 use trankeel_ops::auth::SignupUserFromInvite;
 use trankeel_ops::auth::SignupUserFromInviteInput;
 use trankeel_ops::candidacies::AcceptCandidacy;
