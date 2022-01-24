@@ -1,5 +1,4 @@
 use chrono::Utc;
-use trankeel::providers::reqwest;
 use trankeel::AcceptCandidacyInput;
 use trankeel::AddressInput;
 use trankeel::Amount;
@@ -13,6 +12,7 @@ use trankeel::CreateTenantInput;
 use trankeel::CreateUserWithAccountInput;
 use trankeel::CreateWarrantInput;
 use trankeel::EntryFlexibility;
+use trankeel::InternalError;
 use trankeel::LeaseType;
 use trankeel::WarrantType;
 
@@ -169,9 +169,13 @@ pub async fn seed() {
         .await
     {
         Ok(candidacy) => Ok(candidacy),
-        Err(err) => match err.downcast_ref::<reqwest::Error>() {
-            Some(_) => Ok(client.candidacies().by_id(&candidacy.id).unwrap()),
-            None => Err(err),
+        Err(err) => match err.downcast_ref::<InternalError>().unwrap() {
+            // PdfmakerError is expected here because we are
+            // not running the web server when we run the seed.
+            InternalError::PdfmakerError(_) => {
+                Ok(client.candidacies().by_id(&candidacy.id).unwrap())
+            }
+            _ => Err(err),
         },
     }
     .unwrap();

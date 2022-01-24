@@ -10,6 +10,7 @@ use trankeel_kit::config::Config;
 pub struct Sendinblue;
 
 impl Sendinblue {
+    #[allow(dead_code)]
     pub fn init(_config: &Config) -> Self {
         Self
     }

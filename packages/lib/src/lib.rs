@@ -4,6 +4,7 @@ mod payloads;
 pub use crate::client::init;
 pub use crate::client::Client;
 pub use crate::payloads::CreateUserWithAccountPayload;
+pub use trankeel_core::error::InternalError;
 pub use trankeel_core::handlers;
 pub use trankeel_core::providers;
 pub use trankeel_core::templates;

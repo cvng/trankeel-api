@@ -23,4 +23,3 @@ pub use self::sendinblue::*;
 pub use self::sendinblue_mock::*;
 pub use self::stripe::*;
 pub use self::types::*;
-pub use reqwest;

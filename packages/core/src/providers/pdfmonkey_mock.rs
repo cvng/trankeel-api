@@ -1,4 +1,5 @@
 use super::types::PdfmonkeyInput;
+use crate::error::InternalError;
 use crate::error::Result;
 use crate::pdfmaker::IntoDocument;
 use crate::pdfmaker::Pdfmaker;
@@ -15,6 +16,7 @@ use trankeel_kit::config;
 pub struct Pdfmonkey;
 
 impl Pdfmonkey {
+    #[allow(dead_code)]
     pub fn init() -> Self {
         Self
     }
@@ -88,7 +90,8 @@ where
         .post(format!("{}/webhooks/pdfmonkey", config::base_url()))
         .json(&input)
         .send()
-        .await?;
+        .await
+        .map_err(InternalError::PdfmakerError)?;
 
     Ok(document)
 }
