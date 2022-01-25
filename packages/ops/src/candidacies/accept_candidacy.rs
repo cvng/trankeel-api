@@ -1,6 +1,3 @@
-use super::RejectCandidacy;
-use super::RejectCandidacyInput;
-use super::RejectCandidacyPayload;
 use crate::error::Result;
 use crate::invites::CreateInvite;
 use crate::invites::CreateInviteInput;
@@ -26,7 +23,6 @@ use trankeel_data::Invite;
 use trankeel_data::InviteReason;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
-use trankeel_data::Message;
 use trankeel_data::MessageContent;
 use trankeel_data::Person;
 use trankeel_data::Rent;
@@ -44,7 +40,7 @@ pub struct AcceptCandidacyInput {
 
 pub struct AcceptCandidacyPayload {
     pub candidacy: Candidacy,
-    pub rejected_candidacies: Vec<(Candidacy, (Discussion, Message))>,
+    pub rejected_candidacies: Vec<Candidacy>,
     pub tenant: Tenant,
     pub identity: Person,
     pub warrants: Option<Vec<WarrantWithIdentity>>,
@@ -120,20 +116,8 @@ impl Command for AcceptCandidacy {
         // Make other candidacies rejected.
         let rejected_candidacies = other_candidacies
             .into_iter()
-            .map(|(candidacy, discussion, message)| {
-                RejectCandidacy::new(&candidacy, &account_owner, &discussion, &message)
-                    .run(RejectCandidacyInput { id: candidacy.id })
-            })
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .map(
-                |RejectCandidacyPayload {
-                     candidacy,
-                     discussion,
-                     message,
-                 }| (candidacy, (discussion, message)),
-            )
-            .collect::<Vec<_>>();
+            .map(|(candidacy, _discussion, _message)| candidacy)
+            .collect();
 
         // Create tenant with identity.
         let CreateTenantPayload {

@@ -57,6 +57,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
             match evt {
                 Event::CandidacyAccepted(evt) => handlers::candidacy_accepted_async(ctx, evt).await,
                 Event::CandidacyCreated(evt) => handlers::candidacy_created_async(ctx, evt).await,
+                Event::CandidacyRejected(evt) => handlers::candidacy_rejected_async(ctx, evt).await,
                 Event::DocumentGenerated(evt) => handlers::document_generated_async(ctx, evt).await,
                 Event::NoticeCreated(evt) => handlers::notice_created_async(ctx, evt).await,
                 Event::ReceiptCreated(evt) => handlers::receipt_created_async(ctx, evt).await,

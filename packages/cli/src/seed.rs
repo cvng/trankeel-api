@@ -142,7 +142,7 @@ pub async fn seed() {
     let candidacy = client
         .create_candidacy(CreateCandidacyInput {
             advertisement_id: advertisement.id,
-            email: author.email,
+            email: author.email.clone(),
             first_name: "Candidate".into(),
             last_name: "TRANKEEL".into(),
             phone_number: "+33633123456".to_string().into(),
@@ -164,6 +164,24 @@ pub async fn seed() {
         .await
         .unwrap();
 
+    let rejected_candidacy = client
+        .create_candidacy(CreateCandidacyInput {
+            advertisement_id: advertisement.id,
+            email: author.email,
+            first_name: "Candidate".into(),
+            last_name: "REJECTED".into(),
+            phone_number: "+33633123467".to_string().into(),
+            move_in_date: Utc::now().into(),
+            description: "Bye, Lender!".into(),
+            birthdate: Utc::now().date().naive_utc().into(),
+            birthplace: None,
+            is_student: true,
+            files: None,
+            warrants: None,
+        })
+        .await
+        .unwrap();
+
     let candidacy = match client
         .accept_candidacy(&auth_id, AcceptCandidacyInput { id: candidacy.id })
         .await
@@ -180,9 +198,11 @@ pub async fn seed() {
     }
     .unwrap();
 
+    let rejected_candidacy = client.candidacies().by_id(&rejected_candidacy.id).unwrap();
+
     println!(
-        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",
-        user, lender, property, tenant, lease, advertisement, candidacy
+        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",
+        user, lender, property, tenant, lease, advertisement, candidacy, rejected_candidacy
     );
     println!("🌱 Database seeded.");
 }

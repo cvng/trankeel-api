@@ -5,6 +5,7 @@ use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
 use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
+use trankeel_data::CandidacyId;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Document;
@@ -184,7 +185,7 @@ impl From<AdvertisementUpdated> for Event {
 #[derive(Clone)]
 pub struct CandidacyAccepted {
     pub candidacy: Candidacy,
-    pub rejected_candidacies: Vec<(Candidacy, (Discussion, Message))>,
+    pub rejected_candidacies: Vec<Candidacy>,
     pub tenant: Tenant,
     pub identity: Person,
     pub warrants: Option<Vec<WarrantWithIdentity>>,
@@ -216,9 +217,7 @@ impl From<CandidacyCreated> for Event {
 
 #[derive(Clone)]
 pub struct CandidacyRejected {
-    pub candidacy: Candidacy,
-    pub discussion: Discussion,
-    pub message: Message,
+    pub candidacy_id: CandidacyId,
 }
 
 impl From<CandidacyRejected> for Event {
