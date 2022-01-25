@@ -39,6 +39,12 @@ pub struct CreateUserWithAccountInput {
     pub skip_create_customer: Option<bool>,
 }
 
+pub struct CreateUserWithAccountPayload {
+    pub user: Person,
+    pub lender: Lender,
+    pub account: Account,
+}
+
 pub struct CreateUserWithAccount {
     user_id: PersonId,
     lender_id: LenderId,
