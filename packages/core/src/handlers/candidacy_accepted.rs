@@ -86,13 +86,11 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
 
     lease_affected(ctx, LeaseAffected { tenant })?;
 
-    for (candidacy, (discussion, message)) in rejected_candidacies {
+    for candidacy in rejected_candidacies {
         candidacy_rejected(
             ctx,
             CandidacyRejected {
-                candidacy,
-                discussion,
-                message,
+                candidacy_id: candidacy.id,
             },
         )?;
     }
