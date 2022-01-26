@@ -194,15 +194,12 @@ where
     Ok(serde_json::from_reader(file).unwrap())
 }
 
-pub fn log_json<P>(payload: &P)
+pub fn log_json<P>(payload: &P) -> String
 where
     P: serde::Serialize,
 {
-    println!(
-        "{}",
-        serde_json::to_string(&payload)
-            .unwrap()
-            .to_colored_json_auto()
-            .unwrap()
-    );
+    serde_json::to_string(&payload)
+        .unwrap()
+        .to_colored_json_auto()
+        .unwrap()
 }

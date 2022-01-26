@@ -15,7 +15,9 @@ sendinblue = ["trankeel/sendinblue"]
 async-graphql-rocket = "3.0.20"
 chrono = "0.4.19"
 dotenv = "0.15.0"
+env_logger = "0.9.0"
 jsonwebtoken = "7.2.0"
+log = "0.4.14"
 rocket = { version = "0.5.0-rc.1", default-features = false, features = ["json"] }
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master", default-features = false }
 rocket_dyn_templates = { version = "0.1.0-rc.1", features = ["tera"] }

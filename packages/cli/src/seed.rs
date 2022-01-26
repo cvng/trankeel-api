@@ -200,9 +200,15 @@ pub async fn seed() {
 
     let rejected_candidacy = client.candidacies().by_id(&rejected_candidacy.id).unwrap();
 
-    println!(
-        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}",
-        user, lender, property, tenant, lease, advertisement, candidacy, rejected_candidacy
+    log::info!(
+        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n🌱 Database seeded.",
+        user,
+        lender,
+        property,
+        tenant,
+        lease,
+        advertisement,
+        candidacy,
+        rejected_candidacy
     );
-    println!("🌱 Database seeded.");
 }
