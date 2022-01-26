@@ -35,7 +35,7 @@ impl Mailer for Sendinblue {
 }
 
 fn write_message(mail: &impl IntoMail) {
-    println!(
+    log::debug!(
         "
         Subject: {:?}
         Recipients: {:?}

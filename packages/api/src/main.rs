@@ -7,6 +7,8 @@ mod webhooks;
 
 #[rocket::launch]
 fn rocket() -> _ {
+    init_logger();
+
     #[cfg(debug_assertions)]
     dotenv::dotenv().unwrap();
 
@@ -18,6 +20,15 @@ fn rocket() -> _ {
     let _guard = init_sentry(&config);
 
     server::server(&config).unwrap()
+}
+
+fn init_logger() {
+    use std::io::Write;
+
+    env_logger::builder()
+        .format(|buf, record| writeln!(buf, "{} {}", record.level(), record.args()))
+        .filter(None, log::LevelFilter::Info)
+        .init()
 }
 
 #[cfg(feature = "sentry")]

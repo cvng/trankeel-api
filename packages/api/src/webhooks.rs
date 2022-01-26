@@ -9,7 +9,7 @@ use trankeel::Client;
 
 #[post("/webhooks/pdfmonkey", data = "<input>", format = "application/json")]
 pub async fn pdfmonkey_request(client: &State<Client>, input: Json<PdfmonkeyInput>) -> Status {
-    config::log_json(&input.to_owned());
+    log::debug!("{}", config::log_json(&input.to_owned()));
 
     client
         .dispatch(vec![DocumentGenerated {

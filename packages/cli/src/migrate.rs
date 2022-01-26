@@ -10,4 +10,6 @@ pub async fn migrate() {
 
     io::stdout().write_all(&output.stdout).unwrap();
     io::stderr().write_all(&output.stderr).unwrap();
+
+    log::info!("🌙 Database schema migrated.");
 }

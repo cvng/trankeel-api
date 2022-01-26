@@ -235,7 +235,7 @@ impl Client {
         &self,
         input: CreateUserWithAccountInput,
     ) -> Result<CreateUserWithAccountPayload> {
-        println!("Running command {}", function_name!());
+        log::info!("Command: {}", function_name!());
 
         let user_id = PersonId::new();
         let lender_id = LenderId::new();
@@ -255,10 +255,13 @@ impl Client {
         })
     }
 
+    #[named]
     pub async fn signup_user_from_invite(
         &self,
         input: SignupUserFromInviteInput,
     ) -> Result<Person> {
+        log::info!("Command: {}", function_name!());
+
         let invite = self.0.db().invites().by_token(&input.invite_token)?;
 
         dispatcher::dispatch(&self.0, SignupUserFromInvite::new(&invite).run(input)?)
@@ -268,7 +271,7 @@ impl Client {
 
     #[named]
     pub async fn create_candidacy(&self, input: CreateCandidacyInput) -> Result<Candidacy> {
-        println!("Running command {}", function_name!());
+        log::info!("Command: {}", function_name!());
 
         let candidacy_id = CandidacyId::new();
         let account = self
@@ -290,7 +293,7 @@ impl Client {
         auth_id: &AuthId,
         input: AcceptCandidacyInput,
     ) -> Result<Candidacy> {
-        println!("Running command {}", function_name!());
+        log::info!("Command: {}", function_name!());
 
         let account = self.accounts().by_auth_id(auth_id)?;
         let account_owner = self.persons().by_auth_id(auth_id)?;
@@ -364,7 +367,7 @@ impl Client {
         auth_id: &AuthId,
         input: CreateTenantInput,
     ) -> Result<Tenant> {
-        println!("Running command {}", function_name!());
+        log::info!("Command: {}", function_name!());
 
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
@@ -391,11 +394,14 @@ impl Client {
         Ok(tenant)
     }
 
+    #[named]
     pub async fn update_tenant(
         &self,
         _auth_id: &AuthId,
         input: UpdateTenantInput,
     ) -> Result<Tenant> {
+        log::info!("Command: {}", function_name!());
+
         let tenant = self.0.db().tenants().by_id(&input.id)?;
 
         let UpdateTenantPayload { tenant } = UpdateTenant::new(&tenant).run(input)?;
@@ -412,7 +418,10 @@ impl Client {
         Ok(tenant)
     }
 
+    #[named]
     pub fn delete_tenant(&self, _auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
+        log::info!("Command: {}", function_name!());
+
         let tenant_id = DeleteTenant.run(input)?;
 
         self.0.db().tenants().delete(&tenant_id)?;
@@ -426,7 +435,7 @@ impl Client {
         auth_id: &AuthId,
         input: CreatePropertyInput,
     ) -> Result<Property> {
-        println!("Running command {}", function_name!());
+        log::info!("Command: {}", function_name!());
 
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let (lender, ..) = self
@@ -453,11 +462,14 @@ impl Client {
         Ok(property)
     }
 
+    #[named]
     pub async fn update_property(
         &self,
         _auth_id: &AuthId,
         input: UpdatePropertyInput,
     ) -> Result<Property> {
+        log::info!("Command: {}", function_name!());
+
         let property = self.0.db().properties().by_id(&input.id)?;
 
         let UpdatePropertyPayload { property } = UpdateProperty::new(&property).run(input)?;
@@ -474,11 +486,14 @@ impl Client {
         Ok(property)
     }
 
+    #[named]
     pub fn delete_property(
         &self,
         _auth_id: &AuthId,
         input: DeletePropertyInput,
     ) -> Result<PropertyId> {
+        log::info!("Command: {}", function_name!());
+
         let property_id = DeleteProperty.run(input)?;
 
         self.0.db().properties().delete(&property_id)?;
@@ -492,7 +507,7 @@ impl Client {
         _auth_id: &AuthId,
         input: CreateAdvertisementInput,
     ) -> Result<Advertisement> {
-        println!("Running command {}", function_name!());
+        log::info!("Command: {}", function_name!());
 
         let advertisement_id = AdvertisementId::new();
 
@@ -504,11 +519,14 @@ impl Client {
         .and_then(|_| self.advertisements().by_id(&advertisement_id))
     }
 
+    #[named]
     pub async fn update_advertisement(
         &self,
         _auth_id: &AuthId,
         input: UpdateAdvertisementInput,
     ) -> Result<Advertisement> {
+        log::info!("Command: {}", function_name!());
+
         let advertisement = self.0.db().advertisements().by_id(&input.id)?;
 
         let UpdateAdvertisementPayload { advertisement } =
@@ -526,7 +544,10 @@ impl Client {
         Ok(advertisement)
     }
 
+    #[named]
     pub async fn create_lease(&self, auth_id: &AuthId, input: CreateLeaseInput) -> Result<Lease> {
+        log::info!("Command: {}", function_name!());
+
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
         let (lender, ..) = self.0.db().lenders().by_account_id_first(&account.id)?;
@@ -583,7 +604,7 @@ impl Client {
         auth_id: &AuthId,
         input: CreateFurnishedLeaseInput,
     ) -> Result<Lease> {
-        println!("Running command {}", function_name!());
+        log::info!("Command: {}", function_name!());
 
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let tenants = input
@@ -626,11 +647,14 @@ impl Client {
         Ok(lease)
     }
 
+    #[named]
     pub fn update_furnished_lease(
         &self,
         _auth_id: &AuthId,
         input: UpdateFurnishedLeaseInput,
     ) -> Result<Lease> {
+        log::info!("Command: {}", function_name!());
+
         let lease = self.0.db().leases().by_id(&input.id)?;
 
         let UpdateFurnishedLeasePayload { lease } = UpdateFurnishedLease::new(&lease).run(input)?;
@@ -640,7 +664,10 @@ impl Client {
         Ok(lease)
     }
 
+    #[named]
     pub fn delete_lease(&self, _auth_id: &AuthId, input: DeleteLeaseInput) -> Result<LeaseId> {
+        log::info!("Command: {}", function_name!());
+
         let lease_id = DeleteLease.run(input)?;
 
         self.0.db().leases().delete(&lease_id)?;
@@ -648,11 +675,14 @@ impl Client {
         Ok(lease_id)
     }
 
+    #[named]
     pub fn update_individual_lender(
         &self,
         _auth_id: &AuthId,
         input: UpdateIndividualLenderInput,
     ) -> Result<Lender> {
+        log::info!("Command: {}", function_name!());
+
         let (lender, identity) = self.0.db().lenders().by_id(&input.id)?;
 
         let UpdateIndividualLenderPayload {
@@ -667,11 +697,14 @@ impl Client {
         Ok(lender)
     }
 
+    #[named]
     pub async fn create_receipts(
         &self,
         _auth_id: &AuthId,
         input: CreateReceiptsInput,
     ) -> Result<Vec<Receipt>> {
+        log::info!("Command: {}", function_name!());
+
         let rents = self.rents().by_id_many(&input.rent_ids)?;
 
         dispatcher::dispatch(
@@ -696,7 +729,10 @@ impl Client {
         Ok(vec![])
     }
 
+    #[named]
     pub async fn send_receipts(&self, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
+        log::info!("Command: {}", function_name!());
+
         let rent_ids = SendReceipts.run(input)?;
 
         dispatcher::dispatch(
@@ -711,11 +747,14 @@ impl Client {
         Ok(vec![])
     }
 
+    #[named]
     pub async fn create_notices(
         &self,
         _auth_id: &AuthId,
         input: CreateNoticesInput,
     ) -> Result<Vec<Notice>> {
+        log::info!("Command: {}", function_name!());
+
         let rents = self.rents().by_id_many(&input.rent_ids)?;
 
         dispatcher::dispatch(
@@ -733,7 +772,10 @@ impl Client {
         Ok(vec![])
     }
 
+    #[named]
     pub async fn delete_discussion(&self, input: DeleteDiscussionInput) -> Result<DiscussionId> {
+        log::info!("Command: {}", function_name!());
+
         let discussion_id = input.id;
 
         dispatcher::dispatch(&self.0, DeleteDiscussionCommand.run(input)?)
@@ -741,7 +783,10 @@ impl Client {
             .map(|_| discussion_id)
     }
 
+    #[named]
     pub async fn push_message(&self, input: PushMessageInput) -> Result<Message> {
+        log::info!("Command: {}", function_name!());
+
         let message_id = MessageId::new();
 
         dispatcher::dispatch(&self.0, PushMessageCommand::new(&message_id).run(input)?)
@@ -749,7 +794,10 @@ impl Client {
             .and_then(|_| self.messages().by_id(&message_id))
     }
 
+    #[named]
     pub async fn complete_step(&self, input: CompleteStepInput) -> Result<Step> {
+        log::info!("Command: {}", function_name!());
+
         let step = self.steps().by_id(&input.id)?;
 
         dispatcher::dispatch(&self.0, CompleteStepCommand::new(&step).run(input)?)
@@ -757,7 +805,10 @@ impl Client {
             .and_then(|_| self.steps().by_id(&step.id))
     }
 
+    #[named]
     pub async fn dispatch(&self, events: Vec<Event>) -> Result<()> {
+        log::info!("Command: {}", function_name!());
+
         dispatcher::dispatch(&self.0, events).await
     }
 }

@@ -10,6 +10,7 @@ use rocket_dyn_templates::Template;
 use trankeel::config::Config;
 use trankeel::Result;
 use trankeel_graphql::extensions::ApolloTracing;
+use trankeel_graphql::extensions::Logger;
 
 /// Build Trankeel web server.
 ///
@@ -19,6 +20,7 @@ pub fn server(config: &Config) -> Result<Rocket<Build>> {
 
     let schema = trankeel_graphql::build_schema()
         .extension(ApolloTracing)
+        .extension(Logger)
         .data(client.clone())
         .finish();
 

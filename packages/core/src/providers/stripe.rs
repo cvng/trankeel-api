@@ -1,7 +1,6 @@
 use crate::billing::BillingProvider;
 use crate::error::Error;
 use async_trait::async_trait;
-use log::info;
 use trankeel_data::Email;
 use trankeel_data::Subscription;
 use trankeel_kit::config::Config;
@@ -95,7 +94,7 @@ impl BillingProvider for Stripe {
             .await
             .unwrap();
 
-        info!("Created subscription {}", subscription.id);
+        log::debug!("Created subscription {}", subscription.id);
 
         Ok(subscription.into())
     }

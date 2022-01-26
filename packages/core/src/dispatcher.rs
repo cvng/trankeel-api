@@ -18,7 +18,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     events
         .clone()
         .into_iter()
-        .for_each(|evt| println!("Handling event {}", evt));
+        .for_each(|evt| log::info!("Event: {}", evt));
 
     Pg::transaction(ctx.db(), || {
         events.clone().into_iter().try_for_each(|evt| match evt {
