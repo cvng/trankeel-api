@@ -13,7 +13,7 @@ use trankeel_data::Email;
 use trankeel_data::Invite;
 use trankeel_data::InviteId;
 use trankeel_data::Lease;
-use trankeel_data::LeaseFile;
+use trankeel_data::LeaseId;
 use trankeel_data::Lender;
 use trankeel_data::Message;
 use trankeel_data::Notice;
@@ -23,8 +23,10 @@ use trankeel_data::Property;
 use trankeel_data::Receipt;
 use trankeel_data::Rent;
 use trankeel_data::RentId;
+use trankeel_data::Step;
 use trankeel_data::StepId;
 use trankeel_data::Tenant;
+use trankeel_data::TenantId;
 use trankeel_data::WarrantWithIdentity;
 use trankeel_data::Workflow;
 use trankeel_data::Workflowable;
@@ -42,8 +44,10 @@ pub enum Event {
     DiscussionDeleted(DiscussionDeleted),
     DocumentGenerated(DocumentGenerated),
     InviteAccepted(InviteAccepted),
+    InviteCreated(InviteCreated),
     LeaseAffected(LeaseAffected),
     LeaseCreated(LeaseCreated),
+    LeaseFileRequested(LeaseFileRequested),
     LenderCreated(LenderCreated),
     MessagePushed(MessagePushed),
     NoticeCreated(NoticeCreated),
@@ -54,10 +58,12 @@ pub enum Event {
     ReceiptCreated(ReceiptCreated),
     ReceiptSent(ReceiptSent),
     StepCompleted(StepCompleted),
+    StepCreated(StepCreated),
     SubscriptionRequested(SubscriptionRequested),
     TenantCreated(TenantCreated),
     TenantUpdated(TenantUpdated),
     WarrantCreated(WarrantCreated),
+    WorkflowCreated(WorkflowCreated),
 }
 
 impl fmt::Display for Event {
@@ -76,8 +82,10 @@ impl fmt::Display for Event {
                 Event::DiscussionDeleted(_) => "discussion_deleted",
                 Event::DocumentGenerated(_) => "document_generated",
                 Event::InviteAccepted(_) => "invite_accepted",
+                Event::InviteCreated(_) => "invite_created",
                 Event::LeaseAffected(_) => "lease_affected",
                 Event::LeaseCreated(_) => "lease_created",
+                Event::LeaseFileRequested(_) => "lease_file_requested",
                 Event::LenderCreated(_) => "lender_created",
                 Event::MessagePushed(_) => "message_pushed",
                 Event::NoticeCreated(_) => "notice_created",
@@ -88,10 +96,12 @@ impl fmt::Display for Event {
                 Event::ReceiptCreated(_) => "receipt_created",
                 Event::ReceiptSent(_) => "receipt_sent",
                 Event::StepCompleted(_) => "step_completed",
+                Event::StepCreated(_) => "step_created",
                 Event::SubscriptionRequested(_) => "subscription_requested",
                 Event::TenantCreated(_) => "tenant_created",
                 Event::TenantUpdated(_) => "tenant_updated",
                 Event::WarrantCreated(_) => "warrant_created",
+                Event::WorkflowCreated(_) => "workflow_created",
             }
         )
     }
@@ -117,6 +127,8 @@ impl DomainEvent for DocumentGenerated {}
 
 impl DomainEvent for InviteAccepted {}
 
+impl DomainEvent for InviteCreated {}
+
 impl DomainEvent for LeaseAffected {}
 
 impl DomainEvent for LeaseCreated {}
@@ -140,6 +152,8 @@ impl DomainEvent for ReceiptCreated {}
 impl DomainEvent for ReceiptSent {}
 
 impl DomainEvent for StepCompleted {}
+
+impl DomainEvent for StepCreated {}
 
 impl DomainEvent for SubscriptionRequested {}
 
@@ -184,18 +198,7 @@ impl From<AdvertisementUpdated> for Event {
 
 #[derive(Clone)]
 pub struct CandidacyAccepted {
-    pub candidacy: Candidacy,
-    pub rejected_candidacies: Vec<Candidacy>,
-    pub tenant: Tenant,
-    pub identity: Person,
-    pub warrants: Option<Vec<WarrantWithIdentity>>,
-    pub discussion: Discussion,
-    pub lease: Lease,
-    pub rents: Vec<Rent>,
-    pub lease_file: LeaseFile,
-    pub workflow: Workflow,
-    pub workflowable: Workflowable,
-    pub invite: Invite,
+    pub candidacy_id: CandidacyId,
 }
 
 impl From<CandidacyAccepted> for Event {
@@ -271,9 +274,21 @@ impl From<InviteAccepted> for Event {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct InviteCreated {
+    pub invite: Invite,
+}
+
+impl From<InviteCreated> for Event {
+    fn from(item: InviteCreated) -> Self {
+        Self::InviteCreated(item)
+    }
+}
+
 #[derive(Clone)]
 pub struct LeaseAffected {
-    pub tenant: Tenant,
+    pub lease_id: LeaseId,
+    pub tenant_id: TenantId,
 }
 
 impl From<LeaseAffected> for Event {
@@ -291,6 +306,17 @@ pub struct LeaseCreated {
 impl From<LeaseCreated> for Event {
     fn from(item: LeaseCreated) -> Self {
         Self::LeaseCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct LeaseFileRequested {
+    pub lease_id: LeaseId,
+}
+
+impl From<LeaseFileRequested> for Event {
+    fn from(item: LeaseFileRequested) -> Self {
+        Self::LeaseFileRequested(item)
     }
 }
 
@@ -415,6 +441,17 @@ impl From<StepCompleted> for Event {
 }
 
 #[derive(Clone)]
+pub struct StepCreated {
+    pub step: Step,
+}
+
+impl From<StepCreated> for Event {
+    fn from(item: StepCreated) -> Self {
+        Self::StepCreated(item)
+    }
+}
+
+#[derive(Clone)]
 pub struct SubscriptionRequested {
     pub account_id: AccountId,
     pub email: Email,
@@ -429,7 +466,7 @@ impl From<SubscriptionRequested> for Event {
 #[derive(Clone)]
 pub struct TenantCreated {
     pub tenant: Tenant,
-    pub identity: Person,
+    pub identity: Option<Person>,
     pub discussion: Option<Discussion>,
     pub warrants: Option<Vec<WarrantWithIdentity>>,
 }
@@ -459,5 +496,17 @@ pub struct WarrantCreated {
 impl From<WarrantCreated> for Event {
     fn from(item: WarrantCreated) -> Self {
         Self::WarrantCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct WorkflowCreated {
+    pub workflow: Workflow,
+    pub workflowable: Workflowable,
+}
+
+impl From<WorkflowCreated> for Event {
+    fn from(item: WorkflowCreated) -> Self {
+        Self::WorkflowCreated(item)
     }
 }

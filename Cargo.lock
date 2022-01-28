@@ -3459,6 +3459,7 @@ version = "0.4.0"
 dependencies = [
  "chrono",
  "dotenv",
+ "env_logger",
  "log",
  "tokio 1.15.0",
  "trankeel",

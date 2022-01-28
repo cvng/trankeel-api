@@ -30,7 +30,6 @@ use trankeel_core::providers::Pdfmonkey;
 use trankeel_core::providers::Pg;
 use trankeel_core::providers::Sendinblue;
 use trankeel_core::providers::Stripe;
-use trankeel_core::templates::CandidacyRejectedMail;
 use trankeel_data::AccountId;
 use trankeel_data::Advertisement;
 use trankeel_data::AdvertisementId;
@@ -66,7 +65,6 @@ use trankeel_ops::candidacies::CreateCandidacy;
 use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::AdvertisementUpdated;
-use trankeel_ops::event::CandidacyAccepted;
 use trankeel_ops::event::Event;
 use trankeel_ops::event::LeaseAffected;
 use trankeel_ops::event::LeaseCreated;
@@ -306,28 +304,12 @@ impl Client {
             .candidacies()
             .by_advertisement_id(&advertisement.id)?
             .into_iter()
-            .filter(|candidacy| candidacy.id != input.id);
-        let other_candidacies = other_candidacies
-            .clone()
-            .map(|candidacy| self.discussions().by_candidacy_id(&candidacy.id))
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .zip(other_candidacies);
-        let other_candidacies = other_candidacies
-            .clone()
-            .map(|(_, candidacy)| self.persons().by_candidacy_id(&candidacy.id))
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .map(|candidate| CandidacyRejectedMail::try_new(&candidate))
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .zip(other_candidacies)
-            .map(|(message, (discussion, candidacy))| (candidacy, discussion, message.to_string()))
+            .filter(|candidacy| candidacy.id != input.id)
             .collect::<Vec<_>>();
 
         dispatcher::dispatch(
             &self.0,
-            vec![AcceptCandidacy::new(
+            AcceptCandidacy::new(
                 &candidacy,
                 &account,
                 &account_owner,
@@ -337,24 +319,7 @@ impl Client {
                 &discussion,
                 &other_candidacies,
             )
-            .run(input)
-            .map(|payload| {
-                CandidacyAccepted {
-                    candidacy: payload.candidacy,
-                    rejected_candidacies: payload.rejected_candidacies,
-                    tenant: payload.tenant,
-                    identity: payload.identity,
-                    warrants: payload.warrants,
-                    discussion: payload.discussion,
-                    lease: payload.lease,
-                    rents: payload.rents,
-                    lease_file: payload.lease_file,
-                    workflow: payload.workflow,
-                    workflowable: payload.workflowable,
-                    invite: payload.invite,
-                }
-                .into()
-            })?],
+            .run(input)?,
         )
         .await?;
 
@@ -383,7 +348,7 @@ impl Client {
             &self.0,
             vec![TenantCreated {
                 tenant: tenant.clone(),
-                identity,
+                identity: Some(identity),
                 warrants,
                 discussion,
             }
@@ -577,7 +542,7 @@ impl Client {
                     .map(|(tenant, identity, discussion, warrants)| {
                         TenantCreated {
                             tenant,
-                            identity,
+                            identity: Some(identity),
                             discussion,
                             warrants,
                         }
@@ -588,7 +553,13 @@ impl Client {
             .chain(
                 tenants_with_identities
                     .into_iter()
-                    .map(|(tenant, ..)| LeaseAffected { tenant }.into())
+                    .map(|(tenant, ..)| {
+                        LeaseAffected {
+                            tenant_id: tenant.id,
+                            lease_id: lease.id,
+                        }
+                        .into()
+                    })
                     .collect::<Vec<_>>(),
             )
             .collect(),
@@ -637,7 +608,13 @@ impl Client {
             .chain(
                 tenants
                     .into_iter()
-                    .map(|tenant| LeaseAffected { tenant }.into())
+                    .map(|tenant| {
+                        LeaseAffected {
+                            tenant_id: tenant.id,
+                            lease_id: lease.id,
+                        }
+                        .into()
+                    })
                     .collect::<Vec<_>>(),
             )
             .collect(),

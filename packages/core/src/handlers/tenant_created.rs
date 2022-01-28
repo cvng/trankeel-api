@@ -13,13 +13,15 @@ pub fn tenant_created(ctx: &Context, event: TenantCreated) -> Result<()> {
         warrants,
     } = event;
 
-    db.persons().create(&identity)?;
-    db.tenants().create(&tenant)?;
+    if let Some(identity) = identity {
+        db.persons().create(&identity).unwrap();
+    }
+    db.tenants().create(&tenant).unwrap();
     if let Some(discussion) = discussion {
-        db.discussions().create(&discussion)?;
+        db.discussions().create(&discussion).unwrap();
     }
     if let Some(warrants) = warrants {
-        db.warrants().create_many(&warrants)?;
+        db.warrants().create_many(&warrants).unwrap();
     }
 
     Ok(())
