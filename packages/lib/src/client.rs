@@ -66,7 +66,6 @@ use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::AdvertisementUpdated;
 use trankeel_ops::event::Event;
-use trankeel_ops::event::NoticeCreated;
 use trankeel_ops::event::PropertyCreated;
 use trankeel_ops::event::PropertyUpdated;
 use trankeel_ops::event::ReceiptCreated;
@@ -656,19 +655,9 @@ impl Client {
 
         let rents = self.rents().by_id_many(&input.rent_ids)?;
 
-        dispatcher::dispatch(
-            &self.0,
-            CreateNotices::new(&rents).run(input).map(|payload| {
-                payload
-                    .notices
-                    .into_iter()
-                    .map(|(notice, rent)| NoticeCreated { notice, rent }.into())
-                    .collect()
-            })?,
-        )
-        .await?;
-
-        Ok(vec![])
+        dispatcher::dispatch(&self.0, CreateNotices::new(&rents).run(input)?)
+            .await
+            .map(|_| Vec::new())
     }
 
     #[named]

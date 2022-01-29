@@ -1,9 +1,10 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::NoticeCreated;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::DateTime;
 use trankeel_data::Notice;
-use trankeel_data::NoticeWithRent;
 use trankeel_data::Rent;
 use trankeel_data::RentId;
 use validator::Validate;
@@ -12,10 +13,6 @@ use validator::Validate;
 pub struct CreateNoticesInput {
     pub rent_ids: Vec<RentId>,
     pub date: Option<DateTime>,
-}
-
-pub struct CreateNoticesPayload {
-    pub notices: Vec<NoticeWithRent>,
 }
 
 pub struct CreateNotices {
@@ -32,29 +29,28 @@ impl CreateNotices {
 
 impl Command for CreateNotices {
     type Input = CreateNoticesInput;
-    type Payload = CreateNoticesPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
         let Self { rents } = self;
 
-        let notices = rents
-            .into_iter()
-            .map(|rent| {
-                // Create new notice.
-                let notice = Notice::notice_document(&rent);
+        let notices = rents.into_iter().map(|rent| {
+            // Create new notice.
+            let notice = Notice::notice_document(&rent);
 
-                // Link notice with rent.
-                let rent = Rent {
-                    notice_id: Some(notice.id),
-                    ..rent
-                };
+            // Link notice with rent.
+            let rent = Rent {
+                notice_id: Some(notice.id),
+                ..rent
+            };
 
-                (notice, rent)
-            })
-            .collect();
+            (notice, rent)
+        });
 
-        Ok(Self::Payload { notices })
+        Ok(notices
+            .map(|(notice, rent)| NoticeCreated { notice, rent }.into())
+            .collect::<Vec<_>>())
     }
 }
