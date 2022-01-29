@@ -11,7 +11,6 @@ use crate::event::TenantCreated;
 use crate::event::WorkflowCreated;
 use crate::leases::CreateFurnishedLease;
 use crate::leases::CreateFurnishedLeaseInput;
-use crate::leases::CreateFurnishedLeasePayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::tenants::CreateTenantPayload;
@@ -30,6 +29,7 @@ use trankeel_data::Discussion;
 use trankeel_data::Invite;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
+use trankeel_data::LeaseId;
 use trankeel_data::Person;
 use trankeel_data::Rent;
 use trankeel_data::StepEvent;
@@ -144,24 +144,26 @@ impl Command for AcceptCandidacy {
         )?;
 
         // Create unsigned lease from advertisement.
-        let CreateFurnishedLeasePayload {
-            lease,
-            rents,
-            tenants: _tenants,
-        } = CreateFurnishedLease::new(&account, &vec![tenant.clone()]).run(
-            CreateFurnishedLeaseInput {
-                details: None,
-                deposit_amount: advertisement.deposit_amount,
-                effect_date: advertisement.effect_date,
-                renew_date: None,
-                file: None,
-                property_id: advertisement.property_id,
-                rent_amount: advertisement.rent_amount,
-                rent_charges_amount: advertisement.rent_charges_amount,
-                signature_date: None,
-                tenant_ids: vec![tenant.id],
-            },
-        )?;
+        let (lease, rents) =
+            CreateFurnishedLease::new(LeaseId::new(), &account, &vec![tenant.clone()])
+                .run(CreateFurnishedLeaseInput {
+                    details: None,
+                    deposit_amount: advertisement.deposit_amount,
+                    effect_date: advertisement.effect_date,
+                    renew_date: None,
+                    file: None,
+                    property_id: advertisement.property_id,
+                    rent_amount: advertisement.rent_amount,
+                    rent_charges_amount: advertisement.rent_charges_amount,
+                    signature_date: None,
+                    tenant_ids: vec![tenant.id],
+                })?
+                .into_iter()
+                .find_map(|event| match event {
+                    Event::LeaseCreated(LeaseCreated { lease, rents }) => Some((lease, rents)),
+                    _ => None,
+                })
+                .unwrap();
 
         // Create workflowable.
         let workflowable = Workflowable::Candidacy(candidacy.clone());

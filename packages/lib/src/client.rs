@@ -77,7 +77,6 @@ use trankeel_ops::event::TenantCreated;
 use trankeel_ops::event::TenantUpdated;
 use trankeel_ops::leases::CreateFurnishedLease;
 use trankeel_ops::leases::CreateFurnishedLeaseInput;
-use trankeel_ops::leases::CreateFurnishedLeasePayload;
 use trankeel_ops::leases::CreateLease;
 use trankeel_ops::leases::CreateLeaseInput;
 use trankeel_ops::leases::CreateLeasePayload;
@@ -577,6 +576,7 @@ impl Client {
     ) -> Result<Lease> {
         log::info!("Command: {}", function_name!());
 
+        let lease_id = LeaseId::new();
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let tenants = input
             .tenant_ids
@@ -584,44 +584,12 @@ impl Client {
             .map(|&tenant_id| self.0.db().tenants().by_id(&tenant_id))
             .collect::<Result<Vec<_>>>()?;
 
-        let CreateFurnishedLeasePayload {
-            lease,
-            rents,
-            tenants,
-        } = CreateFurnishedLease::new(&account, &tenants).run(input)?;
-
         dispatcher::dispatch(
             &self.0,
-            vec![LeaseCreated {
-                lease: lease.clone(),
-                rents,
-            }
-            .into()]
-            .into_iter()
-            .chain(
-                tenants
-                    .clone()
-                    .into_iter()
-                    .map(|tenant| TenantUpdated { tenant }.into())
-                    .collect::<Vec<_>>(),
-            )
-            .chain(
-                tenants
-                    .into_iter()
-                    .map(|tenant| {
-                        LeaseAffected {
-                            tenant_id: tenant.id,
-                            lease_id: lease.id,
-                        }
-                        .into()
-                    })
-                    .collect::<Vec<_>>(),
-            )
-            .collect(),
+            CreateFurnishedLease::new(lease_id, &account, &tenants).run(input)?,
         )
-        .await?;
-
-        Ok(lease)
+        .await
+        .and_then(|_| self.leases().by_id(&lease_id))
     }
 
     #[named]
