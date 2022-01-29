@@ -211,7 +211,8 @@ impl Mutation {
     ) -> Result<DeleteLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_lease(ctx.data::<AuthId>()?, input)?
+            .delete_lease(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 

@@ -47,6 +47,7 @@ pub enum Event {
     InviteCreated(InviteCreated),
     LeaseAffected(LeaseAffected),
     LeaseCreated(LeaseCreated),
+    LeaseDeleted(LeaseDeleted),
     LeaseFileRequested(LeaseFileRequested),
     LenderCreated(LenderCreated),
     MessagePushed(MessagePushed),
@@ -85,6 +86,7 @@ impl fmt::Display for Event {
                 Event::InviteCreated(_) => "invite_created",
                 Event::LeaseAffected(_) => "lease_affected",
                 Event::LeaseCreated(_) => "lease_created",
+                Event::LeaseDeleted(_) => "lease_deleted",
                 Event::LeaseFileRequested(_) => "lease_file_requested",
                 Event::LenderCreated(_) => "lender_created",
                 Event::MessagePushed(_) => "message_pushed",
@@ -306,6 +308,17 @@ pub struct LeaseCreated {
 impl From<LeaseCreated> for Event {
     fn from(item: LeaseCreated) -> Self {
         Self::LeaseCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct LeaseDeleted {
+    pub lease_id: LeaseId,
+}
+
+impl From<LeaseDeleted> for Event {
+    fn from(item: LeaseDeleted) -> Self {
+        Self::LeaseDeleted(item)
     }
 }
 

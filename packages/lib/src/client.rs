@@ -562,14 +562,18 @@ impl Client {
     }
 
     #[named]
-    pub fn delete_lease(&self, _auth_id: &AuthId, input: DeleteLeaseInput) -> Result<LeaseId> {
+    pub async fn delete_lease(
+        &self,
+        _auth_id: &AuthId,
+        input: DeleteLeaseInput,
+    ) -> Result<LeaseId> {
         log::info!("Command: {}", function_name!());
 
-        let lease_id = DeleteLease.run(input)?;
+        let lease_id = input.id;
 
-        self.0.db().leases().delete(&lease_id)?;
-
-        Ok(lease_id)
+        dispatcher::dispatch(&self.0, DeleteLease.run(input)?)
+            .await
+            .map(|_| lease_id)
     }
 
     #[named]
