@@ -1,4 +1,6 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::InviteCreated;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::AccountId;
@@ -18,10 +20,6 @@ pub struct CreateInviteInput {
     pub reason: InviteReason,
 }
 
-pub struct CreateInvitePayload {
-    pub invite: Invite,
-}
-
 pub struct CreateInvite {
     invitee: Person,
 }
@@ -36,7 +34,7 @@ impl CreateInvite {
 
 impl Command for CreateInvite {
     type Input = CreateInviteInput;
-    type Payload = CreateInvitePayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -57,6 +55,6 @@ impl Command for CreateInvite {
             reason: input.reason,
         };
 
-        Ok(Self::Payload { invite })
+        Ok(vec![InviteCreated { invite }.into()])
     }
 }
