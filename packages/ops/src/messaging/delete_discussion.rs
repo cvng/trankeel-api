@@ -11,9 +11,9 @@ pub struct DeleteDiscussionInput {
     pub id: DiscussionId,
 }
 
-pub struct DeleteDiscussionCommand;
+pub struct DeleteDiscussion;
 
-impl Command for DeleteDiscussionCommand {
+impl Command for DeleteDiscussion {
     type Input = DeleteDiscussionInput;
     type Payload = Vec<Event>;
 

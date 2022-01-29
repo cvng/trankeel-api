@@ -20,17 +20,17 @@ pub struct CompleteStepInput {
     pub requirements: Option<Vec<CompleteStepRequirementInput>>,
 }
 
-pub struct CompleteStepCommand {
+pub struct CompleteStep {
     step: Step,
 }
 
-impl CompleteStepCommand {
+impl CompleteStep {
     pub fn new(step: &Step) -> Self {
         Self { step: step.clone() }
     }
 }
 
-impl Command for CompleteStepCommand {
+impl Command for CompleteStep {
     type Input = CompleteStepInput;
     type Payload = Vec<Event>;
 

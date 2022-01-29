@@ -91,8 +91,8 @@ use trankeel_ops::leases::UpdateFurnishedLeasePayload;
 use trankeel_ops::lenders::UpdateIndividualLender;
 use trankeel_ops::lenders::UpdateIndividualLenderInput;
 use trankeel_ops::lenders::UpdateIndividualLenderPayload;
-use trankeel_ops::messaging::push_message2::PushMessageCommand;
-use trankeel_ops::messaging::DeleteDiscussionCommand;
+use trankeel_ops::messaging::push_message2::PushMessage;
+use trankeel_ops::messaging::DeleteDiscussion;
 use trankeel_ops::messaging::DeleteDiscussionInput;
 use trankeel_ops::messaging::PushMessageInput;
 use trankeel_ops::properties::CreateAdvertisement;
@@ -116,7 +116,7 @@ use trankeel_ops::tenants::DeleteTenantInput;
 use trankeel_ops::tenants::UpdateTenant;
 use trankeel_ops::tenants::UpdateTenantInput;
 use trankeel_ops::tenants::UpdateTenantPayload;
-use trankeel_ops::workflows::CompleteStepCommand;
+use trankeel_ops::workflows::CompleteStep;
 use trankeel_ops::workflows::CompleteStepInput;
 use trankeel_ops::Command;
 
@@ -677,7 +677,7 @@ impl Client {
 
         let discussion_id = input.id;
 
-        dispatcher::dispatch(&self.0, DeleteDiscussionCommand.run(input)?)
+        dispatcher::dispatch(&self.0, DeleteDiscussion.run(input)?)
             .await
             .map(|_| discussion_id)
     }
@@ -688,7 +688,7 @@ impl Client {
 
         let message_id = MessageId::new();
 
-        dispatcher::dispatch(&self.0, PushMessageCommand::new(&message_id).run(input)?)
+        dispatcher::dispatch(&self.0, PushMessage::new(&message_id).run(input)?)
             .await
             .and_then(|_| self.messages().by_id(&message_id))
     }
@@ -699,7 +699,7 @@ impl Client {
 
         let step = self.steps().by_id(&input.id)?;
 
-        dispatcher::dispatch(&self.0, CompleteStepCommand::new(&step).run(input)?)
+        dispatcher::dispatch(&self.0, CompleteStep::new(&step).run(input)?)
             .await
             .and_then(|_| self.steps().by_id(&step.id))
     }

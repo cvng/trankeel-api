@@ -7,11 +7,11 @@ use trankeel_data::Message;
 use trankeel_data::MessageId;
 use validator::Validate;
 
-pub struct PushMessageCommand {
+pub struct PushMessage {
     pub message_id: MessageId,
 }
 
-impl PushMessageCommand {
+impl PushMessage {
     pub fn new(message_id: &MessageId) -> Self {
         Self {
             message_id: *message_id,
@@ -19,7 +19,7 @@ impl PushMessageCommand {
     }
 }
 
-impl Command for PushMessageCommand {
+impl Command for PushMessage {
     type Input = PushMessageInput;
     type Payload = Vec<Event>;
 
