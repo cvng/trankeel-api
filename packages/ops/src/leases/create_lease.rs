@@ -1,4 +1,9 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::LeaseAffected;
+use crate::event::LeaseCreated;
+use crate::event::PropertyCreated;
+use crate::event::TenantCreated;
 use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
 use crate::properties::CreatePropertyPayload;
@@ -10,24 +15,13 @@ use async_graphql::InputObject;
 use trankeel_data::Account;
 use trankeel_data::Amount;
 use trankeel_data::DateTime;
-use trankeel_data::Discussion;
 use trankeel_data::Lease;
 use trankeel_data::LeaseId;
 use trankeel_data::LeaseType;
 use trankeel_data::Lender;
 use trankeel_data::Person;
-use trankeel_data::Property;
-use trankeel_data::Rent;
 use trankeel_data::Tenant;
-use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
-
-type TenantWithIdentityExtended = (
-    Tenant,
-    Person,
-    Option<Discussion>,
-    Option<Vec<WarrantWithIdentity>>,
-);
 
 #[derive(InputObject, Validate)]
 pub struct CreateLeaseInput {
@@ -39,22 +33,22 @@ pub struct CreateLeaseInput {
     pub tenants: Vec<CreateTenantInput>,
 }
 
-pub struct CreateLeasePayload {
-    pub lease: Lease,
-    pub rents: Vec<Rent>,
-    pub property: Property,
-    pub tenants_with_identities: Vec<TenantWithIdentityExtended>,
-}
-
 pub struct CreateLease {
+    lease_id: LeaseId,
     account: Account,
     account_owner: Person,
     lender: Lender,
 }
 
 impl CreateLease {
-    pub fn new(account: &Account, account_owner: &Person, lender: &Lender) -> Self {
+    pub fn new(
+        lease_id: LeaseId,
+        account: &Account,
+        account_owner: &Person,
+        lender: &Lender,
+    ) -> Self {
         Self {
+            lease_id,
             account: account.clone(),
             account_owner: account_owner.clone(),
             lender: lender.clone(),
@@ -64,12 +58,13 @@ impl CreateLease {
 
 impl Command for CreateLease {
     type Input = CreateLeaseInput;
-    type Payload = CreateLeasePayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
         let Self {
+            lease_id,
             account,
             account_owner,
             lender,
@@ -81,7 +76,7 @@ impl Command for CreateLease {
 
         // Create lease.
         let lease = Lease {
-            id: LeaseId::new(),
+            id: lease_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             account_id: account.id,
@@ -133,14 +128,43 @@ impl Command for CreateLease {
                         warrants,
                     )
                 },
-            )
-            .collect();
+            );
 
-        Ok(Self::Payload {
-            lease,
-            rents,
-            property,
-            tenants_with_identities,
-        })
+        Ok(vec![
+            PropertyCreated { property }.into(),
+            LeaseCreated {
+                lease: lease.clone(),
+                rents,
+            }
+            .into(),
+        ]
+        .into_iter()
+        .chain(
+            tenants_with_identities
+                .clone()
+                .into_iter()
+                .map(|(tenant, identity, discussion, warrants)| {
+                    TenantCreated {
+                        tenant,
+                        identity: Some(identity),
+                        discussion,
+                        warrants,
+                    }
+                    .into()
+                })
+                .collect::<Vec<_>>(),
+        )
+        .chain(
+            tenants_with_identities
+                .map(|(tenant, ..)| {
+                    LeaseAffected {
+                        lease_id: lease.id,
+                        tenant_id: tenant.id,
+                    }
+                    .into()
+                })
+                .collect::<Vec<_>>(),
+        )
+        .collect())
     }
 }

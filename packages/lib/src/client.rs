@@ -66,8 +66,6 @@ use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::AdvertisementUpdated;
 use trankeel_ops::event::Event;
-use trankeel_ops::event::LeaseAffected;
-use trankeel_ops::event::LeaseCreated;
 use trankeel_ops::event::NoticeCreated;
 use trankeel_ops::event::PropertyCreated;
 use trankeel_ops::event::PropertyUpdated;
@@ -79,7 +77,6 @@ use trankeel_ops::leases::CreateFurnishedLease;
 use trankeel_ops::leases::CreateFurnishedLeaseInput;
 use trankeel_ops::leases::CreateLease;
 use trankeel_ops::leases::CreateLeaseInput;
-use trankeel_ops::leases::CreateLeasePayload;
 use trankeel_ops::leases::CreateNotices;
 use trankeel_ops::leases::CreateNoticesInput;
 use trankeel_ops::leases::CreateReceipts;
@@ -512,60 +509,17 @@ impl Client {
     pub async fn create_lease(&self, auth_id: &AuthId, input: CreateLeaseInput) -> Result<Lease> {
         log::info!("Command: {}", function_name!());
 
+        let lease_id = LeaseId::new();
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
         let (lender, ..) = self.0.db().lenders().by_account_id_first(&account.id)?;
 
-        let CreateLeasePayload {
-            lease,
-            rents,
-            property,
-            tenants_with_identities,
-        } = CreateLease::new(&account, &account_owner, &lender).run(input)?;
-
         dispatcher::dispatch(
             &self.0,
-            vec![
-                PropertyCreated { property }.into(),
-                LeaseCreated {
-                    lease: lease.clone(),
-                    rents,
-                }
-                .into(),
-            ]
-            .into_iter()
-            .chain(
-                tenants_with_identities
-                    .clone()
-                    .into_iter()
-                    .map(|(tenant, identity, discussion, warrants)| {
-                        TenantCreated {
-                            tenant,
-                            identity: Some(identity),
-                            discussion,
-                            warrants,
-                        }
-                        .into()
-                    })
-                    .collect::<Vec<_>>(),
-            )
-            .chain(
-                tenants_with_identities
-                    .into_iter()
-                    .map(|(tenant, ..)| {
-                        LeaseAffected {
-                            tenant_id: tenant.id,
-                            lease_id: lease.id,
-                        }
-                        .into()
-                    })
-                    .collect::<Vec<_>>(),
-            )
-            .collect(),
+            CreateLease::new(lease_id, &account, &account_owner, &lender).run(input)?,
         )
-        .await?;
-
-        Ok(lease)
+        .await
+        .and_then(|_| self.leases().by_id(&lease_id))
     }
 
     #[named]
