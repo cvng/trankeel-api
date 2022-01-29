@@ -13,7 +13,9 @@ pub fn tenant_created(ctx: &Context, event: TenantCreated) -> Result<()> {
         warrants,
     } = event;
 
-    db.persons().create(&identity)?;
+    if let Some(identity) = identity {
+        db.persons().create(&identity)?;
+    }
     db.tenants().create(&tenant)?;
     if let Some(discussion) = discussion {
         db.discussions().create(&discussion)?;

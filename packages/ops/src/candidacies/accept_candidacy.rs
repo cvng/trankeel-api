@@ -1,7 +1,14 @@
 use crate::error::Result;
-use crate::invites::CreateInvite;
-use crate::invites::CreateInviteInput;
-use crate::invites::CreateInvitePayload;
+use crate::event::CandidacyAccepted;
+use crate::event::CandidacyRejected;
+use crate::event::Event;
+use crate::event::LeaseAffected;
+use crate::event::LeaseCreated;
+use crate::event::LeaseFileRequested;
+use crate::event::StepCompleted;
+use crate::event::StepCreated;
+use crate::event::TenantCreated;
+use crate::event::WorkflowCreated;
 use crate::leases::CreateFurnishedLease;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::leases::CreateFurnishedLeasePayload;
@@ -13,6 +20,7 @@ use crate::workflows::CreateWorkflowInput;
 use crate::workflows::CreateWorkflowPayload;
 use crate::Command;
 use async_graphql::InputObject;
+use trankeel_data::workflow_steps;
 use trankeel_data::Account;
 use trankeel_data::Advertisement;
 use trankeel_data::Candidacy;
@@ -20,12 +28,11 @@ use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
 use trankeel_data::Invite;
-use trankeel_data::InviteReason;
 use trankeel_data::Lease;
 use trankeel_data::LeaseFile;
-use trankeel_data::MessageContent;
 use trankeel_data::Person;
 use trankeel_data::Rent;
+use trankeel_data::StepEvent;
 use trankeel_data::Tenant;
 use trankeel_data::WarrantWithIdentity;
 use trankeel_data::Workflow;
@@ -61,7 +68,7 @@ pub struct AcceptCandidacy {
     candidacy_warrants: Vec<WarrantWithIdentity>,
     candidate: Person,
     discussion: Discussion,
-    other_candidacies: Vec<(Candidacy, Discussion, MessageContent)>,
+    other_candidacies: Vec<Candidacy>,
 }
 
 impl AcceptCandidacy {
@@ -74,7 +81,7 @@ impl AcceptCandidacy {
         candidacy_warrants: &[WarrantWithIdentity],
         candidate: &Person,
         discussion: &Discussion,
-        other_candidacies: &[(Candidacy, Discussion, MessageContent)],
+        other_candidacies: &[Candidacy],
     ) -> Self {
         Self {
             candidacy: candidacy.clone(),
@@ -91,7 +98,7 @@ impl AcceptCandidacy {
 
 impl Command for AcceptCandidacy {
     type Input = AcceptCandidacyInput;
-    type Payload = AcceptCandidacyPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -103,7 +110,7 @@ impl Command for AcceptCandidacy {
             advertisement,
             candidacy_warrants,
             candidate,
-            discussion,
+            discussion: _discussion,
             other_candidacies,
         } = self;
 
@@ -114,15 +121,12 @@ impl Command for AcceptCandidacy {
         };
 
         // Make other candidacies rejected.
-        let rejected_candidacies = other_candidacies
-            .into_iter()
-            .map(|(candidacy, _discussion, _message)| candidacy)
-            .collect();
+        let rejected_candidacies = other_candidacies;
 
         // Create tenant with identity.
         let CreateTenantPayload {
             tenant,
-            identity,
+            identity: _identity,
             warrants,
             discussion: _discussion,
         } = CreateTenant::new(&account, &account_owner, Some(&candidate)).run(
@@ -139,19 +143,11 @@ impl Command for AcceptCandidacy {
             },
         )?;
 
-        // Create invite for new tenant.
-        let CreateInvitePayload { invite } = CreateInvite::new(&identity) //
-            .run(CreateInviteInput {
-                invitee_id: identity.id,
-                account_id: account.id,
-                reason: InviteReason::CandidacyAccepted,
-            })?;
-
         // Create unsigned lease from advertisement.
         let CreateFurnishedLeasePayload {
             lease,
             rents,
-            tenants,
+            tenants: _tenants,
         } = CreateFurnishedLease::new(&account, &vec![tenant.clone()]).run(
             CreateFurnishedLeaseInput {
                 details: None,
@@ -167,19 +163,6 @@ impl Command for AcceptCandidacy {
             },
         )?;
 
-        // Take first tenant out of lease.
-        let tenant = tenants.first().cloned().unwrap();
-
-        // Create lease file.
-        let lease_file = LeaseFile::lease_document(&lease);
-
-        // Link lease file with lease.
-        let lease = Lease {
-            id: lease.id,
-            lease_id: Some(lease_file.id),
-            ..lease
-        };
-
         // Create workflowable.
         let workflowable = Workflowable::Candidacy(candidacy.clone());
 
@@ -190,19 +173,67 @@ impl Command for AcceptCandidacy {
                 workflowable_id: candidacy.id,
             })?;
 
-        Ok(Self::Payload {
-            candidacy,
-            rejected_candidacies,
-            tenant,
-            identity,
-            warrants,
-            discussion,
-            lease,
-            rents,
-            lease_file,
-            workflow,
-            workflowable,
-            invite,
-        })
+        let steps = workflow_steps(&workflow);
+
+        // Take first step from workflow (candidacy_accepted).
+        let candidacy_accepted_step = steps
+            .iter()
+            .find(|step| step.as_event() == Some(StepEvent::CandidacyAccepted))
+            .cloned()
+            .unwrap();
+
+        Ok(vec![
+            CandidacyAccepted {
+                candidacy_id: candidacy.id,
+            }
+            .into(),
+            TenantCreated {
+                tenant: tenant.clone(),
+                identity: None,
+                warrants,
+                discussion: None,
+            }
+            .into(),
+            LeaseCreated {
+                lease: lease.clone(),
+                rents,
+            }
+            .into(),
+            LeaseAffected {
+                lease_id: lease.id,
+                tenant_id: tenant.id,
+            }
+            .into(),
+            LeaseFileRequested { lease_id: lease.id }.into(),
+            WorkflowCreated {
+                workflow,
+                workflowable,
+            }
+            .into(),
+        ]
+        .into_iter()
+        .chain(
+            steps
+                .into_iter()
+                .map(|step| StepCreated { step }.into())
+                .collect::<Vec<_>>(),
+        )
+        .chain(vec![StepCompleted {
+            step_id: candidacy_accepted_step.id,
+            requirements: None,
+        }
+        .into()])
+        .chain(
+            rejected_candidacies
+                .into_iter()
+                .map(|candidacy| {
+                    CandidacyRejected {
+                        candidacy_id: candidacy.id,
+                    }
+                    .into()
+                })
+                .collect::<Vec<_>>(),
+        )
+        .collect())
     }
 }

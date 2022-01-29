@@ -1,109 +1,35 @@
-use super::candidacy_rejected;
-use super::lease_affected;
-use super::step_completed;
-use super::StepCompletedHandler;
-use super::StepCompletedPayload;
 use crate::context::Context;
 use crate::database::Db;
-use crate::dispatcher::Handler;
 use crate::error::Result;
 use crate::mailer::Mailer;
 use crate::messenger::Messenger;
-use crate::pdfmaker::Pdfmaker;
 use crate::templates::CandidacyAcceptedMail;
-use crate::templates::LeaseDocument;
-use chrono::Utc;
 use diesel::result::Error::NotFound;
-use trankeel_data::workflow_steps;
+use trankeel_data::Candidacy;
+use trankeel_data::CandidacyStatus;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
-use trankeel_data::LeaseFile;
-use trankeel_data::StepEvent;
+use trankeel_data::InviteReason;
 use trankeel_ops::event::CandidacyAccepted;
-use trankeel_ops::event::CandidacyRejected;
-use trankeel_ops::event::LeaseAffected;
-use trankeel_ops::event::StepCompleted;
+use trankeel_ops::invites::CreateInvite;
+use trankeel_ops::invites::CreateInviteInput;
+use trankeel_ops::invites::CreateInvitePayload;
+use trankeel_ops::Command;
 
 pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
     let db = ctx.db();
 
-    let CandidacyAccepted {
-        candidacy,
-        rejected_candidacies,
-        tenant,
-        identity,
-        warrants,
-        discussion,
-        lease,
-        rents,
-        lease_file,
-        workflow,
-        workflowable,
-        invite: _invite,
-    } = event;
+    let CandidacyAccepted { candidacy_id } = event;
 
-    let steps = workflow_steps(&workflow);
+    let candidacy = db.candidacies().by_id(&candidacy_id)?;
 
-    // Take first step from workflow (candidacy_accepted).
-    let candidacy_accepted_step = steps
-        .iter()
-        .find(|step| step.as_event() == Some(StepEvent::CandidacyAccepted))
-        .cloned();
-
-    // Mark step as completed if found.
-    let candidacy_accepted_step = if let Some(step) = candidacy_accepted_step {
-        StepCompletedHandler::new(&step, &lease, &discussion)
-            .run(StepCompleted {
-                step_id: step.id,
-                requirements: None,
-            })
-            .map(
-                |StepCompletedPayload {
-                     step,
-                     lease: _lease,
-                     discussion: _discussion,
-                 }| Some(step),
-            )?
-    } else {
-        None
+    // Make given candidacy accepted.
+    let candidacy = Candidacy {
+        status: CandidacyStatus::Accepted,
+        ..candidacy
     };
 
     db.candidacies().update(&candidacy)?;
-    db.persons().update(&identity)?;
-    db.files().create(&lease_file)?;
-    db.leases().create(&lease)?;
-    db.rents().create_many(&rents)?;
-    db.tenants().create(&tenant)?;
-    db.discussions().update(&discussion)?;
-    db.workflowables().create(&workflowable)?;
-    db.workflows().create(&workflow)?;
-    for step in steps {
-        db.steps().create(&step)?;
-    }
-    if let Some(warrants) = &warrants {
-        db.warrants().create_many(warrants)?;
-    }
-
-    lease_affected(ctx, LeaseAffected { tenant })?;
-
-    for candidacy in rejected_candidacies {
-        candidacy_rejected(
-            ctx,
-            CandidacyRejected {
-                candidacy_id: candidacy.id,
-            },
-        )?;
-    }
-
-    if let Some(step) = candidacy_accepted_step {
-        step_completed(
-            ctx,
-            StepCompleted {
-                step_id: step.id,
-                requirements: None,
-            },
-        )?;
-    }
 
     Ok(())
 }
@@ -111,11 +37,13 @@ pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()>
 pub async fn candidacy_accepted_async(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
     let db = ctx.db();
     let mailer = ctx.mailer();
-    let pdfmaker = ctx.pdfmaker();
     let messenger = ctx.messenger();
 
-    let account = db.accounts().by_candidacy_id(&event.candidacy.id)?;
-    let participant = db.persons().by_candidacy_id(&event.candidacy.id)?;
+    let CandidacyAccepted { candidacy_id } = event;
+
+    let candidacy = db.candidacies().by_id(&candidacy_id)?;
+    let account = db.accounts().by_candidacy_id(&candidacy.id)?;
+    let participant = db.persons().by_candidacy_id(&candidacy.id)?;
     let sender = db
         .persons()
         .by_account_id(&account.id)?
@@ -125,31 +53,25 @@ pub async fn candidacy_accepted_async(ctx: &Context, event: CandidacyAccepted) -
 
     messenger.message(
         EventType::CandidacyAccepted,
-        Eventable::Candidacy(event.candidacy.clone()),
+        Eventable::Candidacy(candidacy.clone()),
         sender.id,
         participant.id,
         None,
     )?;
 
-    // Generate lease document (PDF) and assign document external ID to lease file.
-    let document = pdfmaker
-        .generate(LeaseDocument::try_new(
-            &event.lease,
-            &event.lease_file,
-            Utc::now().into(),
-        )?)
-        .await?;
-
-    db.files().update(&LeaseFile {
-        external_id: Some(document.id),
-        ..event.lease_file
-    })?;
+    // Create invite for new tenant.
+    let CreateInvitePayload { invite } = CreateInvite::new(&participant) //
+        .run(CreateInviteInput {
+            invitee_id: participant.id,
+            account_id: account.id,
+            reason: InviteReason::CandidacyAccepted,
+        })?;
 
     mailer
         .batch(vec![CandidacyAcceptedMail::try_new(
-            &event.candidacy,
-            &event.identity,
-            &event.invite,
+            &candidacy,
+            &participant,
+            &invite,
         )?])
         .await?;
 
