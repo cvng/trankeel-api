@@ -14,11 +14,13 @@ pub trait Handler {
     fn run(self, event: Self::Event) -> crate::error::Result<Self::Payload>;
 }
 
+#[remain::check]
 pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     Pg::transaction(ctx.db(), || {
         events.clone().into_iter().try_for_each(|evt| {
             log::info!("Event: {}", evt);
 
+            #[remain::sorted]
             match evt {
                 Event::AccountCreated(evt) => handlers::account_created(ctx, evt),
                 Event::AdvertisementCreated(evt) => handlers::advertisement_created(ctx, evt),
@@ -57,6 +59,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     stream::iter(events)
         .map(Ok)
         .try_for_each_concurrent(2, |evt| async {
+            #[remain::sorted]
             match evt {
                 Event::CandidacyAccepted(evt) => handlers::candidacy_accepted_async(ctx, evt).await,
                 Event::CandidacyCreated(evt) => handlers::candidacy_created_async(ctx, evt).await,
