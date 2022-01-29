@@ -11,9 +11,10 @@ use trankeel_data::EventType;
 use trankeel_data::Eventable;
 use trankeel_data::InviteReason;
 use trankeel_ops::event::CandidacyAccepted;
+use trankeel_ops::event::Event;
+use trankeel_ops::event::InviteCreated;
 use trankeel_ops::invites::CreateInvite;
 use trankeel_ops::invites::CreateInviteInput;
-use trankeel_ops::invites::CreateInvitePayload;
 use trankeel_ops::Command;
 
 pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
@@ -60,12 +61,18 @@ pub async fn candidacy_accepted_async(ctx: &Context, event: CandidacyAccepted) -
     )?;
 
     // Create invite for new tenant.
-    let CreateInvitePayload { invite } = CreateInvite::new(&participant) //
+    let invite = CreateInvite::new(&participant)
         .run(CreateInviteInput {
             invitee_id: participant.id,
             account_id: account.id,
             reason: InviteReason::CandidacyAccepted,
-        })?;
+        })?
+        .into_iter()
+        .find_map(|event| match event {
+            Event::InviteCreated(InviteCreated { invite }) => Some(invite),
+            _ => None,
+        })
+        .unwrap();
 
     mailer
         .batch(vec![CandidacyAcceptedMail::try_new(
