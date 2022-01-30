@@ -1,4 +1,6 @@
 use crate::error::Result;
+use crate::event::AdvertisementUpdated;
+use crate::event::Event;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Advertisement;
@@ -25,10 +27,6 @@ pub struct UpdateAdvertisementInput {
     pub description: Option<String>,
 }
 
-pub struct UpdateAdvertisementPayload {
-    pub advertisement: Advertisement,
-}
-
 pub struct UpdateAdvertisement {
     advertisement: Advertisement,
 }
@@ -43,7 +41,7 @@ impl UpdateAdvertisement {
 
 impl Command for UpdateAdvertisement {
     type Input = UpdateAdvertisementInput;
-    type Payload = UpdateAdvertisementPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -66,6 +64,6 @@ impl Command for UpdateAdvertisement {
             ..advertisement
         };
 
-        Ok(Self::Payload { advertisement })
+        Ok(vec![AdvertisementUpdated { advertisement }.into()])
     }
 }

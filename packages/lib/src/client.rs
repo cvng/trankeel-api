@@ -63,7 +63,6 @@ use trankeel_ops::candidacies::AcceptCandidacyInput;
 use trankeel_ops::candidacies::CreateCandidacy;
 use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::error::Result;
-use trankeel_ops::event::AdvertisementUpdated;
 use trankeel_ops::event::Event;
 use trankeel_ops::event::PropertyUpdated;
 use trankeel_ops::event::TenantCreated;
@@ -96,7 +95,6 @@ use trankeel_ops::properties::DeleteProperty;
 use trankeel_ops::properties::DeletePropertyInput;
 use trankeel_ops::properties::UpdateAdvertisement;
 use trankeel_ops::properties::UpdateAdvertisementInput;
-use trankeel_ops::properties::UpdateAdvertisementPayload;
 use trankeel_ops::properties::UpdateProperty;
 use trankeel_ops::properties::UpdatePropertyInput;
 use trankeel_ops::properties::UpdatePropertyPayload;
@@ -475,21 +473,16 @@ impl Client {
     ) -> Result<Advertisement> {
         log::info!("Command: {}", function_name!());
 
-        let advertisement = self.0.db().advertisements().by_id(&input.id)?;
-
-        let UpdateAdvertisementPayload { advertisement } =
-            UpdateAdvertisement::new(&advertisement).run(input)?;
+        let advertisement_id = input.id;
+        let advertisement = self.0.db().advertisements().by_id(&advertisement_id)?;
 
         dispatcher::dispatch(
             &self.0,
-            vec![AdvertisementUpdated {
-                advertisement: advertisement.clone(),
-            }
-            .into()],
+            UpdateAdvertisement::new(&advertisement).run(input)?,
         )
         .await?;
 
-        Ok(advertisement)
+        self.0.db().advertisements().by_id(&advertisement_id)
     }
 
     #[named]
