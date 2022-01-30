@@ -68,7 +68,6 @@ use trankeel_ops::event::AdvertisementUpdated;
 use trankeel_ops::event::Event;
 use trankeel_ops::event::PropertyCreated;
 use trankeel_ops::event::PropertyUpdated;
-use trankeel_ops::event::ReceiptSent;
 use trankeel_ops::event::TenantCreated;
 use trankeel_ops::event::TenantUpdated;
 use trankeel_ops::leases::CreateFurnishedLease;
@@ -617,18 +616,9 @@ impl Client {
     pub async fn send_receipts(&self, input: SendReceiptsInput) -> Result<Vec<Receipt>> {
         log::info!("Command: {}", function_name!());
 
-        let rent_ids = SendReceipts.run(input)?;
-
-        dispatcher::dispatch(
-            &self.0,
-            rent_ids
-                .into_iter()
-                .map(|rent_id| ReceiptSent { rent_id }.into())
-                .collect(),
-        )
-        .await?;
-
-        Ok(vec![])
+        dispatcher::dispatch(&self.0, SendReceipts.run(input)?)
+            .await
+            .map(|_| Vec::new())
     }
 
     #[named]

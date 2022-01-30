@@ -135,6 +135,8 @@ impl DomainEvent for LeaseAffected {}
 
 impl DomainEvent for LeaseCreated {}
 
+impl DomainEvent for LeaseDeleted {}
+
 impl DomainEvent for LenderCreated {}
 
 impl DomainEvent for MessagePushed {}
