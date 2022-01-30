@@ -1,5 +1,7 @@
 use crate::auth::AddressInput;
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::PropertyCreated;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
@@ -44,18 +46,16 @@ pub struct CreatePropertyInput {
     pub water_heating_method: Option<PropertyUsageType>,
 }
 
-pub struct CreatePropertyPayload {
-    pub property: Property,
-}
-
 pub struct CreateProperty {
+    property_id: PropertyId,
     account: Account,
     lender: Lender,
 }
 
 impl CreateProperty {
-    pub fn new(account: &Account, lender: &Lender) -> Self {
+    pub fn new(property_id: PropertyId, account: &Account, lender: &Lender) -> Self {
         Self {
+            property_id,
             account: account.clone(),
             lender: lender.clone(),
         }
@@ -64,15 +64,19 @@ impl CreateProperty {
 
 impl Command for CreateProperty {
     type Input = CreatePropertyInput;
-    type Payload = CreatePropertyPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let Self { account, lender } = self;
+        let Self {
+            property_id,
+            account,
+            lender,
+        } = self;
 
         let property = Property {
-            id: PropertyId::new(),
+            id: property_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             account_id: account.id,
@@ -99,6 +103,6 @@ impl Command for CreateProperty {
             water_heating_method: input.water_heating_method,
         };
 
-        Ok(Self::Payload { property })
+        Ok(vec![PropertyCreated { property }.into()])
     }
 }

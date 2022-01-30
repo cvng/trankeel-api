@@ -6,7 +6,6 @@ use crate::event::PropertyCreated;
 use crate::event::TenantCreated;
 use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
-use crate::properties::CreatePropertyPayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::tenants::CreateTenantPayload;
@@ -20,6 +19,7 @@ use trankeel_data::LeaseId;
 use trankeel_data::LeaseType;
 use trankeel_data::Lender;
 use trankeel_data::Person;
+use trankeel_data::PropertyId;
 use trankeel_data::Tenant;
 use validator::Validate;
 
@@ -71,8 +71,14 @@ impl Command for CreateLease {
         } = self;
 
         // Create property.
-        let CreatePropertyPayload { property } = CreateProperty::new(&account, &lender) //
-            .run(input.property)?;
+        let property = CreateProperty::new(PropertyId::new(), &account, &lender)
+            .run(input.property)?
+            .into_iter()
+            .find_map(|event| match event {
+                Event::PropertyCreated(event) => Some(event.property),
+                _ => None,
+            })
+            .unwrap();
 
         // Create lease.
         let lease = Lease {

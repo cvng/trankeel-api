@@ -65,7 +65,6 @@ use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::AdvertisementUpdated;
 use trankeel_ops::event::Event;
-use trankeel_ops::event::PropertyCreated;
 use trankeel_ops::event::PropertyUpdated;
 use trankeel_ops::event::TenantCreated;
 use trankeel_ops::event::TenantUpdated;
@@ -93,7 +92,6 @@ use trankeel_ops::properties::CreateAdvertisement;
 use trankeel_ops::properties::CreateAdvertisementInput;
 use trankeel_ops::properties::CreateProperty;
 use trankeel_ops::properties::CreatePropertyInput;
-use trankeel_ops::properties::CreatePropertyPayload;
 use trankeel_ops::properties::DeleteProperty;
 use trankeel_ops::properties::DeletePropertyInput;
 use trankeel_ops::properties::UpdateAdvertisement;
@@ -392,6 +390,7 @@ impl Client {
     ) -> Result<Property> {
         log::info!("Command: {}", function_name!());
 
+        let property_id = PropertyId::new();
         let account = self.0.db().accounts().by_auth_id(auth_id)?;
         let (lender, ..) = self
             .0
@@ -402,19 +401,9 @@ impl Client {
             .cloned()
             .ok_or_else(|| Error::msg("lender_not_found"))?;
 
-        let CreatePropertyPayload { property } =
-            CreateProperty::new(&account, &lender).run(input)?;
+        dispatcher::dispatch(&self.0, CreateProperty::new(property_id, &account, &lender).run(input)?).await?;
 
-        dispatcher::dispatch(
-            &self.0,
-            vec![PropertyCreated {
-                property: property.clone(),
-            }
-            .into()],
-        )
-        .await?;
-
-        Ok(property)
+        self.properties().by_id(&property_id)
     }
 
     #[named]
