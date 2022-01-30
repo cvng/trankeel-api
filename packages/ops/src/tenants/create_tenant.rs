@@ -5,7 +5,6 @@ use crate::messaging::CreateDiscussion;
 use crate::messaging::CreateDiscussionInput;
 use crate::warrants::CreateWarrant;
 use crate::warrants::CreateWarrantInput;
-use crate::warrants::CreateWarrantPayload;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
@@ -112,7 +111,12 @@ impl Command for CreateTenant {
                 .map(|input| CreateWarrant::new(&account, Some(&tenant), None).run(input))
                 .collect::<Result<Vec<_>>>()?
                 .into_iter()
-                .map(|CreateWarrantPayload { warrant }| Some(warrant))
+                .map(|events| {
+                    events.into_iter().find_map(|event| match event {
+                        Event::WarrantCreated(event) => Some(event.warrant),
+                        _ => None,
+                    })
+                })
                 .collect()
         } else {
             None

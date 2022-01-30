@@ -1,6 +1,8 @@
 use crate::auth::AddressInput;
 use crate::error::Error;
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::WarrantCreated;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
@@ -41,10 +43,6 @@ pub struct CreateWarrantInput {
     pub company: Option<CreateProfessionalWarrantInput>,
 }
 
-pub struct CreateWarrantPayload {
-    pub warrant: WarrantWithIdentity,
-}
-
 pub struct CreateWarrant {
     account: Account,
     tenant: Option<Tenant>,
@@ -63,7 +61,7 @@ impl CreateWarrant {
 
 impl Command for CreateWarrant {
     type Input = CreateWarrantInput;
-    type Payload = CreateWarrantPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -152,7 +150,7 @@ impl Command for CreateWarrant {
             _ => return Err(Error::msg("individual or company is missing")),
         };
 
-        Ok(Self::Payload { warrant })
+        Ok(vec![WarrantCreated { warrant }.into()])
     }
 }
 
