@@ -15,7 +15,6 @@ use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::workflows::CreateWorkflow;
 use crate::workflows::CreateWorkflowInput;
-use crate::workflows::CreateWorkflowPayload;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::workflow_steps;
@@ -179,11 +178,17 @@ impl Command for AcceptCandidacy {
         let workflowable = Workflowable::Candidacy(candidacy.clone());
 
         // Setup candidacy workflow.
-        let CreateWorkflowPayload { workflow } = CreateWorkflow::new(&workflowable) //
+        let workflow = CreateWorkflow::new(&workflowable) //
             .run(CreateWorkflowInput {
                 type_: WorkflowType::Candidacy,
                 workflowable_id: candidacy.id,
-            })?;
+            })?
+            .into_iter()
+            .find_map(|event| match event {
+                Event::WorkflowCreated(event) => Some(event.workflow),
+                _ => None,
+            })
+            .unwrap();
 
         let steps = workflow_steps(&workflow);
 
