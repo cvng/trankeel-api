@@ -65,7 +65,6 @@ use trankeel_ops::candidacies::CreateCandidacy;
 use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::Event;
-use trankeel_ops::event::TenantUpdated;
 use trankeel_ops::leases::CreateFurnishedLease;
 use trankeel_ops::leases::CreateFurnishedLeaseInput;
 use trankeel_ops::leases::CreateLease;
@@ -102,7 +101,6 @@ use trankeel_ops::tenants::DeleteTenant;
 use trankeel_ops::tenants::DeleteTenantInput;
 use trankeel_ops::tenants::UpdateTenant;
 use trankeel_ops::tenants::UpdateTenantInput;
-use trankeel_ops::tenants::UpdateTenantPayload;
 use trankeel_ops::workflows::CompleteStep;
 use trankeel_ops::workflows::CompleteStepInput;
 use trankeel_ops::Command;
@@ -342,20 +340,12 @@ impl Client {
     ) -> Result<Tenant> {
         log::info!("Command: {}", function_name!());
 
-        let tenant = self.tenants().by_id(&input.id)?;
+        let tenant_id = input.id;
+        let tenant = self.tenants().by_id(&tenant_id)?;
 
-        let UpdateTenantPayload { tenant } = UpdateTenant::new(&tenant).run(input)?;
+        dispatcher::dispatch(&self.0, UpdateTenant::new(&tenant).run(input)?).await?;
 
-        dispatcher::dispatch(
-            &self.0,
-            vec![TenantUpdated {
-                tenant: tenant.clone(),
-            }
-            .into()],
-        )
-        .await?;
-
-        Ok(tenant)
+        self.tenants().by_id(&tenant_id)
     }
 
     #[named]
