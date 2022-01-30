@@ -85,9 +85,9 @@ use trankeel_ops::leases::UpdateFurnishedLease;
 use trankeel_ops::leases::UpdateFurnishedLeaseInput;
 use trankeel_ops::lenders::UpdateIndividualLender;
 use trankeel_ops::lenders::UpdateIndividualLenderInput;
-use trankeel_ops::messaging::push_message2::PushMessage;
 use trankeel_ops::messaging::DeleteDiscussion;
 use trankeel_ops::messaging::DeleteDiscussionInput;
+use trankeel_ops::messaging::PushMessage;
 use trankeel_ops::messaging::PushMessageInput;
 use trankeel_ops::properties::CreateAdvertisement;
 use trankeel_ops::properties::CreateAdvertisementInput;
@@ -646,7 +646,7 @@ impl Client {
 
         let message_id = MessageId::new();
 
-        dispatcher::dispatch(&self.0, PushMessage::new(&message_id).run(input)?)
+        dispatcher::dispatch(&self.0, PushMessage::new(message_id).run(input)?)
             .await
             .and_then(|_| self.messages().by_id(&message_id))
     }

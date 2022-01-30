@@ -9,10 +9,11 @@ use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
+use trankeel_data::MessageId;
 use trankeel_ops::event::CandidacyRejected;
+use trankeel_ops::event::Event;
 use trankeel_ops::messaging::PushMessage;
 use trankeel_ops::messaging::PushMessageInput;
-use trankeel_ops::messaging::PushMessagePayload;
 use trankeel_ops::Command;
 
 pub fn candidacy_rejected(ctx: &Context, event: CandidacyRejected) -> Result<()> {
@@ -37,14 +38,18 @@ pub fn candidacy_rejected(ctx: &Context, event: CandidacyRejected) -> Result<()>
         ..discussion
     };
 
-    let PushMessagePayload {
-        message,
-        discussion,
-    } = PushMessage::new(&discussion).run(PushMessageInput {
-        discussion_id: discussion.id,
-        sender_id: account_owner.id,
-        message: candidacy_rejected_message.to_string(),
-    })?;
+    let message = PushMessage::new(MessageId::new())
+        .run(PushMessageInput {
+            discussion_id: discussion.id,
+            sender_id: account_owner.id,
+            message: candidacy_rejected_message.to_string(),
+        })?
+        .into_iter()
+        .find_map(|event| match event {
+            Event::MessagePushed(event) => Some(event.message),
+            _ => None,
+        })
+        .unwrap();
 
     db.candidacies().update(&candidacy)?;
     db.discussions().update(&discussion)?;

@@ -1,6 +1,5 @@
 use super::PushMessage;
 use super::PushMessageInput;
-use super::PushMessagePayload;
 use crate::error::Result;
 use crate::event::DiscussionCreated;
 use crate::event::Event;
@@ -10,6 +9,7 @@ use chrono::Utc;
 use trankeel_data::Account;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
+use trankeel_data::MessageId;
 use trankeel_data::PersonId;
 use validator::Validate;
 
@@ -51,14 +51,18 @@ impl Command for CreateDiscussion {
         };
 
         let (discussion, message) = if let Some(message) = input.message {
-            let PushMessagePayload {
-                message,
-                discussion,
-            } = PushMessage::new(&discussion).run(PushMessageInput {
-                discussion_id: discussion.id,
-                sender_id: input.initiator_id,
-                message,
-            })?;
+            let message = PushMessage::new(MessageId::new())
+                .run(PushMessageInput {
+                    discussion_id: discussion.id,
+                    sender_id: input.initiator_id,
+                    message,
+                })?
+                .into_iter()
+                .find_map(|event| match event {
+                    Event::MessagePushed(event) => Some(event.message),
+                    _ => None,
+                })
+                .unwrap();
 
             (discussion, Some(message))
         } else {
