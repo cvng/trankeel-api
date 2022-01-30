@@ -37,6 +37,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
                 Event::LeaseCreated(evt) => handlers::lease_created(ctx, evt),
                 Event::LeaseDeleted(evt) => handlers::lease_deleted(ctx, evt),
                 Event::LeaseFileRequested(evt) => handlers::lease_file_requested(ctx, evt),
+                Event::LeaseUpdated(evt) => handlers::lease_updated(ctx, evt),
                 Event::LenderCreated(evt) => handlers::lender_created(ctx, evt),
                 Event::MessagePushed(evt) => handlers::message_pushed(ctx, evt),
                 Event::NoticeCreated(evt) => handlers::notice_created(ctx, evt),

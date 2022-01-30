@@ -84,7 +84,6 @@ use trankeel_ops::leases::SendReceipts;
 use trankeel_ops::leases::SendReceiptsInput;
 use trankeel_ops::leases::UpdateFurnishedLease;
 use trankeel_ops::leases::UpdateFurnishedLeaseInput;
-use trankeel_ops::leases::UpdateFurnishedLeasePayload;
 use trankeel_ops::lenders::UpdateIndividualLender;
 use trankeel_ops::lenders::UpdateIndividualLenderInput;
 use trankeel_ops::lenders::UpdateIndividualLenderPayload;
@@ -544,20 +543,19 @@ impl Client {
     }
 
     #[named]
-    pub fn update_furnished_lease(
+    pub async fn update_furnished_lease(
         &self,
         _auth_id: &AuthId,
         input: UpdateFurnishedLeaseInput,
     ) -> Result<Lease> {
         log::info!("Command: {}", function_name!());
 
-        let lease = self.0.db().leases().by_id(&input.id)?;
+        let lease_id = input.id;
+        let lease = self.0.db().leases().by_id(&lease_id)?;
 
-        let UpdateFurnishedLeasePayload { lease } = UpdateFurnishedLease::new(&lease).run(input)?;
-
-        self.0.db().leases().update(&lease)?;
-
-        Ok(lease)
+        dispatcher::dispatch(&self.0, UpdateFurnishedLease::new(&lease).run(input)?)
+            .await
+            .and_then(|_| self.leases().by_id(&lease_id))
     }
 
     #[named]

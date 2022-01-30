@@ -200,7 +200,8 @@ impl Mutation {
     ) -> Result<UpdateFurnishedLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .update_furnished_lease(ctx.data::<AuthId>()?, input)?
+            .update_furnished_lease(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
