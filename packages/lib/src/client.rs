@@ -9,6 +9,7 @@ use trankeel_core::database::Db;
 use trankeel_core::database::DiscussionStore;
 use trankeel_core::database::EventStore;
 use trankeel_core::database::FileStore;
+use trankeel_core::database::InviteStore;
 use trankeel_core::database::LeaseStore;
 use trankeel_core::database::LenderStore;
 use trankeel_core::database::MessageStore;
@@ -130,6 +131,10 @@ impl Client {
         self.0.db().accounts()
     }
 
+    pub fn invites(&self) -> Box<dyn InviteStore + '_> {
+        self.0.db().invites()
+    }
+
     pub fn balances(&self) -> Box<dyn BalanceStore + '_> {
         self.0.db().balances()
     }
@@ -244,7 +249,7 @@ impl Client {
     ) -> Result<Person> {
         log::info!("Command: {}", function_name!());
 
-        let invite = self.0.db().invites().by_token(&input.invite_token)?;
+        let invite = self.invites().by_token(&input.invite_token)?;
 
         dispatcher::dispatch(&self.0, SignupUserFromInvite::new(&invite).run(input)?)
             .await
@@ -318,8 +323,8 @@ impl Client {
     ) -> Result<Tenant> {
         log::info!("Command: {}", function_name!());
 
-        let account = self.0.db().accounts().by_auth_id(auth_id)?;
-        let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
+        let account = self.accounts().by_auth_id(auth_id)?;
+        let account_owner = self.persons().by_auth_id(auth_id)?;
 
         let CreateTenantPayload {
             tenant,
@@ -351,7 +356,7 @@ impl Client {
     ) -> Result<Tenant> {
         log::info!("Command: {}", function_name!());
 
-        let tenant = self.0.db().tenants().by_id(&input.id)?;
+        let tenant = self.tenants().by_id(&input.id)?;
 
         let UpdateTenantPayload { tenant } = UpdateTenant::new(&tenant).run(input)?;
 
@@ -373,7 +378,7 @@ impl Client {
 
         let tenant_id = DeleteTenant.run(input)?;
 
-        self.0.db().tenants().delete(&tenant_id)?;
+        self.tenants().delete(&tenant_id)?;
 
         Ok(tenant_id)
     }
@@ -387,7 +392,7 @@ impl Client {
         log::info!("Command: {}", function_name!());
 
         let property_id = PropertyId::new();
-        let account = self.0.db().accounts().by_auth_id(auth_id)?;
+        let account = self.accounts().by_auth_id(auth_id)?;
         let (lender, ..) = self
             .0
             .db()
@@ -415,7 +420,7 @@ impl Client {
         log::info!("Command: {}", function_name!());
 
         let property_id = input.id;
-        let property = self.0.db().properties().by_id(&property_id)?;
+        let property = self.properties().by_id(&property_id)?;
 
         dispatcher::dispatch(&self.0, UpdateProperty::new(&property).run(input)?).await?;
 
@@ -464,7 +469,7 @@ impl Client {
         log::info!("Command: {}", function_name!());
 
         let advertisement_id = input.id;
-        let advertisement = self.0.db().advertisements().by_id(&advertisement_id)?;
+        let advertisement = self.advertisements().by_id(&advertisement_id)?;
 
         dispatcher::dispatch(
             &self.0,
@@ -472,7 +477,7 @@ impl Client {
         )
         .await?;
 
-        self.0.db().advertisements().by_id(&advertisement_id)
+        self.advertisements().by_id(&advertisement_id)
     }
 
     #[named]
@@ -480,9 +485,9 @@ impl Client {
         log::info!("Command: {}", function_name!());
 
         let lease_id = LeaseId::new();
-        let account = self.0.db().accounts().by_auth_id(auth_id)?;
-        let account_owner = self.0.db().persons().by_auth_id(auth_id)?;
-        let (lender, ..) = self.0.db().lenders().by_account_id_first(&account.id)?;
+        let account = self.accounts().by_auth_id(auth_id)?;
+        let account_owner = self.persons().by_auth_id(auth_id)?;
+        let (lender, ..) = self.lenders().by_account_id_first(&account.id)?;
 
         dispatcher::dispatch(
             &self.0,
@@ -501,11 +506,11 @@ impl Client {
         log::info!("Command: {}", function_name!());
 
         let lease_id = LeaseId::new();
-        let account = self.0.db().accounts().by_auth_id(auth_id)?;
+        let account = self.accounts().by_auth_id(auth_id)?;
         let tenants = input
             .tenant_ids
             .iter()
-            .map(|&tenant_id| self.0.db().tenants().by_id(&tenant_id))
+            .map(|&tenant_id| self.tenants().by_id(&tenant_id))
             .collect::<Result<Vec<_>>>()?;
 
         dispatcher::dispatch(
@@ -525,7 +530,7 @@ impl Client {
         log::info!("Command: {}", function_name!());
 
         let lease_id = input.id;
-        let lease = self.0.db().leases().by_id(&lease_id)?;
+        let lease = self.leases().by_id(&lease_id)?;
 
         dispatcher::dispatch(&self.0, UpdateFurnishedLease::new(&lease).run(input)?)
             .await
@@ -556,7 +561,7 @@ impl Client {
         log::info!("Command: {}", function_name!());
 
         let lender_id = input.id;
-        let (lender, identity) = self.0.db().lenders().by_id(&lender_id)?;
+        let (lender, identity) = self.lenders().by_id(&lender_id)?;
 
         dispatcher::dispatch(
             &self.0,
