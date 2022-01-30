@@ -141,7 +141,8 @@ impl Mutation {
     ) -> Result<DeletePropertyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_property(ctx.data::<AuthId>()?, input)?
+            .delete_property(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 

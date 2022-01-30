@@ -401,7 +401,11 @@ impl Client {
             .cloned()
             .ok_or_else(|| Error::msg("lender_not_found"))?;
 
-        dispatcher::dispatch(&self.0, CreateProperty::new(property_id, &account, &lender).run(input)?).await?;
+        dispatcher::dispatch(
+            &self.0,
+            CreateProperty::new(property_id, &account, &lender).run(input)?,
+        )
+        .await?;
 
         self.properties().by_id(&property_id)
     }
@@ -431,16 +435,16 @@ impl Client {
     }
 
     #[named]
-    pub fn delete_property(
+    pub async fn delete_property(
         &self,
         _auth_id: &AuthId,
         input: DeletePropertyInput,
     ) -> Result<PropertyId> {
         log::info!("Command: {}", function_name!());
 
-        let property_id = DeleteProperty.run(input)?;
+        let property_id = input.id;
 
-        self.0.db().properties().delete(&property_id)?;
+        dispatcher::dispatch(&self.0, DeleteProperty.run(input)?).await?;
 
         Ok(property_id)
     }

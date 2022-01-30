@@ -45,6 +45,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
                 Event::PaymentCreated(evt) => handlers::payment_created(ctx, evt),
                 Event::PersonCreated(evt) => handlers::person_created(ctx, evt),
                 Event::PropertyCreated(evt) => handlers::property_created(ctx, evt),
+                Event::PropertyDeleted(evt) => handlers::property_deleted(ctx, evt),
                 Event::PropertyUpdated(evt) => handlers::property_updated(ctx, evt),
                 Event::ReceiptCreated(evt) => handlers::receipt_created(ctx, evt),
                 Event::ReceiptSent(evt) => handlers::receipt_sent(ctx, evt),

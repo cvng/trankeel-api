@@ -21,6 +21,7 @@ use trankeel_data::Notice;
 use trankeel_data::Payment;
 use trankeel_data::Person;
 use trankeel_data::Property;
+use trankeel_data::PropertyId;
 use trankeel_data::Receipt;
 use trankeel_data::Rent;
 use trankeel_data::RentId;
@@ -58,6 +59,7 @@ pub enum Event {
     PaymentCreated(PaymentCreated),
     PersonCreated(PersonCreated),
     PropertyCreated(PropertyCreated),
+    PropertyDeleted(PropertyDeleted),
     PropertyUpdated(PropertyUpdated),
     ReceiptCreated(ReceiptCreated),
     ReceiptSent(ReceiptSent),
@@ -99,6 +101,7 @@ impl fmt::Display for Event {
                 Event::PaymentCreated(_) => "payment_created",
                 Event::PersonCreated(_) => "person_created",
                 Event::PropertyCreated(_) => "property_created",
+                Event::PropertyDeleted(_) => "property_deleted",
                 Event::PropertyUpdated(_) => "property_updated",
                 Event::ReceiptCreated(_) => "receipt_created",
                 Event::ReceiptSent(_) => "receipt_sent",
@@ -159,6 +162,8 @@ impl DomainEvent for PaymentCreated {}
 impl DomainEvent for PersonCreated {}
 
 impl DomainEvent for PropertyCreated {}
+
+impl DomainEvent for PropertyDeleted {}
 
 impl DomainEvent for PropertyUpdated {}
 
@@ -434,6 +439,17 @@ pub struct PropertyCreated {
 impl From<PropertyCreated> for Event {
     fn from(item: PropertyCreated) -> Self {
         Self::PropertyCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct PropertyDeleted {
+    pub property_id: PropertyId,
+}
+
+impl From<PropertyDeleted> for Event {
+    fn from(item: PropertyDeleted) -> Self {
+        Self::PropertyDeleted(item)
     }
 }
 
