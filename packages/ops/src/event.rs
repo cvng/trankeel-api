@@ -533,8 +533,8 @@ impl From<SubscriptionRequested> for Event {
 pub struct TenantCreated {
     pub tenant: Tenant,
     pub identity: Option<Person>,
-    pub discussion: Option<Discussion>,
     pub warrants: Option<Vec<WarrantWithIdentity>>,
+    pub discussion: Option<Discussion>,
 }
 
 impl From<TenantCreated> for Event {

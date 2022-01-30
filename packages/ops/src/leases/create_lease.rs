@@ -8,7 +8,6 @@ use crate::properties::CreateProperty;
 use crate::properties::CreatePropertyInput;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
-use crate::tenants::CreateTenantPayload;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
@@ -20,7 +19,7 @@ use trankeel_data::LeaseType;
 use trankeel_data::Lender;
 use trankeel_data::Person;
 use trankeel_data::PropertyId;
-use trankeel_data::Tenant;
+use trankeel_data::TenantId;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]
@@ -113,28 +112,25 @@ impl Command for CreateLease {
         let tenants_with_identities = input
             .tenants
             .into_iter()
-            .map(|tenant_input| CreateTenant::new(&account, &account_owner, None).run(tenant_input))
+            .map(|tenant_input| {
+                CreateTenant::new(TenantId::new(), &account, &account_owner, None).run(tenant_input)
+            })
             .collect::<Result<Vec<_>>>()?
             .into_iter()
-            .map(
-                |CreateTenantPayload {
-                     tenant,
-                     identity,
-                     warrants,
-                     discussion,
-                 }| {
-                    (
-                        // Attach tenant to lease.
-                        Tenant {
-                            lease_id: Some(lease.id),
-                            ..tenant
-                        },
-                        identity,
-                        discussion,
-                        warrants,
-                    )
-                },
-            );
+            .map(|events| {
+                events
+                    .into_iter()
+                    .find_map(|event| match event {
+                        Event::TenantCreated(event) => Some((
+                            event.tenant,
+                            event.identity,
+                            event.warrants,
+                            event.discussion,
+                        )),
+                        _ => None,
+                    })
+                    .unwrap()
+            });
 
         Ok(vec![
             PropertyCreated { property }.into(),
@@ -149,12 +145,12 @@ impl Command for CreateLease {
             tenants_with_identities
                 .clone()
                 .into_iter()
-                .map(|(tenant, identity, discussion, warrants)| {
+                .map(|(tenant, identity, warrants, discussion)| {
                     TenantCreated {
                         tenant,
-                        identity: Some(identity),
-                        discussion,
+                        identity,
                         warrants,
+                        discussion,
                     }
                     .into()
                 })

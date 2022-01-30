@@ -65,7 +65,6 @@ use trankeel_ops::candidacies::CreateCandidacy;
 use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::Event;
-use trankeel_ops::event::TenantCreated;
 use trankeel_ops::event::TenantUpdated;
 use trankeel_ops::leases::CreateFurnishedLease;
 use trankeel_ops::leases::CreateFurnishedLeaseInput;
@@ -99,7 +98,6 @@ use trankeel_ops::properties::UpdateProperty;
 use trankeel_ops::properties::UpdatePropertyInput;
 use trankeel_ops::tenants::CreateTenant;
 use trankeel_ops::tenants::CreateTenantInput;
-use trankeel_ops::tenants::CreateTenantPayload;
 use trankeel_ops::tenants::DeleteTenant;
 use trankeel_ops::tenants::DeleteTenantInput;
 use trankeel_ops::tenants::UpdateTenant;
@@ -323,29 +321,17 @@ impl Client {
     ) -> Result<Tenant> {
         log::info!("Command: {}", function_name!());
 
+        let tenant_id = TenantId::new();
         let account = self.accounts().by_auth_id(auth_id)?;
         let account_owner = self.persons().by_auth_id(auth_id)?;
 
-        let CreateTenantPayload {
-            tenant,
-            identity,
-            warrants,
-            discussion,
-        } = CreateTenant::new(&account, &account_owner, None).run(input)?;
-
         dispatcher::dispatch(
             &self.0,
-            vec![TenantCreated {
-                tenant: tenant.clone(),
-                identity: Some(identity),
-                warrants,
-                discussion,
-            }
-            .into()],
+            CreateTenant::new(tenant_id, &account, &account_owner, None).run(input)?,
         )
         .await?;
 
-        Ok(tenant)
+        self.tenants().by_id(&tenant_id)
     }
 
     #[named]

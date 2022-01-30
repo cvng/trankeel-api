@@ -13,7 +13,6 @@ use crate::leases::CreateFurnishedLease;
 use crate::leases::CreateFurnishedLeaseInput;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
-use crate::tenants::CreateTenantPayload;
 use crate::workflows::CreateWorkflow;
 use crate::workflows::CreateWorkflowInput;
 use crate::workflows::CreateWorkflowPayload;
@@ -34,6 +33,7 @@ use trankeel_data::Person;
 use trankeel_data::Rent;
 use trankeel_data::StepEvent;
 use trankeel_data::Tenant;
+use trankeel_data::TenantId;
 use trankeel_data::WarrantWithIdentity;
 use trankeel_data::Workflow;
 use trankeel_data::WorkflowType;
@@ -124,13 +124,13 @@ impl Command for AcceptCandidacy {
         let rejected_candidacies = other_candidacies;
 
         // Create tenant with identity.
-        let CreateTenantPayload {
+        let (
             tenant,
-            identity: _identity,
+            _identity,
             warrants,
-            discussion: _discussion,
-        } = CreateTenant::new(&account, &account_owner, Some(&candidate)).run(
-            CreateTenantInput {
+            _discussion, //
+        ) = CreateTenant::new(TenantId::new(), &account, &account_owner, Some(&candidate))
+            .run(CreateTenantInput {
                 birthdate: candidacy.birthdate,
                 birthplace: candidacy.birthplace.clone(),
                 email: candidate.email.inner().to_string(),
@@ -140,8 +140,18 @@ impl Command for AcceptCandidacy {
                 phone_number: candidate.phone_number.clone(),
                 is_student: candidacy.is_student,
                 warrants: Some(candidacy_warrants.into_iter().map(Into::into).collect()),
-            },
-        )?;
+            })?
+            .into_iter()
+            .find_map(|event| match event {
+                Event::TenantCreated(event) => Some((
+                    event.tenant,
+                    event.identity,
+                    event.warrants,
+                    event.discussion,
+                )),
+                _ => None,
+            })
+            .unwrap();
 
         // Create unsigned lease from advertisement.
         let (lease, rents) =
