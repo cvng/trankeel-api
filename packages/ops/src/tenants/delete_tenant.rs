@@ -15,9 +15,8 @@ pub struct DeleteTenant;
 
 impl Command for DeleteTenant {
     type Input = DeleteTenantInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         Ok(vec![TenantDeleted {

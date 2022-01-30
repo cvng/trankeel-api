@@ -61,9 +61,8 @@ impl CreateWarrant {
 
 impl Command for CreateWarrant {
     type Input = CreateWarrantInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self {

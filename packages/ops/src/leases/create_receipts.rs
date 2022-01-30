@@ -35,9 +35,8 @@ impl CreateReceipts {
 
 impl Command for CreateReceipts {
     type Input = CreateReceiptsInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self { rents } = self;

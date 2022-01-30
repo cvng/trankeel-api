@@ -28,9 +28,8 @@ impl PushMessage {
 
 impl Command for PushMessage {
     type Input = PushMessageInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self { message_id } = self;

@@ -30,9 +30,8 @@ impl CreateWorkflow {
 
 impl Command for CreateWorkflow {
     type Input = CreateWorkflowInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self { workflowable } = self;

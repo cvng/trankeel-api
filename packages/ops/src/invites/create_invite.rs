@@ -34,9 +34,8 @@ impl CreateInvite {
 
 impl Command for CreateInvite {
     type Input = CreateInviteInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self { invitee } = self;

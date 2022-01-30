@@ -64,9 +64,8 @@ impl CreateProperty {
 
 impl Command for CreateProperty {
     type Input = CreatePropertyInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self {

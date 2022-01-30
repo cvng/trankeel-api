@@ -32,9 +32,8 @@ impl CompleteStep {
 
 impl Command for CompleteStep {
     type Input = CompleteStepInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self { step } = self;

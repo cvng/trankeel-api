@@ -15,9 +15,8 @@ pub struct DeleteProperty;
 
 impl Command for DeleteProperty {
     type Input = DeletePropertyInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         Ok(vec![PropertyDeleted {
