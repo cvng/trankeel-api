@@ -1,4 +1,6 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::TenantDeleted;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::TenantId;
@@ -13,11 +15,14 @@ pub struct DeleteTenant;
 
 impl Command for DeleteTenant {
     type Input = DeleteTenantInput;
-    type Payload = TenantId;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        Ok(input.id)
+        Ok(vec![TenantDeleted {
+            tenant_id: input.id,
+        }
+        .into()])
     }
 }

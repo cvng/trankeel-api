@@ -67,6 +67,7 @@ pub enum Event {
     StepCreated(StepCreated),
     SubscriptionRequested(SubscriptionRequested),
     TenantCreated(TenantCreated),
+    TenantDeleted(TenantDeleted),
     TenantUpdated(TenantUpdated),
     WarrantCreated(WarrantCreated),
     WorkflowCreated(WorkflowCreated),
@@ -110,6 +111,7 @@ impl fmt::Display for Event {
                 Event::SubscriptionRequested(_) => "subscription_requested",
                 Event::TenantCreated(_) => "tenant_created",
                 Event::TenantUpdated(_) => "tenant_updated",
+                Event::TenantDeleted(_) => "tenant_deleted",
                 Event::WarrantCreated(_) => "warrant_created",
                 Event::WorkflowCreated(_) => "workflow_created",
             }
@@ -178,6 +180,8 @@ impl DomainEvent for StepCreated {}
 impl DomainEvent for SubscriptionRequested {}
 
 impl DomainEvent for TenantCreated {}
+
+impl DomainEvent for TenantDeleted {}
 
 impl DomainEvent for TenantUpdated {}
 
@@ -540,6 +544,17 @@ pub struct TenantCreated {
 impl From<TenantCreated> for Event {
     fn from(item: TenantCreated) -> Self {
         Self::TenantCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct TenantDeleted {
+    pub tenant_id: TenantId,
+}
+
+impl From<TenantDeleted> for Event {
+    fn from(item: TenantDeleted) -> Self {
+        Self::TenantDeleted(item)
     }
 }
 

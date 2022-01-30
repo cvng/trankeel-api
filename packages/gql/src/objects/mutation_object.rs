@@ -106,7 +106,8 @@ impl Mutation {
     ) -> Result<DeleteTenantPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_tenant(ctx.data::<AuthId>()?, input)?
+            .delete_tenant(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 

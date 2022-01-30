@@ -53,6 +53,7 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
                 Event::StepCreated(evt) => handlers::step_created(ctx, evt),
                 Event::SubscriptionRequested(evt) => handlers::subscription_requested(ctx, evt),
                 Event::TenantCreated(evt) => handlers::tenant_created(ctx, evt),
+                Event::TenantDeleted(evt) => handlers::tenant_deleted(ctx, evt),
                 Event::TenantUpdated(evt) => handlers::tenant_updated(ctx, evt),
                 Event::WarrantCreated(evt) => handlers::warrant_created(ctx, evt),
                 Event::WorkflowCreated(evt) => handlers::workflow_created(ctx, evt),

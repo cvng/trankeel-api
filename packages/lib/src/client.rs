@@ -359,12 +359,16 @@ impl Client {
     }
 
     #[named]
-    pub fn delete_tenant(&self, _auth_id: &AuthId, input: DeleteTenantInput) -> Result<TenantId> {
+    pub async fn delete_tenant(
+        &self,
+        _auth_id: &AuthId,
+        input: DeleteTenantInput,
+    ) -> Result<TenantId> {
         log::info!("Command: {}", function_name!());
 
-        let tenant_id = DeleteTenant.run(input)?;
+        let tenant_id = input.id;
 
-        self.tenants().delete(&tenant_id)?;
+        dispatcher::dispatch(&self.0, DeleteTenant.run(input)?).await?;
 
         Ok(tenant_id)
     }
