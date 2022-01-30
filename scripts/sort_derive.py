@@ -1,5 +1,5 @@
 """
-Small script to sort derives. https://github.com/rust-lang/rustfmt/issues/4112
+Sort derives in Rust code to be consistent. https://github.com/rust-lang/rustfmt/issues/4112
 """
 
 import os
