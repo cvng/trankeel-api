@@ -7,13 +7,6 @@ use futures::stream::StreamExt;
 use futures::stream::TryStreamExt;
 use trankeel_ops::event::Event;
 
-pub trait Handler {
-    type Event;
-    type Payload;
-
-    fn run(self, event: Self::Event) -> crate::error::Result<Self::Payload>;
-}
-
 #[remain::check]
 pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     Pg::transaction(ctx.db(), || {

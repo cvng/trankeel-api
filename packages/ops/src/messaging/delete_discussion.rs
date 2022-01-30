@@ -15,9 +15,8 @@ pub struct DeleteDiscussion;
 
 impl Command for DeleteDiscussion {
     type Input = DeleteDiscussionInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         Ok(vec![DiscussionDeleted {

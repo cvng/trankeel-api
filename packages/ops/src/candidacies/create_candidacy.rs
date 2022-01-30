@@ -63,9 +63,8 @@ impl CreateCandidacy {
 
 impl Command for CreateCandidacy {
     type Input = CreateCandidacyInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self {

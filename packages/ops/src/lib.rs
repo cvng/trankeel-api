@@ -16,9 +16,8 @@ pub mod workflows;
 
 pub trait Command {
     type Input;
-    type Payload;
 
-    fn run(self, input: Self::Input) -> crate::error::Result<Self::Payload>;
+    fn run(self, input: Self::Input) -> crate::error::Result<Vec<crate::event::Event>>;
 }
 
 pub trait DomainEvent: Clone + Into<crate::event::Event> {}

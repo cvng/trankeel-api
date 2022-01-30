@@ -29,9 +29,8 @@ impl CreateNotices {
 
 impl Command for CreateNotices {
     type Input = CreateNoticesInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self { rents } = self;

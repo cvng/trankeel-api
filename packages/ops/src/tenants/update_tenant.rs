@@ -39,9 +39,8 @@ impl UpdateTenant {
 
 impl Command for UpdateTenant {
     type Input = UpdateTenantInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         let Self { tenant } = self;

@@ -15,9 +15,8 @@ pub struct SendReceipts;
 
 impl Command for SendReceipts {
     type Input = SendReceiptsInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         Ok(input

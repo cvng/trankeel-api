@@ -15,9 +15,8 @@ pub struct DeleteLease;
 
 impl Command for DeleteLease {
     type Input = DeleteLeaseInput;
-    type Payload = Vec<Event>;
 
-    fn run(self, input: Self::Input) -> Result<Self::Payload> {
+    fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;
 
         Ok(vec![LeaseDeleted { lease_id: input.id }.into()])
