@@ -24,17 +24,11 @@ use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
-use trankeel_data::Invite;
-use trankeel_data::Lease;
-use trankeel_data::LeaseFile;
 use trankeel_data::LeaseId;
 use trankeel_data::Person;
-use trankeel_data::Rent;
 use trankeel_data::StepEvent;
-use trankeel_data::Tenant;
 use trankeel_data::TenantId;
 use trankeel_data::WarrantWithIdentity;
-use trankeel_data::Workflow;
 use trankeel_data::WorkflowType;
 use trankeel_data::Workflowable;
 use validator::Validate;
@@ -42,21 +36,6 @@ use validator::Validate;
 #[derive(InputObject, Validate)]
 pub struct AcceptCandidacyInput {
     pub id: CandidacyId,
-}
-
-pub struct AcceptCandidacyPayload {
-    pub candidacy: Candidacy,
-    pub rejected_candidacies: Vec<Candidacy>,
-    pub tenant: Tenant,
-    pub identity: Person,
-    pub warrants: Option<Vec<WarrantWithIdentity>>,
-    pub discussion: Discussion,
-    pub lease: Lease,
-    pub rents: Vec<Rent>,
-    pub lease_file: LeaseFile,
-    pub workflow: Workflow,
-    pub workflowable: Workflowable,
-    pub invite: Invite,
 }
 
 pub struct AcceptCandidacy {
