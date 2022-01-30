@@ -64,7 +64,6 @@ use trankeel_ops::candidacies::CreateCandidacy;
 use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::Event;
-use trankeel_ops::event::PropertyUpdated;
 use trankeel_ops::event::TenantCreated;
 use trankeel_ops::event::TenantUpdated;
 use trankeel_ops::leases::CreateFurnishedLease;
@@ -97,7 +96,6 @@ use trankeel_ops::properties::UpdateAdvertisement;
 use trankeel_ops::properties::UpdateAdvertisementInput;
 use trankeel_ops::properties::UpdateProperty;
 use trankeel_ops::properties::UpdatePropertyInput;
-use trankeel_ops::properties::UpdatePropertyPayload;
 use trankeel_ops::tenants::CreateTenant;
 use trankeel_ops::tenants::CreateTenantInput;
 use trankeel_ops::tenants::CreateTenantPayload;
@@ -416,20 +414,12 @@ impl Client {
     ) -> Result<Property> {
         log::info!("Command: {}", function_name!());
 
-        let property = self.0.db().properties().by_id(&input.id)?;
+        let property_id = input.id;
+        let property = self.0.db().properties().by_id(&property_id)?;
 
-        let UpdatePropertyPayload { property } = UpdateProperty::new(&property).run(input)?;
+        dispatcher::dispatch(&self.0, UpdateProperty::new(&property).run(input)?).await?;
 
-        dispatcher::dispatch(
-            &self.0,
-            vec![PropertyUpdated {
-                property: property.clone(),
-            }
-            .into()],
-        )
-        .await?;
-
-        Ok(property)
+        self.properties().by_id(&property_id)
     }
 
     #[named]
