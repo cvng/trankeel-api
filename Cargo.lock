@@ -65,9 +65,9 @@ checksum = "71938f30533e4d95a6d17aa530939da3842c2ab6f4f84b9dae68447e4129f74a"
 
 [[package]]
 name = "async-graphql"
-version = "3.0.20"
+version = "3.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7b72874e1b4bebe34cfd204a0d938225a7e25714315a5f714173842b6d16849"
+checksum = "ce1b92ce50a9e7a9a4d571e0988715d40468361ec66a5013d7d9e890f46ce5ba"
 dependencies = [
  "async-graphql-derive",
  "async-graphql-parser",
@@ -97,9 +97,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-derive"
-version = "3.0.20"
+version = "3.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "646536d653be53fa2ff831d7a4083367d2ea7e333e5710e540596721e598ecad"
+checksum = "c98da5e8c6bbb70d43db36d27b76cc19e84e3029980b734a81b679fb6dae0a00"
 dependencies = [
  "Inflector",
  "async-graphql-parser",
@@ -113,9 +113,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-parser"
-version = "3.0.20"
+version = "3.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b47576aba6c1474888689c5d67a2a7b7f9f650d3122157e00fa14f0c01945f8a"
+checksum = "8c7a1025d329db8c7080337a32c8056ffb0c7c98e8ee8a7cc78260c55fb207d1"
 dependencies = [
  "async-graphql-value",
  "pest",
@@ -126,9 +126,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-rocket"
-version = "3.0.20"
+version = "3.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db619d7164b608529e39b186b0f753ff34ef1d91c83e50a936568bf3a140e73c"
+checksum = "12f4675b8b0116b4ce69506db3b3f73f2af82a1c6bbfc2e109486c491720a231"
 dependencies = [
  "async-graphql",
  "rocket",
@@ -139,9 +139,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-value"
-version = "3.0.20"
+version = "3.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28a266653068d17107cc3b5d9d9eb245b1a49a43501b2317af4f1959624346d5"
+checksum = "8da25b10dd085879d6227967bc6932bea8fed95735873ac82fa2ec65b2cc89ba"
 dependencies = [
  "bytes 1.1.0",
  "indexmap",
