@@ -224,7 +224,8 @@ impl Mutation {
     ) -> Result<UpdateIndividualLenderPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .update_individual_lender(ctx.data::<AuthId>()?, input)?
+            .update_individual_lender(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 

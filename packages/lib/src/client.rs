@@ -39,7 +39,6 @@ use trankeel_data::CandidacyId;
 use trankeel_data::DiscussionId;
 use trankeel_data::Lease;
 use trankeel_data::LeaseId;
-use trankeel_data::LegalIdentity;
 use trankeel_data::Lender;
 use trankeel_data::LenderId;
 use trankeel_data::Message;
@@ -86,7 +85,6 @@ use trankeel_ops::leases::UpdateFurnishedLease;
 use trankeel_ops::leases::UpdateFurnishedLeaseInput;
 use trankeel_ops::lenders::UpdateIndividualLender;
 use trankeel_ops::lenders::UpdateIndividualLenderInput;
-use trankeel_ops::lenders::UpdateIndividualLenderPayload;
 use trankeel_ops::messaging::push_message2::PushMessage;
 use trankeel_ops::messaging::DeleteDiscussion;
 use trankeel_ops::messaging::DeleteDiscussionInput;
@@ -574,25 +572,22 @@ impl Client {
     }
 
     #[named]
-    pub fn update_individual_lender(
+    pub async fn update_individual_lender(
         &self,
         _auth_id: &AuthId,
         input: UpdateIndividualLenderInput,
     ) -> Result<Lender> {
         log::info!("Command: {}", function_name!());
 
-        let (lender, identity) = self.0.db().lenders().by_id(&input.id)?;
+        let lender_id = input.id;
+        let (lender, identity) = self.0.db().lenders().by_id(&lender_id)?;
 
-        let UpdateIndividualLenderPayload {
-            lender: (lender, identity),
-        } = UpdateIndividualLender::new(&(lender, identity)).run(input)?;
-
-        match identity {
-            LegalIdentity::Individual(person) => self.0.db().persons().update(&person)?,
-            _ => return Err(Error::msg("lender is not an individual")),
-        };
-
-        Ok(lender)
+        dispatcher::dispatch(
+            &self.0,
+            UpdateIndividualLender::new(&(lender, identity)).run(input)?,
+        )
+        .await
+        .and_then(|_| Ok(self.lenders().by_id(&lender_id)?.0))
     }
 
     #[named]

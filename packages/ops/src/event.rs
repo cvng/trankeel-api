@@ -14,6 +14,7 @@ use trankeel_data::Invite;
 use trankeel_data::InviteId;
 use trankeel_data::Lease;
 use trankeel_data::LeaseId;
+use trankeel_data::LegalIdentity;
 use trankeel_data::Lender;
 use trankeel_data::Message;
 use trankeel_data::Notice;
@@ -51,6 +52,7 @@ pub enum Event {
     LeaseFileRequested(LeaseFileRequested),
     LeaseUpdated(LeaseUpdated),
     LenderCreated(LenderCreated),
+    LenderUpdated(LenderUpdated),
     MessagePushed(MessagePushed),
     NoticeCreated(NoticeCreated),
     PaymentCreated(PaymentCreated),
@@ -91,6 +93,7 @@ impl fmt::Display for Event {
                 Event::LeaseFileRequested(_) => "lease_file_requested",
                 Event::LeaseUpdated(_) => "lease_updated",
                 Event::LenderCreated(_) => "lender_created",
+                Event::LenderUpdated(_) => "lender_updated",
                 Event::MessagePushed(_) => "message_pushed",
                 Event::NoticeCreated(_) => "notice_created",
                 Event::PaymentCreated(_) => "payment_created",
@@ -144,6 +147,8 @@ impl DomainEvent for LeaseFileRequested {}
 impl DomainEvent for LeaseUpdated {}
 
 impl DomainEvent for LenderCreated {}
+
+impl DomainEvent for LenderUpdated {}
 
 impl DomainEvent for MessagePushed {}
 
@@ -360,6 +365,18 @@ pub struct LenderCreated {
 impl From<LenderCreated> for Event {
     fn from(item: LenderCreated) -> Self {
         Self::LenderCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct LenderUpdated {
+    pub lender: Lender,
+    pub identity: LegalIdentity,
+}
+
+impl From<LenderUpdated> for Event {
+    fn from(item: LenderUpdated) -> Self {
+        Self::LenderUpdated(item)
     }
 }
 
