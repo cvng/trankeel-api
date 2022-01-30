@@ -1,4 +1,6 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::ReceiptSent;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::RentId;
@@ -13,11 +15,15 @@ pub struct SendReceipts;
 
 impl Command for SendReceipts {
     type Input = SendReceiptsInput;
-    type Payload = Vec<RentId>;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        Ok(input.rent_ids)
+        Ok(input
+            .rent_ids
+            .into_iter()
+            .map(|rent_id| ReceiptSent { rent_id }.into())
+            .collect())
     }
 }

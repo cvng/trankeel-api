@@ -10,10 +10,8 @@ use crate::event::WarrantCreated;
 use crate::files::CreateFileInput;
 use crate::messaging::CreateDiscussion;
 use crate::messaging::CreateDiscussionInput;
-use crate::messaging::CreateDiscussionPayload;
 use crate::warrants::CreateWarrant;
 use crate::warrants::CreateWarrantInput;
-use crate::warrants::CreateWarrantPayload;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
@@ -76,7 +74,7 @@ impl Command for CreateCandidacy {
             account_owner,
         } = self;
 
-        let PersonCreated { person: candidate } = CreatePerson::new(&account) //
+        let candidate = CreatePerson::new(&account)
             .run(CreatePersonInput {
                 email: input.email.into(),
                 first_name: input.first_name,
@@ -87,7 +85,7 @@ impl Command for CreateCandidacy {
             })?
             .into_iter()
             .find_map(|event| match event {
-                Event::PersonCreated(event) => Some(event),
+                Event::PersonCreated(event) => Some(event.person),
                 _ => None,
             })
             .unwrap();
@@ -112,20 +110,29 @@ impl Command for CreateCandidacy {
                 .map(|input| CreateWarrant::new(&account, None, Some(&candidacy)).run(input))
                 .collect::<Result<Vec<_>>>()?
                 .into_iter()
-                .map(|CreateWarrantPayload { warrant }| Some(warrant))
+                .map(|events| {
+                    events.into_iter().find_map(|event| match event {
+                        Event::WarrantCreated(event) => Some(event.warrant),
+                        _ => None,
+                    })
+                })
                 .collect::<Option<Vec<_>>>()
         } else {
             None
         };
 
-        let CreateDiscussionPayload {
-            discussion,
-            message,
-        } = CreateDiscussion::new(&account).run(CreateDiscussionInput {
-            recipient_id: account_owner.id,
-            initiator_id: candidate.id,
-            message: Some(candidacy.description.clone()),
-        })?;
+        let (discussion, message) = CreateDiscussion::new(&account)
+            .run(CreateDiscussionInput {
+                recipient_id: account_owner.id,
+                initiator_id: candidate.id,
+                message: Some(candidacy.description.clone()),
+            })?
+            .into_iter()
+            .find_map(|event| match event {
+                Event::DiscussionCreated(event) => Some((event.discussion, event.message)),
+                _ => None,
+            })
+            .unwrap();
 
         let messages = vec![message].into_iter().flatten();
 
@@ -138,7 +145,11 @@ impl Command for CreateCandidacy {
         Ok(vec![
             PersonCreated { person: candidate }.into(),
             CandidacyCreated { candidacy }.into(),
-            DiscussionCreated { discussion }.into(),
+            DiscussionCreated {
+                discussion,
+                message: None,
+            }
+            .into(),
         ]
         .into_iter()
         .chain(

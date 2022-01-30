@@ -11,13 +11,10 @@ use crate::event::TenantCreated;
 use crate::event::WorkflowCreated;
 use crate::leases::CreateFurnishedLease;
 use crate::leases::CreateFurnishedLeaseInput;
-use crate::leases::CreateFurnishedLeasePayload;
 use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
-use crate::tenants::CreateTenantPayload;
 use crate::workflows::CreateWorkflow;
 use crate::workflows::CreateWorkflowInput;
-use crate::workflows::CreateWorkflowPayload;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::workflow_steps;
@@ -27,15 +24,11 @@ use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
-use trankeel_data::Invite;
-use trankeel_data::Lease;
-use trankeel_data::LeaseFile;
+use trankeel_data::LeaseId;
 use trankeel_data::Person;
-use trankeel_data::Rent;
 use trankeel_data::StepEvent;
-use trankeel_data::Tenant;
+use trankeel_data::TenantId;
 use trankeel_data::WarrantWithIdentity;
-use trankeel_data::Workflow;
 use trankeel_data::WorkflowType;
 use trankeel_data::Workflowable;
 use validator::Validate;
@@ -43,21 +36,6 @@ use validator::Validate;
 #[derive(InputObject, Validate)]
 pub struct AcceptCandidacyInput {
     pub id: CandidacyId,
-}
-
-pub struct AcceptCandidacyPayload {
-    pub candidacy: Candidacy,
-    pub rejected_candidacies: Vec<Candidacy>,
-    pub tenant: Tenant,
-    pub identity: Person,
-    pub warrants: Option<Vec<WarrantWithIdentity>>,
-    pub discussion: Discussion,
-    pub lease: Lease,
-    pub rents: Vec<Rent>,
-    pub lease_file: LeaseFile,
-    pub workflow: Workflow,
-    pub workflowable: Workflowable,
-    pub invite: Invite,
 }
 
 pub struct AcceptCandidacy {
@@ -124,13 +102,13 @@ impl Command for AcceptCandidacy {
         let rejected_candidacies = other_candidacies;
 
         // Create tenant with identity.
-        let CreateTenantPayload {
+        let (
             tenant,
-            identity: _identity,
+            _identity,
             warrants,
-            discussion: _discussion,
-        } = CreateTenant::new(&account, &account_owner, Some(&candidate)).run(
-            CreateTenantInput {
+            _discussion, //
+        ) = CreateTenant::new(TenantId::new(), &account, &account_owner, Some(&candidate))
+            .run(CreateTenantInput {
                 birthdate: candidacy.birthdate,
                 birthplace: candidacy.birthplace.clone(),
                 email: candidate.email.inner().to_string(),
@@ -140,38 +118,56 @@ impl Command for AcceptCandidacy {
                 phone_number: candidate.phone_number.clone(),
                 is_student: candidacy.is_student,
                 warrants: Some(candidacy_warrants.into_iter().map(Into::into).collect()),
-            },
-        )?;
+            })?
+            .into_iter()
+            .find_map(|event| match event {
+                Event::TenantCreated(event) => Some((
+                    event.tenant,
+                    event.identity,
+                    event.warrants,
+                    event.discussion,
+                )),
+                _ => None,
+            })
+            .unwrap();
 
         // Create unsigned lease from advertisement.
-        let CreateFurnishedLeasePayload {
-            lease,
-            rents,
-            tenants: _tenants,
-        } = CreateFurnishedLease::new(&account, &vec![tenant.clone()]).run(
-            CreateFurnishedLeaseInput {
-                details: None,
-                deposit_amount: advertisement.deposit_amount,
-                effect_date: advertisement.effect_date,
-                renew_date: None,
-                file: None,
-                property_id: advertisement.property_id,
-                rent_amount: advertisement.rent_amount,
-                rent_charges_amount: advertisement.rent_charges_amount,
-                signature_date: None,
-                tenant_ids: vec![tenant.id],
-            },
-        )?;
+        let (lease, rents) =
+            CreateFurnishedLease::new(LeaseId::new(), &account, &vec![tenant.clone()])
+                .run(CreateFurnishedLeaseInput {
+                    details: None,
+                    deposit_amount: advertisement.deposit_amount,
+                    effect_date: advertisement.effect_date,
+                    renew_date: None,
+                    file: None,
+                    property_id: advertisement.property_id,
+                    rent_amount: advertisement.rent_amount,
+                    rent_charges_amount: advertisement.rent_charges_amount,
+                    signature_date: None,
+                    tenant_ids: vec![tenant.id],
+                })?
+                .into_iter()
+                .find_map(|event| match event {
+                    Event::LeaseCreated(event) => Some((event.lease, event.rents)),
+                    _ => None,
+                })
+                .unwrap();
 
         // Create workflowable.
         let workflowable = Workflowable::Candidacy(candidacy.clone());
 
         // Setup candidacy workflow.
-        let CreateWorkflowPayload { workflow } = CreateWorkflow::new(&workflowable) //
+        let workflow = CreateWorkflow::new(&workflowable) //
             .run(CreateWorkflowInput {
                 type_: WorkflowType::Candidacy,
                 workflowable_id: candidacy.id,
-            })?;
+            })?
+            .into_iter()
+            .find_map(|event| match event {
+                Event::WorkflowCreated(event) => Some(event.workflow),
+                _ => None,
+            })
+            .unwrap();
 
         let steps = workflow_steps(&workflow);
 

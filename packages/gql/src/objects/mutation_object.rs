@@ -106,7 +106,8 @@ impl Mutation {
     ) -> Result<DeleteTenantPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_tenant(ctx.data::<AuthId>()?, input)?
+            .delete_tenant(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -141,7 +142,8 @@ impl Mutation {
     ) -> Result<DeletePropertyPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_property(ctx.data::<AuthId>()?, input)?
+            .delete_property(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -200,7 +202,8 @@ impl Mutation {
     ) -> Result<UpdateFurnishedLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .update_furnished_lease(ctx.data::<AuthId>()?, input)?
+            .update_furnished_lease(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -211,7 +214,8 @@ impl Mutation {
     ) -> Result<DeleteLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .delete_lease(ctx.data::<AuthId>()?, input)?
+            .delete_lease(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 
@@ -222,7 +226,8 @@ impl Mutation {
     ) -> Result<UpdateIndividualLenderPayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .update_individual_lender(ctx.data::<AuthId>()?, input)?
+            .update_individual_lender(ctx.data::<AuthId>()?, input)
+            .await?
             .into())
     }
 

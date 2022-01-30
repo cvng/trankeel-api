@@ -1,5 +1,8 @@
 use crate::error::Error;
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::LeaseAffected;
+use crate::event::LeaseCreated;
 use crate::files::CreateFileInput;
 use crate::Command;
 use async_graphql::InputObject;
@@ -15,7 +18,6 @@ use trankeel_data::LeaseRentReferenceIrl;
 use trankeel_data::LeaseType;
 use trankeel_data::NakedLeaseDuration;
 use trankeel_data::PropertyId;
-use trankeel_data::Rent;
 use trankeel_data::RentChargesRecuperationMode;
 use trankeel_data::RentPaymentMethod;
 use trankeel_data::Tenant;
@@ -87,20 +89,16 @@ pub struct CreateNakedLeaseInput {
     pub details: Option<NakedLeaseDetailsInput>,
 }
 
-pub struct CreateFurnishedLeasePayload {
-    pub lease: Lease,
-    pub rents: Vec<Rent>,
-    pub tenants: Vec<Tenant>,
-}
-
 pub struct CreateFurnishedLease {
+    lease_id: LeaseId,
     account: Account,
     tenants: Vec<Tenant>,
 }
 
 impl CreateFurnishedLease {
-    pub fn new(account: &Account, tenants: &[Tenant]) -> Self {
+    pub fn new(lease_id: LeaseId, account: &Account, tenants: &[Tenant]) -> Self {
         Self {
+            lease_id,
             account: account.clone(),
             tenants: tenants.to_vec(),
         }
@@ -109,12 +107,16 @@ impl CreateFurnishedLease {
 
 impl Command for CreateFurnishedLease {
     type Input = CreateFurnishedLeaseInput;
-    type Payload = CreateFurnishedLeasePayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let Self { account, tenants } = self;
+        let Self {
+            lease_id,
+            account,
+            tenants,
+        } = self;
 
         // Check signature date.
         if let Some(signature_date) = input.signature_date {
@@ -132,7 +134,7 @@ impl Command for CreateFurnishedLease {
 
         // Create lease.
         let lease = Lease {
-            id: LeaseId::new(),
+            id: lease_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             details: input.details.map(Into::into),
@@ -154,19 +156,30 @@ impl Command for CreateFurnishedLease {
         let rents = lease.rents();
 
         // Update status for existing tenants.
-        let tenants = tenants
-            .into_iter()
-            .map(|tenant| Tenant {
-                lease_id: Some(lease.id),
-                ..tenant
-            })
-            .collect();
+        let tenants = tenants.into_iter().map(|tenant| Tenant {
+            lease_id: Some(lease.id),
+            ..tenant
+        });
 
-        Ok(Self::Payload {
-            lease,
+        Ok(vec![LeaseCreated {
+            lease: lease.clone(),
             rents,
-            tenants,
-        })
+        }
+        .into()]
+        .into_iter()
+        .chain(
+            tenants
+                .into_iter()
+                .map(|tenant| {
+                    LeaseAffected {
+                        lease_id: lease.id,
+                        tenant_id: tenant.id,
+                    }
+                    .into()
+                })
+                .collect::<Vec<_>>(),
+        )
+        .collect())
     }
 }
 

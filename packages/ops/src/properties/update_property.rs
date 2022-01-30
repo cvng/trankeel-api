@@ -1,5 +1,7 @@
 use crate::auth::AddressInput;
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::PropertyUpdated;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Amount;
@@ -40,10 +42,6 @@ pub struct UpdatePropertyInput {
     pub water_heating_method: Option<PropertyUsageType>,
 }
 
-pub struct UpdatePropertyPayload {
-    pub property: Property,
-}
-
 pub struct UpdateProperty {
     property: Property,
 }
@@ -58,7 +56,7 @@ impl UpdateProperty {
 
 impl Command for UpdateProperty {
     type Input = UpdatePropertyInput;
-    type Payload = UpdatePropertyPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -90,6 +88,6 @@ impl Command for UpdateProperty {
             ..property
         };
 
-        Ok(Self::Payload { property })
+        Ok(vec![PropertyUpdated { property }.into()])
     }
 }

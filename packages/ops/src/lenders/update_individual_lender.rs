@@ -1,6 +1,8 @@
 use crate::auth::UpdatePersonInput;
 use crate::error::Error;
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::LenderUpdated;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::LegalIdentity;
@@ -13,10 +15,6 @@ use validator::Validate;
 pub struct UpdateIndividualLenderInput {
     pub id: LenderId,
     pub individual: UpdatePersonInput,
-}
-
-pub struct UpdateIndividualLenderPayload {
-    pub lender: LenderWithIdentity,
 }
 
 pub struct UpdateIndividualLender {
@@ -33,7 +31,7 @@ impl UpdateIndividualLender {
 
 impl Command for UpdateIndividualLender {
     type Input = UpdateIndividualLenderInput;
-    type Payload = UpdateIndividualLenderPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -60,8 +58,10 @@ impl Command for UpdateIndividualLender {
             ..invididual
         };
 
-        let lender = (lender, invididual.into());
-
-        Ok(Self::Payload { lender })
+        Ok(vec![LenderUpdated {
+            lender,
+            identity: invididual.into(),
+        }
+        .into()])
     }
 }

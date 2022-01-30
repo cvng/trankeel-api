@@ -1,4 +1,6 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::WorkflowCreated;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Workflow;
@@ -12,10 +14,6 @@ use validator::Validate;
 pub struct CreateWorkflowInput {
     pub type_: WorkflowType,
     pub workflowable_id: WorkflowableId,
-}
-
-pub struct CreateWorkflowPayload {
-    pub workflow: Workflow,
 }
 
 pub struct CreateWorkflow {
@@ -32,7 +30,7 @@ impl CreateWorkflow {
 
 impl Command for CreateWorkflow {
     type Input = CreateWorkflowInput;
-    type Payload = CreateWorkflowPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -48,6 +46,10 @@ impl Command for CreateWorkflow {
             completed: Default::default(),
         };
 
-        Ok(Self::Payload { workflow })
+        Ok(vec![WorkflowCreated {
+            workflow,
+            workflowable,
+        }
+        .into()])
     }
 }

@@ -1,8 +1,8 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::MessagePushed;
 use crate::Command;
 use async_graphql::InputObject;
-use chrono::Utc;
-use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Message;
 use trankeel_data::MessageId;
@@ -16,34 +16,27 @@ pub struct PushMessageInput {
     pub message: String,
 }
 
-pub struct PushMessagePayload {
-    pub message: Message,
-    pub discussion: Discussion,
-}
-
 pub struct PushMessage {
-    discussion: Discussion,
+    pub message_id: MessageId,
 }
 
 impl PushMessage {
-    pub fn new(discussion: &Discussion) -> Self {
-        Self {
-            discussion: discussion.clone(),
-        }
+    pub fn new(message_id: MessageId) -> Self {
+        Self { message_id }
     }
 }
 
 impl Command for PushMessage {
     type Input = PushMessageInput;
-    type Payload = PushMessagePayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
-        let Self { discussion } = self;
+        let Self { message_id } = self;
 
         let message = Message {
-            id: MessageId::new(),
+            id: message_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             discussion_id: input.discussion_id,
@@ -52,14 +45,6 @@ impl Command for PushMessage {
             event_id: None,
         };
 
-        let discussion = Discussion {
-            updated_at: Some(Utc::now().into()), // Touch updated_at.
-            ..discussion
-        };
-
-        Ok(Self::Payload {
-            message,
-            discussion,
-        })
+        Ok(vec![MessagePushed { message }.into()])
     }
 }

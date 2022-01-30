@@ -1,5 +1,7 @@
 use super::FurnishedLeaseDetailsInput;
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::LeaseUpdated;
 use crate::files::CreateFileInput;
 use crate::Command;
 use async_graphql::InputObject;
@@ -12,10 +14,6 @@ pub struct UpdateFurnishedLeaseInput {
     pub details: Option<FurnishedLeaseDetailsInput>,
     pub file: Option<CreateFileInput>, // TODO
     pub id: LeaseId,
-}
-
-pub struct UpdateFurnishedLeasePayload {
-    pub lease: Lease,
 }
 
 pub struct UpdateFurnishedLease {
@@ -32,7 +30,7 @@ impl UpdateFurnishedLease {
 
 impl Command for UpdateFurnishedLease {
     type Input = UpdateFurnishedLeaseInput;
-    type Payload = UpdateFurnishedLeasePayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -45,6 +43,6 @@ impl Command for UpdateFurnishedLease {
             ..lease
         };
 
-        Ok(Self::Payload { lease })
+        Ok(vec![LeaseUpdated { lease }.into()])
     }
 }

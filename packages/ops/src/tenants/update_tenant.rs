@@ -1,4 +1,6 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::TenantUpdated;
 use crate::warrants::CreateWarrantInput;
 use crate::Command;
 use async_graphql::InputObject;
@@ -23,10 +25,6 @@ pub struct UpdateTenantInput {
     pub warrants: Option<Vec<CreateWarrantInput>>, // TODO
 }
 
-pub struct UpdateTenantPayload {
-    pub tenant: Tenant,
-}
-
 pub struct UpdateTenant {
     tenant: Tenant,
 }
@@ -41,7 +39,7 @@ impl UpdateTenant {
 
 impl Command for UpdateTenant {
     type Input = UpdateTenantInput;
-    type Payload = UpdateTenantPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -61,6 +59,6 @@ impl Command for UpdateTenant {
             ..tenant
         };
 
-        Ok(Self::Payload { tenant })
+        Ok(vec![TenantUpdated { tenant }.into()])
     }
 }

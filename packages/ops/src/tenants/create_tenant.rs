@@ -1,22 +1,20 @@
 use crate::error::Result;
+use crate::event::Event;
+use crate::event::TenantCreated;
 use crate::messaging::CreateDiscussion;
 use crate::messaging::CreateDiscussionInput;
-use crate::messaging::CreateDiscussionPayload;
 use crate::warrants::CreateWarrant;
 use crate::warrants::CreateWarrantInput;
-use crate::warrants::CreateWarrantPayload;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
 use trankeel_data::Date;
-use trankeel_data::Discussion;
 use trankeel_data::Person;
 use trankeel_data::PersonId;
 use trankeel_data::PersonRole;
 use trankeel_data::PhoneNumber;
 use trankeel_data::Tenant;
 use trankeel_data::TenantId;
-use trankeel_data::WarrantWithIdentity;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]
@@ -33,23 +31,22 @@ pub struct CreateTenantInput {
     pub warrants: Option<Vec<CreateWarrantInput>>,
 }
 
-#[derive(Clone)]
-pub struct CreateTenantPayload {
-    pub tenant: Tenant,
-    pub identity: Person,
-    pub warrants: Option<Vec<WarrantWithIdentity>>,
-    pub discussion: Option<Discussion>,
-}
-
 pub struct CreateTenant {
+    tenant_id: TenantId,
     account: Account,
     account_owner: Person,
     identity: Option<Person>,
 }
 
 impl CreateTenant {
-    pub fn new(account: &Account, account_owner: &Person, identity: Option<&Person>) -> Self {
+    pub fn new(
+        tenant_id: TenantId,
+        account: &Account,
+        account_owner: &Person,
+        identity: Option<&Person>,
+    ) -> Self {
         Self {
+            tenant_id,
             account: account.clone(),
             account_owner: account_owner.clone(),
             identity: identity.cloned(),
@@ -59,12 +56,13 @@ impl CreateTenant {
 
 impl Command for CreateTenant {
     type Input = CreateTenantInput;
-    type Payload = CreateTenantPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
 
         let Self {
+            tenant_id,
             account,
             account_owner,
             identity,
@@ -90,7 +88,7 @@ impl Command for CreateTenant {
 
         // Create tenant profile.
         let tenant = Tenant {
-            id: TenantId::new(),
+            id: tenant_id,
             created_at: Default::default(),
             updated_at: Default::default(),
             account_id: account.id,
@@ -113,7 +111,12 @@ impl Command for CreateTenant {
                 .map(|input| CreateWarrant::new(&account, Some(&tenant), None).run(input))
                 .collect::<Result<Vec<_>>>()?
                 .into_iter()
-                .map(|CreateWarrantPayload { warrant }| Some(warrant))
+                .map(|events| {
+                    events.into_iter().find_map(|event| match event {
+                        Event::WarrantCreated(event) => Some(event.warrant),
+                        _ => None,
+                    })
+                })
                 .collect()
         } else {
             None
@@ -126,17 +129,22 @@ impl Command for CreateTenant {
                     recipient_id: account_owner.id,
                     initiator_id: identity.id,
                     message: None,
+                })?
+                .into_iter()
+                .find_map(|event| match event {
+                    Event::DiscussionCreated(event) => Some(event.discussion),
+                    _ => None,
                 })
-                .map(|CreateDiscussionPayload { discussion, .. }| Some(discussion))?
         } else {
             None
         };
 
-        Ok(Self::Payload {
+        Ok(vec![TenantCreated {
             tenant,
-            identity,
+            identity: Some(identity),
             warrants,
             discussion,
-        })
+        }
+        .into()])
     }
 }

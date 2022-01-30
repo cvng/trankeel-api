@@ -14,12 +14,14 @@ use trankeel_data::Invite;
 use trankeel_data::InviteId;
 use trankeel_data::Lease;
 use trankeel_data::LeaseId;
+use trankeel_data::LegalIdentity;
 use trankeel_data::Lender;
 use trankeel_data::Message;
 use trankeel_data::Notice;
 use trankeel_data::Payment;
 use trankeel_data::Person;
 use trankeel_data::Property;
+use trankeel_data::PropertyId;
 use trankeel_data::Receipt;
 use trankeel_data::Rent;
 use trankeel_data::RentId;
@@ -47,13 +49,17 @@ pub enum Event {
     InviteCreated(InviteCreated),
     LeaseAffected(LeaseAffected),
     LeaseCreated(LeaseCreated),
+    LeaseDeleted(LeaseDeleted),
     LeaseFileRequested(LeaseFileRequested),
+    LeaseUpdated(LeaseUpdated),
     LenderCreated(LenderCreated),
+    LenderUpdated(LenderUpdated),
     MessagePushed(MessagePushed),
     NoticeCreated(NoticeCreated),
     PaymentCreated(PaymentCreated),
     PersonCreated(PersonCreated),
     PropertyCreated(PropertyCreated),
+    PropertyDeleted(PropertyDeleted),
     PropertyUpdated(PropertyUpdated),
     ReceiptCreated(ReceiptCreated),
     ReceiptSent(ReceiptSent),
@@ -61,6 +67,7 @@ pub enum Event {
     StepCreated(StepCreated),
     SubscriptionRequested(SubscriptionRequested),
     TenantCreated(TenantCreated),
+    TenantDeleted(TenantDeleted),
     TenantUpdated(TenantUpdated),
     WarrantCreated(WarrantCreated),
     WorkflowCreated(WorkflowCreated),
@@ -85,13 +92,17 @@ impl fmt::Display for Event {
                 Event::InviteCreated(_) => "invite_created",
                 Event::LeaseAffected(_) => "lease_affected",
                 Event::LeaseCreated(_) => "lease_created",
+                Event::LeaseDeleted(_) => "lease_deleted",
                 Event::LeaseFileRequested(_) => "lease_file_requested",
+                Event::LeaseUpdated(_) => "lease_updated",
                 Event::LenderCreated(_) => "lender_created",
+                Event::LenderUpdated(_) => "lender_updated",
                 Event::MessagePushed(_) => "message_pushed",
                 Event::NoticeCreated(_) => "notice_created",
                 Event::PaymentCreated(_) => "payment_created",
                 Event::PersonCreated(_) => "person_created",
                 Event::PropertyCreated(_) => "property_created",
+                Event::PropertyDeleted(_) => "property_deleted",
                 Event::PropertyUpdated(_) => "property_updated",
                 Event::ReceiptCreated(_) => "receipt_created",
                 Event::ReceiptSent(_) => "receipt_sent",
@@ -100,6 +111,7 @@ impl fmt::Display for Event {
                 Event::SubscriptionRequested(_) => "subscription_requested",
                 Event::TenantCreated(_) => "tenant_created",
                 Event::TenantUpdated(_) => "tenant_updated",
+                Event::TenantDeleted(_) => "tenant_deleted",
                 Event::WarrantCreated(_) => "warrant_created",
                 Event::WorkflowCreated(_) => "workflow_created",
             }
@@ -133,7 +145,15 @@ impl DomainEvent for LeaseAffected {}
 
 impl DomainEvent for LeaseCreated {}
 
+impl DomainEvent for LeaseDeleted {}
+
+impl DomainEvent for LeaseFileRequested {}
+
+impl DomainEvent for LeaseUpdated {}
+
 impl DomainEvent for LenderCreated {}
+
+impl DomainEvent for LenderUpdated {}
 
 impl DomainEvent for MessagePushed {}
 
@@ -144,6 +164,8 @@ impl DomainEvent for PaymentCreated {}
 impl DomainEvent for PersonCreated {}
 
 impl DomainEvent for PropertyCreated {}
+
+impl DomainEvent for PropertyDeleted {}
 
 impl DomainEvent for PropertyUpdated {}
 
@@ -158,6 +180,8 @@ impl DomainEvent for StepCreated {}
 impl DomainEvent for SubscriptionRequested {}
 
 impl DomainEvent for TenantCreated {}
+
+impl DomainEvent for TenantDeleted {}
 
 impl DomainEvent for TenantUpdated {}
 
@@ -232,6 +256,7 @@ impl From<CandidacyRejected> for Event {
 #[derive(Clone)]
 pub struct DiscussionCreated {
     pub discussion: Discussion,
+    pub message: Option<Message>,
 }
 
 impl From<DiscussionCreated> for Event {
@@ -310,6 +335,17 @@ impl From<LeaseCreated> for Event {
 }
 
 #[derive(Clone)]
+pub struct LeaseDeleted {
+    pub lease_id: LeaseId,
+}
+
+impl From<LeaseDeleted> for Event {
+    fn from(item: LeaseDeleted) -> Self {
+        Self::LeaseDeleted(item)
+    }
+}
+
+#[derive(Clone)]
 pub struct LeaseFileRequested {
     pub lease_id: LeaseId,
 }
@@ -321,6 +357,17 @@ impl From<LeaseFileRequested> for Event {
 }
 
 #[derive(Clone)]
+pub struct LeaseUpdated {
+    pub lease: Lease,
+}
+
+impl From<LeaseUpdated> for Event {
+    fn from(item: LeaseUpdated) -> Self {
+        Self::LeaseUpdated(item)
+    }
+}
+
+#[derive(Clone)]
 pub struct LenderCreated {
     pub lender: Lender,
 }
@@ -328,6 +375,18 @@ pub struct LenderCreated {
 impl From<LenderCreated> for Event {
     fn from(item: LenderCreated) -> Self {
         Self::LenderCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct LenderUpdated {
+    pub lender: Lender,
+    pub identity: LegalIdentity,
+}
+
+impl From<LenderUpdated> for Event {
+    fn from(item: LenderUpdated) -> Self {
+        Self::LenderUpdated(item)
     }
 }
 
@@ -384,6 +443,17 @@ pub struct PropertyCreated {
 impl From<PropertyCreated> for Event {
     fn from(item: PropertyCreated) -> Self {
         Self::PropertyCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct PropertyDeleted {
+    pub property_id: PropertyId,
+}
+
+impl From<PropertyDeleted> for Event {
+    fn from(item: PropertyDeleted) -> Self {
+        Self::PropertyDeleted(item)
     }
 }
 
@@ -467,13 +537,24 @@ impl From<SubscriptionRequested> for Event {
 pub struct TenantCreated {
     pub tenant: Tenant,
     pub identity: Option<Person>,
-    pub discussion: Option<Discussion>,
     pub warrants: Option<Vec<WarrantWithIdentity>>,
+    pub discussion: Option<Discussion>,
 }
 
 impl From<TenantCreated> for Event {
     fn from(item: TenantCreated) -> Self {
         Self::TenantCreated(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct TenantDeleted {
+    pub tenant_id: TenantId,
+}
+
+impl From<TenantDeleted> for Event {
+    fn from(item: TenantDeleted) -> Self {
+        Self::TenantDeleted(item)
     }
 }
 
