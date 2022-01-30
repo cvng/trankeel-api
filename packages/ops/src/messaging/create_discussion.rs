@@ -2,13 +2,14 @@ use super::PushMessage;
 use super::PushMessageInput;
 use super::PushMessagePayload;
 use crate::error::Result;
+use crate::event::DiscussionCreated;
+use crate::event::Event;
 use crate::Command;
 use async_graphql::InputObject;
 use chrono::Utc;
 use trankeel_data::Account;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
-use trankeel_data::Message;
 use trankeel_data::PersonId;
 use validator::Validate;
 
@@ -17,11 +18,6 @@ pub struct CreateDiscussionInput {
     pub initiator_id: PersonId,
     pub recipient_id: PersonId,
     pub message: Option<String>,
-}
-
-pub struct CreateDiscussionPayload {
-    pub discussion: Discussion,
-    pub message: Option<Message>,
 }
 
 pub struct CreateDiscussion {
@@ -38,7 +34,7 @@ impl CreateDiscussion {
 
 impl Command for CreateDiscussion {
     type Input = CreateDiscussionInput;
-    type Payload = CreateDiscussionPayload;
+    type Payload = Vec<Event>;
 
     fn run(self, input: Self::Input) -> Result<Self::Payload> {
         input.validate()?;
@@ -69,9 +65,10 @@ impl Command for CreateDiscussion {
             (discussion, None)
         };
 
-        Ok(Self::Payload {
+        Ok(vec![DiscussionCreated {
             discussion,
             message,
-        })
+        }
+        .into()])
     }
 }

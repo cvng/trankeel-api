@@ -1,7 +1,7 @@
 use crate::error::Result;
+use crate::event::Event;
 use crate::messaging::CreateDiscussion;
 use crate::messaging::CreateDiscussionInput;
-use crate::messaging::CreateDiscussionPayload;
 use crate::warrants::CreateWarrant;
 use crate::warrants::CreateWarrantInput;
 use crate::warrants::CreateWarrantPayload;
@@ -126,8 +126,12 @@ impl Command for CreateTenant {
                     recipient_id: account_owner.id,
                     initiator_id: identity.id,
                     message: None,
+                })?
+                .into_iter()
+                .find_map(|event| match event {
+                    Event::DiscussionCreated(event) => Some(event.discussion),
+                    _ => None,
                 })
-                .map(|CreateDiscussionPayload { discussion, .. }| Some(discussion))?
         } else {
             None
         };

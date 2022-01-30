@@ -247,6 +247,7 @@ impl From<CandidacyRejected> for Event {
 #[derive(Clone)]
 pub struct DiscussionCreated {
     pub discussion: Discussion,
+    pub message: Option<Message>,
 }
 
 impl From<DiscussionCreated> for Event {

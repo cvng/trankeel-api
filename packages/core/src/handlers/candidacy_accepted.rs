@@ -12,7 +12,6 @@ use trankeel_data::Eventable;
 use trankeel_data::InviteReason;
 use trankeel_ops::event::CandidacyAccepted;
 use trankeel_ops::event::Event;
-use trankeel_ops::event::InviteCreated;
 use trankeel_ops::invites::CreateInvite;
 use trankeel_ops::invites::CreateInviteInput;
 use trankeel_ops::Command;
@@ -69,7 +68,7 @@ pub async fn candidacy_accepted_async(ctx: &Context, event: CandidacyAccepted) -
         })?
         .into_iter()
         .find_map(|event| match event {
-            Event::InviteCreated(InviteCreated { invite }) => Some(invite),
+            Event::InviteCreated(event) => Some(event.invite),
             _ => None,
         })
         .unwrap();

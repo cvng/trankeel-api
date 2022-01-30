@@ -160,7 +160,7 @@ impl Command for AcceptCandidacy {
                 })?
                 .into_iter()
                 .find_map(|event| match event {
-                    Event::LeaseCreated(LeaseCreated { lease, rents }) => Some((lease, rents)),
+                    Event::LeaseCreated(event) => Some((event.lease, event.rents)),
                     _ => None,
                 })
                 .unwrap();
