@@ -1,14 +1,15 @@
+use crate::id;
 use crate::sql_schema::events;
 use crate::AccountId;
 use crate::DateTime;
 use crate::Eventable;
 use crate::EventableId;
-use crate::Id;
 use crate::PersonId;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 
-pub type EventId = Id;
+id!(EventId);
 
 pub type EventWithEventable = (Event, Eventable);
 

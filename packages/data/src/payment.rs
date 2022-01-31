@@ -1,15 +1,16 @@
+use crate::id;
 use crate::sql_schema::payments;
 use crate::Amount;
 use crate::DateTime;
-use crate::Id;
 use crate::RentId;
 use async_graphql::Enum;
 use async_graphql::SimpleObject;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 
 // # Types
 
-pub type PaymentId = Id;
+id!(PaymentId);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Transactiontype"]

@@ -1,17 +1,18 @@
+use crate::id;
 use crate::sql_schema::invites;
 use crate::AccountId;
 use crate::DateTime;
 use crate::Email;
-use crate::Id;
 use crate::InviteToken;
 use crate::PersonId;
 use crate::Url;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 use std::fmt;
 use trankeel_kit::config;
 
-pub type InviteId = Id;
+id!(InviteId);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Invitereason"]

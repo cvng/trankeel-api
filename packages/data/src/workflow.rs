@@ -1,17 +1,18 @@
+use crate::id;
 use crate::sql_schema::workflows;
 use crate::DateTime;
-use crate::Id;
 use crate::RequirementOuter;
 use crate::Step;
 use crate::StepId;
 use crate::WorkflowableId;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 use serde::Deserialize;
 use serde::Serialize;
 use trankeel_kit::config;
 
-pub type WorkflowId = Id;
+id!(WorkflowId);
 
 pub type WorkflowWithSteps = (Workflow, Vec<Step>);
 

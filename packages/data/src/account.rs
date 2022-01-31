@@ -1,15 +1,16 @@
+use crate::id;
 use crate::sql_schema::accounts;
 use crate::CustomerId;
 use crate::DateTime;
-use crate::Id;
 use crate::PlanId;
 use crate::SubscriptionId;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 
 // # Types
 
-pub type AccountId = Id;
+id!(AccountId);
 
 /// https://stripe.com/docs/billing/subscriptions/overview
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]

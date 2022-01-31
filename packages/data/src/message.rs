@@ -1,11 +1,12 @@
+use crate::id;
 use crate::sql_schema::messages;
 use crate::DateTime;
 use crate::DiscussionId;
 use crate::EventId;
-use crate::Id;
 use crate::PersonId;
+use fake::Fake;
 
-pub type MessageId = Id;
+id!(MessageId);
 
 pub type MessageContent = String;
 

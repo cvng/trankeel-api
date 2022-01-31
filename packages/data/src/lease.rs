@@ -1,3 +1,4 @@
+use crate::id;
 use crate::rent_util;
 use crate::sql_schema::leases;
 use crate::AccountId;
@@ -7,7 +8,6 @@ use crate::File;
 use crate::FileId;
 use crate::FurnishedLeaseDetails;
 use crate::FurnishedLeaseDuration;
-use crate::Id;
 use crate::PropertyId;
 use crate::Rent;
 use crate::RentId;
@@ -17,11 +17,12 @@ use async_graphql::SimpleObject;
 use chrono::Utc;
 use diesel_derive_enum::DbEnum;
 use fake::Dummy;
+use fake::Fake;
 use serde::Deserialize;
 use serde::Serialize;
 use trankeel_kit::locale;
 
-pub type LeaseId = Id;
+id!(LeaseId);
 
 pub type LeaseFile = File; // alias for a File
 

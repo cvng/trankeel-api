@@ -1,7 +1,7 @@
+use crate::id;
 use crate::sql_schema::warrants;
 use crate::CandidacyId;
 use crate::DateTime;
-use crate::Id;
 use crate::Person;
 use crate::PersonId;
 use crate::ProfessionalWarrant;
@@ -9,10 +9,11 @@ use crate::ProfessionalWarrantId;
 use crate::TenantId;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 use serde::Deserialize;
 use serde::Serialize;
 
-pub type WarrantId = Id;
+id!(WarrantId);
 
 pub type WarrantWithIdentity = (Warrant, WarrantIdentity);
 

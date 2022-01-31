@@ -1,20 +1,21 @@
+use crate::id;
 use crate::sql_schema::persons;
 use crate::AccountId;
 use crate::Address;
 use crate::AuthId;
 use crate::DateTime;
 use crate::Email;
-use crate::Id;
 use crate::Name;
 use crate::PhoneNumber;
 use crate::Url;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 use std::fmt;
 
 // # Types
 
-pub type PersonId = Id;
+id!(PersonId);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[graphql(name = "UserRole")]

@@ -1,9 +1,17 @@
+use crate::id;
 use crate::Candidacy;
-use crate::Id;
+use crate::CandidacyId;
 use crate::Workflow;
 use async_graphql::Union;
+use fake::Fake;
 
-pub type WorkflowableId = Id;
+id!(WorkflowableId);
+
+impl From<CandidacyId> for WorkflowableId {
+    fn from(item: CandidacyId) -> Self {
+        Self(item.0)
+    }
+}
 
 pub type WorkflowableRow = (Workflow, Option<Candidacy>);
 
@@ -15,7 +23,7 @@ pub enum Workflowable {
 impl Workflowable {
     pub fn id(&self) -> WorkflowableId {
         match self {
-            Self::Candidacy(inner) => inner.id,
+            Self::Candidacy(inner) => inner.id.into(),
         }
     }
 }

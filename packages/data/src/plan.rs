@@ -1,11 +1,12 @@
+use crate::id;
 use crate::Amount;
-use crate::Id;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 
 // # Types
 
-pub type PlanId = Id;
+id!(PlanId);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Plancode"]

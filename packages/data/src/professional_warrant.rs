@@ -1,8 +1,9 @@
+use crate::id;
 use crate::sql_schema::professional_warrants;
 use crate::DateTime;
-use crate::Id;
+use fake::Fake;
 
-pub type ProfessionalWarrantId = Id;
+id!(ProfessionalWarrantId);
 
 #[derive(Clone, Debug, Insertable, Queryable)]
 pub struct ProfessionalWarrant {

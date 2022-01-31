@@ -1,11 +1,12 @@
+use crate::id;
 use crate::sql_schema::persons;
 use crate::sql_schema::tenants;
 use crate::Amount;
-use crate::Id;
 use crate::TenantId;
 use async_graphql::SimpleObject;
+use fake::Fake;
 
-pub type BalanceId = Id;
+id!(BalanceId);
 
 #[derive(Clone, Default, Debug, Identifiable, Queryable, SimpleObject)]
 pub struct Balance {

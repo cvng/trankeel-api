@@ -1,20 +1,21 @@
+use crate::id;
 use crate::sql_schema::tenants;
 use crate::AccountId;
 use crate::Balance;
 use crate::Date;
 use crate::DateTime;
 use crate::Email;
-use crate::Id;
 use crate::LeaseId;
 use crate::Name;
 use crate::Person;
 use crate::PersonId;
 use crate::PhoneNumber;
 use async_graphql::Enum;
+use fake::Fake;
 use serde::Deserialize;
 use serde::Serialize;
 
-pub type TenantId = Id;
+id!(TenantId);
 
 pub type TenantWithBalance = (Tenant, Option<Balance>);
 

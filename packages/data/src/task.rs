@@ -1,9 +1,10 @@
-use crate::Id;
+use crate::id;
 use async_graphql::Enum;
+use fake::Fake;
 
 // # Types
 
-pub type TaskId = Id;
+id!(TaskId);
 
 #[derive(Copy, Clone, PartialEq, Eq, Enum)]
 pub enum TaskStatus {
