@@ -1,14 +1,57 @@
+use crate::id;
 use crate::Candidacy;
+use crate::CandidacyId;
 use crate::Event;
 use crate::File;
-use crate::Id;
+use crate::FileId;
 use crate::Lease;
+use crate::LeaseId;
 use crate::Payment;
+use crate::PaymentId;
 use crate::Rent;
+use crate::RentId;
 use crate::Step;
+use crate::StepId;
 use async_graphql::Union;
+use fake::Fake;
 
-pub type EventableId = Id;
+id!(EventableId);
+
+impl From<FileId> for EventableId {
+    fn from(item: FileId) -> Self {
+        Self(item.0)
+    }
+}
+
+impl From<RentId> for EventableId {
+    fn from(item: RentId) -> Self {
+        Self(item.0)
+    }
+}
+
+impl From<StepId> for EventableId {
+    fn from(item: StepId) -> Self {
+        Self(item.0)
+    }
+}
+
+impl From<LeaseId> for EventableId {
+    fn from(item: LeaseId) -> Self {
+        Self(item.0)
+    }
+}
+
+impl From<PaymentId> for EventableId {
+    fn from(item: PaymentId) -> Self {
+        Self(item.0)
+    }
+}
+
+impl From<CandidacyId> for EventableId {
+    fn from(item: CandidacyId) -> Self {
+        Self(item.0)
+    }
+}
 
 pub type EventableRow = (
     Event,
@@ -34,12 +77,12 @@ pub enum Eventable {
 impl Eventable {
     pub fn id(&self) -> EventableId {
         match self {
-            Self::File(inner) => inner.id,
-            Self::Rent(inner) => inner.id,
-            Self::Step(inner) => inner.id,
-            Self::Lease(inner) => inner.id,
-            Self::Payment(inner) => inner.id,
-            Self::Candidacy(inner) => inner.id,
+            Self::File(inner) => inner.id.into(),
+            Self::Rent(inner) => inner.id.into(),
+            Self::Step(inner) => inner.id.into(),
+            Self::Lease(inner) => inner.id.into(),
+            Self::Payment(inner) => inner.id.into(),
+            Self::Candidacy(inner) => inner.id.into(),
         }
     }
 }

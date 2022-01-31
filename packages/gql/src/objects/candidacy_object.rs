@@ -61,7 +61,7 @@ impl Candidacy {
         Ok(ctx
             .data_unchecked::<Client>()
             .workflows()
-            .by_workflowable_id(&self.id)?
+            .by_workflowable_id(&self.id.into())?
             .map(Into::into))
     }
 }

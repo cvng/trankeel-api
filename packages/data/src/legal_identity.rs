@@ -1,8 +1,25 @@
+use crate::id;
 use crate::Address;
 use crate::Company;
-use crate::Id;
+use crate::CompanyId;
 use crate::Name;
 use crate::Person;
+use crate::PersonId;
+use fake::Fake;
+
+id!(LegalIdentityId);
+
+impl From<PersonId> for LegalIdentityId {
+    fn from(item: PersonId) -> Self {
+        Self(item.0)
+    }
+}
+
+impl From<CompanyId> for LegalIdentityId {
+    fn from(item: CompanyId) -> Self {
+        Self(item.0)
+    }
+}
 
 #[derive(Clone)]
 pub enum LegalIdentity {
@@ -11,10 +28,10 @@ pub enum LegalIdentity {
 }
 
 impl LegalIdentity {
-    pub fn id(&self) -> Id {
+    pub fn id(&self) -> LegalIdentityId {
         match self {
-            Self::Individual(person) => person.id,
-            Self::Company(company) => company.id,
+            Self::Individual(person) => person.id.into(),
+            Self::Company(company) => company.id.into(),
         }
     }
 

@@ -1,14 +1,15 @@
+use crate::id;
 use crate::Address;
 use crate::DateTime;
 use crate::Email;
-use crate::Id;
 use crate::PhoneNumber;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 
 // # Types
 
-pub type CompanyId = Id;
+id!(CompanyId);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Legalentitytype"]

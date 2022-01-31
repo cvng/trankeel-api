@@ -1,7 +1,7 @@
+use crate::id;
 use crate::sql_schema::files;
 use crate::DateTime;
 use crate::ExternalId;
-use crate::Id;
 use crate::Lease;
 use crate::LeaseFileId;
 use crate::NoticeId;
@@ -11,14 +11,15 @@ use crate::Url;
 use async_graphql::Enum;
 use async_graphql::SimpleObject;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 use serde::Deserialize;
 use serde::Serialize;
 
 // # Types
 
-pub type FileId = Id;
+id!(FileId);
 
-pub type AttachableId = Id;
+id!(AttachableId);
 
 /// https://www.pdfmonkey.io/fr/doc/api/generer-un-document
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]

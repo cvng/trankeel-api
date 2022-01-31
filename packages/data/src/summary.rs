@@ -1,10 +1,11 @@
+use crate::id;
 use crate::AccountId;
 use crate::Amount;
 use crate::DateTime;
-use crate::Id;
 use async_graphql::SimpleObject;
+use fake::Fake;
 
-pub type SummaryId = Id;
+id!(SummaryId);
 
 #[derive(Clone, Default, Debug, Identifiable, Queryable, SimpleObject)]
 #[table_name = "reports"]

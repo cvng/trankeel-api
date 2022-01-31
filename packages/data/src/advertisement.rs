@@ -1,7 +1,7 @@
+use crate::id;
 use crate::sql_schema::advertisements;
 use crate::Amount;
 use crate::DateTime;
-use crate::Id;
 use crate::LeaseId;
 use crate::LeaseType;
 use crate::PropertyId;
@@ -12,7 +12,7 @@ use fake::Fake;
 
 // # Types
 
-pub type AdvertisementId = Id;
+id!(AdvertisementId);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Dummy, Enum)]
 #[DieselType = "Entryflexibility"]

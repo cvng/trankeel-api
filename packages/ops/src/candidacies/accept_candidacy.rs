@@ -159,7 +159,7 @@ impl Command for AcceptCandidacy {
         let workflow = CreateWorkflow::new(&workflowable) //
             .run(CreateWorkflowInput {
                 type_: WorkflowType::Candidacy,
-                workflowable_id: candidacy.id,
+                workflowable_id: candidacy.id.into(),
             })?
             .into_iter()
             .find_map(|event| match event {

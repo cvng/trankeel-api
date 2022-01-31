@@ -1,16 +1,17 @@
+use crate::id;
 use crate::sql_schema::discussions;
 use crate::AccountId;
 use crate::Candidacy;
 use crate::DateTime;
-use crate::Id;
 use crate::Lease;
 use crate::Message;
 use crate::PersonId;
 use async_graphql::Enum;
 use async_graphql::Union;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 
-pub type DiscussionId = Id;
+id!(DiscussionId);
 
 pub type DiscussionItemRow = (Option<Candidacy>, Option<Lease>);
 

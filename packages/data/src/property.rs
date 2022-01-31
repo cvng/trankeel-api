@@ -1,17 +1,18 @@
+use crate::id;
 use crate::sql_schema::properties;
 use crate::AccountId;
 use crate::Address;
 use crate::Amount;
 use crate::DateTime;
-use crate::Id;
 use crate::LenderId;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 use serde::Deserialize;
 
 // # Types
 
-pub type PropertyId = Id;
+id!(PropertyId);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
 #[DieselType = "Propertyroomtype"]

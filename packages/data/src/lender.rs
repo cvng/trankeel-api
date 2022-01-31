@@ -1,14 +1,15 @@
+use crate::id;
 use crate::sql_schema::lenders;
 use crate::AccountId;
 use crate::CompanyId;
 use crate::DateTime;
-use crate::Id;
 use crate::LegalIdentity;
 use crate::PersonId;
+use fake::Fake;
 
 // # Types
 
-pub type LenderId = Id;
+id!(LenderId);
 
 pub type LenderWithIdentity = (Lender, LegalIdentity);
 

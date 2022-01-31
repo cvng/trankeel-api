@@ -1,9 +1,10 @@
+use crate::id;
 use crate::Amount;
 use crate::DateTime;
-use crate::Id;
 use crate::PlanCode;
+use fake::Fake;
 
-pub type InvoiceId = Id;
+id!(InvoiceId);
 
 pub struct Invoice {
     pub id: InvoiceId,

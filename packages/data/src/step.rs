@@ -1,12 +1,13 @@
+use crate::id;
 use crate::sql_schema::steps;
 use crate::DateTime;
-use crate::Id;
 use crate::RequirementOuter;
 use crate::Workflow;
 use crate::WorkflowId;
 use async_graphql::SimpleObject;
+use fake::Fake;
 
-pub type StepId = Id;
+id!(StepId);
 
 #[derive(PartialEq)]
 pub enum StepEvent {

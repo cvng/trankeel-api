@@ -1,7 +1,7 @@
+use crate::id;
 use crate::sql_schema::rents;
 use crate::Amount;
 use crate::DateTime;
-use crate::Id;
 use crate::LeaseId;
 use crate::NoticeId;
 use crate::ReceiptId;
@@ -10,10 +10,11 @@ use async_graphql::SimpleObject;
 use chrono::Duration;
 use chrono::Utc;
 use diesel_derive_enum::DbEnum;
+use fake::Fake;
 
 // # Types
 
-pub type RentId = Id;
+id!(RentId);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
 #[DieselType = "Rentstatus"]
