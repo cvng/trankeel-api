@@ -37,7 +37,6 @@ pub async fn seed() {
                 line2: None,
             }),
             phone_number: None,
-            skip_create_customer: Some(true),
         })
         .await
         .unwrap()

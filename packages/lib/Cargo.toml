@@ -9,6 +9,7 @@ edition = "2021"
 doctest = false
 
 [features]
+async-stripe = ["trankeel-core/async-stripe"]
 pdfmonkey = ["trankeel-core/pdfmonkey"]
 sendinblue = ["trankeel-core/sendinblue"]
 

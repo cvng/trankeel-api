@@ -7,7 +7,8 @@ default-run = "trankeel-api"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-release = ["pdfmonkey", "sendinblue", "sentry"]
+release = ["async-stripe", "pdfmonkey", "sendinblue", "sentry"]
+async-stripe = ["trankeel/async-stripe"]
 pdfmonkey = ["trankeel/pdfmonkey"]
 sendinblue = ["trankeel/sendinblue"]
 

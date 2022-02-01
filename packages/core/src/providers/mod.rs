@@ -8,7 +8,10 @@ mod postgres;
 mod sendinblue;
 #[cfg(not(feature = "sendinblue"))]
 mod sendinblue_mock;
+#[cfg(feature = "async-stripe")]
 mod stripe;
+#[cfg(not(feature = "async-stripe"))]
+mod stripe_mock;
 mod types;
 
 pub use self::messagerie::*;
@@ -21,5 +24,8 @@ pub use self::postgres::*;
 pub use self::sendinblue::*;
 #[cfg(not(feature = "sendinblue"))]
 pub use self::sendinblue_mock::*;
+#[cfg(feature = "async-stripe")]
 pub use self::stripe::*;
+#[cfg(not(feature = "async-stripe"))]
+pub use self::stripe_mock::*;
 pub use self::types::*;
