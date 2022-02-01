@@ -6,6 +6,7 @@ use fake::Dummy;
 use fake::Fake;
 use serde::Deserialize;
 use serde::Serialize;
+use std::fmt;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, DieselNewType)]
 pub struct Date(chrono::NaiveDate);
@@ -32,6 +33,12 @@ impl DateTime {
 impl Default for DateTime {
     fn default() -> Self {
         Self::new(0)
+    }
+}
+
+impl fmt::Display for DateTime {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0.to_rfc3339())
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::error::Error;
+use crate::error::DomainError;
 use crate::error::Result;
 use crate::event::Event;
 use crate::event::LeaseAffected;
@@ -108,7 +108,7 @@ impl Command for CreateLease {
         // Check signature date.
         if let Some(signature_date) = input.signature_date {
             if input.effect_date.inner() > signature_date.inner() {
-                return Err(Error::msg("effect date must be anterior to signature date"));
+                return Err(DomainError::InvalidSignatureDate(signature_date).into());
             }
         }
 

@@ -8,4 +8,6 @@ pub enum DomainError {
     UnimplementedInviteReason(trankeel_data::InviteReason),
     #[error("candidacy `{0}` is already rejected")]
     CandidacyAlreadyRejected(trankeel_data::CandidacyId),
+    #[error("effect date must be anterior to signature date `{0}`")]
+    InvalidSignatureDate(trankeel_data::DateTime),
 }
