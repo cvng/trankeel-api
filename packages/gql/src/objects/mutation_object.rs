@@ -2,7 +2,6 @@ use crate::payloads::AcceptCandidacyPayload;
 use crate::payloads::CompleteStepPayload;
 use crate::payloads::CreateAdvertisementPayload;
 use crate::payloads::CreateCandidacyPayload;
-use crate::payloads::CreateFurnishedLeasePayload;
 use crate::payloads::CreateLeasePayload;
 use crate::payloads::CreateNoticesPayload;
 use crate::payloads::CreatePropertyPayload;
@@ -16,8 +15,8 @@ use crate::payloads::DeleteTenantPayload;
 use crate::payloads::PushMessagePayload;
 use crate::payloads::SignupUserFromInvitePayload;
 use crate::payloads::UpdateAdvertisementPayload;
-use crate::payloads::UpdateFurnishedLeasePayload;
 use crate::payloads::UpdateIndividualLenderPayload;
+use crate::payloads::UpdateLeasePayload;
 use crate::payloads::UpdatePropertyPayload;
 use crate::payloads::UpdateTenantPayload;
 use async_graphql::Context;
@@ -28,7 +27,6 @@ use trankeel::Client;
 use trankeel::CompleteStepInput;
 use trankeel::CreateAdvertisementInput;
 use trankeel::CreateCandidacyInput;
-use trankeel::CreateFurnishedLeaseInput;
 use trankeel::CreateLeaseInput;
 use trankeel::CreateNoticesInput;
 use trankeel::CreatePropertyInput;
@@ -42,8 +40,8 @@ use trankeel::DeleteTenantInput;
 use trankeel::PushMessageInput;
 use trankeel::SignupUserFromInviteInput;
 use trankeel::UpdateAdvertisementInput;
-use trankeel::UpdateFurnishedLeaseInput;
 use trankeel::UpdateIndividualLenderInput;
+use trankeel::UpdateLeaseInput;
 use trankeel::UpdatePropertyInput;
 use trankeel::UpdateTenantInput;
 
@@ -183,26 +181,14 @@ impl Mutation {
             .into())
     }
 
-    async fn create_furnished_lease(
+    async fn update_lease(
         &self,
         ctx: &Context<'_>,
-        input: CreateFurnishedLeaseInput,
-    ) -> Result<CreateFurnishedLeasePayload> {
+        input: UpdateLeaseInput,
+    ) -> Result<UpdateLeasePayload> {
         Ok(ctx
             .data_unchecked::<Client>()
-            .create_furnished_lease(ctx.data::<AuthId>()?, input)
-            .await?
-            .into())
-    }
-
-    async fn update_furnished_lease(
-        &self,
-        ctx: &Context<'_>,
-        input: UpdateFurnishedLeaseInput,
-    ) -> Result<UpdateFurnishedLeasePayload> {
-        Ok(ctx
-            .data_unchecked::<Client>()
-            .update_furnished_lease(ctx.data::<AuthId>()?, input)
+            .update_lease(ctx.data::<AuthId>()?, input)
             .await?
             .into())
     }

@@ -6,8 +6,8 @@ use crate::Amount;
 use crate::DateTime;
 use crate::File;
 use crate::FileId;
-use crate::FurnishedLeaseDetails;
-use crate::FurnishedLeaseDuration;
+use crate::LeaseDetails;
+use crate::LeaseDuration;
 use crate::PropertyId;
 use crate::Rent;
 use crate::RentId;
@@ -50,8 +50,10 @@ pub enum LeaseType {
     Naked,
 }
 
-pub enum LeaseDetails {
-    FurnishedLeaseDetails(FurnishedLeaseDetails),
+impl Default for LeaseType {
+    fn default() -> Self {
+        Self::Furnished
+    }
 }
 
 #[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
@@ -68,10 +70,10 @@ pub struct Lease {
     pub type_: LeaseType,
     pub lease_id: Option<FileId>,
     pub property_id: PropertyId,
-    pub details: Option<FurnishedLeaseDetails>,
+    pub details: Option<LeaseDetails>,
     pub expired_at: Option<DateTime>,
     pub renew_date: Option<DateTime>,
-    pub duration: FurnishedLeaseDuration,
+    pub duration: LeaseDuration,
 }
 
 impl Lease {
@@ -145,7 +147,7 @@ mod tests {
                 signature_date: Default::default(),
                 rent_amount: Default::default(),
                 rent_charges_amount: Default::default(),
-                type_: LeaseType::Furnished,
+                type_: Default::default(),
                 lease_id: Default::default(),
                 property_id: Default::default(),
                 details: Default::default(),

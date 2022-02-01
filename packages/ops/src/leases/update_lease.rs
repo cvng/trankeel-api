@@ -1,8 +1,7 @@
-use super::FurnishedLeaseDetailsInput;
+use super::LeaseDetailsInput;
 use crate::error::Result;
 use crate::event::Event;
 use crate::event::LeaseUpdated;
-use crate::files::CreateFileInput;
 use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Lease;
@@ -10,17 +9,16 @@ use trankeel_data::LeaseId;
 use validator::Validate;
 
 #[derive(InputObject, Validate)]
-pub struct UpdateFurnishedLeaseInput {
-    pub details: Option<FurnishedLeaseDetailsInput>,
-    pub file: Option<CreateFileInput>, // TODO
+pub struct UpdateLeaseInput {
+    pub details: Option<LeaseDetailsInput>,
     pub id: LeaseId,
 }
 
-pub struct UpdateFurnishedLease {
+pub struct UpdateLease {
     lease: Lease,
 }
 
-impl UpdateFurnishedLease {
+impl UpdateLease {
     pub fn new(lease: &Lease) -> Self {
         Self {
             lease: lease.clone(),
@@ -28,8 +26,8 @@ impl UpdateFurnishedLease {
     }
 }
 
-impl Command for UpdateFurnishedLease {
-    type Input = UpdateFurnishedLeaseInput;
+impl Command for UpdateLease {
+    type Input = UpdateLeaseInput;
 
     fn run(self, input: Self::Input) -> Result<Vec<Event>> {
         input.validate()?;

@@ -65,8 +65,6 @@ use trankeel_ops::candidacies::CreateCandidacy;
 use trankeel_ops::candidacies::CreateCandidacyInput;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::Event;
-use trankeel_ops::leases::CreateFurnishedLease;
-use trankeel_ops::leases::CreateFurnishedLeaseInput;
 use trankeel_ops::leases::CreateLease;
 use trankeel_ops::leases::CreateLeaseInput;
 use trankeel_ops::leases::CreateNotices;
@@ -77,8 +75,8 @@ use trankeel_ops::leases::DeleteLease;
 use trankeel_ops::leases::DeleteLeaseInput;
 use trankeel_ops::leases::SendReceipts;
 use trankeel_ops::leases::SendReceiptsInput;
-use trankeel_ops::leases::UpdateFurnishedLease;
-use trankeel_ops::leases::UpdateFurnishedLeaseInput;
+use trankeel_ops::leases::UpdateLease;
+use trankeel_ops::leases::UpdateLeaseInput;
 use trankeel_ops::lenders::UpdateIndividualLender;
 use trankeel_ops::lenders::UpdateIndividualLenderInput;
 use trankeel_ops::messaging::DeleteDiscussion;
@@ -466,27 +464,6 @@ impl Client {
 
         let lease_id = LeaseId::new();
         let account = self.accounts().by_auth_id(auth_id)?;
-        let account_owner = self.persons().by_auth_id(auth_id)?;
-        let (lender, ..) = self.lenders().by_account_id_first(&account.id)?;
-
-        dispatcher::dispatch(
-            &self.0,
-            CreateLease::new(lease_id, &account, &account_owner, &lender).run(input)?,
-        )
-        .await
-        .and_then(|_| self.leases().by_id(&lease_id))
-    }
-
-    #[named]
-    pub async fn create_furnished_lease(
-        &self,
-        auth_id: &AuthId,
-        input: CreateFurnishedLeaseInput,
-    ) -> Result<Lease> {
-        log::info!("Command: {}", function_name!());
-
-        let lease_id = LeaseId::new();
-        let account = self.accounts().by_auth_id(auth_id)?;
         let tenants = input
             .tenant_ids
             .iter()
@@ -495,24 +472,20 @@ impl Client {
 
         dispatcher::dispatch(
             &self.0,
-            CreateFurnishedLease::new(lease_id, &account, &tenants).run(input)?,
+            CreateLease::new(lease_id, &account, &tenants).run(input)?,
         )
         .await
         .and_then(|_| self.leases().by_id(&lease_id))
     }
 
     #[named]
-    pub async fn update_furnished_lease(
-        &self,
-        _auth_id: &AuthId,
-        input: UpdateFurnishedLeaseInput,
-    ) -> Result<Lease> {
+    pub async fn update_lease(&self, _auth_id: &AuthId, input: UpdateLeaseInput) -> Result<Lease> {
         log::info!("Command: {}", function_name!());
 
         let lease_id = input.id;
         let lease = self.leases().by_id(&lease_id)?;
 
-        dispatcher::dispatch(&self.0, UpdateFurnishedLease::new(&lease).run(input)?)
+        dispatcher::dispatch(&self.0, UpdateLease::new(&lease).run(input)?)
             .await
             .and_then(|_| self.leases().by_id(&lease_id))
     }

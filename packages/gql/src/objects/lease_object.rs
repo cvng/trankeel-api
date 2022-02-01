@@ -1,6 +1,6 @@
 use super::Account;
 use super::File;
-use super::FurnishedLeaseDetails;
+use super::LeaseDetails;
 use super::Property;
 use super::Rent;
 use super::Tenant;
@@ -12,7 +12,7 @@ use trankeel::Amount;
 use trankeel::Client;
 use trankeel::DateTime;
 use trankeel::FileId;
-use trankeel::FurnishedLeaseDuration;
+use trankeel::LeaseDuration;
 use trankeel::LeaseId;
 use trankeel::LeaseStatus;
 use trankeel::LeaseType;
@@ -33,11 +33,10 @@ pub struct Lease {
     pub type_: LeaseType,
     pub lease_id: Option<FileId>,
     pub property_id: PropertyId,
-    #[graphql(name = "data")]
-    pub details: Option<FurnishedLeaseDetails>,
+    pub details: Option<LeaseDetails>,
     pub expired_at: Option<DateTime>,
     pub renew_date: Option<DateTime>,
-    pub duration: FurnishedLeaseDuration,
+    pub duration: LeaseDuration,
     //
     pub status: LeaseStatus,
     pub rent_full_amount: Amount,

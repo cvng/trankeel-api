@@ -1,22 +1,20 @@
 use async_graphql::SimpleObject;
 use trankeel::Amount;
 use trankeel::DateTime;
-use trankeel::FurnishedLeaseDuration;
+use trankeel::LeaseDuration;
 use trankeel::LeaseRentPeriodicity;
 use trankeel::LeaseRentReferenceIrl;
-use trankeel::NakedLeaseDuration;
 use trankeel::RentChargesRecuperationMode;
 use trankeel::RentPaymentMethod;
 
 #[derive(SimpleObject)]
-#[graphql(name = "LeaseFurnishedData")]
-pub struct FurnishedLeaseDetails {
+pub struct LeaseDetails {
     pub charges_recuperation_mode: Option<RentChargesRecuperationMode>,
     pub charges_revision_method: Option<String>,
     pub colocation_insurance_lender: Option<bool>,
     pub colocation_insurance_monthly_amount: Option<Amount>,
     pub colocation_insurance_total_amount: Option<Amount>,
-    pub duration: Option<FurnishedLeaseDuration>,
+    pub duration: Option<LeaseDuration>,
     pub lender_fee_cap: Option<Amount>,
     pub lender_fee_cap_other: Option<String>,
     pub lender_fee_cap_prestations: Option<Amount>,
@@ -50,8 +48,8 @@ pub struct FurnishedLeaseDetails {
     pub works_rent_increase_lender: Option<String>,
 }
 
-impl From<trankeel::FurnishedLeaseDetails> for FurnishedLeaseDetails {
-    fn from(item: trankeel::FurnishedLeaseDetails) -> Self {
+impl From<trankeel::LeaseDetails> for LeaseDetails {
+    fn from(item: trankeel::LeaseDetails) -> Self {
         Self {
             charges_recuperation_mode: item.charges_recuperation_mode,
             charges_revision_method: item.charges_revision_method,
@@ -92,9 +90,4 @@ impl From<trankeel::FurnishedLeaseDetails> for FurnishedLeaseDetails {
             works_rent_increase_lender: item.works_rent_increase_lender,
         }
     }
-}
-
-#[derive(SimpleObject)]
-pub struct NakedLeaseDetails {
-    pub duration: Option<NakedLeaseDuration>,
 }
