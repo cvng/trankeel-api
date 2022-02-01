@@ -220,7 +220,6 @@ input CreateUserWithAccountInput {
 	firstName: String!
 	lastName: String!
 	phoneNumber: String
-	skipCreateCustomer: Boolean
 }
 type CreateUserWithAccountPayload {
 	user: Person!
