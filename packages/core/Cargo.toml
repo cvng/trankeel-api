@@ -9,7 +9,7 @@ edition = "2021"
 doctest = false
 
 [dependencies]
-async-stripe = { version = "0.13.0-rc3", default-features = false, features = ["runtime-tokio-hyper", "billing"] }
+async-stripe = { version = "0.13.0-rc3", default-features = false, features = ["runtime-tokio-hyper", "billing"], optional = true }
 async-trait = "0.1.52"
 chrono = { version = "0.4.19", features = ["serde"] }
 diesel = { version = "1.4.8", features = ["postgres", "r2d2", "uuidv07", "serde_json", "chrono", "numeric"] }

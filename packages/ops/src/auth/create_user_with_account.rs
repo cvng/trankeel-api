@@ -36,7 +36,6 @@ pub struct CreateUserWithAccountInput {
     pub first_name: String,
     pub last_name: String,
     pub phone_number: Option<String>,
-    pub skip_create_customer: Option<bool>,
 }
 
 pub struct CreateUserWithAccountPayload {
@@ -111,7 +110,7 @@ impl Command for CreateUserWithAccount {
             company_id: None,
         };
 
-        let mut events = vec![
+        Ok(vec![
             AccountCreated {
                 account: account.clone(),
             }
@@ -121,19 +120,12 @@ impl Command for CreateUserWithAccount {
             }
             .into(),
             LenderCreated { lender }.into(),
-        ];
-
-        if !matches!(input.skip_create_customer, Some(true)) {
-            events.push(
-                SubscriptionRequested {
-                    account_id: account.id,
-                    email: user.email, // TODO: use account email for billing
-                }
-                .into(),
-            )
-        }
-
-        Ok(events)
+            SubscriptionRequested {
+                account_id: account.id,
+                email: user.email, // TODO: use account email for billing
+            }
+            .into(),
+        ])
     }
 }
 
