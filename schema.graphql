@@ -131,21 +131,6 @@ input CreateFileInput {
 	downloadUrl: URL!
 	type: FileType!
 }
-input CreateFurnishedLeaseInput {
-	details: FurnishedLeaseDetailsInput
-	depositAmount: Decimal!
-	effectDate: DateTime!
-	renewDate: DateTime
-	file: CreateFileInput
-	propertyId: ID!
-	rentAmount: Decimal!
-	rentChargesAmount: Decimal
-	signatureDate: DateTime
-	tenantIds: [ID!]!
-}
-type CreateFurnishedLeasePayload {
-	lease: Lease!
-}
 input CreateIndividualWarrantInput {
 	email: String!
 	firstName: String!
@@ -154,12 +139,16 @@ input CreateIndividualWarrantInput {
 	phoneNumber: PhoneNumber
 }
 input CreateLeaseInput {
+	details: LeaseDetailsInput
+	depositAmount: Decimal
 	effectDate: DateTime!
+	renewDate: DateTime
+	type: LeaseType!
+	propertyId: ID!
 	rentAmount: Decimal!
 	rentChargesAmount: Decimal
-	type: LeaseType!
-	property: CreatePropertyInput!
-	tenants: [CreateTenantInput!]!
+	signatureDate: DateTime
+	tenantIds: [ID!]!
 }
 type CreateLeasePayload {
 	lease: Lease!
@@ -341,45 +330,6 @@ enum FileType {
 	PAYMENT_NOTICE
 	RENT_RECEIPT
 }
-input FurnishedLeaseDetailsInput {
-	chargesRecuperationMode: RentChargesRecuperationMode
-	chargesRevisionMethod: String
-	colocationInsuranceLender: Boolean
-	colocationInsuranceMonthlyAmount: Decimal
-	colocationInsuranceTotalAmount: Decimal
-	duration: LeaseFurnishedDuration
-	lenderFeeCap: Decimal
-	lenderFeeCapOther: String
-	lenderFeeCapPrestations: Decimal
-	otherConditions: String
-	rentComplement: Decimal
-	rentComplementPropertyJustification: String
-	rentFirstAmount: Decimal
-	rentIrl: LeaseRentReferenceIrl
-	rentIrlRevisionDate: DateTime
-	rentMajDecreeIncreasedAmount: Decimal
-	rentMajDecreeReferenceAmount: Decimal
-	rentMajorationDecree: Boolean
-	rentMaxEvolutionRelocation: Boolean
-	rentPaymentDate: DateTime
-	rentPaymentMethod: RentPaymentMethod
-	rentPaymentPlace: String
-	rentPeriodicity: LeaseRentPeriodicity
-	rentUnderestimatedMethod: String
-	rentUnderestimatedMonthlyVariation: Decimal
-	resolutaryClause: String
-	solidarityClause: String
-	tenantFeeCapNewRental: Decimal
-	tenantFeeCapPrestations: Decimal
-	tenantFeeCapReportByMeter: Decimal
-	tenantFeeCapReportPrestations: Decimal
-	tenantLastRentAmount: Decimal
-	tenantLastRentReceivedDate: DateTime
-	tenantLastRentRevisionDate: DateTime
-	worksDecenceSinceLastRental: String
-	worksRentDecreaseTenant: String
-	worksRentIncreaseLender: String
-}
 scalar InviteToken
 type Lease {
 	id: ID!
@@ -394,10 +344,10 @@ type Lease {
 	type: LeaseType!
 	leaseId: ID
 	propertyId: ID!
-	data: LeaseFurnishedData
+	details: LeaseDetails
 	expiredAt: DateTime
 	renewDate: DateTime
-	duration: LeaseFurnishedDuration!
+	duration: LeaseDuration!
 	status: LeaseStatus!
 	rentFullAmount: Decimal!
 	rents: [Rent!]!
@@ -406,13 +356,13 @@ type Lease {
 	account: Account
 	property: Property!
 }
-type LeaseFurnishedData {
+type LeaseDetails {
 	chargesRecuperationMode: RentChargesRecuperationMode
 	chargesRevisionMethod: String
 	colocationInsuranceLender: Boolean
 	colocationInsuranceMonthlyAmount: Decimal
 	colocationInsuranceTotalAmount: Decimal
-	duration: LeaseFurnishedDuration
+	duration: LeaseDuration
 	lenderFeeCap: Decimal
 	lenderFeeCapOther: String
 	lenderFeeCapPrestations: Decimal
@@ -445,9 +395,50 @@ type LeaseFurnishedData {
 	worksRentDecreaseTenant: String
 	worksRentIncreaseLender: String
 }
-enum LeaseFurnishedDuration {
+input LeaseDetailsInput {
+	chargesRecuperationMode: RentChargesRecuperationMode
+	chargesRevisionMethod: String
+	colocationInsuranceLender: Boolean
+	colocationInsuranceMonthlyAmount: Decimal
+	colocationInsuranceTotalAmount: Decimal
+	duration: LeaseDuration
+	lenderFeeCap: Decimal
+	lenderFeeCapOther: String
+	lenderFeeCapPrestations: Decimal
+	otherConditions: String
+	rentComplement: Decimal
+	rentComplementPropertyJustification: String
+	rentFirstAmount: Decimal
+	rentIrl: LeaseRentReferenceIrl
+	rentIrlRevisionDate: DateTime
+	rentMajDecreeIncreasedAmount: Decimal
+	rentMajDecreeReferenceAmount: Decimal
+	rentMajorationDecree: Boolean
+	rentMaxEvolutionRelocation: Boolean
+	rentPaymentDate: DateTime
+	rentPaymentMethod: RentPaymentMethod
+	rentPaymentPlace: String
+	rentPeriodicity: LeaseRentPeriodicity
+	rentUnderestimatedMethod: String
+	rentUnderestimatedMonthlyVariation: Decimal
+	resolutaryClause: String
+	solidarityClause: String
+	tenantFeeCapNewRental: Decimal
+	tenantFeeCapPrestations: Decimal
+	tenantFeeCapReportByMeter: Decimal
+	tenantFeeCapReportPrestations: Decimal
+	tenantLastRentAmount: Decimal
+	tenantLastRentReceivedDate: DateTime
+	tenantLastRentRevisionDate: DateTime
+	worksDecenceSinceLastRental: String
+	worksRentDecreaseTenant: String
+	worksRentIncreaseLender: String
+}
+enum LeaseDuration {
 	NINE_MONTHS
 	ONE_YEAR
+	THREE_YEARS
+	SIX_YEARS
 }
 enum LeaseRentPeriodicity {
 	ANNUALY
@@ -521,8 +512,7 @@ type Mutation {
 	createAdvertisement(input: CreateAdvertisementInput!): CreateAdvertisementPayload!
 	updateAdvertisement(input: UpdateAdvertisementInput!): UpdateAdvertisementPayload!
 	createLease(input: CreateLeaseInput!): CreateLeasePayload!
-	createFurnishedLease(input: CreateFurnishedLeaseInput!): CreateFurnishedLeasePayload!
-	updateFurnishedLease(input: UpdateFurnishedLeaseInput!): UpdateFurnishedLeasePayload!
+	updateLease(input: UpdateLeaseInput!): UpdateLeasePayload!
 	deleteLease(input: DeleteLeaseInput!): DeleteLeasePayload!
 	updateIndividualLender(input: UpdateIndividualLenderInput!): UpdateIndividualLenderPayload!
 	createCandidacy(input: CreateCandidacyInput!): CreateCandidacyPayload!
@@ -848,20 +838,19 @@ input UpdateAdvertisementInput {
 type UpdateAdvertisementPayload {
 	advertisement: Advertisement!
 }
-input UpdateFurnishedLeaseInput {
-	details: FurnishedLeaseDetailsInput
-	file: CreateFileInput
-	id: ID!
-}
-type UpdateFurnishedLeasePayload {
-	lease: Lease!
-}
 input UpdateIndividualLenderInput {
 	id: ID!
 	individual: UpdatePersonInput!
 }
 type UpdateIndividualLenderPayload {
 	lender: Lender!
+}
+input UpdateLeaseInput {
+	details: LeaseDetailsInput
+	id: ID!
+}
+type UpdateLeasePayload {
+	lease: Lease!
 }
 input UpdatePersonInput {
 	address: AddressInput

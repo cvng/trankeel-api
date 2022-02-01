@@ -12,7 +12,6 @@ pub use crate::Invitestatus;
 pub use crate::Leaseduration;
 pub use crate::Leasetype;
 pub use crate::Legalentitytype;
-pub use crate::Nakedleaseduration;
 pub use crate::Personrole;
 pub use crate::Plancode;
 pub use crate::Propertybuildinglegalstatus;

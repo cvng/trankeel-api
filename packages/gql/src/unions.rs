@@ -1,7 +1,6 @@
 use crate::objects::Candidacy;
 use crate::objects::Company;
 use crate::objects::File;
-use crate::objects::FurnishedLeaseDetails;
 use crate::objects::Lease;
 use crate::objects::Payment;
 use crate::objects::Person;
@@ -52,21 +51,6 @@ impl From<trankeel::DiscussionItem> for DiscussionItem {
         match item {
             trankeel::DiscussionItem::Candidacy(inner) => Self::Candidacy(inner.into()),
             trankeel::DiscussionItem::Lease(inner) => Self::Lease(inner.into()),
-        }
-    }
-}
-
-#[derive(Union)]
-pub enum LeaseDetails {
-    FurnishedLeaseDetails(FurnishedLeaseDetails),
-}
-
-impl From<trankeel::LeaseDetails> for LeaseDetails {
-    fn from(item: trankeel::LeaseDetails) -> Self {
-        match item {
-            trankeel::LeaseDetails::FurnishedLeaseDetails(inner) => {
-                Self::FurnishedLeaseDetails(inner.into())
-            }
         }
     }
 }

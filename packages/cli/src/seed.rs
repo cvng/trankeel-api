@@ -5,7 +5,7 @@ use trankeel::Amount;
 use trankeel::AuthId;
 use trankeel::CreateAdvertisementInput;
 use trankeel::CreateCandidacyInput;
-use trankeel::CreateFurnishedLeaseInput;
+use trankeel::CreateLeaseInput;
 use trankeel::CreateProfessionalWarrantInput;
 use trankeel::CreatePropertyInput;
 use trankeel::CreateTenantInput;
@@ -101,14 +101,14 @@ pub async fn seed() {
         .unwrap();
 
     let lease = client
-        .create_furnished_lease(
+        .create_lease(
             &auth_id,
-            CreateFurnishedLeaseInput {
+            CreateLeaseInput {
                 details: None,
-                deposit_amount: Amount::new(36000),
+                deposit_amount: Some(Amount::new(36000)),
                 effect_date: Utc::now().into(),
                 renew_date: None,
-                file: None,
+                type_: LeaseType::default(),
                 property_id: property.id,
                 rent_amount: Amount::new(36000),
                 rent_charges_amount: Some(Amount::new(9000)),
@@ -124,7 +124,7 @@ pub async fn seed() {
             &auth_id,
             CreateAdvertisementInput {
                 published: true,
-                lease_type: LeaseType::Furnished,
+                lease_type: LeaseType::default(),
                 rent_amount: Amount::new(36000),
                 rent_charges_amount: Some(Amount::new(9000)),
                 deposit_amount: Amount::new(36000),

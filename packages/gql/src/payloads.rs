@@ -185,17 +185,6 @@ impl From<trankeel::Message> for PushMessagePayload {
 }
 
 #[derive(SimpleObject)]
-pub struct CreateLeasePayload {
-    lease: Lease,
-}
-
-impl From<trankeel::Lease> for CreateLeasePayload {
-    fn from(item: trankeel::Lease) -> Self {
-        Self { lease: item.into() }
-    }
-}
-
-#[derive(SimpleObject)]
 pub struct DeleteTenantPayload {
     id: TenantId,
 }
@@ -268,22 +257,22 @@ impl From<trankeel::Lender> for UpdateIndividualLenderPayload {
 }
 
 #[derive(SimpleObject)]
-pub struct CreateFurnishedLeasePayload {
+pub struct CreateLeasePayload {
     lease: Lease,
 }
 
-impl From<trankeel::Lease> for CreateFurnishedLeasePayload {
+impl From<trankeel::Lease> for CreateLeasePayload {
     fn from(item: trankeel::Lease) -> Self {
         Self { lease: item.into() }
     }
 }
 
 #[derive(SimpleObject)]
-pub struct UpdateFurnishedLeasePayload {
+pub struct UpdateLeasePayload {
     lease: Lease,
 }
 
-impl From<trankeel::Lease> for UpdateFurnishedLeasePayload {
+impl From<trankeel::Lease> for UpdateLeasePayload {
     fn from(item: trankeel::Lease) -> Self {
         Self { lease: item.into() }
     }

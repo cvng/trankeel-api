@@ -5,7 +5,9 @@ CREATE TYPE leasetype AS ENUM (
 
 CREATE TYPE leaseduration AS ENUM (
     'nine_months',
-    'one_year'
+    'one_year',
+    'three_years',
+    'six_years'
 );
 
 CREATE TABLE leases (
