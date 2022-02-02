@@ -44,6 +44,7 @@ impl BillingProvider for Stripe {
             promotion_code: Default::default(),
             shipping: Default::default(),
             source: Default::default(),
+            tax: Default::default(),
             tax_exempt: Default::default(),
             tax_id_data: Default::default(),
         };
@@ -56,6 +57,7 @@ impl BillingProvider for Stripe {
         let subscription_params = stripe::CreateSubscription {
             add_invoice_items: Default::default(),
             application_fee_percent: Default::default(),
+            automatic_tax: Default::default(),
             backdate_start_date: Default::default(),
             billing_cycle_anchor: Default::default(),
             billing_thresholds: Default::default(),
@@ -70,17 +72,18 @@ impl BillingProvider for Stripe {
             default_tax_rates: Default::default(),
             expand: &["customer"],
             // https://stripe.com/docs/api/subscriptions/create#create_subscription-items
-            items: Some(vec![stripe::CreateSubscriptionItems {
+            items: Some(Box::new(vec![stripe::CreateSubscriptionItems {
                 billing_thresholds: None,
                 metadata: Default::default(),
-                price: Some(price_id), // <-
+                price: Some(Box::new(price_id)), // <-
                 price_data: None,
                 quantity: None,
                 tax_rates: None,
-            }]),
+            }])),
             metadata: Default::default(),
             off_session: Default::default(),
             payment_behavior: Default::default(),
+            payment_settings: Default::default(),
             pending_invoice_item_interval: Default::default(),
             promotion_code: Default::default(),
             proration_behavior: Default::default(),
@@ -93,8 +96,6 @@ impl BillingProvider for Stripe {
         let subscription = stripe::Subscription::create(&self.client, subscription_params)
             .await
             .unwrap();
-
-        log::debug!("Created subscription {}", subscription.id);
 
         Ok(subscription.into())
     }
