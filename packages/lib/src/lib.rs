@@ -28,6 +28,8 @@ pub use trankeel_ops::leases::CreateReceiptsInput;
 pub use trankeel_ops::leases::DeleteLeaseInput;
 pub use trankeel_ops::leases::SendReceiptsInput;
 pub use trankeel_ops::leases::UpdateLeaseInput;
+pub use trankeel_ops::lenders::CreateLenderInput;
+pub use trankeel_ops::lenders::CreateProfessionalLenderInput;
 pub use trankeel_ops::lenders::UpdateIndividualLenderInput;
 pub use trankeel_ops::messaging::CreateDiscussionInput;
 pub use trankeel_ops::messaging::DeleteDiscussionInput;

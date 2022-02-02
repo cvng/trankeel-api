@@ -77,6 +77,8 @@ use trankeel_ops::leases::SendReceipts;
 use trankeel_ops::leases::SendReceiptsInput;
 use trankeel_ops::leases::UpdateLease;
 use trankeel_ops::leases::UpdateLeaseInput;
+use trankeel_ops::lenders::CreateLender;
+use trankeel_ops::lenders::CreateLenderInput;
 use trankeel_ops::lenders::UpdateIndividualLender;
 use trankeel_ops::lenders::UpdateIndividualLenderInput;
 use trankeel_ops::messaging::DeleteDiscussion;
@@ -503,6 +505,22 @@ impl Client {
         dispatcher::dispatch(&self.0, DeleteLease.run(input)?)
             .await
             .map(|_| lease_id)
+    }
+
+    #[named]
+    pub async fn create_lender(
+        &self,
+        auth_id: &AuthId,
+        input: CreateLenderInput,
+    ) -> Result<Lender> {
+        log::info!("Command: {}", function_name!());
+
+        let lender_id = LenderId::new();
+        let account = self.accounts().by_auth_id(auth_id)?;
+
+        dispatcher::dispatch(&self.0, CreateLender::new(lender_id, &account).run(input)?)
+            .await
+            .and_then(|_| Ok(self.lenders().by_id(&lender_id)?.0))
     }
 
     #[named]

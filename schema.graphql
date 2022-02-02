@@ -131,6 +131,13 @@ input CreateFileInput {
 	downloadUrl: URL!
 	type: FileType!
 }
+input CreateIndividualLenderInput {
+	email: String!
+	firstName: String!
+	lastName: String!
+	address: AddressInput
+	phoneNumber: PhoneNumber
+}
 input CreateIndividualWarrantInput {
 	email: String!
 	firstName: String!
@@ -153,12 +160,28 @@ input CreateLeaseInput {
 type CreateLeasePayload {
 	lease: Lease!
 }
+input CreateLenderInput {
+	individual: CreateIndividualLenderInput
+	company: CreateProfessionalLenderInput
+}
+type CreateLenderPayload {
+	lender: Lender!
+}
 input CreateNoticesInput {
 	rentIds: [ID!]!
 	date: DateTime
 }
 type CreateNoticesPayload {
 	notices: [File!]!
+}
+input CreateProfessionalLenderInput {
+	address: AddressInput
+	email: String!
+	legalEntity: String!
+	legalEntityIdentifier: String
+	legalEntityType: LegalEntityType
+	legalEntityTypeOther: String
+	phoneNumber: PhoneNumber
 }
 input CreateProfessionalWarrantInput {
 	name: String!
@@ -513,6 +536,7 @@ type Mutation {
 	createLease(input: CreateLeaseInput!): CreateLeasePayload!
 	updateLease(input: UpdateLeaseInput!): UpdateLeasePayload!
 	deleteLease(input: DeleteLeaseInput!): DeleteLeasePayload!
+	createLender(input: CreateLenderInput!): CreateLenderPayload!
 	updateIndividualLender(input: UpdateIndividualLenderInput!): UpdateIndividualLenderPayload!
 	createCandidacy(input: CreateCandidacyInput!): CreateCandidacyPayload!
 	acceptCandidacy(input: AcceptCandidacyInput!): AcceptCandidacyPayload!

@@ -6,6 +6,8 @@ use trankeel::AuthId;
 use trankeel::CreateAdvertisementInput;
 use trankeel::CreateCandidacyInput;
 use trankeel::CreateLeaseInput;
+use trankeel::CreateLenderInput;
+use trankeel::CreateProfessionalLenderInput;
 use trankeel::CreateProfessionalWarrantInput;
 use trankeel::CreatePropertyInput;
 use trankeel::CreateTenantInput;
@@ -43,6 +45,25 @@ pub async fn seed() {
         .user;
 
     let (lender, _) = client.lenders().by_individual_id(&user.id).unwrap();
+
+    let company_lender = client
+        .create_lender(
+            &auth_id,
+            CreateLenderInput {
+                individual: None,
+                company: Some(CreateProfessionalLenderInput {
+                    address: None,
+                    email: author.email.clone(),
+                    legal_entity: "SCI TRANKEEL".into(),
+                    legal_entity_identifier: None,
+                    legal_entity_type: None,
+                    legal_entity_type_other: None,
+                    phone_number: None,
+                }),
+            },
+        )
+        .await
+        .unwrap();
 
     let property = client
         .create_property(
@@ -200,9 +221,10 @@ pub async fn seed() {
     let rejected_candidacy = client.candidacies().by_id(&rejected_candidacy.id).unwrap();
 
     log::info!(
-        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n🌱 Database seeded.",
+        "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n🌱 Database seeded.",
         user,
         lender,
+        company_lender,
         property,
         tenant,
         lease,
