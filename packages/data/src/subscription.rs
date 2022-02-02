@@ -29,7 +29,7 @@ impl From<stripe::Subscription> for Subscription {
                 Expandable::Object(customer) => customer.id.to_string(),
             },
             // https://stripe.com/docs/api/subscriptions/object#subscription_object-trial_end
-            trial_end: item.trial_end.map(DateTime::new),
+            trial_end: item.trial_end.as_deref().copied().map(DateTime::new),
         }
     }
 }
