@@ -1,4 +1,5 @@
 use crate::id;
+use crate::sql_schema::companies;
 use crate::Address;
 use crate::DateTime;
 use crate::Email;
@@ -25,7 +26,8 @@ pub enum LegalEntityType {
     Snc,
 }
 
-#[derive(Clone, Debug, Queryable)]
+#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
+#[table_name = "companies"]
 pub struct Company {
     pub id: CompanyId,
     pub created_at: Option<DateTime>,

@@ -1038,6 +1038,12 @@ impl database::CompanyStore for CompanyStore<'_> {
     fn by_id(&mut self, id: &CompanyId) -> Result<Company> {
         Ok(companies::table.find(id).first(&self.0.get()?)?)
     }
+
+    fn create(&mut self, data: &Company) -> Result<Company> {
+        Ok(insert_into(companies::table)
+            .values(data)
+            .get_result(&self.0.get()?)?)
+    }
 }
 
 impl database::EventStore for EventStore<'_> {

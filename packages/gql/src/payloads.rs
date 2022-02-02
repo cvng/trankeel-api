@@ -244,6 +244,19 @@ impl From<trankeel::Candidacy> for AcceptCandidacyPayload {
 }
 
 #[derive(SimpleObject)]
+pub struct CreateLenderPayload {
+    lender: Lender,
+}
+
+impl From<trankeel::Lender> for CreateLenderPayload {
+    fn from(item: trankeel::Lender) -> Self {
+        Self {
+            lender: item.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
 pub struct UpdateIndividualLenderPayload {
     lender: Lender,
 }

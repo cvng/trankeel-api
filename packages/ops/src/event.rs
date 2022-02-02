@@ -6,6 +6,7 @@ use trankeel_data::Advertisement;
 use trankeel_data::AuthId;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;
+use trankeel_data::Company;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Document;
@@ -42,6 +43,7 @@ pub enum Event {
     CandidacyAccepted(CandidacyAccepted),
     CandidacyCreated(CandidacyCreated),
     CandidacyRejected(CandidacyRejected),
+    CompanyCreated(CompanyCreated),
     DiscussionCreated(DiscussionCreated),
     DiscussionDeleted(DiscussionDeleted),
     DocumentGenerated(DocumentGenerated),
@@ -85,6 +87,7 @@ impl fmt::Display for Event {
                 Event::CandidacyAccepted(_) => "candidacy_accepted",
                 Event::CandidacyCreated(_) => "candidacy_created",
                 Event::CandidacyRejected(_) => "candidacy_rejected",
+                Event::CompanyCreated(_) => "company_created",
                 Event::DiscussionCreated(_) => "discussion_created",
                 Event::DiscussionDeleted(_) => "discussion_deleted",
                 Event::DocumentGenerated(_) => "document_generated",
@@ -130,6 +133,8 @@ impl DomainEvent for CandidacyAccepted {}
 impl DomainEvent for CandidacyCreated {}
 
 impl DomainEvent for CandidacyRejected {}
+
+impl DomainEvent for CompanyCreated {}
 
 impl DomainEvent for DiscussionCreated {}
 
@@ -250,6 +255,17 @@ pub struct CandidacyRejected {
 impl From<CandidacyRejected> for Event {
     fn from(item: CandidacyRejected) -> Self {
         Self::CandidacyRejected(item)
+    }
+}
+
+#[derive(Clone)]
+pub struct CompanyCreated {
+    pub company: Company,
+}
+
+impl From<CompanyCreated> for Event {
+    fn from(item: CompanyCreated) -> Self {
+        Self::CompanyCreated(item)
     }
 }
 

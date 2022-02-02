@@ -125,6 +125,7 @@ pub trait PersonStore {
 
 pub trait CompanyStore {
     fn by_id(&mut self, id: &CompanyId) -> Result<Company>;
+    fn create(&mut self, data: &Company) -> Result<Company>;
 }
 
 pub trait LenderStore {

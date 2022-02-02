@@ -3,6 +3,7 @@ use crate::payloads::CompleteStepPayload;
 use crate::payloads::CreateAdvertisementPayload;
 use crate::payloads::CreateCandidacyPayload;
 use crate::payloads::CreateLeasePayload;
+use crate::payloads::CreateLenderPayload;
 use crate::payloads::CreateNoticesPayload;
 use crate::payloads::CreatePropertyPayload;
 use crate::payloads::CreateReceiptsPayload;
@@ -28,6 +29,7 @@ use trankeel::CompleteStepInput;
 use trankeel::CreateAdvertisementInput;
 use trankeel::CreateCandidacyInput;
 use trankeel::CreateLeaseInput;
+use trankeel::CreateLenderInput;
 use trankeel::CreateNoticesInput;
 use trankeel::CreatePropertyInput;
 use trankeel::CreateReceiptsInput;
@@ -201,6 +203,18 @@ impl Mutation {
         Ok(ctx
             .data_unchecked::<Client>()
             .delete_lease(ctx.data::<AuthId>()?, input)
+            .await?
+            .into())
+    }
+
+    async fn create_lender(
+        &self,
+        ctx: &Context<'_>,
+        input: CreateLenderInput,
+    ) -> Result<CreateLenderPayload> {
+        Ok(ctx
+            .data_unchecked::<Client>()
+            .create_lender(ctx.data::<AuthId>()?, input)
             .await?
             .into())
     }
