@@ -2,6 +2,7 @@ use crate::routes;
 #[cfg(debug_assertions)]
 use crate::routes::debug_routes;
 use crate::webhooks;
+use firebase_admin_auth_rs::jwk_auth::JwkAuth;
 use rocket::routes;
 use rocket::Build;
 use rocket::Rocket;
@@ -15,8 +16,8 @@ use trankeel_graphql::extensions::Logger;
 /// Build Trankeel web server.
 ///
 /// https://rocket.rs
-pub fn server(config: &Config) -> Result<Rocket<Build>> {
-    let client = trankeel::init(config)?;
+pub async fn server(config: Config) -> Result<Rocket<Build>> {
+    let client = trankeel::init(&config)?;
 
     let schema = trankeel_graphql::build_schema()
         .extension(ApolloTracing)
@@ -24,11 +25,15 @@ pub fn server(config: &Config) -> Result<Rocket<Build>> {
         .data(client.clone())
         .finish();
 
+    let jwk_auth = JwkAuth::new(config.firebase_project_id.clone().unwrap()).await;
+
     let server = rocket::build()
         .attach(CorsOptions::default().to_cors()?)
         .attach(Template::fairing())
+        .manage(config)
         .manage(client)
         .manage(schema)
+        .manage(jwk_auth)
         .mount(
             "/",
             routes![
