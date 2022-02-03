@@ -8,17 +8,7 @@
       "type": "lldb",
       "request": "launch",
       "name": "Debug executable 'trankeel-api'",
-      "cargo": {
-        "args": [
-          "build",
-          "--bin=trankeel-api",
-          "--package=trankeel-api"
-        ],
-        "filter": {
-          "name": "trankeel-api",
-          "kind": "bin"
-        }
-      },
+      "program": "${workspaceRoot}/target/debug/trankeel-api",
       "args": [],
       "cwd": "${workspaceFolder}"
     }

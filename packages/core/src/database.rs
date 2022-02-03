@@ -134,6 +134,7 @@ pub trait LenderStore {
     fn by_account_id(&mut self, account_id: &AccountId) -> Result<Vec<LenderWithIdentity>>;
     fn by_account_id_first(&mut self, account_id: &AccountId) -> Result<LenderWithIdentity>;
     fn by_individual_id(&mut self, individual_id: &PersonId) -> Result<LenderWithIdentity>;
+    fn by_rent_id(&mut self, rent_id: &RentId) -> Result<LenderWithIdentity>;
     fn create(&mut self, data: &Lender) -> Result<Lender>;
     fn update(&mut self, data: &Lender) -> Result<Lender>;
 }

@@ -17,6 +17,7 @@ pub use trankeel_ops::auth::UpdateAccountInput;
 pub use trankeel_ops::candidacies::AcceptCandidacyInput;
 pub use trankeel_ops::candidacies::CreateCandidacyInput;
 pub use trankeel_ops::error::Error;
+pub use trankeel_ops::error::PublicError;
 pub use trankeel_ops::error::Result;
 pub use trankeel_ops::event;
 pub use trankeel_ops::files::CreateFileInput;

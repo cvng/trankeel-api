@@ -672,6 +672,12 @@ enum PropertyUsageType {
 	COLLECTIVE
 	INDIVIDUAL
 }
+enum PublicError {
+	UNIMPLEMENTED_INVITE_REASON
+	CANDIDACY_ALREADY_REJECTED
+	INVALID_SIGNATURE_DATE
+	MISSING_LENDER_ADDRESS
+}
 input PushMessageInput {
 	discussionId: ID!
 	senderId: ID!
