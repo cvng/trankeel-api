@@ -787,6 +787,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "firebase-admin-auth-rs"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7469df9705c71ef880f2c1c2761e0212cc9df01321701eb4db73bdbce312e78"
+dependencies = [
+ "async-trait",
+ "hyper 0.14.16",
+ "jsonwebtoken",
+ "log",
+ "reqwest 0.11.9",
+ "serde",
+ "tokio 1.15.0",
+]
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3424,7 +3439,7 @@ dependencies = [
  "chrono",
  "dotenv",
  "env_logger",
- "jsonwebtoken",
+ "firebase-admin-auth-rs",
  "log",
  "rocket",
  "rocket_cors",

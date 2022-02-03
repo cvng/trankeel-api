@@ -6,7 +6,7 @@ mod server;
 mod webhooks;
 
 #[rocket::launch]
-fn rocket() -> _ {
+async fn rocket() -> _ {
     init_logger();
 
     #[cfg(debug_assertions)]
@@ -19,7 +19,7 @@ fn rocket() -> _ {
     #[cfg(feature = "sentry")]
     let _guard = init_sentry(&config);
 
-    server::server(&config).unwrap()
+    server::server(config).await.unwrap()
 }
 
 fn init_logger() {

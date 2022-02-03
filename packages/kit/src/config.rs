@@ -21,6 +21,7 @@ pub struct Config {
     author: Option<String>,
     pub database_url: Option<String>,
     pub debug_auth_id: Option<String>,
+    pub firebase_project_id: Option<String>,
     pub pdfmonkey_private_key: Option<String>,
     pub sendinblue_api_key: Option<String>,
     pub sentry_dsn: Option<String>,
