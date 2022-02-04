@@ -1,2 +1,4 @@
+# https://rust-lang.github.io/rustfmt
+
 imports_granularity = "item"
 group_imports = "one"
