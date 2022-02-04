@@ -551,8 +551,12 @@ impl Client {
         log::info!("Command: {}", function_name!());
 
         let rents = self.rents().by_id_many(&input.rent_ids)?;
+        let lenders = rents
+            .iter()
+            .map(|rent| self.lenders().by_rent_id(&rent.id))
+            .collect::<Result<Vec<_>>>()?;
 
-        dispatcher::dispatch(&self.0, CreateReceipts::new(&rents).run(input)?)
+        dispatcher::dispatch(&self.0, CreateReceipts::new(&rents, &lenders).run(input)?)
             .await
             .map(|_| Vec::new())
     }

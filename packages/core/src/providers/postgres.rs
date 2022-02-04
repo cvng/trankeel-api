@@ -717,6 +717,17 @@ impl database::LenderStore for LenderStore<'_> {
         Ok((lender, LegalIdentity::Individual(person)))
     }
 
+    fn by_rent_id(&mut self, rent_id: &RentId) -> Result<LenderWithIdentity> {
+        lenders::table
+            .select(lenders::all_columns)
+            .left_join(properties::table.on(properties::lender_id.eq(lenders::id)))
+            .left_join(leases::table.on(leases::property_id.eq(properties::id)))
+            .left_join(rents::table.on(rents::lease_id.eq(leases::id)))
+            .filter(rents::id.eq(rent_id))
+            .first::<Lender>(&self.0.get()?)
+            .map(|lender| self.by_id(&lender.id))?
+    }
+
     fn create(&mut self, data: &Lender) -> Result<Lender> {
         Ok(insert_into(lenders::table)
             .values(data)

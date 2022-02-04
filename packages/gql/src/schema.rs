@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io;
 use std::io::Write;
 use std::path::Path;
+use trankeel::PublicError;
 
 pub type Schema = async_graphql::Schema<Query, Mutation, EmptySubscription>;
 
@@ -16,6 +17,7 @@ pub type Schema = async_graphql::Schema<Query, Mutation, EmptySubscription>;
 /// https://async-graphql.github.io
 pub fn build_schema() -> SchemaBuilder<Query, Mutation, EmptySubscription> {
     async_graphql::Schema::build(Query, Mutation, EmptySubscription)
+        .register_output_type::<PublicError>()
         .register_output_type::<PersonInterface>()
         .register_output_type::<LegalIdentityInterface>()
 }
