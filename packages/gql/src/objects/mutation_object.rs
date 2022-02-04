@@ -39,6 +39,7 @@ use trankeel::DeleteDiscussionInput;
 use trankeel::DeleteLeaseInput;
 use trankeel::DeletePropertyInput;
 use trankeel::DeleteTenantInput;
+use trankeel::PublicError;
 use trankeel::PushMessageInput;
 use trankeel::SignupUserFromInviteInput;
 use trankeel::UpdateAdvertisementInput;
@@ -313,5 +314,10 @@ impl Mutation {
             .complete_step(input)
             .await?
             .into())
+    }
+
+    // TODO: https://github.com/piteo-team/trankeel-api/pull/349
+    async fn errors(&self, input: PublicError) -> Result<PublicError> {
+        Ok(input)
     }
 }

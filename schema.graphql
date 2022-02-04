@@ -545,6 +545,7 @@ type Mutation {
 	pushMessage(input: PushMessageInput!): PushMessagePayload!
 	deleteDiscussion(input: DeleteDiscussionInput!): DeleteDiscussionPayload!
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
+	errors(input: PublicError!): PublicError!
 }
 type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
