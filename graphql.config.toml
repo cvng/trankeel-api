@@ -1,1 +1,3 @@
+# https://www.graphql-config.com/docs/user/user-introduction
+
 schema = "schema.graphql"

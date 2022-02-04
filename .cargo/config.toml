@@ -2,6 +2,9 @@
 dev = "watch --clear --exec=run --ignore=schema.graphql"
 lint = "clippy"
 coverage = "llvm-cov"
-codegen = "run --bin=trankeel-cli -- codegen"
+generate = "run --bin=trankeel-cli -- generate"
 migrate = "run --bin=trankeel-cli -- migrate"
 seed = "run --bin=trankeel-cli -- seed"
+
+[build]
+target-dir = "build"

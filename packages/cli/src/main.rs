@@ -1,4 +1,4 @@
-mod codegen;
+mod generate;
 mod migrate;
 mod seed;
 
@@ -13,7 +13,7 @@ async fn main() {
     let command = args[1].as_str();
 
     match command {
-        "codegen" => codegen::codegen().await,
+        "generate" => generate::generate().await,
         "migrate" => migrate::migrate().await,
         "seed" => seed::seed().await,
         _ => eprintln!("error: invalid command: `{command}`"),

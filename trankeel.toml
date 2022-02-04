@@ -1,3 +1,5 @@
+# https://github.com/piteo-team/trankeel-api
+
 [routes]
 candidacy_url = "/candidacy/:id"
 invite_url = "/invite?email=:email&token=:token"

@@ -19,7 +19,6 @@ for root, dirs, files in os.walk("."):
         path = root + os.sep + name
 
         if name.endswith(".rs"):
-            # print(path)
             for line in fileinput.input(path, inplace=True):
                 if a.match(line):
                     derives = line[9:-3]
