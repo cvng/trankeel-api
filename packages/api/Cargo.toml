@@ -11,7 +11,7 @@ pdfmonkey = ["trankeel/pdfmonkey"]
 sendinblue = ["trankeel/sendinblue"]
 
 [dependencies]
-async-graphql-rocket = "3.0.28"
+async-graphql-rocket = "3.0.29"
 chrono = "0.4.19"
 dotenv = "0.15.0"
 env_logger = "0.9.0"
