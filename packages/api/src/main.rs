@@ -7,37 +7,28 @@ mod webhooks;
 
 #[rocket::launch]
 async fn rocket() -> _ {
-    init_logger();
+    if std::env::var_os("RUST_LOG").is_none() {
+        std::env::set_var("RUST_LOG", "info");
+    }
 
-    #[cfg(debug_assertions)]
+    tracing_subscriber::fmt::init();
+
+    #[cfg(feature = "dotenv")]
     dotenv::dotenv().unwrap();
 
     let config = trankeel::config::config();
 
-    trankeel_graphql::write_schema("schema.graphql").ok();
+    #[cfg(not(feature = "release"))]
+    trankeel_graphql::write_schema(config.graphql.get("schema").unwrap()).ok();
 
     #[cfg(feature = "sentry")]
-    let _guard = init_sentry(&config);
-
-    server::server(config).await.unwrap()
-}
-
-fn init_logger() {
-    use std::io::Write;
-
-    env_logger::builder()
-        .format(|buf, record| writeln!(buf, "{} {}", record.level(), record.args()))
-        .filter(None, log::LevelFilter::Info)
-        .init()
-}
-
-#[cfg(feature = "sentry")]
-fn init_sentry(config: &trankeel::config::Config) -> sentry::ClientInitGuard {
-    sentry::init((
+    let _guard = sentry::init((
         config.sentry_dsn.clone(),
         sentry::ClientOptions {
             release: sentry::release_name!(),
             ..Default::default()
         },
-    ))
+    ));
+
+    server::server(config).await.unwrap()
 }

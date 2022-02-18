@@ -5,6 +5,7 @@ edition = "2021"
 default-run = "trankeel-api"
 
 [features]
+default = ["dotenv"]
 release = ["async-stripe", "pdfmonkey", "sendinblue", "sentry"]
 async-stripe = ["trankeel/async-stripe"]
 pdfmonkey = ["trankeel/pdfmonkey"]
@@ -13,8 +14,7 @@ sendinblue = ["trankeel/sendinblue"]
 [dependencies]
 async-graphql-rocket = "3.0.28"
 chrono = "0.4.19"
-dotenv = "0.15.0"
-env_logger = "0.9.0"
+dotenv = { version = "0.15.0", optional = true }
 firebase-admin-auth-rs = "0.1.0"
 log = "0.4.14"
 rocket = { version = "0.5.0-rc.1", default-features = false, features = ["json"] }
@@ -24,5 +24,6 @@ sentry = { version = "0.24.2", optional = true }
 serde = "1.0"
 serde_json = "1.0"
 tokio = { version = "1.10.0", features = ["full"] }
+tracing-subscriber = "0.3.9"
 trankeel = { path = "../lib" }
 trankeel-graphql = { path = "../gql" }

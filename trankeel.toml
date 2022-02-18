@@ -1,5 +1,8 @@
 # https://github.com/piteo-team/trankeel-api
 
+[graphql]
+schema = "schema.graphql"
+
 [routes]
 candidacy_url = "/candidacy/:id"
 invite_url = "/invite?email=:email&token=:token"

@@ -1,4 +1,5 @@
 use chrono::Utc;
+use trankeel::config::Config;
 use trankeel::AcceptCandidacyInput;
 use trankeel::AddressInput;
 use trankeel::Amount;
@@ -18,7 +19,7 @@ use trankeel::InternalError;
 use trankeel::LeaseType;
 use trankeel::WarrantType;
 
-pub async fn seed() {
+pub async fn seed(_config: Config) {
     let config = trankeel::config::config();
     let client = trankeel::init(&config).unwrap();
 
@@ -220,7 +221,7 @@ pub async fn seed() {
 
     let rejected_candidacy = client.candidacies().by_id(&rejected_candidacy.id).unwrap();
 
-    log::info!(
+    println!(
         "{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n{:#?}\n🌱 Database seeded.",
         user,
         lender,
