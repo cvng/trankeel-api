@@ -1,5 +1,7 @@
-pub async fn generate() {
-    trankeel_graphql::write_schema("schema.graphql").unwrap();
+use trankeel::config::Config;
 
-    log::info!("💫 GraphQL schema printed.");
+pub async fn generate(config: Config) {
+    trankeel_graphql::write_schema(config.graphql.get("schema").unwrap()).unwrap();
+
+    println!("💫 GraphQL schema printed.");
 }

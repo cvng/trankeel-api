@@ -1,8 +1,9 @@
 use std::io;
 use std::io::Write;
 use std::process::Command;
+use trankeel::config::Config;
 
-pub async fn migrate() {
+pub async fn migrate(_config: Config) {
     let output = Command::new("diesel")
         .args(&["migration", "run"])
         .output()
@@ -11,5 +12,5 @@ pub async fn migrate() {
     io::stdout().write_all(&output.stdout).unwrap();
     io::stderr().write_all(&output.stderr).unwrap();
 
-    log::info!("🌙 Database schema migrated.");
+    println!("🌙 Database schema migrated.");
 }

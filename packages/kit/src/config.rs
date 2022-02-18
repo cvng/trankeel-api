@@ -16,7 +16,7 @@ use std::path::Path;
 
 const CONFIG_FILE: &str = "trankeel.toml";
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Config {
     author: Option<String>,
     pub database_url: Option<String>,
@@ -31,6 +31,7 @@ pub struct Config {
     routes: BTreeMap<String, String>,
     templates: BTreeMap<String, Template>,
     workflows: BTreeMap<String, Workflow>,
+    pub graphql: BTreeMap<String, String>,
 }
 
 impl Config {
@@ -59,12 +60,6 @@ impl Config {
 
     pub fn workflows(&self, key: &str) -> Option<Workflow> {
         self.workflows.get(&key.replace('"', "")).cloned()
-    }
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -136,7 +131,7 @@ pub struct Requirement {
 }
 
 pub fn config() -> Config {
-    Config::default()
+    Config::new()
 }
 
 #[derive(Debug, Serialize, Deserialize)]

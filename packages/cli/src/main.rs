@@ -4,27 +4,23 @@ mod seed;
 
 #[tokio::main]
 async fn main() {
-    init_logger();
+    if std::env::var_os("RUST_LOG").is_none() {
+        std::env::set_var("RUST_LOG", "info");
+    }
 
-    #[cfg(debug_assertions)]
+    tracing_subscriber::fmt::init();
+
+    #[cfg(feature = "dotenv")]
     dotenv::dotenv().unwrap();
 
-    let args: Vec<String> = std::env::args().collect();
-    let command = args[1].as_str();
+    let config = trankeel::config::config();
 
-    match command {
-        "generate" => generate::generate().await,
-        "migrate" => migrate::migrate().await,
-        "seed" => seed::seed().await,
-        _ => eprintln!("error: invalid command: `{command}`"),
+    let command = std::env::args().collect::<Vec<_>>().get(1).cloned();
+
+    match command.as_deref() {
+        Some("generate") => generate::generate(config).await,
+        Some("migrate") => migrate::migrate(config).await,
+        Some("seed") => seed::seed(config).await,
+        _ => eprintln!("error: invalid command: `{:?}`", command),
     }
-}
-
-fn init_logger() {
-    use std::io::Write;
-
-    env_logger::builder()
-        .format(|buf, record| writeln!(buf, "{} {}", record.level(), record.args()))
-        .filter(None, log::LevelFilter::Info)
-        .init()
 }
