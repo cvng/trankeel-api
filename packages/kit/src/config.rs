@@ -16,13 +16,14 @@ use std::path::Path;
 
 const CONFIG_FILE: &str = "trankeel.toml";
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct Config {
     author: Option<String>,
     pub database_url: Option<String>,
     pub debug_auth_id: Option<String>,
     pub firebase_project_id: Option<String>,
     pub pdfmonkey_private_key: Option<String>,
+    pub port: Option<u16>,
     pub sendinblue_api_key: Option<String>,
     pub sentry_dsn: Option<String>,
     pub stripe_secret_key: Option<String>,
@@ -31,7 +32,6 @@ pub struct Config {
     routes: BTreeMap<String, String>,
     templates: BTreeMap<String, Template>,
     workflows: BTreeMap<String, Workflow>,
-    pub graphql: BTreeMap<String, String>,
 }
 
 impl Config {

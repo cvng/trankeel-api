@@ -248,7 +248,6 @@ type CreateUserWithAccountPayload {
 	user: Person!
 	lender: Lender!
 	account: Account!
-	subscription: Subscription
 }
 input CreateWarrantInput {
 	type: WarrantType!
@@ -756,10 +755,7 @@ type Step {
 	completedAt: DateTime
 }
 type Subscription {
-	id: String!
-	customerId: String!
-	status: SubscriptionStatus!
-	trialEnd: DateTime
+	viewer: AuthenticationID
 }
 """
 https://stripe.com/docs/billing/subscriptions/overview
@@ -964,4 +960,5 @@ enum WorkflowType {
 schema {
 	query: Query
 	mutation: Mutation
+	subscription: Subscription
 }

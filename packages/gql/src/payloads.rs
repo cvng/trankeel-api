@@ -20,7 +20,6 @@ pub struct CreateUserWithAccountPayload {
     user: Person,
     lender: Lender,
     account: Account,
-    subscription: Option<trankeel::Subscription>,
 }
 
 impl From<trankeel::CreateUserWithAccountPayload> for CreateUserWithAccountPayload {
@@ -29,7 +28,6 @@ impl From<trankeel::CreateUserWithAccountPayload> for CreateUserWithAccountPaylo
             user: item.user.into(),
             lender: item.lender.into(),
             account: item.account.into(),
-            subscription: None,
         }
     }
 }

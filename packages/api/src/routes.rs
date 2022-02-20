@@ -1,54 +1,99 @@
-use crate::guards::AuthGuard;
-use async_graphql_rocket::GraphQLRequest;
-use async_graphql_rocket::GraphQLResponse;
-use rocket::get;
-use rocket::post;
-use rocket::response::content::Html;
-use rocket::State;
+use crate::guards::AuthIdGuard;
+use async_graphql_poem::GraphQLProtocol;
+use async_graphql_poem::GraphQLRequest;
+use async_graphql_poem::GraphQLResponse;
+use async_graphql_poem::GraphQLWebSocket;
+use poem::handler;
+use poem::web::websocket::WebSocket;
+use poem::web::Data;
+use poem::web::Html;
+use poem::web::WithStatus;
+use poem::Error;
+use poem::IntoResponse;
+use serde_json::Value;
+use tera::Context;
+use tera::Tera;
+use trankeel::config;
 use trankeel_graphql::http::playground_source;
 use trankeel_graphql::http::GraphQLPlaygroundConfig;
+use trankeel_graphql::http::ALL_WEBSOCKET_PROTOCOLS;
 use trankeel_graphql::Schema;
+use trankeel_graphql::ServerError;
 
-#[get("/graphql")]
-pub fn graphql_playground() -> Html<String> {
-    Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
+pub async fn error_handler(err: Error) -> WithStatus<GraphQLResponse> {
+    log::error!("{err}");
+
+    GraphQLResponse(trankeel_graphql::Response::from_errors(vec![
+        ServerError::new(err.to_string(), None),
+    ]))
+    .with_status(err.as_response().status())
 }
 
-#[post("/graphql", data = "<request>", format = "application/json")]
-pub async fn graphql_request(
-    schema: &State<Schema>,
-    request: GraphQLRequest,
-    auth: AuthGuard,
-) -> GraphQLResponse {
-    let mut request = request;
+#[handler]
+pub fn graphql_playground() -> Html<String> {
+    Html(playground_source(
+        GraphQLPlaygroundConfig::new("/graphql").subscription_endpoint("/graphql/live"),
+    ))
+}
 
-    if let Some(auth_id) = auth.inner() {
+#[handler]
+pub async fn graphql_request(
+    request: GraphQLRequest,
+    schema: Data<&Schema>,
+    auth_id: Data<&AuthIdGuard>,
+) -> GraphQLResponse {
+    let mut request = request.0;
+
+    if let Some(auth_id) = auth_id.inner() {
         request = request.data(auth_id);
     }
 
-    request.execute(schema).await
+    schema.execute(request).await.into()
 }
 
-#[cfg(debug_assertions)]
-pub mod debug_routes {
-    use rocket::get;
-    use rocket_dyn_templates::Template;
-    use serde_json::Value;
-    use trankeel::config;
+#[handler]
+pub async fn graphql_live_request(
+    websocket: WebSocket,
+    protocol: GraphQLProtocol,
+    schema: Data<&Schema>,
+    auth_id: Data<&AuthIdGuard>,
+) -> impl IntoResponse {
+    let mut data = trankeel_graphql::Data::default();
 
-    #[get("/preview/<document_id>")]
-    pub fn preview_request(document_id: &str) -> Template {
-        let mut data = config::read_json(format!("pdfmonkey/{}.json", document_id)).unwrap();
-
-        let template_id = data.get("document_template_id").unwrap().as_str().unwrap();
-        let template_name = config::template_by_id(template_id)
-            .unwrap()
-            .path
-            .replace("templates/", "")
-            .replace(".html.tera", "");
-
-        let context: Value = data.get_mut("payload").unwrap().take();
-
-        Template::render(template_name, &context)
+    if let Some(auth_id) = auth_id.inner() {
+        data.insert(auth_id);
     }
+
+    let schema = schema.0.clone();
+
+    websocket
+        .protocols(ALL_WEBSOCKET_PROTOCOLS)
+        .on_upgrade(move |stream| {
+            GraphQLWebSocket::new(stream, schema, protocol)
+                .with_data(data)
+                .serve()
+        })
+}
+
+#[handler]
+pub fn preview_request(document_id: String) -> Html<String> {
+    let mut data = config::read_json(format!("pdfmonkey/{}.json", document_id)).unwrap();
+
+    let template_id = data.get("document_template_id").unwrap().as_str().unwrap();
+    let template_name = config::template_by_id(template_id)
+        .unwrap()
+        .path
+        .replace("templates/", "")
+        .replace(".html.tera", "");
+
+    let data: Value = data.get_mut("payload").unwrap().take();
+
+    Html(render(&template_name, data))
+}
+
+fn render(template_name: &str, data: Value) -> String {
+    Tera::new("templates/**/*") // TODO: use config
+        .unwrap()
+        .render(template_name, &Context::from_value(data).unwrap())
+        .unwrap()
 }

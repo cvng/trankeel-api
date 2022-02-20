@@ -2,7 +2,7 @@ use crate::interfaces::LegalIdentityInterface;
 use crate::interfaces::PersonInterface;
 use crate::objects::Mutation;
 use crate::objects::Query;
-use async_graphql::EmptySubscription;
+use crate::objects::Subscription;
 use async_graphql::SchemaBuilder;
 use std::fs::File;
 use std::io;
@@ -10,13 +10,13 @@ use std::io::Write;
 use std::path::Path;
 use trankeel::PublicError;
 
-pub type Schema = async_graphql::Schema<Query, Mutation, EmptySubscription>;
+pub type Schema = async_graphql::Schema<Query, Mutation, Subscription>;
 
 /// Build the GraphQL schema.
 ///
 /// https://async-graphql.github.io
-pub fn build_schema() -> SchemaBuilder<Query, Mutation, EmptySubscription> {
-    async_graphql::Schema::build(Query, Mutation, EmptySubscription)
+pub fn build_schema() -> SchemaBuilder<Query, Mutation, Subscription> {
+    async_graphql::Schema::build(Query, Mutation, Subscription)
         .register_output_type::<PublicError>()
         .register_output_type::<PersonInterface>()
         .register_output_type::<LegalIdentityInterface>()
