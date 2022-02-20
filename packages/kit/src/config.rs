@@ -23,7 +23,7 @@ pub struct Config {
     pub debug_auth_id: Option<String>,
     pub firebase_project_id: Option<String>,
     pub pdfmonkey_private_key: Option<String>,
-    pub port: u16,
+    pub port: Option<u16>,
     pub sendinblue_api_key: Option<String>,
     pub sentry_dsn: Option<String>,
     pub stripe_secret_key: Option<String>,
