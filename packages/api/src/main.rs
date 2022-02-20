@@ -5,30 +5,22 @@ mod routes;
 mod server;
 mod webhooks;
 
-#[rocket::launch]
-async fn rocket() -> _ {
-    if std::env::var_os("RUST_LOG").is_none() {
-        std::env::set_var("RUST_LOG", "info");
-    }
-
-    tracing_subscriber::fmt::init();
-
+#[tokio::main]
+async fn main() {
     #[cfg(feature = "dotenv")]
     dotenv::dotenv().unwrap();
+
+    tracing_subscriber::fmt::init();
 
     let config = trankeel::config::config();
 
     #[cfg(not(feature = "release"))]
-    trankeel_graphql::write_schema(config.graphql.get("schema").unwrap()).ok();
+    trankeel_graphql::write_schema("schema.graphql").unwrap();
 
     #[cfg(feature = "sentry")]
-    let _guard = sentry::init((
-        config.sentry_dsn.clone(),
-        sentry::ClientOptions {
-            release: sentry::release_name!(),
-            ..Default::default()
-        },
-    ));
+    let _guard = sentry::init(config.sentry_dsn.clone());
 
-    server::server(config).await.unwrap()
+    let app = server::app(config.clone()).await.unwrap();
+
+    server::server(config).run(app).await.unwrap()
 }
