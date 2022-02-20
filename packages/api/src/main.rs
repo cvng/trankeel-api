@@ -22,5 +22,8 @@ async fn main() {
 
     let app = server::app(config.clone()).await.unwrap();
 
-    server::server(config).run(app).await.unwrap()
+    server::server(("0.0.0.0", config.port.unwrap()))
+        .run(app)
+        .await
+        .unwrap()
 }
