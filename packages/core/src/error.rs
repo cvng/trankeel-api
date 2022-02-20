@@ -6,7 +6,7 @@ pub fn no(path: &str) -> Error {
     Error::msg(format!("Missing {}", path))
 }
 
-#[derive(thiserror::Error, Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum InternalError {
     #[error("mailer error")]
     MailerError,
