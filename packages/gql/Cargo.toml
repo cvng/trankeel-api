@@ -8,5 +8,6 @@ doctest = false
 
 [dependencies]
 async-graphql = { version = "3.0.28", features = ["apollo_tracing", "tracing"] }
+futures-timer = "3.0.2"
 trankeel = { path = "../lib" }
 serde = "1.0"
