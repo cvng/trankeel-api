@@ -1,7 +1,7 @@
 use trankeel::config::Config;
 
-pub async fn generate(config: Config) {
-    trankeel_graphql::write_schema(config.graphql.get("schema").unwrap()).unwrap();
+pub async fn generate(_config: Config) {
+    trankeel_graphql::write_schema("schema.graphql").unwrap();
 
     println!("💫 GraphQL schema printed.");
 }
