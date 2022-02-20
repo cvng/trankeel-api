@@ -11,3 +11,6 @@ pub use crate::schema::write_schema;
 pub use crate::schema::Schema;
 pub use async_graphql::extensions;
 pub use async_graphql::http;
+pub use async_graphql::Data;
+pub use async_graphql::Response;
+pub use async_graphql::ServerError;
