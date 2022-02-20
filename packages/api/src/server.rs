@@ -15,13 +15,16 @@ use trankeel_graphql::extensions::ApolloTracing;
 use trankeel_graphql::extensions::Tracing;
 
 /// Trankeel web server.
-pub type Server<'a> = poem::Server<TcpListener<(&'a str, u16)>, Infallible>;
+pub type Server<T> = poem::Server<TcpListener<T>, Infallible>;
 
 /// Build the web server.
 ///
 /// https://github.com/poem-web/poem
-pub fn server<'a>(config: Config) -> Server<'a> {
-    Server::new(TcpListener::bind(("0.0.0.0", config.port))).name("trankeel")
+pub fn server<T>(addr: T) -> Server<T>
+where
+    T: tokio::net::ToSocketAddrs + Send,
+{
+    Server::new(TcpListener::bind(addr)).name("trankeel")
 }
 
 /// Configure the web server.
