@@ -1,15 +1,15 @@
-use rocket::http::Status;
-use rocket::post;
-use rocket::serde::json::Json;
-use rocket::State;
+use poem::handler;
+use poem::http::StatusCode;
+use poem::web::Data;
+use poem::web::Json;
 use trankeel::config;
 use trankeel::event::DocumentGenerated;
 use trankeel::providers::PdfmonkeyInput;
 use trankeel::Client;
 
-#[post("/webhooks/pdfmonkey", data = "<input>", format = "application/json")]
-pub async fn pdfmonkey_request(client: &State<Client>, input: Json<PdfmonkeyInput>) -> Status {
-    log::debug!("{}", config::log_json(&input.to_owned()));
+#[handler]
+pub async fn pdfmonkey_request(client: Data<&Client>, input: Json<PdfmonkeyInput>) -> StatusCode {
+    log::debug!("{}", config::log_json(&input.0));
 
     client
         .dispatch(vec![DocumentGenerated {
@@ -17,6 +17,6 @@ pub async fn pdfmonkey_request(client: &State<Client>, input: Json<PdfmonkeyInpu
         }
         .into()])
         .await
-        .map(|_| Status::Ok)
+        .map(|_| StatusCode::OK)
         .unwrap()
 }
