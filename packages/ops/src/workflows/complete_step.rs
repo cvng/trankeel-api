@@ -1,8 +1,8 @@
+use crate::command::Command;
 use crate::error::Result;
 use crate::event::Event;
 use crate::event::StepCompleted;
 use crate::event::StepCompletedRequirement;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Step;
 use trankeel_data::StepId;

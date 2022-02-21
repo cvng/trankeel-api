@@ -6,6 +6,7 @@ use crate::Workflow;
 use crate::WorkflowId;
 use async_graphql::SimpleObject;
 use fake::Fake;
+use serde::Serialize;
 
 id!(StepId);
 
@@ -34,7 +35,15 @@ impl From<String> for StepEvent {
 }
 
 #[derive(
-    Clone, Debug, Associations, Identifiable, Insertable, Queryable, SimpleObject, AsChangeset,
+    Clone,
+    Debug,
+    Associations,
+    Identifiable,
+    Insertable,
+    Queryable,
+    SimpleObject,
+    AsChangeset,
+    Serialize,
 )]
 #[belongs_to(parent = "Workflow")]
 pub struct Step {

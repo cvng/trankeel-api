@@ -7,13 +7,14 @@ use crate::SubscriptionId;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
 use fake::Fake;
+use serde::Serialize;
 
 // # Types
 
 id!(AccountId);
 
 /// https://stripe.com/docs/billing/subscriptions/overview
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[graphql(name = "SubscriptionStatus")]
 #[DieselType = "Accountstatus"]
 pub enum AccountStatus {
@@ -32,7 +33,7 @@ impl Default for AccountStatus {
     }
 }
 
-#[derive(Clone, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(Clone, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Account {
     pub id: AccountId,
     pub created_at: Option<DateTime>,

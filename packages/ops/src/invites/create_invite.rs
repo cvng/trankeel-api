@@ -1,7 +1,7 @@
+use crate::command::Command;
 use crate::error::Result;
 use crate::event::Event;
 use crate::event::InviteCreated;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::AccountId;
 use trankeel_data::Invite;

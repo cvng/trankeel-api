@@ -1,7 +1,7 @@
+use crate::command::Command;
 use crate::error::Result;
 use crate::event::Event;
 use crate::event::WorkflowCreated;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Workflow;
 use trankeel_data::WorkflowId;

@@ -63,6 +63,7 @@ use trankeel_ops::candidacies::AcceptCandidacy;
 use trankeel_ops::candidacies::AcceptCandidacyInput;
 use trankeel_ops::candidacies::CreateCandidacy;
 use trankeel_ops::candidacies::CreateCandidacyInput;
+use trankeel_ops::command::Command;
 use trankeel_ops::error::Result;
 use trankeel_ops::event::Event;
 use trankeel_ops::leases::CreateLease;
@@ -103,7 +104,6 @@ use trankeel_ops::tenants::UpdateTenant;
 use trankeel_ops::tenants::UpdateTenantInput;
 use trankeel_ops::workflows::CompleteStep;
 use trankeel_ops::workflows::CompleteStepInput;
-use trankeel_ops::Command;
 
 #[derive(Clone)]
 pub struct Client(context::Context);

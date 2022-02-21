@@ -26,13 +26,13 @@ pub enum WarrantType {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub enum WarrantIdentity {
     Individual(Person),
     Professional(ProfessionalWarrant),
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Insertable, Queryable)]
 pub struct Warrant {
     pub id: WarrantId,
     pub created_at: Option<DateTime>,

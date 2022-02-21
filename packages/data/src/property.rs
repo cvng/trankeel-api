@@ -9,12 +9,13 @@ use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
 use fake::Fake;
 use serde::Deserialize;
+use serde::Serialize;
 
 // # Types
 
 id!(PropertyId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Propertyroomtype"]
 pub enum PropertyRoomType {
     Other,
@@ -27,7 +28,7 @@ pub enum PropertyRoomType {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Propertybuildperiodtype"]
 pub enum PropertyBuildPeriodType {
     #[graphql(name = "BEFORE_Y1949")]
@@ -42,7 +43,7 @@ pub enum PropertyBuildPeriodType {
     From_2005,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Propertyenergyclass"]
 pub enum PropertyEnergyClass {
     A,
@@ -54,7 +55,7 @@ pub enum PropertyEnergyClass {
     G,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Propertygasemission"]
 pub enum PropertyGasEmission {
     A,
@@ -66,28 +67,28 @@ pub enum PropertyGasEmission {
     G,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Propertybuildinglegalstatus"]
 pub enum PropertyBuildingLegalStatus {
     Copro,
     Mono,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Propertyhabitationusagetype"]
 pub enum PropertyHabitationUsageType {
     Habitation,
     Mixte,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Propertyusagetype"]
 pub enum PropertyUsageType {
     Collective,
     Individual,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[DieselType = "Propertystatus"]
 pub enum PropertyStatus {
     ForSale,
@@ -103,7 +104,7 @@ impl Default for PropertyStatus {
     }
 }
 
-#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
 #[table_name = "properties"]
 pub struct Property {
     pub id: PropertyId,

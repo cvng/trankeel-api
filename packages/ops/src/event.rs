@@ -1,4 +1,4 @@
-use crate::DomainEvent;
+use serde::Serialize;
 use std::fmt;
 use trankeel_data::Account;
 use trankeel_data::AccountId;
@@ -35,7 +35,7 @@ use trankeel_data::Workflow;
 use trankeel_data::Workflowable;
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub enum Event {
     AccountCreated(AccountCreated),
     AdvertisementCreated(AdvertisementCreated),
@@ -75,124 +75,56 @@ pub enum Event {
     WorkflowCreated(WorkflowCreated),
 }
 
-impl fmt::Display for Event {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                Event::AccountCreated(_) => "account_created",
-                Event::AdvertisementCreated(_) => "advertisement_created",
-                Event::AdvertisementUpdated(_) => "advertisement_updated",
-                Event::CandidacyAccepted(_) => "candidacy_accepted",
-                Event::CandidacyCreated(_) => "candidacy_created",
-                Event::CandidacyRejected(_) => "candidacy_rejected",
-                Event::CompanyCreated(_) => "company_created",
-                Event::DiscussionCreated(_) => "discussion_created",
-                Event::DiscussionDeleted(_) => "discussion_deleted",
-                Event::DocumentGenerated(_) => "document_generated",
-                Event::InviteAccepted(_) => "invite_accepted",
-                Event::InviteCreated(_) => "invite_created",
-                Event::LeaseAffected(_) => "lease_affected",
-                Event::LeaseCreated(_) => "lease_created",
-                Event::LeaseDeleted(_) => "lease_deleted",
-                Event::LeaseFileRequested(_) => "lease_file_requested",
-                Event::LeaseUpdated(_) => "lease_updated",
-                Event::LenderCreated(_) => "lender_created",
-                Event::LenderUpdated(_) => "lender_updated",
-                Event::MessagePushed(_) => "message_pushed",
-                Event::NoticeCreated(_) => "notice_created",
-                Event::PaymentCreated(_) => "payment_created",
-                Event::PersonCreated(_) => "person_created",
-                Event::PropertyCreated(_) => "property_created",
-                Event::PropertyDeleted(_) => "property_deleted",
-                Event::PropertyUpdated(_) => "property_updated",
-                Event::ReceiptCreated(_) => "receipt_created",
-                Event::ReceiptSent(_) => "receipt_sent",
-                Event::StepCompleted(_) => "step_completed",
-                Event::StepCreated(_) => "step_created",
-                Event::SubscriptionRequested(_) => "subscription_requested",
-                Event::TenantCreated(_) => "tenant_created",
-                Event::TenantUpdated(_) => "tenant_updated",
-                Event::TenantDeleted(_) => "tenant_deleted",
-                Event::WarrantCreated(_) => "warrant_created",
-                Event::WorkflowCreated(_) => "workflow_created",
-            }
-        )
+impl Event {
+    pub fn event_type(&self) -> String {
+        match self {
+            Event::AccountCreated(_) => "account_created".into(),
+            Event::AdvertisementCreated(_) => "advertisement_created".into(),
+            Event::AdvertisementUpdated(_) => "advertisement_updated".into(),
+            Event::CandidacyAccepted(_) => "candidacy_accepted".into(),
+            Event::CandidacyCreated(_) => "candidacy_created".into(),
+            Event::CandidacyRejected(_) => "candidacy_rejected".into(),
+            Event::CompanyCreated(_) => "company_created".into(),
+            Event::DiscussionCreated(_) => "discussion_created".into(),
+            Event::DiscussionDeleted(_) => "discussion_deleted".into(),
+            Event::DocumentGenerated(_) => "document_generated".into(),
+            Event::InviteAccepted(_) => "invite_accepted".into(),
+            Event::InviteCreated(_) => "invite_created".into(),
+            Event::LeaseAffected(_) => "lease_affected".into(),
+            Event::LeaseCreated(_) => "lease_created".into(),
+            Event::LeaseDeleted(_) => "lease_deleted".into(),
+            Event::LeaseFileRequested(_) => "lease_file_requested".into(),
+            Event::LeaseUpdated(_) => "lease_updated".into(),
+            Event::LenderCreated(_) => "lender_created".into(),
+            Event::LenderUpdated(_) => "lender_updated".into(),
+            Event::MessagePushed(_) => "message_pushed".into(),
+            Event::NoticeCreated(_) => "notice_created".into(),
+            Event::PaymentCreated(_) => "payment_created".into(),
+            Event::PersonCreated(_) => "person_created".into(),
+            Event::PropertyCreated(_) => "property_created".into(),
+            Event::PropertyDeleted(_) => "property_deleted".into(),
+            Event::PropertyUpdated(_) => "property_updated".into(),
+            Event::ReceiptCreated(_) => "receipt_created".into(),
+            Event::ReceiptSent(_) => "receipt_sent".into(),
+            Event::StepCompleted(_) => "step_completed".into(),
+            Event::StepCreated(_) => "step_created".into(),
+            Event::SubscriptionRequested(_) => "subscription_requested".into(),
+            Event::TenantCreated(_) => "tenant_created".into(),
+            Event::TenantUpdated(_) => "tenant_updated".into(),
+            Event::TenantDeleted(_) => "tenant_deleted".into(),
+            Event::WarrantCreated(_) => "warrant_created".into(),
+            Event::WorkflowCreated(_) => "workflow_created".into(),
+        }
     }
 }
 
-impl DomainEvent for AccountCreated {}
+impl fmt::Display for Event {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.event_type())
+    }
+}
 
-impl DomainEvent for AdvertisementCreated {}
-
-impl DomainEvent for AdvertisementUpdated {}
-
-impl DomainEvent for CandidacyAccepted {}
-
-impl DomainEvent for CandidacyCreated {}
-
-impl DomainEvent for CandidacyRejected {}
-
-impl DomainEvent for CompanyCreated {}
-
-impl DomainEvent for DiscussionCreated {}
-
-impl DomainEvent for DiscussionDeleted {}
-
-impl DomainEvent for DocumentGenerated {}
-
-impl DomainEvent for InviteAccepted {}
-
-impl DomainEvent for InviteCreated {}
-
-impl DomainEvent for LeaseAffected {}
-
-impl DomainEvent for LeaseCreated {}
-
-impl DomainEvent for LeaseDeleted {}
-
-impl DomainEvent for LeaseFileRequested {}
-
-impl DomainEvent for LeaseUpdated {}
-
-impl DomainEvent for LenderCreated {}
-
-impl DomainEvent for LenderUpdated {}
-
-impl DomainEvent for MessagePushed {}
-
-impl DomainEvent for NoticeCreated {}
-
-impl DomainEvent for PaymentCreated {}
-
-impl DomainEvent for PersonCreated {}
-
-impl DomainEvent for PropertyCreated {}
-
-impl DomainEvent for PropertyDeleted {}
-
-impl DomainEvent for PropertyUpdated {}
-
-impl DomainEvent for ReceiptCreated {}
-
-impl DomainEvent for ReceiptSent {}
-
-impl DomainEvent for StepCompleted {}
-
-impl DomainEvent for StepCreated {}
-
-impl DomainEvent for SubscriptionRequested {}
-
-impl DomainEvent for TenantCreated {}
-
-impl DomainEvent for TenantDeleted {}
-
-impl DomainEvent for TenantUpdated {}
-
-impl DomainEvent for WarrantCreated {}
-
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct AccountCreated {
     pub account: Account,
 }
@@ -203,7 +135,7 @@ impl From<AccountCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct AdvertisementCreated {
     pub advertisement: Advertisement,
 }
@@ -214,7 +146,7 @@ impl From<AdvertisementCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct AdvertisementUpdated {
     pub advertisement: Advertisement,
 }
@@ -225,7 +157,7 @@ impl From<AdvertisementUpdated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct CandidacyAccepted {
     pub candidacy_id: CandidacyId,
 }
@@ -236,7 +168,7 @@ impl From<CandidacyAccepted> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct CandidacyCreated {
     pub candidacy: Candidacy,
 }
@@ -247,7 +179,7 @@ impl From<CandidacyCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct CandidacyRejected {
     pub candidacy_id: CandidacyId,
 }
@@ -258,7 +190,7 @@ impl From<CandidacyRejected> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct CompanyCreated {
     pub company: Company,
 }
@@ -269,7 +201,7 @@ impl From<CompanyCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct DiscussionCreated {
     pub discussion: Discussion,
     pub message: Option<Message>,
@@ -281,7 +213,7 @@ impl From<DiscussionCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct DiscussionDeleted {
     pub discussion_id: DiscussionId,
 }
@@ -292,7 +224,7 @@ impl From<DiscussionDeleted> for Event {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Serialize)]
 pub struct DocumentGenerated {
     pub document: Document,
 }
@@ -303,7 +235,7 @@ impl From<DocumentGenerated> for Event {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Serialize)]
 pub struct InviteAccepted {
     pub invite_id: InviteId,
     pub auth_id: AuthId,
@@ -315,7 +247,7 @@ impl From<InviteAccepted> for Event {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Serialize)]
 pub struct InviteCreated {
     pub invite: Invite,
 }
@@ -326,7 +258,7 @@ impl From<InviteCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct LeaseAffected {
     pub lease_id: LeaseId,
     pub tenant_id: TenantId,
@@ -338,7 +270,7 @@ impl From<LeaseAffected> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct LeaseCreated {
     pub lease: Lease,
     pub rents: Vec<Rent>,
@@ -350,7 +282,7 @@ impl From<LeaseCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct LeaseDeleted {
     pub lease_id: LeaseId,
 }
@@ -361,7 +293,7 @@ impl From<LeaseDeleted> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct LeaseFileRequested {
     pub lease_id: LeaseId,
 }
@@ -372,7 +304,7 @@ impl From<LeaseFileRequested> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct LeaseUpdated {
     pub lease: Lease,
 }
@@ -383,7 +315,7 @@ impl From<LeaseUpdated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct LenderCreated {
     pub lender: Lender,
 }
@@ -394,7 +326,7 @@ impl From<LenderCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct LenderUpdated {
     pub lender: Lender,
     pub identity: LegalIdentity,
@@ -406,7 +338,7 @@ impl From<LenderUpdated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct MessagePushed {
     pub message: Message,
 }
@@ -417,7 +349,7 @@ impl From<MessagePushed> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct NoticeCreated {
     pub notice: Notice,
     pub rent: Rent,
@@ -429,7 +361,7 @@ impl From<NoticeCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct PaymentCreated {
     pub payment: Payment,
 }
@@ -440,7 +372,7 @@ impl From<PaymentCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct PersonCreated {
     pub person: Person,
 }
@@ -451,7 +383,7 @@ impl From<PersonCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct PropertyCreated {
     pub property: Property,
 }
@@ -462,7 +394,7 @@ impl From<PropertyCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct PropertyDeleted {
     pub property_id: PropertyId,
 }
@@ -473,7 +405,7 @@ impl From<PropertyDeleted> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct PropertyUpdated {
     pub property: Property,
 }
@@ -484,7 +416,7 @@ impl From<PropertyUpdated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct ReceiptCreated {
     pub receipt: Receipt,
     pub rent: Rent,
@@ -497,7 +429,7 @@ impl From<ReceiptCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct ReceiptSent {
     pub rent_id: RentId,
 }
@@ -508,13 +440,13 @@ impl From<ReceiptSent> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct StepCompletedRequirement {
     pub name: String,
     pub value: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct StepCompleted {
     pub step_id: StepId,
     pub requirements: Option<Vec<StepCompletedRequirement>>,
@@ -526,7 +458,7 @@ impl From<StepCompleted> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct StepCreated {
     pub step: Step,
 }
@@ -537,7 +469,7 @@ impl From<StepCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct SubscriptionRequested {
     pub account_id: AccountId,
     pub email: Email,
@@ -549,7 +481,7 @@ impl From<SubscriptionRequested> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct TenantCreated {
     pub tenant: Tenant,
     pub identity: Option<Person>,
@@ -563,7 +495,7 @@ impl From<TenantCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct TenantDeleted {
     pub tenant_id: TenantId,
 }
@@ -574,7 +506,7 @@ impl From<TenantDeleted> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct TenantUpdated {
     pub tenant: Tenant,
 }
@@ -585,7 +517,7 @@ impl From<TenantUpdated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct WarrantCreated {
     pub warrant: WarrantWithIdentity,
 }
@@ -596,7 +528,7 @@ impl From<WarrantCreated> for Event {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct WorkflowCreated {
     pub workflow: Workflow,
     pub workflowable: Workflowable,

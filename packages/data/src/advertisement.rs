@@ -9,21 +9,21 @@ use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
 use fake::Dummy;
 use fake::Fake;
+use serde::Serialize;
 
 // # Types
 
 id!(AdvertisementId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Dummy, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Dummy, Enum)]
 #[DieselType = "Entryflexibility"]
-#[graphql(name = "LenderFlexibility")]
 pub enum EntryFlexibility {
     OneDay,
     ThreeDays,
     SevenDays,
 }
 
-#[derive(Clone, Debug, AsChangeset, Dummy, Identifiable, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, AsChangeset, Dummy, Identifiable, Insertable, Queryable)]
 pub struct Advertisement {
     pub id: AdvertisementId,
     pub created_at: Option<DateTime>,

@@ -7,12 +7,13 @@ use async_graphql::Enum;
 use async_graphql::SimpleObject;
 use diesel_derive_enum::DbEnum;
 use fake::Fake;
+use serde::Serialize;
 
 // # Types
 
 id!(PaymentId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[DieselType = "Transactiontype"]
 pub enum TransactionType {
     InsuranceHab,
@@ -24,7 +25,7 @@ pub enum TransactionType {
     Rent,
 }
 
-#[derive(Clone, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Serialize, Insertable, Queryable, SimpleObject)]
 pub struct Payment {
     pub id: PaymentId,
     pub created_at: Option<DateTime>,

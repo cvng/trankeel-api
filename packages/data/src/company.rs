@@ -7,12 +7,13 @@ use crate::PhoneNumber;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
 use fake::Fake;
+use serde::Serialize;
 
 // # Types
 
 id!(CompanyId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[DieselType = "Legalentitytype"]
 pub enum LegalEntityType {
     Eurl,
@@ -26,7 +27,7 @@ pub enum LegalEntityType {
     Snc,
 }
 
-#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
 #[table_name = "companies"]
 pub struct Company {
     pub id: CompanyId,

@@ -1,9 +1,9 @@
+use crate::command::Command;
 use crate::error::DomainError;
 use crate::error::Result;
 use crate::event::Event;
 use crate::event::LeaseAffected;
 use crate::event::LeaseCreated;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
 use trankeel_data::Amount;
