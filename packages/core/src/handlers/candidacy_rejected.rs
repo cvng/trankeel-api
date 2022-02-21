@@ -10,11 +10,11 @@ use trankeel_data::DiscussionStatus;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
 use trankeel_data::MessageId;
+use trankeel_ops::command::Command;
 use trankeel_ops::event::CandidacyRejected;
 use trankeel_ops::event::Event;
 use trankeel_ops::messaging::PushMessage;
 use trankeel_ops::messaging::PushMessageInput;
-use trankeel_ops::Command;
 
 pub fn candidacy_rejected(ctx: &Context, event: CandidacyRejected) -> Result<()> {
     let db = ctx.db();

@@ -1,3 +1,4 @@
+use crate::command::Command;
 use crate::error::Result;
 use crate::event::Event;
 use crate::event::TenantCreated;
@@ -5,7 +6,6 @@ use crate::messaging::CreateDiscussion;
 use crate::messaging::CreateDiscussionInput;
 use crate::warrants::CreateWarrant;
 use crate::warrants::CreateWarrantInput;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
 use trankeel_data::Date;

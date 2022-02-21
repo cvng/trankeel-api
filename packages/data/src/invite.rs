@@ -9,12 +9,13 @@ use crate::Url;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
 use fake::Fake;
+use serde::Serialize;
 use std::fmt;
 use trankeel_kit::config;
 
 id!(InviteId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[DieselType = "Invitereason"]
 pub enum InviteReason {
     CandidacyAccepted,
@@ -32,7 +33,7 @@ impl fmt::Display for InviteReason {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[DieselType = "Invitestatus"]
 pub enum InviteStatus {
     Pending,
@@ -45,7 +46,7 @@ impl Default for InviteStatus {
     }
 }
 
-#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Invite {
     pub id: InviteId,
     pub created_at: Option<DateTime>,

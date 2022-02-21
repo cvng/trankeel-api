@@ -1,9 +1,9 @@
 use super::PushMessage;
 use super::PushMessageInput;
+use crate::command::Command;
 use crate::error::Result;
 use crate::event::DiscussionCreated;
 use crate::event::Event;
-use crate::Command;
 use async_graphql::InputObject;
 use chrono::Utc;
 use trankeel_data::Account;

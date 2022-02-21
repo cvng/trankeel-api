@@ -1,8 +1,8 @@
+use crate::command::Command;
 use crate::error::DomainError;
 use crate::error::Result;
 use crate::event::CandidacyRejected;
 use crate::event::Event;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyId;

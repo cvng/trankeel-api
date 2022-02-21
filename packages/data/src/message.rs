@@ -5,12 +5,13 @@ use crate::DiscussionId;
 use crate::EventId;
 use crate::PersonId;
 use fake::Fake;
+use serde::Serialize;
 
 id!(MessageId);
 
 pub type MessageContent = String;
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Insertable, Queryable)]
 pub struct Message {
     pub id: MessageId,
     pub created_at: Option<DateTime>,

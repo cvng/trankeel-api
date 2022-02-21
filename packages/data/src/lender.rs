@@ -6,6 +6,7 @@ use crate::DateTime;
 use crate::LegalIdentity;
 use crate::PersonId;
 use fake::Fake;
+use serde::Serialize;
 
 // # Types
 
@@ -13,7 +14,7 @@ id!(LenderId);
 
 pub type LenderWithIdentity = (Lender, LegalIdentity);
 
-#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Lender {
     pub id: LenderId,
     pub created_at: Option<DateTime>,

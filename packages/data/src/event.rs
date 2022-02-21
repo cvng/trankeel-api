@@ -8,12 +8,13 @@ use crate::PersonId;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
 use fake::Fake;
+use serde::Serialize;
 
 id!(EventId);
 
 pub type EventWithEventable = (Event, Eventable);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[DieselType = "Eventtype"]
 pub enum EventType {
     CandidacyAccepted,
@@ -28,7 +29,7 @@ pub enum EventType {
     StepCompleted,
 }
 
-#[derive(Clone, Debug, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Insertable, Queryable)]
 pub struct Event {
     pub id: EventId,
     pub created_at: Option<DateTime>,
@@ -37,4 +38,5 @@ pub struct Event {
     pub participant_id: PersonId,
     pub eventable_id: EventableId,
     pub type_: EventType,
+    // TODO: pub payload: Value,
 }

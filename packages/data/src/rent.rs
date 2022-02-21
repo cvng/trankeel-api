@@ -11,12 +11,13 @@ use chrono::Duration;
 use chrono::Utc;
 use diesel_derive_enum::DbEnum;
 use fake::Fake;
+use serde::Serialize;
 
 // # Types
 
 id!(RentId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[DieselType = "Rentstatus"]
 pub enum RentStatus {
     Open,
@@ -30,7 +31,7 @@ impl Default for RentStatus {
     }
 }
 
-#[derive(Clone, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Serialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Rent {
     pub id: RentId,
     pub created_at: Option<DateTime>,

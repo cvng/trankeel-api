@@ -4,6 +4,7 @@ use crate::CandidacyId;
 use crate::Workflow;
 use async_graphql::Union;
 use fake::Fake;
+use serde::Serialize;
 
 id!(WorkflowableId);
 
@@ -15,7 +16,7 @@ impl From<CandidacyId> for WorkflowableId {
 
 pub type WorkflowableRow = (Workflow, Option<Candidacy>);
 
-#[derive(Clone, Union)]
+#[derive(Clone, Serialize, Union)]
 pub enum Workflowable {
     Candidacy(Candidacy),
 }

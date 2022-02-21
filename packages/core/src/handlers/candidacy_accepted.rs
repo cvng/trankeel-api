@@ -10,11 +10,11 @@ use trankeel_data::CandidacyStatus;
 use trankeel_data::EventType;
 use trankeel_data::Eventable;
 use trankeel_data::InviteReason;
+use trankeel_ops::command::Command;
 use trankeel_ops::event::CandidacyAccepted;
 use trankeel_ops::event::Event;
 use trankeel_ops::invites::CreateInvite;
 use trankeel_ops::invites::CreateInviteInput;
-use trankeel_ops::Command;
 
 pub fn candidacy_accepted(ctx: &Context, event: CandidacyAccepted) -> Result<()> {
     let db = ctx.db();

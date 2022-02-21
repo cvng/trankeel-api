@@ -1,3 +1,4 @@
+use crate::command::Command;
 use crate::error::Result;
 use crate::event::CandidacyAccepted;
 use crate::event::CandidacyRejected;
@@ -15,7 +16,6 @@ use crate::tenants::CreateTenant;
 use crate::tenants::CreateTenantInput;
 use crate::workflows::CreateWorkflow;
 use crate::workflows::CreateWorkflowInput;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::workflow_steps;
 use trankeel_data::Account;

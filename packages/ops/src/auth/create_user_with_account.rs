@@ -1,10 +1,10 @@
+use crate::command::Command;
 use crate::error::Result;
 use crate::event::AccountCreated;
 use crate::event::Event;
 use crate::event::LenderCreated;
 use crate::event::PersonCreated;
 use crate::event::SubscriptionRequested;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
 use trankeel_data::AccountId;

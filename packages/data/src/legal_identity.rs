@@ -6,6 +6,7 @@ use crate::Name;
 use crate::Person;
 use crate::PersonId;
 use fake::Fake;
+use serde::Serialize;
 
 id!(LegalIdentityId);
 
@@ -21,7 +22,7 @@ impl From<CompanyId> for LegalIdentityId {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub enum LegalIdentity {
     Individual(Person),
     Company(Company),

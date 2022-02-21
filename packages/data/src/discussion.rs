@@ -10,6 +10,7 @@ use async_graphql::Enum;
 use async_graphql::Union;
 use diesel_derive_enum::DbEnum;
 use fake::Fake;
+use serde::Serialize;
 
 id!(DiscussionId);
 
@@ -17,7 +18,7 @@ pub type DiscussionItemRow = (Option<Candidacy>, Option<Lease>);
 
 pub type DiscussionWithMessages = (Discussion, Vec<Message>);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[DieselType = "Discussionstatus"]
 pub enum DiscussionStatus {
     Active,
@@ -37,7 +38,7 @@ pub enum DiscussionItem {
     Lease(Lease),
 }
 
-#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Discussion {
     pub id: DiscussionId,
     pub created_at: Option<DateTime>,

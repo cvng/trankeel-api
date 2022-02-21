@@ -11,13 +11,14 @@ use crate::Url;
 use async_graphql::Enum;
 use diesel_derive_enum::DbEnum;
 use fake::Fake;
+use serde::Serialize;
 use std::fmt;
 
 // # Types
 
 id!(PersonId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
 #[graphql(name = "UserRole")]
 #[DieselType = "Personrole"]
 pub enum PersonRole {
@@ -35,7 +36,7 @@ impl Default for PersonRole {
     }
 }
 
-#[derive(Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
 pub struct Person {
     pub id: PersonId,
     pub created_at: Option<DateTime>,

@@ -1,9 +1,9 @@
 use crate::auth::AddressInput;
+use crate::command::Command;
 use crate::error::Error;
 use crate::error::Result;
 use crate::event::Event;
 use crate::event::WarrantCreated;
-use crate::Command;
 use async_graphql::InputObject;
 use trankeel_data::Account;
 use trankeel_data::Candidacy;
