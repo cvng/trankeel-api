@@ -17,7 +17,7 @@ diesel-derive-enum = { version = "1.1.2", features = ["postgres"] }
 diesel-derive-newtype = "0.1.2"
 eyre = "0.6.6"
 fake = { version = "2.4.3", features=["derive", "chrono", "uuid"] }
-rand = "0.8.4"
+rand = "0.8.5"
 rust_decimal = { version = "1.22.0", features = ["db-diesel-postgres"] }
 rust_decimal_macros = "1.21.0"
 serde = "1.0"
