@@ -1984,9 +1984,9 @@ checksum = "58893f751c9b0412871a09abd62ecd2a00298c6c83befa223ef98c52aef40cbe"
 
 [[package]]
 name = "poem"
-version = "1.2.59"
+version = "1.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "999f6c792c05befa0796cc02e11b6ca7ca639e1cdf0bc83e06e05bd5bddec295"
+checksum = "dff186e2a726a8cc954ca29e844aae4f2f24cbf5cf4432bf9a563819b22226ee"
 dependencies = [
  "async-trait",
  "base64 0.13.0",
@@ -2009,15 +2009,15 @@ dependencies = [
  "tokio 1.17.0",
  "tokio-stream",
  "tokio-tungstenite",
- "tokio-util 0.6.9",
+ "tokio-util 0.7.0",
  "tracing",
 ]
 
 [[package]]
 name = "poem-derive"
-version = "1.2.59"
+version = "1.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "683b71cc5589de913b1f1b35eb7ff91fb1b2031b0269de84424bc9dda1dab0b5"
+checksum = "10e615b57bee783ff6fc11ea31666c78ae7d06a9dc64b8e9f755fdbc8169396a"
 dependencies = [
  "proc-macro-crate 1.1.0",
  "proc-macro2 1.0.36",
@@ -2998,6 +2998,20 @@ dependencies = [
  "bytes 1.1.0",
  "futures-core",
  "futures-io",
+ "futures-sink",
+ "log",
+ "pin-project-lite 0.2.8",
+ "tokio 1.17.0",
+]
+
+[[package]]
+name = "tokio-util"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64910e1b9c1901aaf5375561e35b9c057d95ff41a44ede043a03e09279eabaf1"
+dependencies = [
+ "bytes 1.1.0",
+ "futures-core",
  "futures-sink",
  "log",
  "pin-project-lite 0.2.8",
