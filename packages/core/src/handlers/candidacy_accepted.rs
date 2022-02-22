@@ -7,7 +7,6 @@ use crate::templates::CandidacyAcceptedMail;
 use diesel::result::Error::NotFound;
 use trankeel_data::Candidacy;
 use trankeel_data::CandidacyStatus;
-use trankeel_data::EventType;
 use trankeel_data::Eventable;
 use trankeel_data::InviteReason;
 use trankeel_ops::command::Command;
@@ -52,11 +51,11 @@ pub async fn candidacy_accepted_async(ctx: &Context, event: CandidacyAccepted) -
         .ok_or(NotFound)?;
 
     messenger.message(
-        EventType::CandidacyAccepted,
-        Eventable::Candidacy(candidacy.clone()),
         sender.id,
         participant.id,
         None,
+        Some(Event::from(event).event_type()),
+        Some(Eventable::Candidacy(candidacy.clone())),
     )?;
 
     // Create invite for new tenant.

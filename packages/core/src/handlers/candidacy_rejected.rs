@@ -7,7 +7,6 @@ use trankeel_data::Candidacy;
 use trankeel_data::CandidacyStatus;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
-use trankeel_data::EventType;
 use trankeel_data::Eventable;
 use trankeel_data::MessageId;
 use trankeel_ops::command::Command;
@@ -70,11 +69,11 @@ pub async fn candidacy_rejected_async(ctx: &Context, event: CandidacyRejected) -
     let account_owner = db.persons().by_account_id_first(&account.id)?;
 
     messenger.message(
-        EventType::CandidacyRejected,
-        Eventable::Candidacy(candidacy),
         account_owner.id,
         candidate.id,
         None,
+        Some(Event::from(event).event_type()),
+        Some(Eventable::Candidacy(candidacy)),
     )?;
 
     Ok(())

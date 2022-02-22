@@ -14,8 +14,8 @@ use trankeel_data::DiscussionId;
 use trankeel_data::DiscussionItem;
 use trankeel_data::Event;
 use trankeel_data::EventId;
-use trankeel_data::EventWithEventable;
 use trankeel_data::Eventable;
+use trankeel_data::EventableId;
 use trankeel_data::File;
 use trankeel_data::FileId;
 use trankeel_data::Invite;
@@ -232,12 +232,12 @@ pub trait PlanStore {
 }
 
 pub trait EventStore {
-    fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable>;
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>>;
+    fn by_id(&mut self, id: &EventId) -> Result<Event>;
     fn create(&mut self, data: &Event) -> Result<Event>;
 }
 
 pub trait EventableStore {
+    fn by_id(&mut self, id: &EventableId) -> Result<Eventable>;
     fn create(&mut self, data: &Eventable) -> Result<Eventable>;
 }
 

@@ -8,6 +8,7 @@ use trankeel_core::database::CompanyStore;
 use trankeel_core::database::Db;
 use trankeel_core::database::DiscussionStore;
 use trankeel_core::database::EventStore;
+use trankeel_core::database::EventableStore;
 use trankeel_core::database::FileStore;
 use trankeel_core::database::InviteStore;
 use trankeel_core::database::LeaseStore;
@@ -189,6 +190,10 @@ impl Client {
 
     pub fn events(&self) -> Box<dyn EventStore + '_> {
         self.0.db().events()
+    }
+
+    pub fn eventables(&self) -> Box<dyn EventableStore + '_> {
+        self.0.db().eventables()
     }
 
     pub fn reports(&self) -> Box<dyn ReportStore + '_> {

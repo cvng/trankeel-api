@@ -1,10 +1,12 @@
 use crate::context::Context;
+use crate::database::Db;
 use crate::error::Result;
 use crate::handlers;
 use crate::providers::Pg;
 use futures::stream;
 use futures::stream::StreamExt;
 use futures::stream::TryStreamExt;
+use trankeel_data::EventId;
 use trankeel_ops::event::Event;
 
 #[remain::check]
@@ -12,6 +14,8 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
     Pg::transaction(ctx.db(), || {
         events.clone().into_iter().try_for_each(|evt| {
             log::info!("Event: {}", evt);
+
+            store_event(ctx, &evt)?;
 
             #[remain::sorted]
             match evt {
@@ -79,6 +83,19 @@ pub async fn dispatch(ctx: &Context, events: Vec<Event>) -> Result<()> {
             }
         })
         .await?;
+
+    Ok(())
+}
+
+fn store_event(ctx: &Context, event: &Event) -> Result<()> {
+    let db = ctx.db();
+
+    db.events().create(&trankeel_data::Event {
+        id: EventId::new(),
+        created_at: Default::default(),
+        type_: event.event_type(),
+        payload: serde_json::to_value(event).unwrap(),
+    })?;
 
     Ok(())
 }

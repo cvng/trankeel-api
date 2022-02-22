@@ -2,8 +2,8 @@ use crate::context::Context;
 use crate::database::Db;
 use crate::error::Result;
 use crate::messenger::Messenger;
-use trankeel_data::EventType;
 use trankeel_data::Eventable;
+use trankeel_ops::event::Event;
 use trankeel_ops::event::LeaseAffected;
 
 pub fn lease_affected(ctx: &Context, event: LeaseAffected) -> Result<()> {
@@ -39,11 +39,11 @@ pub async fn lease_affected_async(ctx: &Context, event: LeaseAffected) -> Result
     let sender = db.persons().by_account_id_first(&account.id)?;
 
     messenger.message(
-        EventType::LeaseCreated, // Use "LeaseCreated" as message event type.
-        Eventable::Lease(lease),
         sender.id,
         participant.id,
         None,
+        Some(Event::from(event).event_type()),
+        Some(Eventable::Lease(lease)),
     )?;
 
     Ok(())

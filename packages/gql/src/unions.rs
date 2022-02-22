@@ -33,12 +33,6 @@ impl From<trankeel::Eventable> for Eventable {
     }
 }
 
-impl From<trankeel::EventWithEventable> for Eventable {
-    fn from(item: trankeel::EventWithEventable) -> Self {
-        item.1.into()
-    }
-}
-
 #[allow(clippy::large_enum_variant)]
 #[derive(Union)]
 pub enum DiscussionItem {

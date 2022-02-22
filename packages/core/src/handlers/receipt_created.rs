@@ -6,8 +6,8 @@ use crate::messenger::Messenger;
 use crate::pdfmaker::Pdfmaker;
 use crate::templates::ReceiptDocument;
 use chrono::Utc;
-use trankeel_data::EventType;
 use trankeel_data::Eventable;
+use trankeel_ops::event::Event;
 use trankeel_ops::event::PaymentCreated;
 use trankeel_ops::event::ReceiptCreated;
 
@@ -19,7 +19,7 @@ pub fn receipt_created(ctx: &Context, event: ReceiptCreated) -> Result<()> {
         receipt,
         rent,
         payment,
-    } = event;
+    } = event.clone();
 
     db.files().create(&receipt)?;
     db.rents().update(&rent)?;
@@ -29,11 +29,11 @@ pub fn receipt_created(ctx: &Context, event: ReceiptCreated) -> Result<()> {
     let participant = db.persons().by_receipt_id(&receipt.id)?;
 
     messenger.message(
-        EventType::ReceiptCreated,
-        Eventable::File(receipt),
         participant.id,
         participant.id,
         None,
+        Some(Event::from(event).event_type()),
+        Some(Eventable::File(receipt)),
     )?;
 
     Ok(())

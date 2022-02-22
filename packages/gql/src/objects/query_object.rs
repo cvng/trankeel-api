@@ -191,16 +191,6 @@ impl Query {
         )?)
     }
 
-    async fn events(&self, ctx: &Context<'_>) -> Result<Vec<Event>> {
-        Ok(ctx
-            .data_unchecked::<Client>()
-            .events()
-            .by_auth_id(ctx.data::<AuthId>()?)?
-            .into_iter()
-            .map(Into::into)
-            .collect())
-    }
-
     async fn discussions(
         &self,
         ctx: &Context<'_>,
@@ -221,5 +211,10 @@ impl Query {
                 .map(Into::into)
                 .collect())
         }
+    }
+
+    // TODO: https://github.com/piteo-team/trankeel-api/pull/369
+    async fn events(&self) -> Result<Vec<Event>> {
+        Ok(Vec::new())
     }
 }

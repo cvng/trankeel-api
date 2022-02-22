@@ -7,10 +7,10 @@ use trankeel_data::PersonId;
 pub trait Messenger {
     fn message(
         &self,
-        type_: EventType,
-        eventable: Eventable,
         sender_id: PersonId,
         participant_id: PersonId,
         content: Option<String>,
+        type_: Option<EventType>,
+        eventable: Option<Eventable>,
     ) -> Result<Message>;
 }

@@ -1,7 +1,6 @@
 use crate::id;
 use crate::Candidacy;
 use crate::CandidacyId;
-use crate::Event;
 use crate::File;
 use crate::FileId;
 use crate::Lease;
@@ -54,7 +53,6 @@ impl From<CandidacyId> for EventableId {
 }
 
 pub type EventableRow = (
-    Event,
     Option<File>,
     Option<Rent>,
     Option<Step>,
@@ -63,6 +61,7 @@ pub type EventableRow = (
     Option<Candidacy>,
 );
 
+/// Eventable = Message attachment.
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Union)]
 pub enum Eventable {
@@ -89,12 +88,12 @@ impl Eventable {
 
 impl From<EventableRow> for Eventable {
     fn from(item: EventableRow) -> Self {
-        None.or_else(|| item.1.clone().map(Self::File))
-            .or_else(|| item.2.clone().map(Self::Rent))
-            .or_else(|| item.3.clone().map(Self::Step))
-            .or_else(|| item.4.clone().map(Self::Lease))
-            .or_else(|| item.5.clone().map(Self::Payment))
-            .or_else(|| item.6.clone().map(Self::Candidacy))
+        None.or_else(|| item.0.clone().map(Self::File))
+            .or_else(|| item.1.clone().map(Self::Rent))
+            .or_else(|| item.2.clone().map(Self::Step))
+            .or_else(|| item.3.clone().map(Self::Lease))
+            .or_else(|| item.4.clone().map(Self::Payment))
+            .or_else(|| item.5.clone().map(Self::Candidacy))
             .unwrap()
     }
 }

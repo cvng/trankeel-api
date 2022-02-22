@@ -41,7 +41,8 @@ impl Command for PushMessage {
             discussion_id: input.discussion_id,
             sender_id: input.sender_id,
             content: Some(input.message),
-            event_id: None,
+            type_: None,
+            eventable_id: None,
         };
 
         Ok(vec![MessagePushed { message }.into()])

@@ -2,7 +2,8 @@ use crate::id;
 use crate::sql_schema::messages;
 use crate::DateTime;
 use crate::DiscussionId;
-use crate::EventId;
+use crate::EventType;
+use crate::EventableId;
 use crate::PersonId;
 use fake::Fake;
 use serde::Serialize;
@@ -19,5 +20,6 @@ pub struct Message {
     pub discussion_id: DiscussionId,
     pub sender_id: PersonId,
     pub content: Option<MessageContent>,
-    pub event_id: Option<EventId>,
+    pub type_: Option<EventType>,
+    pub eventable_id: Option<EventableId>,
 }

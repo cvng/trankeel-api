@@ -40,7 +40,7 @@ type Advertisement {
 	rentChargesAmount: Decimal
 	depositAmount: Decimal!
 	effectDate: DateTime!
-	flexibility: LenderFlexibility
+	flexibility: EntryFlexibility
 	referralLeaseId: ID
 	propertyId: ID!
 	title: String!
@@ -101,7 +101,7 @@ input CreateAdvertisementInput {
 	rentChargesAmount: Decimal
 	depositAmount: Decimal!
 	effectDate: DateTime!
-	flexibility: LenderFlexibility
+	flexibility: EntryFlexibility
 	referralLeaseId: ID
 	propertyId: ID!
 	title: String!
@@ -299,25 +299,53 @@ enum DiscussionStatus {
 	CANDIDACY
 }
 scalar Email
+enum EntryFlexibility {
+	ONE_DAY
+	THREE_DAYS
+	SEVEN_DAYS
+}
 type Event {
 	id: ID!
 	createdAt: DateTime
-	updatedAt: DateTime
-	accountId: ID!
 	type: EventType!
-	object: Eventable!
 }
 enum EventType {
+	ACCOUNT_CREATED
+	ADVERTISEMENT_CREATED
+	ADVERTISEMENT_UPDATED
 	CANDIDACY_ACCEPTED
 	CANDIDACY_CREATED
 	CANDIDACY_REJECTED
+	COMPANY_CREATED
+	DISCUSSION_CREATED
+	DISCUSSION_DELETED
+	DOCUMENT_GENERATED
+	INVITE_ACCEPTED
+	INVITE_CREATED
+	LEASE_AFFECTED
 	LEASE_CREATED
+	LEASE_DELETED
+	LEASE_FILE_REQUESTED
+	LEASE_UPDATED
+	LENDER_CREATED
+	LENDER_UPDATED
+	MESSAGE_PUSHED
 	NOTICE_CREATED
-	NOTICE_SENT
 	PAYMENT_CREATED
+	PERSON_CREATED
+	PROPERTY_CREATED
+	PROPERTY_DELETED
+	PROPERTY_UPDATED
 	RECEIPT_CREATED
 	RECEIPT_SENT
 	STEP_COMPLETED
+	STEP_CREATED
+	SUBSCRIPTION_REQUESTED
+	TENANT_CREATED
+	TENANT_DELETED
+	TENANT_UPDATED
+	WARRANT_CREATED
+	WORKFLOW_CREATED
 }
 union Eventable = | File | Rent | Step | Lease | Transaction | Candidacy
 type Feature {
@@ -505,11 +533,6 @@ type Lender {
 	displayName: String!
 	identity: LegalIdentity!
 }
-enum LenderFlexibility {
-	ONE_DAY
-	THREE_DAYS
-	SEVEN_DAYS
-}
 type Message {
 	id: ID!
 	createdAt: DateTime
@@ -517,9 +540,10 @@ type Message {
 	discussionId: ID!
 	senderId: ID!
 	content: String
-	eventId: ID
+	type: EventType
+	eventableId: ID
 	sender: Person!
-	event: Event
+	eventable: Eventable
 }
 type Mutation {
 	createUserWithAccount(input: CreateUserWithAccountInput!): CreateUserWithAccountPayload!
@@ -697,8 +721,8 @@ type Query {
 	lenders(id: ID, query: String): [Lender!]!
 	rents(since: DateTime!, until: DateTime!): [Rent!]!
 	summary(since: DateTime!, until: DateTime!): Summary!
-	events: [Event!]!
 	discussions(id: ID): [Discussion!]!
+	events: [Event!]!
 }
 type Rent {
 	id: ID!
@@ -856,7 +880,7 @@ input UpdateAdvertisementInput {
 	rentChargesAmount: Decimal
 	depositAmount: Decimal
 	effectDate: DateTime
-	flexibility: LenderFlexibility
+	flexibility: EntryFlexibility
 	referralLeaseId: ID
 	title: String
 	description: String
