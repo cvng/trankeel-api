@@ -5,15 +5,15 @@ use crate::messenger::Messenger;
 use crate::pdfmaker::Pdfmaker;
 use crate::templates::NoticeDocument;
 use chrono::Utc;
-use trankeel_data::EventType;
 use trankeel_data::Eventable;
+use trankeel_ops::event::Event;
 use trankeel_ops::event::NoticeCreated;
 
 pub fn notice_created(ctx: &Context, event: NoticeCreated) -> Result<()> {
     let db = ctx.db();
     let messenger = ctx.messenger();
 
-    let NoticeCreated { notice, rent } = event;
+    let NoticeCreated { notice, rent } = event.clone();
 
     db.files().create(&notice)?;
     db.rents().update(&rent)?;
@@ -21,11 +21,11 @@ pub fn notice_created(ctx: &Context, event: NoticeCreated) -> Result<()> {
     let participant = db.persons().by_notice_id(&notice.id)?;
 
     messenger.message(
-        EventType::NoticeCreated,
-        Eventable::File(notice),
         participant.id,
         participant.id,
         None,
+        Some(Event::from(event).event_type()),
+        Some(Eventable::File(notice)),
     )?;
 
     Ok(())

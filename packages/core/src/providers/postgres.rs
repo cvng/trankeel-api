@@ -54,8 +54,8 @@ use trankeel_data::DiscussionItem;
 use trankeel_data::DiscussionItemRow;
 use trankeel_data::Event;
 use trankeel_data::EventId;
-use trankeel_data::EventWithEventable;
 use trankeel_data::Eventable;
+use trankeel_data::EventableId;
 use trankeel_data::EventableRow;
 use trankeel_data::File;
 use trankeel_data::FileId;
@@ -1058,40 +1058,8 @@ impl database::CompanyStore for CompanyStore<'_> {
 }
 
 impl database::EventStore for EventStore<'_> {
-    fn by_id(&mut self, id: &EventId) -> Result<EventWithEventable> {
-        let event = events::table
-            .left_join(eventables::table.on(eventables::id.eq(events::eventable_id)))
-            .left_join(files::table.on(files::id.nullable().eq(eventables::file_id)))
-            .left_join(rents::table.on(rents::id.nullable().eq(eventables::rent_id)))
-            .left_join(steps::table.on(steps::id.nullable().eq(eventables::step_id)))
-            .left_join(leases::table.on(leases::id.nullable().eq(eventables::lease_id)))
-            .left_join(payments::table.on(payments::id.nullable().eq(eventables::payment_id)))
-            .left_join(
-                candidacies::table.on(candidacies::id.nullable().eq(eventables::candidacy_id)),
-            )
-            .select((
-                events::all_columns,
-                files::all_columns.nullable(),
-                rents::all_columns.nullable(),
-                steps::all_columns.nullable(),
-                leases::all_columns.nullable(),
-                payments::all_columns.nullable(),
-                candidacies::all_columns.nullable(),
-            ))
-            .filter(events::id.eq(id))
-            .first::<EventableRow>(&self.0.get()?)?;
-        Ok((event.0.clone(), event.into()))
-    }
-
-    fn by_auth_id(&mut self, auth_id: &AuthId) -> Result<Vec<EventWithEventable>> {
-        events::table
-            .select(events::all_columns)
-            .left_join(persons::table.on(persons::account_id.eq(events::account_id)))
-            .filter(persons::auth_id.eq(auth_id.inner()))
-            .load(&self.0.get()?)?
-            .iter()
-            .map(|event: &Event| self.by_id(&event.id))
-            .collect::<Result<Vec<_>>>()
+    fn by_id(&mut self, id: &EventId) -> Result<Event> {
+        Ok(events::table.find(id).first(&self.0.get()?)?)
     }
 
     fn create(&mut self, data: &Event) -> Result<Event> {
@@ -1102,6 +1070,29 @@ impl database::EventStore for EventStore<'_> {
 }
 
 impl database::EventableStore for EventableStore<'_> {
+    fn by_id(&mut self, id: &EventableId) -> Result<Eventable> {
+        Ok(eventables::table
+            .left_join(files::table.on(files::id.nullable().eq(eventables::file_id)))
+            .left_join(rents::table.on(rents::id.nullable().eq(eventables::rent_id)))
+            .left_join(steps::table.on(steps::id.nullable().eq(eventables::step_id)))
+            .left_join(leases::table.on(leases::id.nullable().eq(eventables::lease_id)))
+            .left_join(payments::table.on(payments::id.nullable().eq(eventables::payment_id)))
+            .left_join(
+                candidacies::table.on(candidacies::id.nullable().eq(eventables::candidacy_id)),
+            )
+            .select((
+                files::all_columns.nullable(),
+                rents::all_columns.nullable(),
+                steps::all_columns.nullable(),
+                leases::all_columns.nullable(),
+                payments::all_columns.nullable(),
+                candidacies::all_columns.nullable(),
+            ))
+            .filter(eventables::id.eq(id))
+            .first::<EventableRow>(&self.0.get()?)?
+            .into())
+    }
+
     fn create(&mut self, data: &Eventable) -> Result<Eventable> {
         match &data {
             Eventable::File(inner) => insert_into(eventables::table)

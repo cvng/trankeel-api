@@ -1,12 +1,14 @@
-use super::Event;
 use super::Person;
+use crate::unions::Eventable;
 use async_graphql::Context;
 use async_graphql::Result;
 use async_graphql::SimpleObject;
 use trankeel::Client;
 use trankeel::DateTime;
 use trankeel::DiscussionId;
-use trankeel::EventId;
+use trankeel::EventType;
+use trankeel::EventableId;
+use trankeel::MessageContent;
 use trankeel::MessageId;
 use trankeel::PersonId;
 
@@ -18,8 +20,9 @@ pub struct Message {
     pub updated_at: Option<DateTime>,
     pub discussion_id: DiscussionId,
     pub sender_id: PersonId,
-    pub content: Option<String>,
-    pub event_id: Option<EventId>,
+    pub content: Option<MessageContent>,
+    pub type_: Option<EventType>,
+    pub eventable_id: Option<EventableId>,
 }
 
 #[async_graphql::ComplexObject]
@@ -32,16 +35,16 @@ impl Message {
             .into())
     }
 
-    async fn event(&self, ctx: &Context<'_>) -> Result<Option<Event>> {
+    async fn eventable(&self, ctx: &Context<'_>) -> Result<Option<Eventable>> {
         Ok(self
-            .event_id
-            .map(|event_id| {
+            .eventable_id
+            .map(|eventable_id| {
                 ctx.data_unchecked::<Client>()
-                    .events()
-                    .by_id(&event_id)
-                    .ok()
+                    .eventables()
+                    .by_id(&eventable_id)
+                    .ok() // NotFound error is ok here.
             })
-            .and_then(|event| event.map(Into::into)))
+            .and_then(|eventable| eventable.map(Into::into)))
     }
 }
 
@@ -54,7 +57,8 @@ impl From<trankeel::Message> for Message {
             discussion_id: item.discussion_id,
             sender_id: item.sender_id,
             content: item.content,
-            event_id: item.event_id,
+            type_: item.type_,
+            eventable_id: item.eventable_id,
         }
     }
 }

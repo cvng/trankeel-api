@@ -11,6 +11,7 @@ use trankeel_data::Discussion;
 use trankeel_data::DiscussionId;
 use trankeel_data::Document;
 use trankeel_data::Email;
+use trankeel_data::EventType;
 use trankeel_data::Invite;
 use trankeel_data::InviteId;
 use trankeel_data::Lease;
@@ -36,6 +37,8 @@ use trankeel_data::Workflowable;
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Serialize)]
+#[serde(tag = "event_type")]
+#[serde(rename_all = "snake_case")]
 pub enum Event {
     AccountCreated(AccountCreated),
     AdvertisementCreated(AdvertisementCreated),
@@ -76,44 +79,44 @@ pub enum Event {
 }
 
 impl Event {
-    pub fn event_type(&self) -> String {
+    pub fn event_type(&self) -> EventType {
         match self {
-            Event::AccountCreated(_) => "account_created".into(),
-            Event::AdvertisementCreated(_) => "advertisement_created".into(),
-            Event::AdvertisementUpdated(_) => "advertisement_updated".into(),
-            Event::CandidacyAccepted(_) => "candidacy_accepted".into(),
-            Event::CandidacyCreated(_) => "candidacy_created".into(),
-            Event::CandidacyRejected(_) => "candidacy_rejected".into(),
-            Event::CompanyCreated(_) => "company_created".into(),
-            Event::DiscussionCreated(_) => "discussion_created".into(),
-            Event::DiscussionDeleted(_) => "discussion_deleted".into(),
-            Event::DocumentGenerated(_) => "document_generated".into(),
-            Event::InviteAccepted(_) => "invite_accepted".into(),
-            Event::InviteCreated(_) => "invite_created".into(),
-            Event::LeaseAffected(_) => "lease_affected".into(),
-            Event::LeaseCreated(_) => "lease_created".into(),
-            Event::LeaseDeleted(_) => "lease_deleted".into(),
-            Event::LeaseFileRequested(_) => "lease_file_requested".into(),
-            Event::LeaseUpdated(_) => "lease_updated".into(),
-            Event::LenderCreated(_) => "lender_created".into(),
-            Event::LenderUpdated(_) => "lender_updated".into(),
-            Event::MessagePushed(_) => "message_pushed".into(),
-            Event::NoticeCreated(_) => "notice_created".into(),
-            Event::PaymentCreated(_) => "payment_created".into(),
-            Event::PersonCreated(_) => "person_created".into(),
-            Event::PropertyCreated(_) => "property_created".into(),
-            Event::PropertyDeleted(_) => "property_deleted".into(),
-            Event::PropertyUpdated(_) => "property_updated".into(),
-            Event::ReceiptCreated(_) => "receipt_created".into(),
-            Event::ReceiptSent(_) => "receipt_sent".into(),
-            Event::StepCompleted(_) => "step_completed".into(),
-            Event::StepCreated(_) => "step_created".into(),
-            Event::SubscriptionRequested(_) => "subscription_requested".into(),
-            Event::TenantCreated(_) => "tenant_created".into(),
-            Event::TenantUpdated(_) => "tenant_updated".into(),
-            Event::TenantDeleted(_) => "tenant_deleted".into(),
-            Event::WarrantCreated(_) => "warrant_created".into(),
-            Event::WorkflowCreated(_) => "workflow_created".into(),
+            Event::AccountCreated(_) => EventType::AccountCreated,
+            Event::AdvertisementCreated(_) => EventType::AdvertisementCreated,
+            Event::AdvertisementUpdated(_) => EventType::AdvertisementUpdated,
+            Event::CandidacyAccepted(_) => EventType::CandidacyAccepted,
+            Event::CandidacyCreated(_) => EventType::CandidacyCreated,
+            Event::CandidacyRejected(_) => EventType::CandidacyRejected,
+            Event::CompanyCreated(_) => EventType::CompanyCreated,
+            Event::DiscussionCreated(_) => EventType::DiscussionCreated,
+            Event::DiscussionDeleted(_) => EventType::DiscussionDeleted,
+            Event::DocumentGenerated(_) => EventType::DocumentGenerated,
+            Event::InviteAccepted(_) => EventType::InviteAccepted,
+            Event::InviteCreated(_) => EventType::InviteCreated,
+            Event::LeaseAffected(_) => EventType::LeaseAffected,
+            Event::LeaseCreated(_) => EventType::LeaseCreated,
+            Event::LeaseDeleted(_) => EventType::LeaseDeleted,
+            Event::LeaseFileRequested(_) => EventType::LeaseFileRequested,
+            Event::LeaseUpdated(_) => EventType::LeaseUpdated,
+            Event::LenderCreated(_) => EventType::LenderCreated,
+            Event::LenderUpdated(_) => EventType::LenderUpdated,
+            Event::MessagePushed(_) => EventType::MessagePushed,
+            Event::NoticeCreated(_) => EventType::NoticeCreated,
+            Event::PaymentCreated(_) => EventType::PaymentCreated,
+            Event::PersonCreated(_) => EventType::PersonCreated,
+            Event::PropertyCreated(_) => EventType::PropertyCreated,
+            Event::PropertyDeleted(_) => EventType::PropertyDeleted,
+            Event::PropertyUpdated(_) => EventType::PropertyUpdated,
+            Event::ReceiptCreated(_) => EventType::ReceiptCreated,
+            Event::ReceiptSent(_) => EventType::ReceiptSent,
+            Event::StepCompleted(_) => EventType::StepCompleted,
+            Event::StepCreated(_) => EventType::StepCreated,
+            Event::SubscriptionRequested(_) => EventType::SubscriptionRequested,
+            Event::TenantCreated(_) => EventType::TenantCreated,
+            Event::TenantUpdated(_) => EventType::TenantUpdated,
+            Event::TenantDeleted(_) => EventType::TenantDeleted,
+            Event::WarrantCreated(_) => EventType::WarrantCreated,
+            Event::WorkflowCreated(_) => EventType::WorkflowCreated,
         }
     }
 }

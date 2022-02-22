@@ -5,7 +5,8 @@ CREATE TABLE messages (
     discussion_id UUID NOT NULL REFERENCES discussions(id) ON DELETE CASCADE,
     sender_id UUID NOT NULL REFERENCES persons(id),
     content TEXT,
-    event_id UUID REFERENCES events(id)
+    type EVENTTYPE,
+    eventable_id UUID REFERENCES eventables(id)
 );
 
 SELECT manage_updated_at('messages');

@@ -7,7 +7,6 @@ use chrono::DateTime;
 use chrono::Utc;
 use trankeel_data::Discussion;
 use trankeel_data::DiscussionStatus;
-use trankeel_data::EventType;
 use trankeel_data::Eventable;
 use trankeel_data::Lease;
 use trankeel_data::Name;
@@ -17,6 +16,7 @@ use trankeel_data::RequirementOuter;
 use trankeel_data::Step;
 use trankeel_data::StepEvent;
 use trankeel_kit::locale;
+use trankeel_ops::event::Event;
 use trankeel_ops::event::StepCompleted;
 
 pub fn step_completed(ctx: &Context, event: StepCompleted) -> Result<()> {
@@ -97,11 +97,11 @@ pub async fn step_completed_async(ctx: &Context, event: StepCompleted) -> Result
     let lease = db.leases().by_tenant_id(&tenant.id)?; // TODO: match workflowable
 
     messenger.message(
-        EventType::StepCompleted,
-        Eventable::Step(step.clone()),
         sender.id,
         participant.id,
         render_step_message(&step, &participant, &lease)?,
+        Some(Event::from(event).event_type()),
+        Some(Eventable::Step(step.clone())),
     )?;
 
     Ok(())

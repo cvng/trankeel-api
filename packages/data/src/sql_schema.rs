@@ -116,12 +116,9 @@ table! {
     events (id) {
         id -> Uuid,
         created_at -> Nullable<Timestamptz>,
-        updated_at -> Nullable<Timestamptz>,
-        account_id -> Uuid,
-        participant_id -> Uuid,
-        eventable_id -> Uuid,
         #[sql_name = "type"]
         type_ -> Eventtype,
+        payload -> Jsonb,
     }
 }
 
@@ -214,7 +211,9 @@ table! {
         discussion_id -> Uuid,
         sender_id -> Uuid,
         content -> Nullable<Text>,
-        event_id -> Nullable<Uuid>,
+        #[sql_name = "type"]
+        type_ -> Nullable<Eventtype>,
+        eventable_id -> Nullable<Uuid>,
     }
 }
 
@@ -439,9 +438,6 @@ joinable!(eventables -> leases (lease_id));
 joinable!(eventables -> payments (payment_id));
 joinable!(eventables -> rents (rent_id));
 joinable!(eventables -> steps (step_id));
-joinable!(events -> accounts (account_id));
-joinable!(events -> eventables (eventable_id));
-joinable!(events -> persons (participant_id));
 joinable!(invites -> accounts (account_id));
 joinable!(invites -> persons (invitee_id));
 joinable!(leases -> accounts (account_id));
@@ -451,7 +447,7 @@ joinable!(lenders -> accounts (account_id));
 joinable!(lenders -> companies (company_id));
 joinable!(lenders -> persons (individual_id));
 joinable!(messages -> discussions (discussion_id));
-joinable!(messages -> events (event_id));
+joinable!(messages -> eventables (eventable_id));
 joinable!(messages -> persons (sender_id));
 joinable!(payments -> rents (rent_id));
 joinable!(persons -> accounts (account_id));

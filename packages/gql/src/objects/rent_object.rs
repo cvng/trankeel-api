@@ -78,7 +78,7 @@ impl Rent {
                 ctx.data_unchecked::<Client>()
                     .files()
                     .by_id(&receipt_id)
-                    .ok()
+                    .ok() // NotFound error is ok here.
             })
             .and_then(|receipt| receipt.map(Into::into)))
     }
