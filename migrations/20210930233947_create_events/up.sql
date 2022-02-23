@@ -44,24 +44,4 @@ CREATE TABLE events (
     payload JSONB NOT NULL
 );
 
-SELECT manage_updated_at('events');
-
---
-
-CREATE OR REPLACE FUNCTION manage_event() RETURNS VOID AS $$
-BEGIN
-    EXECUTE format('CREATE TRIGGER notify_event AFTER INSERT ON %s
-                    FOR EACH ROW EXECUTE PROCEDURE app_notify_event()', 'events');
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION app_notify_event() RETURNS trigger AS $$
-BEGIN
-    PERFORM pg_notify('events', NEW.payload::TEXT);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
---
-
-SELECT manage_event();
+SELECT manage_payload('events');

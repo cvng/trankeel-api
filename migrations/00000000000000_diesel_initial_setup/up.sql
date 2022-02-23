@@ -53,3 +53,19 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION manage_payload(_tbl regclass) RETURNS VOID AS $$
+BEGIN
+    EXECUTE format('CREATE TRIGGER notify_payload AFTER INSERT ON %s
+                    FOR EACH ROW EXECUTE PROCEDURE app_notify_payload()', _tbl);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION app_notify_payload() RETURNS trigger AS $$
+BEGIN
+    PERFORM pg_notify('events', NEW.payload::TEXT);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
