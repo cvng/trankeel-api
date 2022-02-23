@@ -10,7 +10,7 @@ use std::fmt;
 
 id!(EventId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Eventtype"]
 pub enum EventType {
     AccountCreated,

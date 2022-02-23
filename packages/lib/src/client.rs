@@ -1,4 +1,7 @@
 use function_name::named;
+use futures::Stream;
+use futures::StreamExt;
+use sqlx::postgres::PgListener;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
@@ -628,6 +631,19 @@ impl Client {
         log::info!("Command: {}", function_name!());
 
         dispatcher::dispatch(&self.0, events).await
+    }
+
+    #[named]
+    pub async fn listen(&self) -> Result<impl Stream<Item = Event>> {
+        log::info!("Command: {}", function_name!());
+
+        let mut listener = PgListener::connect("postgres://cvng@localhost:5432/trankeel").await?; // TODO
+
+        listener.listen_all(vec!["events"]).await?;
+
+        Ok(listener
+            .into_stream()
+            .map(|res| serde_json::from_str(&res.unwrap().payload().to_owned()).unwrap()))
     }
 }
 

@@ -15,7 +15,7 @@ use trankeel_kit::config;
 
 id!(InviteId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Invitereason"]
 pub enum InviteReason {
     CandidacyAccepted,
@@ -33,7 +33,7 @@ impl fmt::Display for InviteReason {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Invitestatus"]
 pub enum InviteStatus {
     Pending,
@@ -46,7 +46,17 @@ impl Default for InviteStatus {
     }
 }
 
-#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    AsChangeset,
+    Identifiable,
+    Insertable,
+    Queryable,
+    SimpleObject,
+)]
 pub struct Invite {
     pub id: InviteId,
     pub created_at: Option<DateTime>,

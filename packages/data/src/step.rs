@@ -44,6 +44,7 @@ impl From<String> for StepEvent {
     SimpleObject,
     AsChangeset,
     Serialize,
+    Deserialize,
 )]
 #[belongs_to(parent = "Workflow")]
 pub struct Step {

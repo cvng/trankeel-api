@@ -57,7 +57,15 @@ impl Default for LeaseType {
 }
 
 #[derive(
-    Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject, Serialize,
+    Clone,
+    Debug,
+    AsChangeset,
+    Identifiable,
+    Insertable,
+    Queryable,
+    SimpleObject,
+    Serialize,
+    Deserialize,
 )]
 pub struct Lease {
     pub id: LeaseId,

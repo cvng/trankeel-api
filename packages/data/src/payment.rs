@@ -13,7 +13,7 @@ use serde::Serialize;
 
 id!(PaymentId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Transactiontype"]
 pub enum TransactionType {
     InsuranceHab,
@@ -25,7 +25,7 @@ pub enum TransactionType {
     Rent,
 }
 
-#[derive(Clone, Serialize, Insertable, Queryable, SimpleObject)]
+#[derive(Clone, Serialize, Deserialize, Insertable, Queryable, SimpleObject)]
 pub struct Payment {
     pub id: PaymentId,
     pub created_at: Option<DateTime>,

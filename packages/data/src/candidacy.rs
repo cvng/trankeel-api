@@ -30,7 +30,15 @@ impl Default for CandidacyStatus {
 }
 
 #[derive(
-    Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject, Serialize,
+    Clone,
+    Debug,
+    AsChangeset,
+    Identifiable,
+    Deserialize,
+    Insertable,
+    Queryable,
+    SimpleObject,
+    Serialize,
 )]
 #[table_name = "candidacies"]
 pub struct Candidacy {

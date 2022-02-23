@@ -41,7 +41,9 @@ pub enum FileType {
     RentReceipt,
 }
 
-#[derive(Clone, Serialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
+#[derive(
+    Clone, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject,
+)]
 pub struct File {
     pub id: FileId,
     pub created_at: Option<DateTime>,

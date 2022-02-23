@@ -15,7 +15,12 @@ use serde::Serialize;
 
 id!(WarrantId);
 
-pub type WarrantWithIdentity = (Warrant, WarrantIdentity);
+// TODO: https://github.com/cvng/trankeel-api/pull/371
+#[derive(Clone, Serialize, Deserialize, SimpleObject)]
+pub struct WarrantWithIdentity {
+    pub warrant: Warrant,
+    pub identity: WarrantIdentity,
+}
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Warranttype"]
@@ -26,13 +31,13 @@ pub enum WarrantType {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize, Union)]
 pub enum WarrantIdentity {
     Individual(Person),
     Professional(ProfessionalWarrant),
 }
 
-#[derive(Clone, Debug, Serialize, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Queryable, SimpleObject)]
 pub struct Warrant {
     pub id: WarrantId,
     pub created_at: Option<DateTime>,

@@ -81,7 +81,7 @@ impl Command for CreateWarrant {
             None => None,
         };
 
-        let warrant = match (input.type_, input.individual, input.company) {
+        let (warrant, identity) = match (input.type_, input.individual, input.company) {
             (WarrantType::Person, Some(individual_input), _) => (
                 Warrant {
                     id: WarrantId::new(),
@@ -149,20 +149,23 @@ impl Command for CreateWarrant {
             _ => return Err(Error::msg("individual or company is missing")),
         };
 
-        Ok(vec![WarrantCreated { warrant }.into()])
+        Ok(vec![WarrantCreated {
+            warrant: WarrantWithIdentity { warrant, identity },
+        }
+        .into()])
     }
 }
 
 impl From<WarrantWithIdentity> for CreateWarrantInput {
     fn from(item: WarrantWithIdentity) -> Self {
-        match item.1 {
+        match item.identity {
             WarrantIdentity::Individual(person) => Self {
-                type_: item.0.type_,
+                type_: item.warrant.type_,
                 individual: Some(person.into()),
                 company: None,
             },
             WarrantIdentity::Professional(professional) => Self {
-                type_: item.0.type_,
+                type_: item.warrant.type_,
                 individual: None,
                 company: Some(professional.into()),
             },

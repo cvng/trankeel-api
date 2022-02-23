@@ -13,7 +13,7 @@ use serde::Serialize;
 
 id!(CompanyId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Legalentitytype"]
 pub enum LegalEntityType {
     Eurl,
@@ -27,7 +27,17 @@ pub enum LegalEntityType {
     Snc,
 }
 
-#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(
+    Clone,
+    Debug,
+    Serialize,
+    AsChangeset,
+    Deserialize,
+    Identifiable,
+    Insertable,
+    Queryable,
+    SimpleObject,
+)]
 #[table_name = "companies"]
 pub struct Company {
     pub id: CompanyId,

@@ -18,7 +18,7 @@ pub type DiscussionItemRow = (Option<Candidacy>, Option<Lease>);
 
 pub type DiscussionWithMessages = (Discussion, Vec<Message>);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Discussionstatus"]
 pub enum DiscussionStatus {
     Active,
@@ -38,7 +38,17 @@ pub enum DiscussionItem {
     Lease(Lease),
 }
 
-#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    AsChangeset,
+    Identifiable,
+    Insertable,
+    Queryable,
+    SimpleObject,
+)]
 pub struct Discussion {
     pub id: DiscussionId,
     pub created_at: Option<DateTime>,

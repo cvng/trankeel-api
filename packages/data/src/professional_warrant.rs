@@ -6,7 +6,7 @@ use serde::Serialize;
 
 id!(ProfessionalWarrantId);
 
-#[derive(Clone, Debug, Serialize, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Queryable, SimpleObject)]
 pub struct ProfessionalWarrant {
     pub id: ProfessionalWarrantId,
     pub created_at: Option<DateTime>,

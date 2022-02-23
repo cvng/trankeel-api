@@ -52,6 +52,6 @@ impl From<trankeel::Warrant> for Warrant {
 
 impl From<trankeel::WarrantWithIdentity> for Warrant {
     fn from(item: trankeel::WarrantWithIdentity) -> Self {
-        item.0.into()
+        item.warrant.into()
     }
 }

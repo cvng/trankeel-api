@@ -88,7 +88,7 @@ pub enum PropertyUsageType {
     Individual,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Propertystatus"]
 pub enum PropertyStatus {
     ForSale,
@@ -104,7 +104,17 @@ impl Default for PropertyStatus {
     }
 }
 
-#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    AsChangeset,
+    Identifiable,
+    Insertable,
+    Queryable,
+    SimpleObject,
+)]
 #[table_name = "properties"]
 pub struct Property {
     pub id: PropertyId,

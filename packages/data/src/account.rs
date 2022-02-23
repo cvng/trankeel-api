@@ -14,7 +14,7 @@ use serde::Serialize;
 id!(AccountId);
 
 /// https://stripe.com/docs/billing/subscriptions/overview
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[graphql(name = "SubscriptionStatus")]
 #[DieselType = "Accountstatus"]
 pub enum AccountStatus {
@@ -33,7 +33,9 @@ impl Default for AccountStatus {
     }
 }
 
-#[derive(Clone, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(
+    Clone, Deserialize, Serialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject,
+)]
 pub struct Account {
     pub id: AccountId,
     pub created_at: Option<DateTime>,

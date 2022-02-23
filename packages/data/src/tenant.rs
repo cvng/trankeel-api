@@ -36,7 +36,17 @@ impl Default for TenantStatus {
     }
 }
 
-#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
+#[derive(
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    AsChangeset,
+    Identifiable,
+    Insertable,
+    Queryable,
+    SimpleObject,
+)]
 pub struct Tenant {
     pub id: TenantId,
     pub created_at: Option<DateTime>,
