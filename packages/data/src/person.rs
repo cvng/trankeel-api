@@ -18,7 +18,7 @@ use std::fmt;
 
 id!(PersonId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[graphql(name = "UserRole")]
 #[DieselType = "Personrole"]
 pub enum PersonRole {
@@ -36,7 +36,8 @@ impl Default for PersonRole {
     }
 }
 
-#[derive(Clone, Debug, Serialize, AsChangeset, Identifiable, Insertable, Queryable)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Person {
     pub id: PersonId,
     pub created_at: Option<DateTime>,

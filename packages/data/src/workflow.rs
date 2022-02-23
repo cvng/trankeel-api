@@ -23,7 +23,8 @@ pub enum WorkflowType {
     Candidacy,
 }
 
-#[derive(Clone, Debug, Serialize, Identifiable, Insertable, Queryable)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Workflow {
     pub id: WorkflowId,
     pub created_at: Option<DateTime>,

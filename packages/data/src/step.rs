@@ -34,17 +34,8 @@ impl From<String> for StepEvent {
     }
 }
 
-#[derive(
-    Clone,
-    Debug,
-    Associations,
-    Identifiable,
-    Insertable,
-    Queryable,
-    SimpleObject,
-    AsChangeset,
-    Serialize,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Associations, Identifiable, Insertable, Queryable, SimpleObject)]
 #[belongs_to(parent = "Workflow")]
 pub struct Step {
     pub id: StepId,

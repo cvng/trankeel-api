@@ -88,6 +88,19 @@ impl From<trankeel::WarrantIdentity> for WarrantIdentity {
 
 impl From<trankeel::WarrantWithIdentity> for WarrantIdentity {
     fn from(item: trankeel::WarrantWithIdentity) -> Self {
-        item.1.into()
+        item.identity.into()
+    }
+}
+
+#[derive(Union)]
+pub enum Workflowable {
+    Candidacy(Candidacy),
+}
+
+impl From<trankeel::Workflowable> for Workflowable {
+    fn from(item: trankeel::Workflowable) -> Self {
+        match item {
+            trankeel::Workflowable::Candidacy(inner) => Self::Candidacy(inner.into()),
+        }
     }
 }

@@ -56,9 +56,8 @@ impl Default for LeaseType {
     }
 }
 
-#[derive(
-    Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject, Serialize,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Lease {
     pub id: LeaseId,
     pub created_at: Option<DateTime>,

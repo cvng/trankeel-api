@@ -12,7 +12,7 @@ id!(MessageId);
 
 pub type MessageContent = String;
 
-#[derive(Clone, Debug, Serialize, Insertable, Queryable)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Queryable, SimpleObject)]
 pub struct Message {
     pub id: MessageId,
     pub created_at: Option<DateTime>,

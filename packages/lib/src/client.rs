@@ -26,6 +26,8 @@ use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
 use trankeel_core::dispatcher;
 use trankeel_core::error::Error;
+use trankeel_core::futures::Stream;
+use trankeel_core::listener;
 use trankeel_core::providers;
 use trankeel_core::providers::Messagerie;
 use trankeel_core::providers::Pdfmonkey;
@@ -111,6 +113,7 @@ pub struct Client(context::Context);
 
 impl Client {
     pub fn new(
+        config: Config,
         pg: Pg,
         pdfmonkey: Pdfmonkey,
         sendinblue: Sendinblue,
@@ -118,7 +121,7 @@ impl Client {
         stripe: Stripe,
     ) -> Self {
         Self(context::Context::new(
-            pg, pdfmonkey, sendinblue, messagerie, stripe,
+            config, pg, pdfmonkey, sendinblue, messagerie, stripe,
         ))
     }
 
@@ -629,6 +632,13 @@ impl Client {
 
         dispatcher::dispatch(&self.0, events).await
     }
+
+    #[named]
+    pub async fn listen(&self) -> Result<impl Stream<Item = Event>> {
+        log::info!("Command: {}", function_name!());
+
+        listener::listen(&self.0).await
+    }
 }
 
 pub fn init(config: &Config) -> Result<Client> {
@@ -638,5 +648,12 @@ pub fn init(config: &Config) -> Result<Client> {
     let messagerie = providers::Messagerie::init(pg.clone());
     let stripe = providers::Stripe::init(config);
 
-    Ok(Client::new(pg, pdfmonkey, sendinblue, messagerie, stripe))
+    Ok(Client::new(
+        config.clone(),
+        pg,
+        pdfmonkey,
+        sendinblue,
+        messagerie,
+        stripe,
+    ))
 }

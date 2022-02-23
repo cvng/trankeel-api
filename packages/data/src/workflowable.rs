@@ -16,7 +16,7 @@ impl From<CandidacyId> for WorkflowableId {
 
 pub type WorkflowableRow = (Workflow, Option<Candidacy>);
 
-#[derive(Clone, Serialize, Union)]
+#[derive(Clone, Serialize, Deserialize, Union)]
 pub enum Workflowable {
     Candidacy(Candidacy),
 }

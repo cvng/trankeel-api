@@ -5,6 +5,7 @@ mod objects;
 mod payloads;
 mod schema;
 mod unions;
+mod unions2;
 
 pub use crate::schema::build_schema;
 pub use crate::schema::write_schema;

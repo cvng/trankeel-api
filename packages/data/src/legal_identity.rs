@@ -22,7 +22,7 @@ impl From<CompanyId> for LegalIdentityId {
     }
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize, Union)]
 pub enum LegalIdentity {
     Individual(Person),
     Company(Company),
@@ -48,11 +48,5 @@ impl LegalIdentity {
             Self::Individual(person) => person.address.clone(),
             Self::Company(company) => company.address.clone(),
         }
-    }
-}
-
-impl From<Person> for LegalIdentity {
-    fn from(item: Person) -> Self {
-        Self::Individual(item)
     }
 }

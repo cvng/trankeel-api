@@ -582,7 +582,7 @@ impl database::WarrantStore for WarrantStore<'_> {
             _ => return Err(Error::new(NotFound)),
         };
 
-        Ok((warrant, identity))
+        Ok(WarrantWithIdentity { warrant, identity })
     }
 
     fn by_id(&mut self, id: &WarrantId) -> Result<WarrantWithIdentity> {
@@ -608,7 +608,7 @@ impl database::WarrantStore for WarrantStore<'_> {
     }
 
     fn create(&mut self, data: &WarrantWithIdentity) -> Result<WarrantWithIdentity> {
-        match (data.0.type_, data.1.clone()) {
+        match (data.warrant.type_, data.identity.clone()) {
             (WarrantType::Person, WarrantIdentity::Individual(person)) => {
                 let person = insert_into(persons::table)
                     .values(person)
@@ -617,11 +617,14 @@ impl database::WarrantStore for WarrantStore<'_> {
                 let warrant = insert_into(warrants::table)
                     .values(Warrant {
                         individual_id: Some(person.id),
-                        ..data.0
+                        ..data.warrant
                     })
                     .get_result(&self.0.get()?)?;
 
-                Ok((warrant, WarrantIdentity::Individual(person)))
+                Ok(WarrantWithIdentity {
+                    warrant,
+                    identity: WarrantIdentity::Individual(person),
+                })
             }
             (WarrantType::Visale, WarrantIdentity::Professional(professional)) => {
                 let professional = insert_into(professional_warrants::table)
@@ -631,11 +634,14 @@ impl database::WarrantStore for WarrantStore<'_> {
                 let warrant = insert_into(warrants::table)
                     .values(Warrant {
                         professional_id: Some(professional.id),
-                        ..data.0
+                        ..data.warrant
                     })
                     .get_result(&self.0.get()?)?;
 
-                Ok((warrant, WarrantIdentity::Professional(professional)))
+                Ok(WarrantWithIdentity {
+                    warrant,
+                    identity: WarrantIdentity::Professional(professional),
+                })
             }
             (WarrantType::Company, WarrantIdentity::Professional(professional)) => {
                 let professional = insert_into(professional_warrants::table)
@@ -645,11 +651,14 @@ impl database::WarrantStore for WarrantStore<'_> {
                 let warrant = insert_into(warrants::table)
                     .values(Warrant {
                         professional_id: Some(professional.id),
-                        ..data.0
+                        ..data.warrant
                     })
                     .get_result(&self.0.get()?)?;
 
-                Ok((warrant, WarrantIdentity::Professional(professional)))
+                Ok(WarrantWithIdentity {
+                    warrant,
+                    identity: WarrantIdentity::Professional(professional),
+                })
             }
             _ => Err(Error::new(NotFound)),
         }

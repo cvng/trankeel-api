@@ -15,7 +15,7 @@ use serde::Serialize;
 
 id!(AdvertisementId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Dummy, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Dummy, Enum)]
 #[DieselType = "Entryflexibility"]
 pub enum EntryFlexibility {
     OneDay,
@@ -23,7 +23,8 @@ pub enum EntryFlexibility {
     SevenDays,
 }
 
-#[derive(Clone, Debug, Serialize, AsChangeset, Dummy, Identifiable, Insertable, Queryable)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Dummy, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Advertisement {
     pub id: AdvertisementId,
     pub created_at: Option<DateTime>,

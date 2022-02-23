@@ -17,7 +17,7 @@ use serde::Serialize;
 
 id!(RentId);
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, DbEnum, Enum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DbEnum, Enum)]
 #[DieselType = "Rentstatus"]
 pub enum RentStatus {
     Open,
@@ -31,7 +31,8 @@ impl Default for RentStatus {
     }
 }
 
-#[derive(Clone, Serialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
+#[rustfmt::skip]
+#[derive(Clone, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Rent {
     pub id: RentId,
     pub created_at: Option<DateTime>,

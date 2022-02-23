@@ -1,5 +1,9 @@
 #[macro_use]
+extern crate async_graphql;
+#[macro_use]
 extern crate diesel;
+#[macro_use]
+extern crate serde;
 
 pub mod sql_schema;
 pub mod sql_types;

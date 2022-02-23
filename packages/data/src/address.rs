@@ -7,7 +7,7 @@ use trankeel_kit::locale;
 
 // # Types
 
-#[derive(Clone, Debug, Serialize, Deserialize, AsJsonb)]
+#[derive(Clone, Debug, Serialize, Deserialize, AsJsonb, SimpleObject)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
     pub city: String,

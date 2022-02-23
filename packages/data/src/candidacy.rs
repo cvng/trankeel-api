@@ -29,9 +29,8 @@ impl Default for CandidacyStatus {
     }
 }
 
-#[derive(
-    Clone, Debug, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject, Serialize,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 #[table_name = "candidacies"]
 pub struct Candidacy {
     pub id: CandidacyId,

@@ -3,19 +3,8 @@ use fake::Fake;
 #[macro_export]
 macro_rules! id {
     ($t:ident) => {
-        #[derive(
-            Copy,
-            Clone,
-            Default,
-            Debug,
-            PartialEq,
-            Eq,
-            Hash,
-            serde::Serialize,
-            serde::Deserialize,
-            diesel_derive_newtype::DieselNewType,
-            fake::Dummy,
-        )]
+        #[rustfmt::skip]
+        #[derive(Copy, Clone, Default, Debug, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize, diesel_derive_newtype::DieselNewType, fake::Dummy)]
         pub struct $t(pub(crate) uuid::Uuid);
 
         impl $t {

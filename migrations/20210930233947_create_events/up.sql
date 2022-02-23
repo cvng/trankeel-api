@@ -44,4 +44,4 @@ CREATE TABLE events (
     payload JSONB NOT NULL
 );
 
-SELECT manage_updated_at('events');
+SELECT manage_payload('events');
