@@ -35,6 +35,7 @@ impl Message {
             .into())
     }
 
+    #[graphql(name = "object")]
     async fn eventable(&self, ctx: &Context<'_>) -> Result<Option<Eventable>> {
         Ok(self
             .eventable_id

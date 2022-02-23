@@ -636,7 +636,7 @@ type Message {
 	type: EventType
 	eventableId: ID
 	sender: Person!
-	eventable: Eventable
+	object: Eventable
 }
 type MessagePushed {
 	message: Message!
