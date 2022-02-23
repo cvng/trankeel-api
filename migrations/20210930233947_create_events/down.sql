@@ -1,2 +1,4 @@
 DROP TABLE IF EXISTS events;
 DROP TYPE IF EXISTS eventtype;
+DROP FUNCTION IF EXISTS manage_event();
+DROP FUNCTION IF EXISTS app_notify_event();
