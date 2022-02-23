@@ -38,17 +38,8 @@ pub enum DiscussionItem {
     Lease(Lease),
 }
 
-#[derive(
-    Clone,
-    Debug,
-    Serialize,
-    Deserialize,
-    AsChangeset,
-    Identifiable,
-    Insertable,
-    Queryable,
-    SimpleObject,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Discussion {
     pub id: DiscussionId,
     pub created_at: Option<DateTime>,

@@ -23,18 +23,8 @@ pub enum EntryFlexibility {
     SevenDays,
 }
 
-#[derive(
-    Clone,
-    Debug,
-    Serialize,
-    AsChangeset,
-    Deserialize,
-    Dummy,
-    Identifiable,
-    Insertable,
-    Queryable,
-    SimpleObject,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Dummy, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Advertisement {
     pub id: AdvertisementId,
     pub created_at: Option<DateTime>,

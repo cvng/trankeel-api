@@ -104,17 +104,8 @@ impl Default for PropertyStatus {
     }
 }
 
-#[derive(
-    Clone,
-    Debug,
-    Serialize,
-    Deserialize,
-    AsChangeset,
-    Identifiable,
-    Insertable,
-    Queryable,
-    SimpleObject,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 #[table_name = "properties"]
 pub struct Property {
     pub id: PropertyId,

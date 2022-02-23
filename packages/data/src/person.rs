@@ -36,17 +36,8 @@ impl Default for PersonRole {
     }
 }
 
-#[derive(
-    Clone,
-    Debug,
-    Serialize,
-    Deserialize,
-    AsChangeset,
-    Identifiable,
-    Insertable,
-    Queryable,
-    SimpleObject,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Person {
     pub id: PersonId,
     pub created_at: Option<DateTime>,

@@ -31,9 +31,8 @@ impl Default for RentStatus {
     }
 }
 
-#[derive(
-    Clone, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Rent {
     pub id: RentId,
     pub created_at: Option<DateTime>,

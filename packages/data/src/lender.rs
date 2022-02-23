@@ -14,17 +14,8 @@ id!(LenderId);
 
 pub type LenderWithIdentity = (Lender, LegalIdentity);
 
-#[derive(
-    Clone,
-    Debug,
-    Serialize,
-    AsChangeset,
-    Identifiable,
-    Insertable,
-    Queryable,
-    SimpleObject,
-    Deserialize,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Lender {
     pub id: LenderId,
     pub created_at: Option<DateTime>,

@@ -27,17 +27,8 @@ pub enum LegalEntityType {
     Snc,
 }
 
-#[derive(
-    Clone,
-    Debug,
-    Serialize,
-    AsChangeset,
-    Deserialize,
-    Identifiable,
-    Insertable,
-    Queryable,
-    SimpleObject,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 #[table_name = "companies"]
 pub struct Company {
     pub id: CompanyId,

@@ -33,9 +33,8 @@ impl Default for AccountStatus {
     }
 }
 
-#[derive(
-    Clone, Deserialize, Serialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject,
-)]
+#[rustfmt::skip]
+#[derive(Clone, Serialize, Deserialize, AsChangeset, Identifiable, Insertable, Queryable, SimpleObject)]
 pub struct Account {
     pub id: AccountId,
     pub created_at: Option<DateTime>,
