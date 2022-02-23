@@ -65,7 +65,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION app_notify_payload() RETURNS trigger AS $$
 BEGIN
-    PERFORM pg_notify('events', NEW.payload::TEXT);
+    PERFORM pg_notify(TG_TABLE_NAME, NEW.payload::TEXT);
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
