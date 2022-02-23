@@ -1,7 +1,4 @@
 use function_name::named;
-use futures::Stream;
-use futures::StreamExt;
-use sqlx::postgres::PgListener;
 use trankeel_core::context;
 use trankeel_core::database::AccountStore;
 use trankeel_core::database::AdvertisementStore;
@@ -29,6 +26,8 @@ use trankeel_core::database::WarrantStore;
 use trankeel_core::database::WorkflowStore;
 use trankeel_core::dispatcher;
 use trankeel_core::error::Error;
+use trankeel_core::futures::Stream;
+use trankeel_core::listener;
 use trankeel_core::providers;
 use trankeel_core::providers::Messagerie;
 use trankeel_core::providers::Pdfmonkey;
@@ -114,6 +113,7 @@ pub struct Client(context::Context);
 
 impl Client {
     pub fn new(
+        config: Config,
         pg: Pg,
         pdfmonkey: Pdfmonkey,
         sendinblue: Sendinblue,
@@ -121,7 +121,7 @@ impl Client {
         stripe: Stripe,
     ) -> Self {
         Self(context::Context::new(
-            pg, pdfmonkey, sendinblue, messagerie, stripe,
+            config, pg, pdfmonkey, sendinblue, messagerie, stripe,
         ))
     }
 
@@ -637,13 +637,7 @@ impl Client {
     pub async fn listen(&self) -> Result<impl Stream<Item = Event>> {
         log::info!("Command: {}", function_name!());
 
-        let mut listener = PgListener::connect("postgres://cvng@localhost:5432/trankeel").await?; // TODO
-
-        listener.listen_all(vec!["events"]).await?;
-
-        Ok(listener
-            .into_stream()
-            .map(|res| serde_json::from_str(&res.unwrap().payload().to_owned()).unwrap()))
+        listener::listen(&self.0).await
     }
 }
 
@@ -654,5 +648,12 @@ pub fn init(config: &Config) -> Result<Client> {
     let messagerie = providers::Messagerie::init(pg.clone());
     let stripe = providers::Stripe::init(config);
 
-    Ok(Client::new(pg, pdfmonkey, sendinblue, messagerie, stripe))
+    Ok(Client::new(
+        config.clone(),
+        pg,
+        pdfmonkey,
+        sendinblue,
+        messagerie,
+        stripe,
+    ))
 }

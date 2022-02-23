@@ -3378,10 +3378,7 @@ name = "trankeel"
 version = "0.6.0"
 dependencies = [
  "function_name",
- "futures",
  "log",
- "serde_json",
- "sqlx",
  "trankeel-core",
  "trankeel-data",
  "trankeel-kit",
@@ -3441,6 +3438,7 @@ dependencies = [
  "sendinblue",
  "serde",
  "serde_json",
+ "sqlx",
  "thiserror",
  "tokio 0.2.25",
  "trankeel-data",
