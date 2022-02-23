@@ -1,4 +1,4 @@
-use crate::unions2::Event;
+use crate::unions2::Listenable;
 use async_graphql::futures_util::Stream;
 use async_graphql::futures_util::StreamExt;
 use async_graphql::Context;
@@ -10,7 +10,7 @@ pub struct Subscription;
 
 #[async_graphql::Subscription]
 impl Subscription {
-    async fn listen(&self, ctx: &Context<'_>) -> Result<impl Stream<Item = Event>> {
+    async fn listen(&self, ctx: &Context<'_>) -> Result<impl Stream<Item = Listenable>> {
         ctx.data::<AuthId>()?;
 
         Ok(ctx

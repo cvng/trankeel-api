@@ -15,6 +15,9 @@ type Account {
 	trialEnd: DateTime
 	plan: Plan
 }
+type AccountCreated {
+	account: Account!
+}
 type Address {
 	city: String!
 	country: String
@@ -47,6 +50,12 @@ type Advertisement {
 	description: String!
 	property: Property!
 }
+type AdvertisementCreated {
+	advertisement: Advertisement!
+}
+type AdvertisementUpdated {
+	advertisement: Advertisement!
+}
 scalar AuthenticationID
 type Candidacy {
 	id: ID!
@@ -65,6 +74,15 @@ type Candidacy {
 	warrants: [Warrant!]!
 	workflow: Workflow
 }
+type CandidacyAccepted {
+	candidacyId: ID!
+}
+type CandidacyCreated {
+	candidacy: Candidacy!
+}
+type CandidacyRejected {
+	candidacyId: ID!
+}
 enum CandidacyStatus {
 	PENDING
 	REJECTED
@@ -82,6 +100,9 @@ type Company implements LegalIdentityInterface {
 	legalEntityTypeOther: String
 	phoneNumber: PhoneNumber
 	displayName: String!
+}
+type CompanyCreated {
+	company: Company!
 }
 input CompleteStepInput {
 	id: ID!
@@ -293,10 +314,33 @@ type Discussion {
 	snippet: Message
 	messages: [Message!]!
 }
+type DiscussionCreated {
+	discussion: Discussion!
+	message: Message
+}
+type DiscussionDeleted {
+	discussionId: ID!
+}
 union DiscussionItem = | Candidacy | Lease
 enum DiscussionStatus {
 	ACTIVE
 	CANDIDACY
+}
+type Document {
+	id: String!
+	status: FileStatus!
+	documentTemplateId: String!
+	payload: String!
+	checksum: String!
+	downloadUrl: URL!
+	previewUrl: URL!
+	meta: String
+	errors: [String!]
+	createdAt: String!
+	updatedAt: String!
+}
+type DocumentGenerated {
+	document: Document!
 }
 scalar Email
 enum EntryFlexibility {
@@ -379,6 +423,30 @@ enum FileType {
 	PAYMENT_NOTICE
 	RENT_RECEIPT
 }
+type Invite {
+	id: ID!
+	createdAt: DateTime
+	updatedAt: DateTime
+	accountId: ID!
+	inviteeId: ID!
+	token: InviteToken!
+	status: InviteStatus!
+	reason: InviteReason!
+}
+type InviteAccepted {
+	inviteId: ID!
+	authId: AuthenticationID!
+}
+type InviteCreated {
+	invite: Invite!
+}
+enum InviteReason {
+	CANDIDACY_ACCEPTED
+}
+enum InviteStatus {
+	PENDING
+	ACCEPTED
+}
 scalar InviteToken
 type Lease {
 	id: ID!
@@ -404,6 +472,17 @@ type Lease {
 	tenants: [Tenant!]!
 	account: Account
 	property: Property!
+}
+type LeaseAffected {
+	leaseId: ID!
+	tenantId: ID!
+}
+type LeaseCreated {
+	lease: Lease!
+	rents: [Rent!]!
+}
+type LeaseDeleted {
+	leaseId: ID!
 }
 type LeaseDetails {
 	chargesRecuperationMode: RentChargesRecuperationMode
@@ -489,6 +568,9 @@ enum LeaseDuration {
 	THREE_YEARS
 	SIX_YEARS
 }
+type LeaseFileRequested {
+	leaseId: ID!
+}
 enum LeaseRentPeriodicity {
 	ANNUALY
 	MONTHLY
@@ -507,6 +589,9 @@ enum LeaseStatus {
 enum LeaseType {
 	FURNISHED
 	NAKED
+}
+type LeaseUpdated {
+	lease: Lease!
 }
 enum LegalEntityType {
 	EURL
@@ -533,6 +618,14 @@ type Lender {
 	displayName: String!
 	identity: LegalIdentity!
 }
+type LenderCreated {
+	lender: Lender!
+}
+type LenderUpdated {
+	lender: Lender!
+	identity: LegalIdentity!
+}
+union Listenable = | AccountCreated | AdvertisementCreated | AdvertisementUpdated | CandidacyAccepted | CandidacyCreated | CandidacyRejected | CompanyCreated | DiscussionCreated | DiscussionDeleted | DocumentGenerated | InviteAccepted | InviteCreated | LeaseAffected | LeaseCreated | LeaseDeleted | LeaseFileRequested | LeaseUpdated | LenderCreated | LenderUpdated | MessagePushed | NoticeCreated | PaymentCreated | PersonCreated | PropertyCreated | PropertyDeleted | PropertyUpdated | ReceiptCreated | ReceiptSent | StepCompleted | StepCreated | SubscriptionRequested | TenantCreated | TenantDeleted | TenantUpdated | WarrantCreated | WorkflowCreated
 type Message {
 	id: ID!
 	createdAt: DateTime
@@ -544,6 +637,9 @@ type Message {
 	eventableId: ID
 	sender: Person!
 	eventable: Eventable
+}
+type MessagePushed {
+	message: Message!
 }
 type Mutation {
 	createUserWithAccount(input: CreateUserWithAccountInput!): CreateUserWithAccountPayload!
@@ -570,6 +666,13 @@ type Mutation {
 	completeStep(input: CompleteStepInput!): CompleteStepPayload!
 	errors(input: PublicError!): PublicError!
 }
+type NoticeCreated {
+	notice: File!
+	rent: Rent!
+}
+type PaymentCreated {
+	payment: Transaction!
+}
 type Person implements PersonInterface & LegalIdentityInterface {
 	id: ID!
 	createdAt: DateTime
@@ -586,6 +689,9 @@ type Person implements PersonInterface & LegalIdentityInterface {
 	displayName: String!
 	account: Account!
 	accounts: [Account!]
+}
+type PersonCreated {
+	person: Person!
 }
 interface PersonInterface {
 	firstName: String!
@@ -654,6 +760,12 @@ enum PropertyBuildingLegalStatus {
 	COPRO
 	MONO
 }
+type PropertyCreated {
+	property: Property!
+}
+type PropertyDeleted {
+	propertyId: ID!
+}
 enum PropertyEnergyClass {
 	A
 	B
@@ -692,6 +804,9 @@ enum PropertyStatus {
 	UNDER_CONSTRUCTION
 	UNRENTED
 }
+type PropertyUpdated {
+	property: Property!
+}
 enum PropertyUsageType {
 	COLLECTIVE
 	INDIVIDUAL
@@ -723,6 +838,14 @@ type Query {
 	summary(since: DateTime!, until: DateTime!): Summary!
 	discussions(id: ID): [Discussion!]!
 	events: [Event!]!
+}
+type ReceiptCreated {
+	receipt: File!
+	rent: Rent!
+	payment: Transaction!
+}
+type ReceiptSent {
+	rentId: ID!
 }
 type Rent {
 	id: ID!
@@ -778,8 +901,23 @@ type Step {
 	completed: Boolean!
 	completedAt: DateTime
 }
+type StepCompleted {
+	stepId: ID!
+	requirements: [StepCompletedRequirement!]
+}
+type StepCompletedRequirement {
+	name: String!
+	value: String!
+}
+type StepCreated {
+	step: Step!
+}
 type Subscription {
-	viewer: AuthenticationID
+	listen: Listenable!
+}
+type SubscriptionRequested {
+	accountId: ID!
+	email: Email!
 }
 """
 https://stripe.com/docs/billing/subscriptions/overview
@@ -844,12 +982,24 @@ type Tenant implements PersonInterface {
 	discussion: Discussion!
 	lease: Lease
 }
+type TenantCreated {
+	tenant: Tenant!
+	identity: Person
+	warrants: [WarrantWithIdentity!]
+	discussion: Discussion
+}
+type TenantDeleted {
+	tenantId: ID!
+}
 enum TenantStatus {
 	CANDIDATE
 	GONE
 	LATE
 	NEW
 	UPTODATE
+}
+type TenantUpdated {
+	tenant: Tenant!
 }
 type Transaction {
 	id: ID!
@@ -967,20 +1117,32 @@ type Warrant {
 	candidacyId: ID
 	identity: WarrantIdentity!
 }
+type WarrantCreated {
+	warrant: WarrantWithIdentity!
+}
 union WarrantIdentity = | Person | ProfessionalWarrant
 enum WarrantType {
 	PERSON
 	VISALE
 	COMPANY
 }
+type WarrantWithIdentity {
+	warrant: Warrant!
+	identity: WarrantIdentity!
+}
 type Workflow {
 	id: ID!
 	type: WorkflowType!
 	steps: [Step!]!
 }
+type WorkflowCreated {
+	workflow: Workflow!
+	workflowable: Workflowable!
+}
 enum WorkflowType {
 	CANDIDACY
 }
+union Workflowable = | Candidacy
 schema {
 	query: Query
 	mutation: Mutation

@@ -6,6 +6,10 @@ use trankeel::FileStatus;
 use trankeel::FileType;
 use trankeel::Url;
 
+pub type Notice = File; // alias for a File
+
+pub type Receipt = File; // alias for a File
+
 #[derive(SimpleObject)]
 pub struct File {
     pub id: FileId,

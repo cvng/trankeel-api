@@ -12,6 +12,21 @@ use trankeel::WarrantId;
 use trankeel::WarrantType;
 
 #[derive(SimpleObject)]
+pub struct WarrantWithIdentity {
+    pub warrant: Warrant,
+    pub identity: WarrantIdentity,
+}
+
+impl From<trankeel::WarrantWithIdentity> for WarrantWithIdentity {
+    fn from(item: trankeel::WarrantWithIdentity) -> Self {
+        Self {
+            warrant: item.warrant.into(),
+            identity: item.identity.into(),
+        }
+    }
+}
+
+#[derive(SimpleObject)]
 #[graphql(complex)]
 pub struct Warrant {
     pub id: WarrantId,
