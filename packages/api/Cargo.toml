@@ -12,7 +12,7 @@ pdfmonkey = ["trankeel/pdfmonkey"]
 sendinblue = ["trankeel/sendinblue"]
 
 [dependencies]
-async-graphql-poem = "3.0.28"
+async-graphql-poem = "3.0.34"
 chrono = "0.4.19"
 dotenv = { version = "0.15.0", optional = true }
 firebase-admin-auth-rs = "0.1.0"
