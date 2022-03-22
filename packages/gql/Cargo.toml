@@ -7,6 +7,6 @@ edition = "2021"
 doctest = false
 
 [dependencies]
-async-graphql = { version = "3.0.28", features = ["apollo_tracing", "tracing"] }
+async-graphql = { version = "3.0.36", features = ["apollo_tracing", "tracing"] }
 serde = "1.0"
 trankeel = { path = "../lib" }
