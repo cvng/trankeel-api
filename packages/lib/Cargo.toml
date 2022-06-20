@@ -13,7 +13,7 @@ sendinblue = ["trankeel-core/sendinblue"]
 
 [dependencies]
 function_name = "0.2.0"
-log = "0.4.14"
+log = "0.4.17"
 trankeel-core = { path = "../core" }
 trankeel-data = { path = "../data" }
 trankeel-kit = { path = "../kit" }
