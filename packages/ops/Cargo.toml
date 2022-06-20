@@ -14,4 +14,4 @@ thiserror = "1.0.30"
 trankeel-data = { path = "../data" }
 serde = "1.0"
 serde_json = "1.0"
-validator = { version = "0.14.0", features = ["derive"] }
+validator = { version = "0.15.0", features = ["derive"] }
