@@ -138,9 +138,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-poem"
-version = "3.0.31"
+version = "3.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87f34deeb0567741045e72fbc1b81553f76d9f2ce7c2a52a404fc4032ae2172f"
+checksum = "70abe98993ad6da39162f7e4428af2de2b26da1834a32c2519dfcfbb1f58059c"
 dependencies = [
  "async-graphql",
  "futures-util",
